@@ -1,0 +1,32 @@
+services:
+  backend:
+    container_name: backend
+    build:
+      context: backend
+    image: transcendence_backend:dev_1.0
+    pull_policy: build
+    networks:
+      - transcendence_network
+    ports:
+      - 127.0.0.1:8080:8080
+    restart: unless-stopped
+
+  frontend:
+    container_name: frontend
+    build:
+      context: frontend
+    image: transcendence_frontend:dev_1.0
+    pull_policy: build
+    volumes:
+      - type: bind
+        source: ./frontend/src
+        target: /app/src
+    networks:
+      - transcendence_network
+    ports:
+      - 127.0.0.1:5173:5173
+    restart: unless-stopped
+
+networks:
+  transcendence_network:
+    driver: bridge

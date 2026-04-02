@@ -106,7 +106,7 @@ func main() {
 
 	router.PATCH("/api/users", patchUsers)
 
-	router.Run("localhost:" + strconv.Itoa(port))
+	router.Run("0.0.0.0:" + strconv.Itoa(port))
 }
 
 // -------------------------------------------------------------------------- //

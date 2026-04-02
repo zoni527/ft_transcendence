@@ -12,4 +12,6 @@ ${SRC_DIR}/backend/${BACKEND_EXEC}:
 fclean:
 	rm -f ${SRC_DIR}/backend/${BACKEND_EXEC}
 
+re: fclean all
+
 .PHONY: all clean fclean re run_backend

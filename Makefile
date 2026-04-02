@@ -10,7 +10,7 @@ run_frontend: build_frontend
 	docker run \
 		--detach \
 		--name frontend \
-		--publish 5173:5173 \
+		--publish 127.0.0.1:5173:5173 \
 		frontend:dev_1.0
 
 build_frontend:

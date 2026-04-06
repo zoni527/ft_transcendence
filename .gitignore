@@ -8,7 +8,10 @@ CLAUDE.md
 .vscode
 .DS_Store
 .env
+<<<<<<< HEAD
 architecture.html
+=======
+>>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 
 # Frontend
 src/frontend/node_modules

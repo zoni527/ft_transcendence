@@ -80,13 +80,14 @@ var recipes = []recipe{
 func main() {
 	fmt.Println("ft_transcendence")
 
-	// Connect to PostgreSQL
+	// Connect to PostgreSQL - Lily' testing
 	err := ConnectDB()
 	if err != nil {
 		fmt.Println("Database connection failed:", err)
 		return
 	}
 	defer CloseDB()
+	///connnect db ends here
 
 	port := 8080
 	argc := len(os.Args)

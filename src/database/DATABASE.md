@@ -97,7 +97,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 
 ## Accessing the Database
 
-### Via Adminer (Web UI)
+### Login Via Adminer (Web UI)
 
 1. Run `make` to start all containers
 2. Open `http://localhost:8081`

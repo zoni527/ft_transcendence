@@ -32,7 +32,6 @@ Variables:
 
 When the postgres container starts **for the first time**, it automatically runs all `.sql` files found in `src/database/` (mounted to `/docker-entrypoint-initdb.d/` inside the container) in **alphabetical order**.
 
-<<<<<<< HEAD
 **How does PostgreSQL know to run these files?** 
 It's not a PostgreSQL feature — it's built into the official PostgreSQL Docker image (`postgres:17-alpine`). The image creators programmed it to check the `docker-entrypoint-initdb.d` folder on first startup and execute any `.sql` files it finds. In `compose.yaml`, this line maps our local folder into that special folder:
 
@@ -43,9 +42,6 @@ volumes:
 
 This is why migration files are numbered:
 
-=======
-This is why migration files are numbered:
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 ```
 001_initial_schema.sql      ← runs first (current)
 002_add_comments_table.sql  ← would run second (future)
@@ -54,22 +50,15 @@ This is why migration files are numbered:
 
 All files modify the **same database** — they don't create separate databases.
 
-<<<<<<< HEAD
 > **Note:** Init scripts only run on a fresh database. If you change a migration file and want to re-initialize, reset the database volume from the project root:
 >
 > ```bash
 > make dbclean
-=======
-> **Note:** Init scripts only run on a fresh database. If you change a migration file and want to re-initialize, please delete the Docker volume first just like this:
-> ```bash
-> docker volume rm src_postgres_data
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 > ```
 
 ### UUID Primary Keys
 
 #### Why do we use UUID?
-<<<<<<< HEAD
 
 INTs are simple and small but predictable — a user could guess other users' IDs by just trying /api/users/2, /api/users/3. We don't want someone iterating through those numbers to scrape all user data.
 It can cause problems if we ever merge data from multiple sources (ID conflicts).
@@ -78,14 +67,6 @@ Example:
 - Server A creates a recipe with id = 1
 - Server B also creates a recipe with id = 1
   If we ever need to combine them into one database, both have id = 1 —-> conflict.
-=======
-INTs are simple and small but predictable — a user could guess other users' IDs by just trying /api/users/2, /api/users/3. We don't want someone iterating through those numbers to scrape all user data.
-It can cause problems if we ever merge data from multiple sources (ID conflicts).
-Example:
-- Server A creates a recipe with id = 1
-- Server B also creates a recipe with id = 1
-If we ever need to combine them into one database, both have id = 1 —-> conflict.
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 
 UUIDs are random and unguessable --> better for a web app with a public API and prevent conflicts when multiple services create records.
 
@@ -98,11 +79,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 **User Management:**
 | Table | Purpose |
 |---|---|
-<<<<<<< HEAD
 | `user` | User accounts (email, password hash, name, display name) |
-=======
-| `user` | User accounts (email, password hash, display name) |
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 | `role` | Role definitions (admin, moderator, chef, user) |
 | `permission` | Permission definitions (create_recipe, ban_user, etc.) |
 | `user_role` | Links users to roles (many-to-many) |
@@ -129,18 +106,11 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
 - **ON DELETE CASCADE** — deleting a user removes their favorites and roles. Deleting a recipe removes its steps, ingredients, and favorites.
 - **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship).
-<<<<<<< HEAD
   //can decide what we wanna do when an user is deleted!!!!! @TODO
 
 ## Accessing the Database
 
 ### Login Via Adminer (Web UI)
-=======
-
-## Accessing the Database
-
-### Via Adminer (Web UI)
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 
 1. Run `make` to start all containers
 2. Open `http://localhost:8081`
@@ -154,32 +124,19 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 ### Via command line
 
 ```bash
-<<<<<<< HEAD
 docker exec -it postgres psql -U dbuser -d ft_transcendence
-=======
-docker exec -it postgres psql -U transcendence -d transcendence
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 ```
 
 ## Port Configuration
 
 The postgres container runs on port **5433** on the host machine (mapped from 5432 inside the container). This avoids conflicts if we have PostgreSQL installed locally on machine.
 
-<<<<<<< HEAD
 | Service  | Internal Port | Host Port |
 | -------- | ------------- | --------- |
 | postgres | 5432          | 5433      |
 | adminer  | 8080          | 8081      |
 | backend  | 8080          | 8080      |
 | frontend | 5173          | 5173      |
-=======
-| Service | Internal Port | Host Port |
-|---|---|---|
-| postgres | 5432 | 5433 |
-| adminer | 8080 | 8081 |
-| backend | 8080 | 8080 |
-| frontend | 5173 | 5173 |
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 
 ## Changing .env Credentials
 
@@ -187,11 +144,7 @@ If you change `.env` values after the database has been created, you need to del
 
 ```bash
 make clean
-<<<<<<< HEAD
 make dbclean
-=======
-docker volume rm src_postgres_data
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)
 make
 ```
 
@@ -199,7 +152,6 @@ make
 
 1. Create a new file: `src/database/002_descriptive_name.sql`
 2. Write your `CREATE TABLE` or `ALTER TABLE` statements
-<<<<<<< HEAD
 3. Delete the volume and restart to re-initialize: `make dbclean`
 4. Or run the SQL manually via Adminer or psql
 
@@ -237,13 +189,3 @@ You should see "Connected to PostgreSQL" in the output.
 - [ ] Refactor existing hardcoded endpoints to query real database
 
 ![alt text](pic.png)
-=======
-3. Delete the volume and restart to re-initialize: `docker volume rm src_postgres_data`
-4. Or run the SQL manually via Adminer or psql
-
-## What's Next
-
-- [ ] Add `pgx` PostgreSQL driver to Go backend
-- [ ] Write DB connection code in Gin (startup)
-- [ ] Refactor existing hardcoded endpoints to query real database
->>>>>>> 6eebdbb (added database set up with docker, and wrote docs)

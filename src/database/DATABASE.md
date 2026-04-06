@@ -94,6 +94,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
 - **ON DELETE CASCADE** — deleting a user removes their favorites and roles. Deleting a recipe removes its steps, ingredients, and favorites.
 - **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship).
+//can decide what we wanna do when an user is deleted!!!!! @TODO
 
 ## Accessing the Database
 

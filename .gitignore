@@ -5,6 +5,7 @@
 .claude
 *.swp
 .vscode
+.DS_Store
 
 # Frontend
 src/frontend/node_modules

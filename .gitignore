@@ -2,6 +2,7 @@
 *.txt
 *.tmp
 *.temp
+.claude
 *.swp
 .vscode
 

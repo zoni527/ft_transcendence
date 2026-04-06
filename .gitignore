@@ -6,6 +6,7 @@
 *.swp
 .vscode
 .DS_Store
+.env
 
 # Frontend
 src/frontend/node_modules

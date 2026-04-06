@@ -80,8 +80,15 @@ var recipes = []recipe{
 func main() {
 	fmt.Println("ft_transcendence")
 
+	// Connect to PostgreSQL
+	err := ConnectDB()
+	if err != nil {
+		fmt.Println("Database connection failed:", err)
+		return
+	}
+	defer CloseDB()
+
 	port := 8080
-	err := error(nil)
 	argc := len(os.Args)
 	switch {
 	case argc >= 2:

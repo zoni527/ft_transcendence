@@ -112,7 +112,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 ### Via command line
 
 ```bash
-docker exec -it postgres psql -U transcendence -d transcendence
+docker exec -it postgres psql -U dbuser -d ft_transcendence
 ```
 
 ## Port Configuration
@@ -143,8 +143,31 @@ make
 3. Delete the volume and restart to re-initialize: `docker volume rm src_postgres_data`
 4. Or run the SQL manually via Adminer or psql
 
+## Backend ↔ Database Connection
+
+The backend connects to PostgreSQL using the `pgx` driver (via a connection pool).
+
+**How it works:**
+- `db.go` — contains `ConnectDB()` and `CloseDB()` functions
+- `ConnectDB()` reads the `DATABASE_URL` environment variable and opens a connection pool
+- A **connection pool** manages multiple connections so the backend can handle concurrent requests without opening a new connection each time
+- `main.go` calls `ConnectDB()` on startup and `CloseDB()` on shutdown via `defer`
+
+**`DATABASE_URL` format:**
+```
+postgres://username:password@host:port/database_name
+```
+
+Inside Docker, the host is `postgres` (the container name), not `localhost`.
+
+**Verifying the connection:**
+```bash
+docker logs backend
+```
+You should see "Connected to PostgreSQL" in the output.
+
 ## What's Next
 
-- [ ] Add `pgx` PostgreSQL driver to Go backend
-- [ ] Write DB connection code in Gin (startup)
+- [x] Add `pgx` PostgreSQL driver to Go backend
+- [x] Write DB connection code in Gin (startup)
 - [ ] Refactor existing hardcoded endpoints to query real database

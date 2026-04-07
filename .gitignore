@@ -6,7 +6,7 @@
 .vscode
 
 # Frontend
-./src/frontend/node_modules
+src/frontend/node_modules
 
 # Backend, name of executable might change in future
-./src/backend/backend
+src/backend/backend

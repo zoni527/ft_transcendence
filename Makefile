@@ -1,17 +1,15 @@
-SRC_DIR			:= ./src
-BACKEND_EXEC	:= backend
+# ---------------------------------------------------------------------------- #
+all:
+	docker compose --file ./src/compose.yaml up --detach
 
-all: run_backend
+clean:
+	docker compose --file ./src/compose.yaml down
 
-run_backend: ${SRC_DIR}/backend/${BACKEND_EXEC}
-	${SRC_DIR}/backend/${BACKEND_EXEC}
-
-${SRC_DIR}/backend/${BACKEND_EXEC}:
-	cd ${SRC_DIR}/backend; go build -o ${BACKEND_EXEC}
-
-fclean:
-	rm -f ${SRC_DIR}/backend/${BACKEND_EXEC}
+fclean: clean
+	docker rmi --force transcendence_backend:dev_1.0
+	docker rmi --force transcendence_frontend:dev_1.0
 
 re: fclean all
-
-.PHONY: all clean fclean re run_backend
+# ---------------------------------------------------------------------------- #
+.PHONY: all clean fclean re
+# ---------------------------------------------------------------------------- #

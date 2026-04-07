@@ -33,6 +33,7 @@ Variables:
 When the postgres container starts **for the first time**, it automatically runs all `.sql` files found in `src/database/` (mounted to `/docker-entrypoint-initdb.d/` inside the container) in **alphabetical order**.
 
 This is why migration files are numbered:
+
 ```
 001_initial_schema.sql      ← runs first (current)
 002_add_comments_table.sql  ← would run second (future)
@@ -42,6 +43,7 @@ This is why migration files are numbered:
 All files modify the **same database** — they don't create separate databases.
 
 > **Note:** Init scripts only run on a fresh database. If you change a migration file and want to re-initialize, please delete the Docker volume first just like this:
+>
 > ```bash
 > docker volume rm src_postgres_data
 > ```
@@ -49,12 +51,14 @@ All files modify the **same database** — they don't create separate databases.
 ### UUID Primary Keys
 
 #### Why do we use UUID?
+
 INTs are simple and small but predictable — a user could guess other users' IDs by just trying /api/users/2, /api/users/3. We don't want someone iterating through those numbers to scrape all user data.
 It can cause problems if we ever merge data from multiple sources (ID conflicts).
 Example:
+
 - Server A creates a recipe with id = 1
 - Server B also creates a recipe with id = 1
-If we ever need to combine them into one database, both have id = 1 —-> conflict.
+  If we ever need to combine them into one database, both have id = 1 —-> conflict.
 
 UUIDs are random and unguessable --> better for a web app with a public API and prevent conflicts when multiple services create records.
 
@@ -94,7 +98,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
 - **ON DELETE CASCADE** — deleting a user removes their favorites and roles. Deleting a recipe removes its steps, ingredients, and favorites.
 - **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship).
-//can decide what we wanna do when an user is deleted!!!!! @TODO
+  //can decide what we wanna do when an user is deleted!!!!! @TODO
 
 ## Accessing the Database
 
@@ -119,12 +123,12 @@ docker exec -it postgres psql -U dbuser -d ft_transcendence
 
 The postgres container runs on port **5433** on the host machine (mapped from 5432 inside the container). This avoids conflicts if we have PostgreSQL installed locally on machine.
 
-| Service | Internal Port | Host Port |
-|---|---|---|
-| postgres | 5432 | 5433 |
-| adminer | 8080 | 8081 |
-| backend | 8080 | 8080 |
-| frontend | 5173 | 5173 |
+| Service  | Internal Port | Host Port |
+| -------- | ------------- | --------- |
+| postgres | 5432          | 5433      |
+| adminer  | 8080          | 8081      |
+| backend  | 8080          | 8080      |
+| frontend | 5173          | 5173      |
 
 ## Changing .env Credentials
 
@@ -148,12 +152,14 @@ make
 The backend connects to PostgreSQL using the `pgx` driver (via a connection pool).
 
 **How it works:**
+
 - `db.go` — contains `ConnectDB()` and `CloseDB()` functions
 - `ConnectDB()` reads the `DATABASE_URL` environment variable and opens a connection pool
 - A **connection pool** manages multiple connections so the backend can handle concurrent requests without opening a new connection each time
 - `main.go` calls `ConnectDB()` on startup and `CloseDB()` on shutdown via `defer`
 
 **`DATABASE_URL` format:**
+
 ```
 postgres://username:password@host:port/database_name
 ```
@@ -161,9 +167,11 @@ postgres://username:password@host:port/database_name
 Inside Docker, the host is `postgres` (the container name), not `localhost`.
 
 **Verifying the connection:**
+
 ```bash
 docker logs backend
 ```
+
 You should see "Connected to PostgreSQL" in the output.
 
 ## What's Next
@@ -171,3 +179,5 @@ You should see "Connected to PostgreSQL" in the output.
 - [x] Add `pgx` PostgreSQL driver to Go backend
 - [x] Write DB connection code in Gin (startup)
 - [ ] Refactor existing hardcoded endpoints to query real database
+
+![alt text](pic.png)

@@ -3,17 +3,17 @@ import { cardBase } from '../styles/styles';
 import type { Recipe } from '../types/types';
 
 interface RecipeCardProps {
-  recipe: Recipe | undefined; // Undefined needed?
+  recipe: Recipe;
 }
 
 const RecipeCard = ({ recipe }: RecipeCardProps) => {
   const navigate = useNavigate();
 
-  if (!recipe) return <p>No recipe found</p>; // Note: Double-check this undefined return!!! (Better way to handle this?)
-
   return (
     <div
-      onClick={() => navigate(`/recipe/${recipe.id}`, { state: { recipe } })}
+      onClick={() =>
+        void navigate(`/recipe/${recipe.id}`, { state: { recipe } })
+      }
       className={`${cardBase} flex w-full flex-col transition-all duration-300 hover:-translate-y-2 hover:cursor-pointer hover:shadow-[0px_0px_10px_0px_rgba(0,0,0,0.4)]`}
     >
       {/* Recipe Image */}

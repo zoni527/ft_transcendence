@@ -1,4 +1,4 @@
-import getRecipes from '../api';
+import { getRecipes } from '../api';
 import { useEffect, useState } from 'react';
 import RecipeCard from '../components/RecipeCard';
 import type { Recipe } from '../types/types';

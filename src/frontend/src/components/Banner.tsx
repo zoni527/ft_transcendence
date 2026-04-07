@@ -5,7 +5,7 @@ const Banner = () => {
       <div className="absolute inset-0 bg-amber-700/40" />
 
       {/* Text Box */}
-      <div className="[cursive] relative z-10 flex h-full items-center justify-center text-center text-amber-950">
+      <div className="relative z-10 flex h-full items-center justify-center text-center text-amber-950">
         <h1
           style={{
             fontFamily: 'Dancing Script, cursive',

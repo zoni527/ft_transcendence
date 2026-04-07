@@ -6,7 +6,7 @@ const getRecipes = async () => {
   const response = await fetch(baseUrl);
 
   if (!response.ok) {
-    throw new Error('Failed to fetch notes');
+    throw new Error(`Failed to fetch recipes: ${response.status} ${response.statusText}`);
   }
 
   const data = (await response.json()) as Recipe[];

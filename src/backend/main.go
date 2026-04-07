@@ -106,7 +106,10 @@ func main() {
 
 	router.PATCH("/api/users", patchUsers)
 
-	router.Run("0.0.0.0:" + strconv.Itoa(port))
+	if err := router.Run("0.0.0.0:" + strconv.Itoa(port)); err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 // -------------------------------------------------------------------------- //

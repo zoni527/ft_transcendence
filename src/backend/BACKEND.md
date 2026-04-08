@@ -94,7 +94,7 @@ func CreateUser(u user) (user, error) {
 ```
 
 **Key points:**
-- `RETURNING` lets PostgreSQL send back auto-generated fields (id, created_at)
+- `RETURNING` lets PostgreSQL send ack auto-generated fields (id, created_at)
 - Don't insert `id` or `created_at` — the DB generates those
 
 ## HTTP Status Codes
@@ -107,23 +107,8 @@ func CreateUser(u user) (user, error) {
 | 404  | `http.StatusNotFound`             | Resource doesn't exist (wrong ID, etc.)  |
 | 500  | `http.StatusInternalServerError`  | Server/DB error (not the user's fault)   |
 
+
 ## Connecting Gin handlers to DB functions
 
-Once you have a DB function, replace the hardcoded handler:
-
-```go
-// Before (hardcoded)
-func getUsers(c *gin.Context) {
-    c.IndentedJSON(http.StatusOK, users)
-}
-
-// After (real DB)
-func getUsers(c *gin.Context) {
-    users, err := GetAllUsers()
-    if err != nil {
-        c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-    c.IndentedJSON(http.StatusOK, users)
-}
-```
+- `c.IndentedJSON(status, data)` — serializes the given struct as pretty JSON (indented + endlines) into the response body. First argument is the HTTP status code, second is the data to send.
+- `gin.H{"key": "value"}` — shorthand for creating a JSON object (used for error messages, etc.)b

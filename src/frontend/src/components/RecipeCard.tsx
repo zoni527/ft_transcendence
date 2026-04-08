@@ -19,14 +19,16 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
       {/* Recipe Image */}
       <img
         src={`/assets/${recipe.id}.jpg`}
-        alt={recipe.title}
+        alt={recipe?.title ?? 'N/A'}
         className="h-40 w-full rounded object-cover"
       />
 
       {/* Recipe Information Panel */}
       <div className="flex flex-1 flex-col p-3">
         {/* Recipe name */}
-        <h2 className="mb-3 truncate text-xl font-semibold">{recipe.title}</h2>
+        <h2 className="mb-3 truncate text-xl font-semibold">
+          {recipe?.title ?? 'N/A'}
+        </h2>
 
         {/* Bottom Row */}
         <div className="mt-auto flex items-center justify-between">
@@ -44,7 +46,11 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span>{recipe.prep_time_min + recipe.cook_time_min} min</span>
+          <span>
+            {recipe?.prep_time_min != null && recipe?.cook_time_min != null
+              ? recipe.prep_time_min + recipe.cook_time_min + ' min'
+              : 'N/A'}
+          </span>
         </div>
       </div>
     </div>

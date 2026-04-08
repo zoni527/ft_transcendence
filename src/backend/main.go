@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 )
 
 // -------------------------------------------------------------------------- //
@@ -156,13 +157,16 @@ func getRecipes(c *gin.Context) {
 func getUserById(c *gin.Context) {
 	id := c.Param("id")
 
-	for _, u := range users {
-		if u.Id == id {
-			c.IndentedJSON(http.StatusOK, u)
-			return
-		}
+	user, err := GetUserById(id)
+	if err == pgx.ErrNoRows {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "user not found"})
+		return
 	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "user not found"})
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, user)
 }
 
 func getRecipeById(c *gin.Context) {

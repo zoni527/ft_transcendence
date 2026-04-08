@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { cardBase, cardHighlight } from '../styles/styles';
 import type { Recipe } from '../types/types';
+import { cardBase, cardHighlight } from '../styles/styles';
 
 interface RecipeCardProps {
   recipe: Recipe;

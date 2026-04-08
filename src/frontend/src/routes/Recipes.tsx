@@ -1,5 +1,5 @@
-import { getRecipes } from '../api';
 import { useEffect, useState } from 'react';
+import { getRecipes } from '../api';
 import RecipeCard from '../components/RecipeCard';
 import type { Recipe } from '../types/types';
 

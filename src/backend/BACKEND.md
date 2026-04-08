@@ -5,6 +5,18 @@
 - **Gin** — HTTP framework (handles routes, requests, JSON responses)
 - **pgx** — PostgreSQL driver (talks to the database)
 
+## Architecture Layers
+
+```
+API layer (main.go)      → handles HTTP requests, sends JSON responses
+Database layer (db.go)   → handles SQL queries, returns Go structs
+PostgreSQL               → stores the actual data
+```
+In particular:
+- **main.go** — **Gin** routes and handlers. Receives a request, calls a db function, returns JSON.
+- **db.go** — pgx query functions (`GetAllUsers`, `CreateUser`, etc.). Only talks to the database.
+- Each layer only talks to the one below it.
+
 ## pgx Query Pattern
 
 ### 1. Query multiple rows

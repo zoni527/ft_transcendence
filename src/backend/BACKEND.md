@@ -25,11 +25,14 @@ Use `DB.Query()` to get multiple rows, then loop through them with `rows.Next()`
 
 ```go
 func GetAllUsers() ([]user, error) {
+
+    //DB.Query() returns a pgx.Rows object point to the result set of db.
     rows, err := DB.Query(context.Background(),
         `SELECT id, email, display_name, created_at FROM "user"`)
     if err != nil {
         return nil, err
     }
+    // releases the database connection back to the pool. If you forget to close, you'll leak connections and eventually run out.
     defer rows.Close()
 
     var users []user
@@ -93,6 +96,16 @@ func CreateUser(u user) (user, error) {
 **Key points:**
 - `RETURNING` lets PostgreSQL send back auto-generated fields (id, created_at)
 - Don't insert `id` or `created_at` — the DB generates those
+
+## HTTP Status Codes
+
+| Code | Constant                          | When to use                              |
+|------|-----------------------------------|------------------------------------------|
+| 200  | `http.StatusOK`                   | Success (GET, PATCH)                     |
+| 201  | `http.StatusCreated`              | Successfully created a resource (POST)   |
+| 400  | `http.StatusBadRequest`           | User sent invalid/missing data           |
+| 404  | `http.StatusNotFound`             | Resource doesn't exist (wrong ID, etc.)  |
+| 500  | `http.StatusInternalServerError`  | Server/DB error (not the user's fault)   |
 
 ## Connecting Gin handlers to DB functions
 

@@ -26,9 +26,9 @@ const Recipes = () => {
 
       <div className="grid grid-cols-1 gap-6 bg-white p-6 sm:grid-cols-2 md:grid-cols-4">
         {loading ? (
-          <p className="col-span-full text-center">Loading recipes...</p>
+          <p className="justify-self-start">Loading recipes...</p>
         ) : error ? (
-          <p className="col-span-full text-center text-red-500">{error}</p>
+          <p className="justify-self-start text-red-500">{error}</p>
         ) : (
           recipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />

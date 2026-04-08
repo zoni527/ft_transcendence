@@ -25,11 +25,24 @@ type user struct {
 }
 
 type recipe struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Created_at  string `json:"created_at"`
-	Updated_at  string `json:"updated_at"`
+	Id            string `json:"id"`
+	Author_id     string `json:"author_id"`
+	Title         string `json:"title"`
+	Description   string `json:"description"`
+	Prep_time_min int    `json:"prep_time_min"`
+	Cook_time_min int    `json:"cook_time_min"`
+	Servings      int    `json:"servings"`
+	Difficulty    string `json:"difficulty"`
+	Cuisine       string `json:"cuisine"`
+	Meal_type     string `json:"meal_type"`
+	Image_url     string `json:"image_url"`
+	Calories      int    `json:"calories"`
+	Protein_g     float64 `json:"protein_g"`
+	Carbs_g       float64 `json:"carbs_g"`
+	Fat_g         float64 `json:"fat_g"`
+	Is_published  bool   `json:"is_published"`
+	Created_at    string `json:"created_at"`
+	Updated_at    string `json:"updated_at"`
 }
 
 // -------------------------------------------------------------------------- //
@@ -64,15 +77,15 @@ var users = []user{
 }
 
 var recipes = []recipe{
-	{Id: "0", Name: "Recipe0", Description: "Description0"},
-	{Id: "1", Name: "Recipe1", Description: "Description1"},
-	{Id: "2", Name: "Recipe2", Description: "Description2"},
-	{Id: "3", Name: "Recipe3", Description: "Description3"},
-	{Id: "4", Name: "Recipe4", Description: "Description4"},
-	{Id: "5", Name: "Recipe5", Description: "Description5"},
-	{Id: "6", Name: "Recipe6", Description: "Description6"},
-	{Id: "7", Name: "Recipe7", Description: "Description7"},
-	{Id: "8", Name: "Recipe8", Description: "Description8"},
+	{Id: "0", Title: "Recipe0", Description: "Description0"},
+	{Id: "1", Title: "Recipe1", Description: "Description1"},
+	{Id: "2", Title: "Recipe2", Description: "Description2"},
+	{Id: "3", Title: "Recipe3", Description: "Description3"},
+	{Id: "4", Title: "Recipe4", Description: "Description4"},
+	{Id: "5", Title: "Recipe5", Description: "Description5"},
+	{Id: "6", Title: "Recipe6", Description: "Description6"},
+	{Id: "7", Title: "Recipe7", Description: "Description7"},
+	{Id: "8", Title: "Recipe8", Description: "Description8"},
 }
 
 // -------------------------------------------------------------------------- //
@@ -197,7 +210,7 @@ func postRecipes(c *gin.Context) {
 	}
 
 	// Field validation
-	if newRecipe.Name == "" ||
+	if newRecipe.Title == "" ||
 		newRecipe.Description == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": "bad request",

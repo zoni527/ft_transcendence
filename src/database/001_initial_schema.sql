@@ -12,6 +12,7 @@ CREATE TABLE "user" (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email           VARCHAR UNIQUE NOT NULL,
     password_hash   VARCHAR NOT NULL,
+    name            VARCHAR,
     display_name    VARCHAR NOT NULL,
     created_at      TIMESTAMP DEFAULT now()
 );

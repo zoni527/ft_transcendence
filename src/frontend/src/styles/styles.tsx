@@ -41,3 +41,11 @@ export const inputFieldBase = `
   focus:ring-amber-500
   focus:outline-none
 `;
+
+export const cardHighlight = `
+  transition-all
+  duration-300
+  hover:-translate-y-2
+  hover:cursor-pointer
+  hover:shadow-[0px_0px_10px_0px_rgba(0,0,0,0.4)]
+`;

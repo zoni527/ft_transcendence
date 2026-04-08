@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { cardBase } from '../styles/styles';
+import { cardBase, cardHighlight } from '../styles/styles';
 import type { Recipe } from '../types/types';
 
 interface RecipeCardProps {
@@ -14,7 +14,7 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
       onClick={() =>
         void navigate(`/recipe/${recipe.id}`, { state: { recipe } })
       }
-      className={`${cardBase} flex w-full flex-col transition-all duration-300 hover:-translate-y-2 hover:cursor-pointer hover:shadow-[0px_0px_10px_0px_rgba(0,0,0,0.4)]`}
+      className={`${cardBase} ${cardHighlight} flex w-full flex-col`}
     >
       {/* Recipe Image */}
       <img

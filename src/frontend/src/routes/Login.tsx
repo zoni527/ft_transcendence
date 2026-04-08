@@ -18,7 +18,7 @@ const Login = () => {
       </h1>
 
       {/* Input Fields */}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <InputField
           id="email"
           name="email"

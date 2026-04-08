@@ -16,7 +16,7 @@ const InputField = ({
   placeholder = '',
 }: InputFieldProps) => {
   return (
-    <div className="mb-6">
+    <div>
       <label htmlFor={id} className="text-md block font-medium text-gray-700">
         {label}
       </label>

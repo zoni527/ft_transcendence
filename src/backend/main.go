@@ -137,8 +137,13 @@ func main() {
 // GET
 
 // ---- All
-
+// Calling: GetAllUsers() from db.go
 func getUsers(c *gin.Context) {
+	users, err := GetAllUsers()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.IndentedJSON(http.StatusOK, users)
 }
 

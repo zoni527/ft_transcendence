@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -83,4 +84,24 @@ func GetAllUsers() ([]user, error) {
 		return nil, fmt.Errorf("error iterating user rows: %w", err)
 	}
 	return users, nil
+}
+
+//placeholder — $1 tells pgx "use the first parameter I pass in"
+func GetUserById(id string) (user, error) {
+	sql := `SELECT id, email, name, display_name, created_at
+			FROM "user"
+			WHERE id = $1`
+
+	var u user
+	err := DB.QueryRow(context.Background(), sql, id).Scan(&u.Id, &u.Email, &u.Name, &u.Display_name, &u.Created_at)
+
+	// built-in error that pgx defines
+	if err == pgx.ErrNoRows {
+		return user{}, pgx.ErrNoRows
+	}
+	
+	if err != nil {
+		return user{}, fmt.Errorf("error getting user by id: %w", err)
+	}
+	return u, nil
 }

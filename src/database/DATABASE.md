@@ -32,6 +32,14 @@ Variables:
 
 When the postgres container starts **for the first time**, it automatically runs all `.sql` files found in `src/database/` (mounted to `/docker-entrypoint-initdb.d/` inside the container) in **alphabetical order**.
 
+**How does PostgreSQL know to run these files?** 
+It's not a PostgreSQL feature — it's built into the official PostgreSQL Docker image (`postgres:17-alpine`). The image creators programmed it to check the `docker-entrypoint-initdb.d` folder on first startup and execute any `.sql` files it finds. In `compose.yaml`, this line maps our local folder into that special folder:
+
+```yaml
+volumes:
+  - ./database:/docker-entrypoint-initdb.d
+```
+
 This is why migration files are numbered:
 
 ```

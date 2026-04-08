@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
+import RecipeDetailField from '../components/RecipeDetailField';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -36,40 +37,75 @@ const RecipeDetail = () => {
           {/* Recipe Image */}
           <img
             src={`/assets/${recipe?.id}.jpg`}
-            alt={recipe?.title}
+            alt={recipe?.title ?? 'N/A'}
             className="mb-8 h-64 w-full rounded object-cover shadow-md md:h-80"
           />
 
           {/* Header */}
           <h1 className="mb-6 text-2xl font-semibold text-amber-900">
-            {recipe?.title}
+            {recipe?.title ?? 'N/A'}
           </h1>
 
-          {/* Recipe Info */}
-          <div className="mb-6">
-            <p className="text-lg">
-              <strong>Description:</strong> {recipe?.description}
-            </p>
+          {/* Description */}
+          <h2 className="mb-6 text-lg font-semibold">
+            {recipe?.description ?? 'N/A'}
+          </h2>
+
+          {/* Recipe Info Fields */}
+          <div className="mt-6 flex gap-8">
+            {/* Left */}
+            <div className="flex-1 space-y-2">
+              <RecipeDetailField
+                label="Author"
+                value={recipe?.author_id ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Preparation (minutes)'}
+                value={recipe?.prep_time_min ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Cooking (minutes)'}
+                value={recipe?.cook_time_min ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Servings'}
+                value={recipe?.servings ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Difficulty'}
+                value={recipe?.difficulty ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Likes'}
+                value={recipe?.has_been_favorite_times ?? 'N/A'}
+              />
+            </div>
+
+            {/* Right */}
+            <div className="flex-1 space-y-2">
+              <RecipeDetailField
+                label="Calories"
+                value={recipe?.calories ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Protein (grams)'}
+                value={recipe?.protein_g ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Carbohydrates (grams'}
+                value={recipe?.carbs_g ?? 'N/A'}
+              />
+              <RecipeDetailField
+                label={'Fat (grams)'}
+                value={recipe?.fat_g ?? 'N/A'}
+              />
+            </div>
           </div>
 
-          <div className="space-y-1">
-            <p className="text-lg">
-              <strong>Calories:</strong> {recipe?.calories}
-            </p>
-
-            <p className="text-lg">
-              <strong>Protein g:</strong> {recipe?.protein_g}
-            </p>
-
-            <p className="text-lg">
-              <strong>Carbs (g):</strong> {recipe?.carbs_g}
-            </p>
-          </div>
-
-          {/* Likes */}
+          {/* Like */}
           <div className="mt-6">
             <p className="text-md max-w-[80%]">
-              Likes: {recipe?.has_been_favorite_times}
+              Like: {recipe?.has_been_favorite_times}
             </p>
             <button
               className="text-amber-500 transition-colors hover:cursor-pointer hover:text-amber-600 hover:shadow-xl"

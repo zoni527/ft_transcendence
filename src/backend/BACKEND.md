@@ -62,14 +62,20 @@ Use `DB.Query()` to get multiple rows, then loop through them with `rows.Next()`
 
 ```go
 func GetAllUsers() ([]user, error) {
+<<<<<<< HEAD
 
     //DB.Query() returns a pgx.Rows object point to the result set of db.
+=======
+>>>>>>> 1f7e94a (docs: add BACKEND.md guide and improve db.go comments)
     rows, err := DB.Query(context.Background(),
         `SELECT id, email, display_name, created_at FROM "user"`)
     if err != nil {
         return nil, err
     }
+<<<<<<< HEAD
     // releases the database connection back to the pool. If you forget to close, you'll leak connections and eventually run out.
+=======
+>>>>>>> 1f7e94a (docs: add BACKEND.md guide and improve db.go comments)
     defer rows.Close()
 
     var users []user

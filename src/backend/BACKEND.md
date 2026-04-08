@@ -17,6 +17,15 @@ In particular:
 - **db.go** — pgx query functions (`GetAllUsers`, `CreateUser`, etc.). Only talks to the database.
 - Each layer only talks to the one below it.
 
+## How a query works (flow)
+
+1. Go code sends SQL to **PostgreSQL** via pgx
+2. PostgreSQL searches the table (uses index for PRIMARY KEY lookups — very fast, like a map)
+3. PostgreSQL sends back the matching row(s)
+4. `Scan()` reads the result into your Go struct
+
+The database does the searching — Go just asks and receives. No for-loop needed for single-row lookups.
+
 ## pgx Query Pattern
 
 ### 1. Query multiple rows

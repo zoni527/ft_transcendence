@@ -144,7 +144,7 @@ If you change `.env` values after the database has been created, you need to del
 
 ```bash
 make clean
-docker volume rm src_postgres_data
+make dbclean
 make
 ```
 
@@ -152,7 +152,7 @@ make
 
 1. Create a new file: `src/database/002_descriptive_name.sql`
 2. Write your `CREATE TABLE` or `ALTER TABLE` statements
-3. Delete the volume and restart to re-initialize: `docker volume rm src_postgres_data`
+3. Delete the volume and restart to re-initialize: `make dbclean`
 4. Or run the SQL manually via Adminer or psql
 
 ## Backend ↔ Database Connection

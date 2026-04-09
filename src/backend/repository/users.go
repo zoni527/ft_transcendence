@@ -28,7 +28,7 @@ func GetRolesByUserId(userId string) ([]string, error) {
 			JOIN role r ON ur.role_id = r.id
 			WHERE ur.user_id = $1`
 
-	rows, err := DB.Query(context.Background(), sql, userId)
+	rows, err := Pool.Query(context.Background(), sql, userId)
 	if err != nil {
 		return nil, fmt.Errorf("error querying roles: %w", err)
 	}
@@ -53,7 +53,7 @@ func GetAllUsers() ([]models.User, error) {
 	sql := `SELECT id, email, name, display_name, created_at
 			FROM "user" `
 
-	rows, err := DB.Query(context.Background(), sql)
+	rows, err := Pool.Query(context.Background(), sql)
 	if err != nil {
 		return nil, fmt.Errorf("error querying users: %w", err)
 	}
@@ -98,7 +98,7 @@ func GetUserById(id string) (models.User, error) {
 			WHERE id = $1`
 
 	var u models.User
-	err := DB.QueryRow(context.Background(), sql, id).Scan(&u.Id, &u.Email, &u.Name, &u.Display_name, &u.Created_at)
+	err := Pool.QueryRow(context.Background(), sql, id).Scan(&u.Id, &u.Email, &u.Name, &u.Display_name, &u.Created_at)
 
 	if err == pgx.ErrNoRows {
 		return models.User{}, pgx.ErrNoRows

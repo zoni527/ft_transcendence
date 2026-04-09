@@ -15,12 +15,12 @@ import (
 func main() {
 	fmt.Println("ft_transcendence")
 
-	err := repository.ConnectDB()
+	err := repository.ConnectPool()
 	if err != nil {
 		fmt.Println("Database connection failed:", err)
 		return
 	}
-	defer repository.CloseDB()
+	defer repository.ClosePool()
 
 	port := 8080
 	argc := len(os.Args)

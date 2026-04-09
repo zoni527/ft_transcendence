@@ -34,7 +34,7 @@ func GetAllRecipes() ([]models.Recipe, error) {
 			WHERE is_published = true
 			ORDER BY created_at DESC`
 
-	rows, err := DB.Query(context.Background(), sql)
+	rows, err := Pool.Query(context.Background(), sql)
 	if err != nil {
 		return nil, fmt.Errorf("error querying recipes: %w", err)
 	}
@@ -76,7 +76,7 @@ func GetRecipeById(id string) (models.Recipe, error) {
 			WHERE id = $1`
 
 	var r models.Recipe
-	err := DB.QueryRow(context.Background(), sql, id).Scan(
+	err := Pool.QueryRow(context.Background(), sql, id).Scan(
 		&r.Id, &r.Author_id, &r.Title, &r.Description,
 		&r.Prep_time_min, &r.Cook_time_min, &r.Servings,
 		&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,

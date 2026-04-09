@@ -17,6 +17,34 @@ In particular:
 - **db.go** — pgx query functions (`GetAllUsers`, `CreateUser`, etc.). Only talks to the database.
 - Each layer only talks to the one below it.
 
+## Connection Pool (pgxpool)
+
+The pool is like a **circle** with multiple **straws** sticking into it — each straw is a connection to PostgreSQL, and the items rolling through those straws are queries (requests).
+
+```
+                    ┌──────────────┐
+    handler A ───→  │              │ ───→  PostgreSQL
+    handler B ───→  │   Pool (DB)  │ ───→  PostgreSQL
+    handler C ───→  │              │ ───→  PostgreSQL
+                    └──────────────┘
+                     3 connections
+                     reused by all
+```
+
+- **Connection** — a persistent link between the app and PostgreSQL (a straw)
+- **Query** — a single `DB.Query()` or `DB.QueryRow()` call sent through a connection (an item in the straw)
+- **Pool** — manages the connections. Reuses them, replaces broken ones, and queues requests if all are busy
+
+One connection handles many queries over its lifetime, one at a time. The pool keeps several open so multiple requests can run in parallel.
+
+**How it works:**
+1. App starts → `ConnectDB()` opens the pool (stored in `repository.DB`)
+2. A handler calls a repository function → pool picks an idle connection
+3. Query runs on PostgreSQL → result comes back
+4. Connection returns to the pool, ready for the next query
+
+You never open or close connections yourself — the pool handles it all.
+
 ## How a query works (flow)
 
 1. Go code sends SQL to **PostgreSQL** via pgx

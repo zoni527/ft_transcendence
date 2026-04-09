@@ -93,4 +93,8 @@ func GetRecipeById(id string) (models.Recipe, error) {
 	}
 
 	return r, nil
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 0c8c55d (feat: implement GetAllRecipes and GetRecipeById endpoints)

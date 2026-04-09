@@ -1,6 +1,6 @@
 package repository
 
-// Ingredient DB functions needed:
+// Ingredient repository functions needed:
 // [TODO] GetAllIngredients          — GET /api/ingredients
 // [TODO] CreateIngredient           — POST /api/ingredients
 // [TODO] GetAllIngredientCategories — GET /api/ingredient-categories

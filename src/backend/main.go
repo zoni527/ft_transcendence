@@ -11,19 +11,19 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
 )
 
 // -------------------------------------------------------------------------- //
 // Structs
 
 type user struct {
-	Id            string `json:"id"`
-	Email         string `json:"email"`
-	Password_hash string `json:"-"`
-	Name          string `json:"name"`
-	Display_name  string `json:"display_name"`
+	Id            string    `json:"id"`
+	Email         string    `json:"email"`
+	Password_hash string    `json:"-"`
+	Name          string    `json:"name"`
+	Display_name  string    `json:"display_name"`
 	Created_at    time.Time `json:"created_at"`
+	Roles         []string  `json:"roles"`
 }
 
 type recipe struct {
@@ -93,39 +93,11 @@ func main() {
 }
 
 // -------------------------------------------------------------------------- //
-// GET
-
-// ---- All
-// Calling: GetAllUsers() from db.go
-func getUsers(c *gin.Context) {
-	users, err := GetAllUsers()
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.IndentedJSON(http.StatusOK, users)
-}
+// Recipe handlers (TODO: move to recipes_handlers.go later)
 
 func getRecipes(c *gin.Context) {
 	// TODO: replace with GetAllRecipes() from db.go
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
-}
-
-// ---- By Id
-
-func getUserById(c *gin.Context) {
-	id := c.Param("id")
-
-	user, err := GetUserById(id)
-	if err == pgx.ErrNoRows {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "user not found"})
-		return
-	}
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.IndentedJSON(http.StatusOK, user)
 }
 
 func getRecipeById(c *gin.Context) {
@@ -133,24 +105,8 @@ func getRecipeById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
 }
 
-// -------------------------------------------------------------------------- //
-// POST
-
-func postUsers(c *gin.Context) {
-	// TODO: replace with CreateUser() from db.go
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
-}
-
 func postRecipes(c *gin.Context) {
 	// TODO: replace with CreateRecipe() from db.go
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
-}
-
-// -------------------------------------------------------------------------- //
-// PATCH
-
-func patchUsers(c *gin.Context) {
-	// TODO: replace with UpdateUser() from db.go
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
 }
 

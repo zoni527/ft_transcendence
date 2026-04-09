@@ -79,7 +79,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 **User Management:**
 | Table | Purpose |
 |---|---|
-| `user` | User accounts (email, password hash, display name) |
+| `user` | User accounts (email, password hash, name, display name) |
 | `role` | Role definitions (admin, moderator, chef, user) |
 | `permission` | Permission definitions (create_recipe, ban_user, etc.) |
 | `user_role` | Links users to roles (many-to-many) |

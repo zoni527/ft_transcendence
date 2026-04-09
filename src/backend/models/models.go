@@ -1,8 +1,14 @@
 package models
 
-// Structs live here so both db/ and handlers/ can import them.
+// Structs live here so both repository/ and handlers/ can import them.
 // In Go, a type must start with a CAPITAL letter to be visible
 // outside its package. That's why it's "User" not "user".
+
+
+//  In Go, capitalization controls visibility:
+// User (capital) → exported — accessible from other packages
+// user (lowercase) → unexported — only usable inside the same package
+// This applies to everything: structs, functions, variables, fields. That's why our struct fields are Id, Title, Email — if they were id, title, email, the JSON serializer (which lives in another package) couldn't access them.
 
 import "time"
 

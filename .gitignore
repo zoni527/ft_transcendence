@@ -3,6 +3,7 @@
 *.tmp
 *.temp
 .claude
+CLAUDE.md
 *.swp
 .vscode
 .DS_Store

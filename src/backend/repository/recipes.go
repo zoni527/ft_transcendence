@@ -18,6 +18,10 @@ import (
 )
 
 // GetAllRecipes returns all published recipes.
+// COALESCE(column, fallback) — if column is NULL, use the fallback value instead.
+// We need this because pgx can't scan NULL into a Go string or int!!!
+// Example: COALESCE(image_url, '') → if image_url is NULL, return '' instead.
+//          COALESCE(calories, 0)   → if calories is NULL, return 0 instead.
 func GetAllRecipes() ([]models.Recipe, error) {
 	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
 				COALESCE(prep_time_min, 0), COALESCE(cook_time_min, 0),

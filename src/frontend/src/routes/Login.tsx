@@ -1,13 +1,33 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
 import { cardBase, buttonBase } from '../styles/styles';
 
 const Login = () => {
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  //   const navigate = useNavigate();
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    void navigate('/dashboard'); // This will have a proper authentication and fetch of the user detail from the backend
+    setError('');
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    // Helper to safely get string values
+    function getStringValue(name: string): string {
+      const value = formData.get(name);
+      if (typeof value === 'string') return value.trim();
+      return '';
+    }
+
+    const email = getStringValue('email');
+    const password = getStringValue('password');
+
+    if (!email || !password) {
+      setError('All fields are required.');
+      return;
+    }
   };
 
   return (
@@ -19,6 +39,7 @@ const Login = () => {
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Email */}
         <InputField
           id="email"
           name="email"
@@ -27,6 +48,7 @@ const Login = () => {
           placeholder="Enter your email"
         />
 
+        {/* Password */}
         <InputField
           id="password"
           name="password"
@@ -35,8 +57,13 @@ const Login = () => {
           placeholder="Enter your password"
         />
 
+        {/* Errors & Warnings */}
+        <p className="text-md min-h-5 text-center text-red-500">
+          {error || '\u00A0'}
+        </p>
+
         {/* Submit Button */}
-        <button type="submit" className={`${buttonBase} mt-6`}>
+        <button type="submit" className={`${buttonBase}`}>
           Continue
         </button>
       </form>

@@ -8,6 +8,7 @@ CLAUDE.md
 .vscode
 .DS_Store
 .env
+architecture.html
 
 # Frontend
 src/frontend/node_modules

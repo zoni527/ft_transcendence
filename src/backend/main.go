@@ -44,7 +44,7 @@ func main() {
 	router.PATCH("/api/users", handlers.PatchUser)
 
 	// Recipes
-	router.GET("/api/recipes", handlers.GetRecipes)
+	router.GET("/api/recipes", handlers.GetAllRecipes)
 	router.GET("/api/recipes/:id", handlers.GetRecipeById)
 	router.POST("/api/recipes", handlers.PostRecipe)
 

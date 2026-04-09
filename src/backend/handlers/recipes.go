@@ -1,8 +1,8 @@
 package handlers
 
 // Recipe handlers needed:
-// [TODO] GetRecipes      — GET /api/recipes (parse query params for filters)
-// [TODO] GetRecipeById   — GET /api/recipes/:id
+// [done] GetAllRecipes   — GET /api/recipes
+// [done] GetRecipeById   — GET /api/recipes/:id
 // [TODO] PostRecipe      — POST /api/recipes (validate + call CreateRecipe)
 // [TODO] PutRecipe       — PUT /api/recipes/:id
 // [TODO] PatchRecipe     — PATCH /api/recipes/:id
@@ -11,21 +11,36 @@ package handlers
 
 import (
 	"net/http"
-
+	"ft_transcendence/backend/repository"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 )
 
-func GetRecipes(c *gin.Context) {
-	// TODO: call db.GetAllRecipes()
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
+func GetAllRecipes(c *gin.Context) {
+	recipes, err := repository.GetAllRecipes()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, recipes)
 }
 
 func GetRecipeById(c *gin.Context) {
-	// TODO: call db.GetRecipeById()
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
+	id := c.Param("id")
+
+	recipe, err := repository.GetRecipeById(id)
+	if err == pgx.ErrNoRows {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "recipe not found"})
+		return
+	}
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, recipe)
 }
 
 func PostRecipe(c *gin.Context) {
-	// TODO: call db.CreateRecipe()
+	// TODO: call repository.CreateRecipe()
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
 }

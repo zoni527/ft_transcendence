@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import RecipeDetailField from '../components/RecipeDetailField';
+import DetailField from '../components/DetailField';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -55,27 +55,24 @@ const RecipeDetail = () => {
           <div className="mt-6 flex gap-8">
             {/* Left */}
             <div className="flex-1 space-y-2">
-              <RecipeDetailField
-                label="Author"
-                value={recipe?.author_id ?? 'N/A'}
-              />
-              <RecipeDetailField
+              <DetailField label="Author" value={recipe?.author_id ?? 'N/A'} />
+              <DetailField
                 label={'Preparation (minutes)'}
                 value={recipe?.prep_time_min ?? 'N/A'}
               />
-              <RecipeDetailField
+              <DetailField
                 label={'Cooking (minutes)'}
                 value={recipe?.cook_time_min ?? 'N/A'}
               />
-              <RecipeDetailField
+              <DetailField
                 label={'Servings'}
                 value={recipe?.servings ?? 'N/A'}
               />
-              <RecipeDetailField
+              <DetailField
                 label={'Difficulty'}
                 value={recipe?.difficulty ?? 'N/A'}
               />
-              <RecipeDetailField
+              <DetailField
                 label={'Likes'}
                 value={recipe?.has_been_favorite_times ?? 'N/A'}
               />
@@ -83,19 +80,16 @@ const RecipeDetail = () => {
 
             {/* Right */}
             <div className="flex-1 space-y-2">
-              <RecipeDetailField
-                label="Calories"
-                value={recipe?.calories ?? 'N/A'}
-              />
-              <RecipeDetailField
+              <DetailField label="Calories" value={recipe?.calories ?? 'N/A'} />
+              <DetailField
                 label={'Protein (grams)'}
                 value={recipe?.protein_g ?? 'N/A'}
               />
-              <RecipeDetailField
+              <DetailField
                 label={'Carbohydrates (grams'}
                 value={recipe?.carbs_g ?? 'N/A'}
               />
-              <RecipeDetailField
+              <DetailField
                 label={'Fat (grams)'}
                 value={recipe?.fat_g ?? 'N/A'}
               />

@@ -43,7 +43,7 @@ export const getRecipeById = async (id: string): Promise<Recipe> => {
 export const postSignup = async (
   payload: SignupPayload,
 ): Promise<SignupResponse> => {
-  const response = await fetch(`${baseUrl}users`, {
+  const response = await fetch(`${baseUrl}/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

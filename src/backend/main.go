@@ -1,65 +1,26 @@
-// -------------------------------------------------------------------------- //
-
 package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"strconv"
-	"time"
+
+	"ft_transcendence/backend/repository"
+	"ft_transcendence/backend/handlers"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-// -------------------------------------------------------------------------- //
-// Structs
-
-type user struct {
-	Id            string    `json:"id"`
-	Email         string    `json:"email"`
-	Password_hash string    `json:"-"`
-	Name          string    `json:"name"`
-	Display_name  string    `json:"display_name"`
-	Created_at    time.Time `json:"created_at"`
-	Roles         []string  `json:"roles"`
-}
-
-type recipe struct {
-	Id            string `json:"id"`
-	Author_id     string `json:"author_id"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Prep_time_min int    `json:"prep_time_min"`
-	Cook_time_min int    `json:"cook_time_min"`
-	Servings      int    `json:"servings"`
-	Difficulty    string `json:"difficulty"`
-	Cuisine       string `json:"cuisine"`
-	Meal_type     string `json:"meal_type"`
-	Image_url     string `json:"image_url"`
-	Calories      int    `json:"calories"`
-	Protein_g     float64 `json:"protein_g"`
-	Carbs_g       float64 `json:"carbs_g"`
-	Fat_g         float64 `json:"fat_g"`
-	Is_published  bool   `json:"is_published"`
-	Created_at    string `json:"created_at"`
-	Updated_at    string `json:"updated_at"`
-}
-
-// -------------------------------------------------------------------------- //
-
 func main() {
 	fmt.Println("ft_transcendence")
 
-	// Connect to PostgreSQL - Lily' testing
-	err := ConnectDB()
+	err := repository.ConnectDB()
 	if err != nil {
 		fmt.Println("Database connection failed:", err)
 		return
 	}
-	defer CloseDB()
-	///connnect db ends here
+	defer repository.CloseDB()
 
 	port := 8080
 	argc := len(os.Args)
@@ -74,40 +35,21 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.Use(cors.Default()) // All origins allowed by default
+	router.Use(cors.Default())
 
-	router.GET("/api/users", getUsers)
-	router.GET("/api/users/:id", getUserById)
-	router.GET("/api/recipes", getRecipes)
-	router.GET("/api/recipes/:id", getRecipeById)
+	// Users
+	router.GET("/api/users", handlers.GetUsers)
+	router.GET("/api/users/:id", handlers.GetUserById)
+	router.POST("/api/users", handlers.PostUser)
+	router.PATCH("/api/users", handlers.PatchUser)
 
-	router.POST("/api/users", postUsers)
-	router.POST("/api/recipes", postRecipes)
-
-	router.PATCH("/api/users", patchUsers)
+	// Recipes
+	router.GET("/api/recipes", handlers.GetRecipes)
+	router.GET("/api/recipes/:id", handlers.GetRecipeById)
+	router.POST("/api/recipes", handlers.PostRecipe)
 
 	if err := router.Run("0.0.0.0:" + strconv.Itoa(port)); err != nil {
 		fmt.Println(err)
 		return
 	}
 }
-
-// -------------------------------------------------------------------------- //
-// Recipe handlers (TODO: move to recipes_handlers.go later)
-
-func getRecipes(c *gin.Context) {
-	// TODO: replace with GetAllRecipes() from db.go
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
-}
-
-func getRecipeById(c *gin.Context) {
-	// TODO: replace with GetRecipeById() from db.go
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
-}
-
-func postRecipes(c *gin.Context) {
-	// TODO: replace with CreateRecipe() from db.go
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
-}
-
-// -------------------------------------------------------------------------- //

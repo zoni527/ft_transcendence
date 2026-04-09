@@ -1,8 +1,21 @@
-package main
+package repository
+
+// Users DB functions needed:
+	// [done] GetRolesByUserId  — helper for attaching roles
+	// [done] GetAllUsers       — GET /api/users
+	// [done] GetUserById       — GET /api/users/:id
+
+// [TODO] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
+// [TODO] UpdateUser        — PUT /api/users/:id (full replace)
+// [TODO] PatchUser         — PATCH /api/users/:id (partial update)
+// [TODO] DeleteUser        — DELETE /api/users/:id
+// [TODO] SearchUsers       — GET /api/users/search?q=
 
 import (
 	"context"
 	"fmt"
+
+	"ft_transcendence/backend/models"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -35,24 +48,20 @@ func GetRolesByUserId(userId string) ([]string, error) {
 	return roles, nil
 }
 
-//http://betterstack.com/community/guides/scaling-go/postgresql-pgx-golang/
-func GetAllUsers() ([]user, error) {
+// GetAllUsers returns all users with their roles attached.
+func GetAllUsers() ([]models.User, error) {
 	sql := `SELECT id, email, name, display_name, created_at
 			FROM "user" `
 
-	//DB.Query() returns a pgx.Rows object point to the result set of db.
 	rows, err := DB.Query(context.Background(), sql)
 	if err != nil {
 		return nil, fmt.Errorf("error querying users: %w", err)
-    }
-
-	// releases the database connection back to the pool. If you forget to close, you'll leak connections and eventually run out.
+	}
 	defer rows.Close()
 
-	var users []user
-	//step through rows one by one with
+	var users []models.User
 	for rows.Next() {
-		var u user
+		var u models.User
 		err := rows.Scan(
 			&u.Id,
 			&u.Email,
@@ -66,7 +75,6 @@ func GetAllUsers() ([]user, error) {
 		users = append(users, u)
 	}
 
-	//declaring err, then check if it's nil
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating user rows: %w", err)
 	}
@@ -83,28 +91,27 @@ func GetAllUsers() ([]user, error) {
 	return users, nil
 }
 
-//placeholder — $1 tells pgx "use the first parameter I pass in"
-func GetUserById(id string) (user, error) {
+// GetUserById returns a single user by UUID, with roles attached.
+func GetUserById(id string) (models.User, error) {
 	sql := `SELECT id, email, name, display_name, created_at
 			FROM "user"
 			WHERE id = $1`
 
-	var u user
+	var u models.User
 	err := DB.QueryRow(context.Background(), sql, id).Scan(&u.Id, &u.Email, &u.Name, &u.Display_name, &u.Created_at)
 
-	// built-in error that pgx defines
 	if err == pgx.ErrNoRows {
-		return user{}, pgx.ErrNoRows
+		return models.User{}, pgx.ErrNoRows
 	}
 
 	if err != nil {
-		return user{}, fmt.Errorf("error getting user by id: %w", err)
+		return models.User{}, fmt.Errorf("error getting user by id: %w", err)
 	}
 
 	// Attach roles
 	roles, err := GetRolesByUserId(u.Id)
 	if err != nil {
-		return user{}, fmt.Errorf("error getting roles for user: %w", err)
+		return models.User{}, fmt.Errorf("error getting roles for user: %w", err)
 	}
 	u.Roles = roles
 

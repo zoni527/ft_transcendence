@@ -50,10 +50,10 @@ This is why migration files are numbered:
 
 All files modify the **same database** — they don't create separate databases.
 
-> **Note:** Init scripts only run on a fresh database. If you change a migration file and want to re-initialize, please delete the Docker volume first just like this:
+> **Note:** Init scripts only run on a fresh database. If you change a migration file and want to re-initialize, reset the database volume from the project root:
 >
 > ```bash
-> docker volume rm src_postgres_data
+> make dbclean
 > ```
 
 ### UUID Primary Keys

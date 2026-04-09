@@ -8,6 +8,8 @@ clean:
 fclean: clean
 	docker rmi --force transcendence_backend:dev_1.0
 	docker rmi --force transcendence_frontend:dev_1.0
+
+dbclean:
 	docker volume rm -f src_postgres_data
 
 re: fclean all
@@ -16,5 +18,5 @@ re: fclean all
 check:
 	cd src/backend && go build ./...
 # ---------------------------------------------------------------------------- #
-.PHONY: all clean fclean re check
+.PHONY: all clean fclean dbclean re check
 # ---------------------------------------------------------------------------- #

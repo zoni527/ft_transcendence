@@ -36,16 +36,13 @@ const Dashboard = () => {
             <div className="flex gap-8">
               {/* Left */}
               <div className="flex-1 space-y-2">
-                <DetailField
-                  label="Username"
-                  value={user?.displayName ?? 'N/A'}
-                />
-                <DetailField label="Email" value={user?.email ?? 'N/A'} />
+                <DetailField label="Username" value={user.displayName} />
+                <DetailField label="Email" value={user.email} />
               </div>
 
               {/* Right */}
               <div className="flex-1 space-y-2">
-                <DetailField label="ID" value={user?.id ?? 'N/A'} />
+                <DetailField label="ID" value={user.id} />
               </div>
             </div>
 
@@ -53,15 +50,15 @@ const Dashboard = () => {
             <div className="w-full space-y-2">
               <DetailField
                 label="Followers"
-                value={user?.followers.join(', ') ?? 'N/A'}
+                value={user.followers.join(', ')}
               />
               <DetailField
                 label="Following"
-                value={user?.following.join(', ') ?? 'N/A'}
+                value={user.following.join(', ')}
               />
               <DetailField
                 label="Favourite Recipes"
-                value={user?.recipe_favourite.join(', ') ?? 'N/A'}
+                value={user.recipe_favourite.join(', ')}
               />
             </div>
           </div>

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
 import { cardBase, buttonBase } from '../styles/styles';
 
-const Login = () => {
+const Signup = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.SubmitEvent) => {
@@ -14,7 +14,7 @@ const Login = () => {
     <div className={`${cardBase} mx-auto mt-8 max-w-sm p-8`}>
       {/* Header */}
       <h1 className="mb-6 text-center text-2xl font-semibold text-amber-900">
-        Log in
+        Sign up
       </h1>
 
       {/* Input Fields */}
@@ -44,4 +44,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

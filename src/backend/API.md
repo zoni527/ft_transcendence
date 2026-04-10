@@ -220,6 +220,8 @@ Get all published recipes.
 | difficulty | string | Filter by difficulty (easy/medium/hard) |
 | sort | string | Sort by field (e.g. "created_at", "title", "calories") — TODO |
 | order | string | Sort order: "asc" or "desc" (default: "desc") — TODO |
+| page | int | Page number for pagination (default: 1) — TODO |
+| limit | int | Results per page (default: 20) — TODO |
 
 **Response** `200 OK`
 ```json

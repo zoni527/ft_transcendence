@@ -7,11 +7,11 @@ const Login = () => {
   const [error, setError] = useState('');
   //   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
-    const form = e.target;
+    const form = e.currentTarget;
     const formData = new FormData(form);
 
     // Helper to safely get string values

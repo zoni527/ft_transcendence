@@ -29,7 +29,7 @@ export const getRecipes = async (): Promise<Recipe[]> => {
 
 // GET Recipe by ID
 export const getRecipeById = async (id: string): Promise<Recipe> => {
-  const response = await fetch(`${baseUrl}recipes/${id}`);
+  const response = await fetch(`${baseUrl}/recipes/${id}`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch recipe with id ${id}`);

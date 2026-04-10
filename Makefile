@@ -12,8 +12,6 @@ fclean: clean
 dbclean:
 	docker volume rm -f src_postgres_data
 
-dbclean:
-	docker volume rm -f src_postgres_data
 
 re: fclean all
 

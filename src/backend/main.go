@@ -8,8 +8,7 @@ import (
 	"ft_transcendence/backend/repository"
 	"ft_transcendence/backend/handlers"
 
-	"ft_transcendence/backend/repository"
-	"ft_transcendence/backend/handlers"
+
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

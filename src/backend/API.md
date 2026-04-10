@@ -542,6 +542,11 @@ Unfavourite a recipe.
 }
 ```
 
+**Errors:**
+| Status | When |
+|---|---|
+| 404 | Recipe or favourite not found |
+
 ---
 
 ### GET /api/users/:id/favourites

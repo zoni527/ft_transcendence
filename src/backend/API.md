@@ -210,6 +210,8 @@ Delete a user. Cascades: removes their roles and favourites. Recipes they author
 
 Get all published recipes.
 
+> **Future:** Once auth + roles are implemented, admins can use `?include_drafts=true` to see unpublished recipes. Authors will be able to see their own drafts via `GET /api/users/:id/recipes`.
+
 **Query parameters (optional):**
 | Param | Type | Description |
 |---|---|---|

@@ -7,6 +7,8 @@ package repository
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] PatchRecipe       — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
+// [TODO] GetAllRecipes should support ?include_drafts=true for admins (once auth is implemented)
+// [TODO] Add GET /api/users/:id/recipes so authors can see their own unpublished recipes
 
 import (
 	"context"

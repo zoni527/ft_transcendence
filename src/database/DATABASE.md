@@ -97,14 +97,14 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 **Engagement:**
 | Table | Purpose |
 |---|---|
-| `recipe_favorite` | Tracks which users favorited which recipes |
+| `recipe_favourite` | Tracks which users favourited which recipes |
 
 ### Key Design Decisions
 
-- **Favorite count is computed, not stored** — instead of a `has_been_favorite_times` column on recipe, we count from `recipe_favorite` with `COUNT(*)`. This prevents the count from going out of sync.
+- **Favourite count is computed, not stored** — instead of a `has_been_favourite_times` column on recipe, we count from `recipe_favourite` with `COUNT(*)`. This prevents the count from going out of sync.
 - **Serving-based ingredient scaling** — `recipe.servings` stores the base serving count. `recipe_ingredient.quantity` stores the amount for that base. Scaling (e.g. 4 servings → 2 servings) is done in app logic: `adjusted = quantity * (desired / base)`.
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
-- **ON DELETE CASCADE** — deleting a user removes their favorites and roles. Deleting a recipe removes its steps, ingredients, and favorites.
+- **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its steps, ingredients, and favourites.
 - **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship).
   //can decide what we wanna do when an user is deleted!!!!! @TODO
 

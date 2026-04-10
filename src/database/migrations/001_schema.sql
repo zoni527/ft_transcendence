@@ -108,7 +108,7 @@ CREATE TABLE recipe_ingredient (
 -- ENGAGEMENT
 -- =====================
 
-CREATE TABLE recipe_favorite (
+CREATE TABLE recipe_favourite (
     user_id         UUID REFERENCES "user"(id) ON DELETE CASCADE,
     recipe_id       UUID REFERENCES recipe(id) ON DELETE CASCADE,
     created_at      TIMESTAMP DEFAULT now(),

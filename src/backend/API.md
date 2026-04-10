@@ -188,7 +188,7 @@ Partially update a user. Only include the fields you want to change.
 
 ### DELETE /api/users/:id
 
-Delete a user. Cascades: removes their roles and favorites. Recipes they authored keep existing with `author_id` set to NULL.
+Delete a user. Cascades: removes their roles and favourites. Recipes they authored keep existing with `author_id` set to NULL.
 
 **Response** `200 OK`
 ```json
@@ -399,7 +399,7 @@ Partially update a recipe. Only include the fields you want to change.
 
 ### DELETE /api/recipes/:id
 
-Delete a recipe. Cascades: removes its steps, ingredients, and favorites.
+Delete a recipe. Cascades: removes its steps, ingredients, and favourites.
 
 **Response** `200 OK`
 ```json
@@ -495,11 +495,11 @@ Create a new ingredient category.
 
 ---
 
-## Favorites
+## Favourites
 
-### POST /api/recipes/:id/favorite
+### POST /api/recipes/:id/favourite
 
-Favorite a recipe for the current user.
+Favourite a recipe for the current user.
 
 **Request body:**
 ```json
@@ -511,21 +511,21 @@ Favorite a recipe for the current user.
 **Response** `201 Created`
 ```json
 {
-  "message": "recipe favorited"
+  "message": "recipe favourited"
 }
 ```
 
 **Errors:**
 | Status | When |
 |---|---|
-| 400 | Already favorited |
+| 400 | Already favourited |
 | 404 | Recipe not found |
 
 ---
 
-### DELETE /api/recipes/:id/favorite
+### DELETE /api/recipes/:id/favourite
 
-Unfavorite a recipe.
+Unfavourite a recipe.
 
 **Request body:**
 ```json
@@ -537,15 +537,15 @@ Unfavorite a recipe.
 **Response** `200 OK`
 ```json
 {
-  "message": "favorite removed"
+  "message": "favourite removed"
 }
 ```
 
 ---
 
-### GET /api/users/:id/favorites
+### GET /api/users/:id/favourites
 
-Get all recipes a user has favorited.
+Get all recipes a user has favourited.
 
 **Response** `200 OK` — returns an array of recipe objects (same format as GET /api/recipes).
 
@@ -573,6 +573,6 @@ Get all recipes a user has favorited.
 | POST /api/ingredients | TODO |
 | GET /api/ingredient-categories | TODO |
 | POST /api/ingredient-categories | TODO |
-| POST /api/recipes/:id/favorite | TODO |
-| DELETE /api/recipes/:id/favorite | TODO |
-| GET /api/users/:id/favorites | TODO |
+| POST /api/recipes/:id/favourite | TODO |
+| DELETE /api/recipes/:id/favourite | TODO |
+| GET /api/users/:id/favourites | TODO |

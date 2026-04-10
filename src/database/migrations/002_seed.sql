@@ -20,7 +20,7 @@ INSERT INTO role (name, description) VALUES
     ('admin',     'Full access — manage users, recipes, roles, and site settings'),
     ('moderator', 'Can review, edit, and delete recipes and comments'),
     ('chef',      'Can create and publish recipes'),
-    ('user',      'Default role — can browse, favorite, and comment');
+    ('user',      'Default role — can browse, favourite, and comment');
 
 INSERT INTO permission (name, description) VALUES
     ('create_recipe',  'Create new recipes'),
@@ -153,10 +153,10 @@ INSERT INTO recipe_ingredient (recipe_id, ingredient_id, quantity, unit, sort_or
     ((SELECT id FROM recipe WHERE title = 'Garlic Tomato Bruschetta'), (SELECT id FROM ingredient WHERE name = 'Olive Oil'), 2,   'tbsp', 3);
 
 -- =====================
--- FAVORITES
+-- FAVOURITES
 -- =====================
 
-INSERT INTO recipe_favorite (user_id, recipe_id) VALUES
+INSERT INTO recipe_favourite (user_id, recipe_id) VALUES
     ((SELECT id FROM "user" WHERE email = 'bob@test.com'),    (SELECT id FROM recipe WHERE title = 'Pasta Carbonara')),
     ((SELECT id FROM "user" WHERE email = 'diana@test.com'),  (SELECT id FROM recipe WHERE title = 'Pasta Carbonara')),
     ((SELECT id FROM "user" WHERE email = 'eve@test.com'),    (SELECT id FROM recipe WHERE title = 'Pasta Carbonara')),

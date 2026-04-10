@@ -30,7 +30,7 @@ func GetRecipeById(c *gin.Context) {
 
 	recipe, err := repository.GetRecipeById(id)
 	if err == pgx.ErrNoRows {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "recipe not found"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 	if err != nil {

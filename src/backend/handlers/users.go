@@ -30,7 +30,7 @@ func GetUserById(c *gin.Context) {
 
 	user, err := repository.GetUserById(id)
 	if err == pgx.ErrNoRows {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "user not found"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 	if err != nil {

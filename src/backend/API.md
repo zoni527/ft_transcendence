@@ -48,6 +48,12 @@ All errors return JSON in this format:
 
 Get all users.
 
+**Query parameters (optional):**
+| Param | Type | Description |
+|---|---|---|
+| page | int | Page number for pagination (default: 1) — TODO |
+| limit | int | Results per page (default: 20) — TODO |
+
 **Response** `200 OK`
 ```json
 [

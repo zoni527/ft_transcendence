@@ -10,6 +10,7 @@ package repository
 // [TODO] UpdateUser        — PATCH /api/users/:id (partial update)
 // [TODO] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
+// [TODO] Add pagination (?page=1&limit=20) to GetAllUsers
 
 import (
 	"context"

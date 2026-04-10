@@ -343,6 +343,7 @@ Create a new recipe with steps and ingredients.
 |---|---|
 | 400 | Missing required fields (title, author_id) |
 | 400 | Invalid difficulty or meal_type value |
+| 400 | Negative or zero numeric fields (servings, prep_time, etc.) |
 
 ---
 

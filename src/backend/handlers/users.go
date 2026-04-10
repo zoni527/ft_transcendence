@@ -3,8 +3,8 @@ package handlers
 // User handlers needed:
 // [done] GetUsers      — GET /api/users
 // [done] GetUserById   — GET /api/users/:id
-// [TODO] PostUser      — POST /api/users (validate + hash password + call CreateUser)
-// [TODO] PutUser       — PUT /api/users/:id
+// [TODO] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
+// [TODO] UpdateUser    — PUT /api/users/:id
 // [TODO] PatchUser     — PATCH /api/users/:id
 // [TODO] DeleteUser    — DELETE /api/users/:id
 // [TODO] SearchUsers   — GET /api/users/search?q=
@@ -40,12 +40,12 @@ func GetUserById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, user)
 }
 
-func PostUser(c *gin.Context) {
+func CreateUser(c *gin.Context) {
 	// TODO: validate + hash password + call db.CreateUser()
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
 }
 
-func PatchUser(c *gin.Context) {
-	// TODO: call db.PatchUser()
+func UpdateUser(c *gin.Context) {
+	// TODO: call db.UpdateUser()
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
 }

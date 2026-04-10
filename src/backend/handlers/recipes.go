@@ -3,11 +3,11 @@ package handlers
 // Recipe handlers needed:
 // [done] GetAllRecipes   — GET /api/recipes
 // [done] GetRecipeById   — GET /api/recipes/:id
-// [TODO] PostRecipe      — POST /api/recipes (validate + call CreateRecipe)
-// [TODO] PutRecipe       — PUT /api/recipes/:id
+// [TODO] CreateRecipe    — POST /api/recipes (validate + call CreateRecipe)
+// [TODO] UpdateRecipe    — PUT /api/recipes/:id
 // [TODO] PatchRecipe     — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe    — DELETE /api/recipes/:id
-// [TODO] PostRecipeImage — POST /api/recipes/:id/image (multipart upload)
+// [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
 import (
 	"net/http"
@@ -40,7 +40,7 @@ func GetRecipeById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, recipe)
 }
 
-func PostRecipe(c *gin.Context) {
+func CreateRecipe(c *gin.Context) {
 	// TODO: call repository.CreateRecipe()
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
 }

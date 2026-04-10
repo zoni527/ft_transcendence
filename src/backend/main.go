@@ -42,13 +42,13 @@ func main() {
 	// Users
 	router.GET("/api/users", handlers.GetUsers)
 	router.GET("/api/users/:id", handlers.GetUserById)
-	router.POST("/api/users", handlers.PostUser)
-	router.PATCH("/api/users", handlers.PatchUser)
+	router.POST("/api/users", handlers.CreateUser)
+	router.PATCH("/api/users", handlers.UpdateUser)
 
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)
 	router.GET("/api/recipes/:id", handlers.GetRecipeById)
-	router.POST("/api/recipes", handlers.PostRecipe)
+	router.POST("/api/recipes", handlers.CreateRecipe)
 
 	if err := router.Run("0.0.0.0:" + strconv.Itoa(port)); err != nil {
 		fmt.Println(err)

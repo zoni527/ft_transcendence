@@ -12,7 +12,6 @@ const Signup = () => {
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     const form = e.target;
     const formData = new FormData(form);
@@ -40,10 +39,11 @@ const Signup = () => {
       return;
     }
 
+    setLoading(true);
+
     // POST Signup API call
     postSignup({ username, email, password })
-      .then((data) => {
-        console.log('Signup successful', data);
+      .then(() => {
         void navigate('/dashboard');
       })
       .catch((err: unknown) => {

@@ -136,7 +136,7 @@ Create a new user.
 | Status | When |
 |---|---|
 | 400 | Missing required fields or invalid data |
-| 400 | Email already exists |
+| 409 | Email already exists |
 
 ---
 

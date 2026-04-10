@@ -218,6 +218,8 @@ Get all published recipes.
 | cuisine | string | Filter by cuisine (e.g. "italian") |
 | meal_type | string | Filter by meal type (breakfast/lunch/dinner/snack) |
 | difficulty | string | Filter by difficulty (easy/medium/hard) |
+| sort | string | Sort by field (e.g. "created_at", "title", "calories") — TODO |
+| order | string | Sort order: "asc" or "desc" (default: "desc") — TODO |
 
 **Response** `200 OK`
 ```json

@@ -9,6 +9,7 @@ package repository
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] GetAllRecipes should support ?include_drafts=true for admins (once auth is implemented)
 // [TODO] Add GET /api/users/:id/recipes so authors can see their own unpublished recipes
+// [TODO] Add sorting (?sort=created_at&order=desc) to GetAllRecipes
 
 import (
 	"context"

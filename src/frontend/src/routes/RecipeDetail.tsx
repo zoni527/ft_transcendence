@@ -77,7 +77,7 @@ const RecipeDetail = () => {
               <DetailField label="Calories" value={recipe.calories} />
               <DetailField label={'Protein (grams)'} value={recipe.protein_g} />
               <DetailField
-                label={'Carbohydrates (grams'}
+                label={'Carbohydrates (grams)'}
                 value={recipe.carbs_g}
               />
               <DetailField label={'Fat (grams)'} value={recipe.fat_g} />

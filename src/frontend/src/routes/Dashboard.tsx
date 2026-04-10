@@ -21,7 +21,7 @@ const Dashboard = () => {
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
       {loading ? (
-        <p className="justify-self-start">Loading recipe...</p>
+        <p className="justify-self-start">Loading user...</p>
       ) : error ? (
         <p className="justify-self-start text-red-500">{error}</p>
       ) : (

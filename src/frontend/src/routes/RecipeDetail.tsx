@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import RecipeDetailField from '../components/RecipeDetailField';
+import DetailField from '../components/DetailField';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -32,80 +32,62 @@ const RecipeDetail = () => {
         <p className="justify-self-start">Loading recipe...</p>
       ) : error ? (
         <p className="justify-self-start text-red-500">{error}</p>
+      ) : !recipe ? (
+        <p>Failed to load recipe</p>
       ) : (
         <>
           {/* Recipe Image */}
           <img
-            src={`/assets/${recipe?.id}.jpg`}
-            alt={recipe?.title ?? 'N/A'}
+            src={`/assets/${recipe.id}.jpg`}
+            alt={recipe.title}
             className="mb-8 h-64 w-full rounded object-cover shadow-md md:h-80"
           />
 
           {/* Header */}
           <h1 className="mb-6 text-2xl font-semibold text-amber-900">
-            {recipe?.title ?? 'N/A'}
+            {recipe.title}
           </h1>
 
           {/* Description */}
-          <h2 className="mb-6 text-lg font-semibold">
-            {recipe?.description ?? 'N/A'}
-          </h2>
+          <h2 className="mb-6 text-lg font-semibold">{recipe.description}</h2>
 
           {/* Recipe Info Fields */}
           <div className="mt-6 flex gap-8">
             {/* Left */}
             <div className="flex-1 space-y-2">
-              <RecipeDetailField
-                label="Author"
-                value={recipe?.author_id ?? 'N/A'}
-              />
-              <RecipeDetailField
+              <DetailField label="Author" value={recipe.author_id} />
+              <DetailField
                 label={'Preparation (minutes)'}
-                value={recipe?.prep_time_min ?? 'N/A'}
+                value={recipe.prep_time_min}
               />
-              <RecipeDetailField
+              <DetailField
                 label={'Cooking (minutes)'}
-                value={recipe?.cook_time_min ?? 'N/A'}
+                value={recipe.cook_time_min}
               />
-              <RecipeDetailField
-                label={'Servings'}
-                value={recipe?.servings ?? 'N/A'}
-              />
-              <RecipeDetailField
-                label={'Difficulty'}
-                value={recipe?.difficulty ?? 'N/A'}
-              />
-              <RecipeDetailField
+              <DetailField label={'Servings'} value={recipe.servings} />
+              <DetailField label={'Difficulty'} value={recipe.difficulty} />
+              <DetailField
                 label={'Likes'}
-                value={recipe?.has_been_favorite_times ?? 'N/A'}
+                value={recipe.has_been_favorite_times}
               />
             </div>
 
             {/* Right */}
             <div className="flex-1 space-y-2">
-              <RecipeDetailField
-                label="Calories"
-                value={recipe?.calories ?? 'N/A'}
-              />
-              <RecipeDetailField
-                label={'Protein (grams)'}
-                value={recipe?.protein_g ?? 'N/A'}
-              />
-              <RecipeDetailField
+              <DetailField label="Calories" value={recipe.calories} />
+              <DetailField label={'Protein (grams)'} value={recipe.protein_g} />
+              <DetailField
                 label={'Carbohydrates (grams'}
-                value={recipe?.carbs_g ?? 'N/A'}
+                value={recipe.carbs_g}
               />
-              <RecipeDetailField
-                label={'Fat (grams)'}
-                value={recipe?.fat_g ?? 'N/A'}
-              />
+              <DetailField label={'Fat (grams)'} value={recipe.fat_g} />
             </div>
           </div>
 
           {/* Like */}
           <div className="mt-6">
             <p className="text-md max-w-[80%]">
-              Like: {recipe?.has_been_favorite_times}
+              Like: {recipe.has_been_favorite_times}
             </p>
             <button
               className="text-amber-500 transition-colors hover:cursor-pointer hover:text-amber-600 hover:shadow-xl"

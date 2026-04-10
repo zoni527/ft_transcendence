@@ -21,6 +21,7 @@ export const buttonBase = `
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   hover:cursor-pointer
   hover:bg-amber-700
+  whitespace-nowrap
 `;
 
 export const navLeftBase = `

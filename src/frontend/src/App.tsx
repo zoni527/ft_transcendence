@@ -6,6 +6,7 @@ import RecipeDetail from './routes/RecipeDetail';
 import Recipes from './routes/Recipes';
 import Dashboard from './routes/Dashboard';
 import Login from './routes/Login';
+import Signup from './routes/Signup';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
             <Route path="/recipe/:id" element={<RecipeDetail />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           </Routes>
         </div>
       </div>

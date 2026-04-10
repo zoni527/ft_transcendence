@@ -1,9 +1,9 @@
-interface RecipeDetailFieldProps {
+interface DetailFieldProps {
   label: string;
   value: string | number;
 }
 
-const RecipeDetailField = ({ label, value }: RecipeDetailFieldProps) => {
+const DetailField = ({ label, value }: DetailFieldProps) => {
   return (
     <p className={`text-lg`}>
       <strong>{label}:</strong> {value}
@@ -11,4 +11,4 @@ const RecipeDetailField = ({ label, value }: RecipeDetailFieldProps) => {
   );
 };
 
-export default RecipeDetailField;
+export default DetailField;

@@ -1,5 +1,8 @@
+import { useState } from 'react';
+import DetailField from '../components/DetailField';
 import { cardBase } from '../styles/styles';
 
+// This whole section up will get modified when we get user api endpoint
 const Dashboard = () => {
   const user = {
     email: 'user@example.com',
@@ -10,47 +13,57 @@ const Dashboard = () => {
     recipe_favourite: ['(id: xxx / shown as Spaghetti)'],
   };
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  //
+
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
-      {/* Header */}
-      <h1 className="mb-12 text-2xl font-semibold text-amber-900">
-        Welcome, {user.displayName}!
-      </h1>
+      {loading ? (
+        <p className="justify-self-start">Loading recipe...</p>
+      ) : error ? (
+        <p className="justify-self-start text-red-500">{error}</p>
+      ) : (
+        <>
+          {/* Header */}
+          <h1 className="mb-6 text-2xl font-semibold text-amber-900">
+            Welcome, {user.displayName}!
+          </h1>
 
-      <div className="space-y-12">
-        {/* User Info */}
-        <div className="space-y-4">
-          <p className="text-lg">
-            <strong>Email:</strong> {user.email}
-          </p>
-          <p className="text-lg">
-            <strong>Display Name:</strong> {user.displayName}
-          </p>
-          <p className="text-lg">
-            <strong>User ID:</strong> {user.id}
-          </p>
-        </div>
+          {/* User Info Fields */}
+          <div className="mt-6 space-y-16">
+            <div className="flex gap-8">
+              {/* Left */}
+              <div className="flex-1 space-y-2">
+                <DetailField label="Username" value={user.displayName} />
+                <DetailField label="Email" value={user.email} />
+              </div>
 
-        <div className="space-y-4">
-          {/* Followers */}
-          <p className="text-lg">
-            <strong>Followers:</strong> {user.followers.join(', ')}
-          </p>
+              {/* Right */}
+              <div className="flex-1 space-y-2">
+                <DetailField label="ID" value={user.id} />
+              </div>
+            </div>
 
-          {/* Following */}
-          <p className="text-lg">
-            <strong>Following:</strong> {user.following.join(', ')}
-          </p>
-        </div>
-
-        <div>
-          {/* Favourite Recipes */}
-          <p className="text-lg">
-            <strong>Favourite Recipes: </strong>
-            {user.recipe_favourite.join(', ')}
-          </p>
-        </div>
-      </div>
+            {/* Bottom */}
+            <div className="w-full space-y-2">
+              <DetailField
+                label="Followers"
+                value={user.followers.join(', ')}
+              />
+              <DetailField
+                label="Following"
+                value={user.following.join(', ')}
+              />
+              <DetailField
+                label="Favourite Recipes"
+                value={user.recipe_favourite.join(', ')}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -1,6 +1,8 @@
 # API Reference
 
-Base URL: `https://localhost:8080`
+Base URL: `http://localhost:8080`
+
+> **TODO:** Switch to HTTPS (required by subject).
 
 ## Authentication
 

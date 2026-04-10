@@ -98,7 +98,13 @@ func GetUserById(id string) (models.User, error) {
 			WHERE id = $1`
 
 	var u models.User
-	err := Pool.QueryRow(context.Background(), sql, id).Scan(&u.Id, &u.Email, &u.Name, &u.Display_name, &u.Created_at)
+	err := Pool.QueryRow(context.Background(), sql, id).Scan(
+		&u.Id,
+		&u.Email,
+		&u.Name,
+		&u.Display_name,
+		&u.Created_at,
+	)
 
 	if err == pgx.ErrNoRows {
 		return models.User{}, pgx.ErrNoRows

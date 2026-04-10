@@ -455,7 +455,7 @@ Create a new ingredient.
 | Status | When |
 |---|---|
 | 400 | Missing name |
-| 400 | Ingredient name already exists |
+| 409 | Ingredient name already exists |
 
 ---
 

@@ -42,10 +42,10 @@ func GetUserById(c *gin.Context) {
 
 func CreateUser(c *gin.Context) {
 	// TODO: validate + hash password + call db.CreateUser()
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"message": "not implemented yet"})
 }
 
 func UpdateUser(c *gin.Context) {
 	// TODO: call db.UpdateUser()
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"message": "not implemented yet"})
 }

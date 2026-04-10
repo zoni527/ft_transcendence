@@ -42,5 +42,5 @@ func GetRecipeById(c *gin.Context) {
 
 func CreateRecipe(c *gin.Context) {
 	// TODO: call repository.CreateRecipe()
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "not implemented yet"})
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"message": "not implemented yet"})
 }

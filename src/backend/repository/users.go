@@ -80,7 +80,8 @@ func GetAllUsers() ([]models.User, error) {
 		return nil, fmt.Errorf("error iterating user rows: %w", err)
 	}
 
-	// Attach roles to each user
+	// TODO: N+1 query problem — this loops one query per user to get roles.
+	// Optimize with LEFT JOIN + array_agg to fetch users and roles in a single query.
 	for i := range users {
 		roles, err := GetRolesByUserId(users[i].Id)
 		if err != nil {
@@ -115,7 +116,7 @@ func GetUserById(id string) (models.User, error) {
 		return models.User{}, fmt.Errorf("error getting user by id: %w", err)
 	}
 
-	// Attach roles
+	// TODO: Same N+1 issue — optimize with JOIN when GetAllUsers is updated.
 	roles, err := GetRolesByUserId(u.Id)
 	if err != nil {
 		return models.User{}, fmt.Errorf("error getting roles for user: %w", err)

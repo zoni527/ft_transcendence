@@ -29,6 +29,10 @@ func GetUsers(c *gin.Context) {
 
 func GetUserById(c *gin.Context) {
 	id := c.Param("id")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		return
+	}
 
 	user, err := repository.GetUserById(id)
 	if err == pgx.ErrNoRows {

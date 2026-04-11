@@ -29,6 +29,10 @@ func GetAllRecipes(c *gin.Context) {
 
 func GetRecipeById(c *gin.Context) {
 	id := c.Param("id")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe ID format"})
+		return
+	}
 
 	recipe, err := repository.GetRecipeById(id)
 	if err == pgx.ErrNoRows {

@@ -6,6 +6,8 @@ Base URL: `http://localhost:8080`
 
 ## Authentication
 
+> **TODO:** API key middleware not implemented yet. Spec below describes target behavior.
+
 All API requests require an API key in the header:
 
 ```
@@ -15,6 +17,8 @@ X-API-Key: your_api_key_here
 Requests without a valid API key will receive `401 Unauthorized`.
 
 ## Rate Limiting
+
+> **TODO:** Rate limiting middleware not implemented yet. Spec below describes target behavior.
 
 Requests are rate-limited per API key. If you exceed the limit, the server responds with `429 Too Many Requests`.
 
@@ -262,6 +266,8 @@ Get all published recipes.
 ### GET /api/recipes/:id
 
 Get a single recipe by ID, including its steps and ingredients.
+
+> **TODO:** Currently returns only the base recipe fields. Steps and ingredients are not yet included in the response.
 
 **Response** `200 OK`
 ```json
@@ -582,8 +588,8 @@ Get all recipes a user has favourited.
 | PUT /api/users/:id | TODO |
 | PATCH /api/users/:id | TODO |
 | DELETE /api/users/:id | TODO |
-| GET /api/recipes | TODO |
-| GET /api/recipes/:id | TODO |
+| GET /api/recipes | done |
+| GET /api/recipes/:id | done |
 | POST /api/recipes | TODO |
 | POST /api/recipes/:id/image | TODO |
 | PUT /api/recipes/:id | TODO |

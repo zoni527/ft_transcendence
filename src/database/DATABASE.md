@@ -10,8 +10,8 @@ ft_transcendence uses **PostgreSQL 17** as its relational database, running as a
 
 The database is defined in `src/compose.yaml` with two services:
 
-- **postgres** — the PostgreSQL database server (port 5432)
-- **adminer** — a web UI for browsing the database (port 8081)
+- **postgres** — the PostgreSQL database server (container port `5432`, host port `5433`)
+- **adminer** — a web UI for browsing the database (host port `8081`)
 
 ### Environment Variables
 
@@ -30,22 +30,21 @@ Variables:
 
 ### Schema Initialization
 
-When the postgres container starts **for the first time**, it automatically runs all `.sql` files found in `src/database/` (mounted to `/docker-entrypoint-initdb.d/` inside the container) in **alphabetical order**.
+When the postgres container starts **for the first time**, it automatically runs all `.sql` files found in `src/database/migrations/` (mounted to `/docker-entrypoint-initdb.d/` inside the container) in **alphabetical order**.
 
 **How does PostgreSQL know to run these files?** 
 It's not a PostgreSQL feature — it's built into the official PostgreSQL Docker image (`postgres:17-alpine`). The image creators programmed it to check the `docker-entrypoint-initdb.d` folder on first startup and execute any `.sql` files it finds. In `compose.yaml`, this line maps our local folder into that special folder:
 
 ```yaml
 volumes:
-  - ./database:/docker-entrypoint-initdb.d
+  - ./database/migrations:/docker-entrypoint-initdb.d
 ```
 
 This is why migration files are numbered:
 
 ```
-001_initial_schema.sql      ← runs first (current)
-002_add_comments_table.sql  ← would run second (future)
-003_add_shopping_cart.sql   ← would run third (future)
+001_schema.sql              ← runs first (creates tables)
+002_seed.sql                ← runs second (inserts test data)
 ```
 
 All files modify the **same database** — they don't create separate databases.
@@ -106,7 +105,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
 - **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its steps, ingredients, and favourites.
 - **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship).
-  //can decide what we wanna do when an user is deleted!!!!! @TODO
+  - **TODO:** Decide whether to keep this behavior when a user is deleted.
 
 ## Accessing the Database
 

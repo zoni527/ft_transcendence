@@ -1,17 +1,19 @@
 package handlers
 
 // Recipe handlers needed:
-// [done] GetAllRecipes   — GET /api/recipes
-// [done] GetRecipeById   — GET /api/recipes/:id
-// [TODO] CreateRecipe    — POST /api/recipes (validate + call CreateRecipe)
-// [TODO] UpdateRecipe    — PUT /api/recipes/:id
-// [TODO] PatchRecipe     — PATCH /api/recipes/:id
-// [TODO] DeleteRecipe    — DELETE /api/recipes/:id
+// [done] GetAllRecipes     — GET /api/recipes
+// [done] GetRecipeById     — GET /api/recipes/:id
+// [TODO] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
+// [TODO] UpdateRecipe      — PUT /api/recipes/:id
+// [TODO] PatchRecipe       — PATCH /api/recipes/:id
+// [TODO] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
 import (
 	"net/http"
+
 	"ft_transcendence/backend/repository"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 )

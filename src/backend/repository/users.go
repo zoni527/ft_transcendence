@@ -1,9 +1,9 @@
 package repository
 
 // Users DB functions needed:
-	// [done] GetRolesByUserId  — helper for attaching roles
-	// [done] GetAllUsers       — GET /api/users
-	// [done] GetUserById       — GET /api/users/:id
+// [done] GetRolesByUserId  — helper for attaching roles
+// [done] GetAllUsers       — GET /api/users
+// [done] GetUserById       — GET /api/users/:id
 
 // [TODO] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
 // [TODO] UpdateUser        — PUT /api/users/:id (full replace)

@@ -11,7 +11,9 @@ package handlers
 
 import (
 	"net/http"
+
 	"ft_transcendence/backend/repository"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 )

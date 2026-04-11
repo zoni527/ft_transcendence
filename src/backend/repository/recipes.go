@@ -29,6 +29,9 @@ import (
 //
 //	COALESCE(image_url, '')	→ if image_url is NULL, return '' instead.
 //	COALESCE(calories, 0)	→ if  calories is NULL, return  0 instead.
+//
+// TODO: Replace COALESCE with pointer types (*string, *int) in the Recipe struct
+// so NULL fields return JSON null instead of empty strings/zeros.
 func GetAllRecipes() ([]models.Recipe, error) {
 	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
 				COALESCE(prep_time_min, 0), COALESCE(cook_time_min, 0),
@@ -80,7 +83,7 @@ func GetRecipeById(id string) (models.Recipe, error) {
 				COALESCE(fat_g, 0), is_published,
 				created_at, updated_at
 			FROM recipe
-			WHERE id = $1`
+			WHERE id = $1 AND is_published = true`
 
 	var r models.Recipe
 	err := Pool.QueryRow(context.Background(), sql, id).Scan(

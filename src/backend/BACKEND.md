@@ -8,13 +8,15 @@
 ## Architecture Layers
 
 ```
-API layer (main.go)      → handles HTTP requests, sends JSON responses
-Database layer (db.go)   → handles SQL queries, returns Go structs
-PostgreSQL               → stores the actual data
+Routes (main.go)              → defines routes, calls handlers
+Handlers (handlers/)          → validates input, sends JSON responses
+Repository (repository/)      → handles SQL queries, returns Go structs
+PostgreSQL                    → stores the actual data
 ```
 In particular:
-- **main.go** — **Gin** routes and handlers. Receives a request, calls a db function, returns JSON.
-- **db.go** — pgx query functions (`GetAllUsers`, `CreateUser`, etc.). Only talks to the database.
+- **main.go** — defines **Gin** routes and wires them to handler functions.
+- **handlers/** — receives requests, validates input, calls repository functions, returns JSON.
+- **repository/** — pgx query functions (`GetAllUsers`, `CreateUser`, etc.). Only talks to the database.
 - Each layer only talks to the one below it.
 
 ## Connection Pool (pgxpool)
@@ -32,13 +34,13 @@ The pool is like a **circle** with multiple **straws** sticking into it — each
 ```
 
 - **Connection** — a persistent link between the app and PostgreSQL (a straw)
-- **Query** — a single `DB.Query()` or `DB.QueryRow()` call sent through a connection (an item in the straw)
+- **Query** — a single `Pool.Query()` or `Pool.QueryRow()` call sent through a connection (an item in the straw)
 - **Pool** — manages the connections. Reuses them, replaces broken ones, and queues requests if all are busy
 
 One connection handles many queries over its lifetime, one at a time. The pool keeps several open so multiple requests can run in parallel.
 
 **How it works:**
-1. App starts → `ConnectDB()` opens the pool (stored in `repository.DB`)
+1. App starts → `ConnectPool()` opens the pool (stored in `repository.Pool`)
 2. A handler calls a repository function → pool picks an idle connection
 3. Query runs on PostgreSQL → result comes back
 4. Connection returns to the pool, ready for the next query
@@ -58,13 +60,13 @@ The database does the searching — Go just asks and receives. No for-loop neede
 
 ### 1. Query multiple rows
 
-Use `DB.Query()` to get multiple rows, then loop through them with `rows.Next()` and `rows.Scan()`.
+Use `Pool.Query()` to get multiple rows, then loop through them with `rows.Next()` and `rows.Scan()`.
 
 ```go
 func GetAllUsers() ([]user, error) {
 
-    //DB.Query() returns a pgx.Rows object point to the result set of db.
-    rows, err := DB.Query(context.Background(),
+    //Pool.Query() returns a pgx.Rows object point to the result set of db.
+    rows, err := Pool.Query(context.Background(),
         `SELECT id, email, display_name, created_at FROM "user"`)
     if err != nil {
         return nil, err
@@ -92,12 +94,12 @@ func GetAllUsers() ([]user, error) {
 
 ### 2. Query a single row
 
-Use `DB.QueryRow()` when you expect one result (e.g. find by ID).
+Use `Pool.QueryRow()` when you expect one result (e.g. find by ID).
 
 ```go
 func GetUserByID(id string) (user, error) {
     var u user
-    err := DB.QueryRow(context.Background(),
+    err := Pool.QueryRow(context.Background(),
         `SELECT id, email, display_name, created_at FROM "user" WHERE id = $1`, id,
     ).Scan(&u.Id, &u.Email, &u.Display_name, &u.Created_at)
     if err != nil {
@@ -113,11 +115,11 @@ func GetUserByID(id string) (user, error) {
 
 ### 3. Insert a row
 
-Use `DB.Exec()` for INSERT/UPDATE/DELETE, or `QueryRow()` if you want the inserted row back.
+Use `Pool.Exec()` for INSERT/UPDATE/DELETE, or `QueryRow()` if you want the inserted row back.
 
 ```go
 func CreateUser(u user) (user, error) {
-    err := DB.QueryRow(context.Background(),
+    err := Pool.QueryRow(context.Background(),
         `INSERT INTO "user" (email, password_hash, display_name)
          VALUES ($1, $2, $3)
          RETURNING id, created_at`,
@@ -145,7 +147,7 @@ func CreateUser(u user) (user, error) {
 | 500  | `http.StatusInternalServerError`  | Server/DB error (not the user's fault)   |
 
 
-## Connecting Gin handlers to DB functions
+## Connecting Gin handlers to repository functions
 
 - `c.IndentedJSON(status, data)` — serializes the given struct as pretty JSON (indented + endlines) into the response body. First argument is the HTTP status code, second is the data to send.
 - `gin.H{"key": "value"}` — shorthand for creating a JSON object (used for error messages, etc.)

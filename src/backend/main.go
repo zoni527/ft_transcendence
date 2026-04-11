@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 
 	"ft_transcendence/backend/handlers"
 	"ft_transcendence/backend/repository"
@@ -22,18 +20,6 @@ func main() {
 	}
 	defer repository.ClosePool()
 
-	port := 8080
-	argc := len(os.Args)
-	switch {
-	case argc >= 2:
-		port, err = strconv.Atoi(os.Args[1])
-	default:
-	}
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
 	router := gin.Default()
 	router.Use(cors.Default())
 
@@ -48,7 +34,7 @@ func main() {
 	router.GET("/api/recipes/:id", handlers.GetRecipeById)
 	router.POST("/api/recipes", handlers.CreateRecipe)
 
-	if err := router.Run("0.0.0.0:" + strconv.Itoa(port)); err != nil {
+	if err := router.Run("0.0.0.0:8080"); err != nil {
 		fmt.Println(err)
 		return
 	}

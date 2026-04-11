@@ -27,7 +27,7 @@ func main() {
 	router.GET("/api/users", handlers.GetUsers)
 	router.GET("/api/users/:id", handlers.GetUserById)
 	router.POST("/api/users", handlers.CreateUser)
-	router.PATCH("/api/users", handlers.UpdateUser)
+	router.PATCH("/api/users/:id", handlers.UpdateUser)
 
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)

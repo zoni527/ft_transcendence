@@ -131,7 +131,7 @@ func CreateUser(u user) (user, error) {
 ```
 
 **Key points:**
-- `RETURNING` lets PostgreSQL send ack auto-generated fields (id, created_at)
+- `RETURNING` lets PostgreSQL send back auto-generated fields (id, created_at)
 - Don't insert `id` or `created_at` — the DB generates those
 
 ## HTTP Status Codes
@@ -148,4 +148,4 @@ func CreateUser(u user) (user, error) {
 ## Connecting Gin handlers to DB functions
 
 - `c.IndentedJSON(status, data)` — serializes the given struct as pretty JSON (indented + endlines) into the response body. First argument is the HTTP status code, second is the data to send.
-- `gin.H{"key": "value"}` — shorthand for creating a JSON object (used for error messages, etc.)b
+- `gin.H{"key": "value"}` — shorthand for creating a JSON object (used for error messages, etc.)

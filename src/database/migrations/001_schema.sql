@@ -96,6 +96,7 @@ CREATE TABLE ingredient (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name            VARCHAR UNIQUE NOT NULL,
     category_id     UUID REFERENCES ingredient_category(id) ON DELETE SET NULL,
+    -- default_unit is a form pre-fill hint only; each recipe_ingredient has its own unit field
     default_unit    VARCHAR
 );
 

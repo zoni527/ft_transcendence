@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -21,13 +22,16 @@ func ConnectPool() error {
 		return fmt.Errorf("DATABASE_URL environment variable is not set")
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	var err error
-	Pool, err = pgxpool.New(context.Background(), databaseURL)
+	Pool, err = pgxpool.New(ctx, databaseURL)
 	if err != nil {
 		return fmt.Errorf("unable to connect to database: %w", err)
 	}
 
-	err = Pool.Ping(context.Background())
+	err = Pool.Ping(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to ping database: %w", err)
 	}

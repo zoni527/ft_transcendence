@@ -1,5 +1,5 @@
 -- Seed data for testing
--- This file runs automatically on first DB init (after 001_initial_schema.sql)
+-- This file runs automatically on first DB init (after 001_schema.sql)
 
 -- =====================
 -- USERS

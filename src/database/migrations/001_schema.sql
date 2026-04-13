@@ -14,7 +14,8 @@ CREATE TABLE "user" (
     password_hash   VARCHAR NOT NULL,
     name            VARCHAR,
     display_name    VARCHAR NOT NULL,
-    created_at      TIMESTAMP DEFAULT now()
+    created_at      TIMESTAMP DEFAULT now(),
+    updated_at      TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE role (

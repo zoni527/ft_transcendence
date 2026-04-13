@@ -18,6 +18,7 @@ type User struct {
 	Name          string    `json:"name"`
 	Display_name  string    `json:"display_name"`
 	Created_at    time.Time `json:"created_at"`
+	Updated_at    time.Time `json:"updated_at"`
 	Roles         []string  `json:"roles"`
 }
 

@@ -72,7 +72,7 @@ CREATE TABLE recipe (
 -- TODO: consider adding created_at field to recipe_step
 CREATE TABLE recipe_step (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    recipe_id       UUID REFERENCES recipe(id) ON DELETE CASCADE,
+    recipe_id       UUID NOT NULL REFERENCES recipe(id) ON DELETE CASCADE,
     step_number     INT NOT NULL,
     instruction     TEXT NOT NULL,
     media_url       VARCHAR,

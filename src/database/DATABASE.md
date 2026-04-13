@@ -78,7 +78,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 **User Management:**
 | Table | Purpose |
 |---|---|
-| `user` | User accounts (email, password hash, name, display name) |
+| `user` | User accounts (email, password hash, name, display name, timestamps) |
 | `role` | Role definitions (admin, moderator, chef, user) |
 | `permission` | Permission definitions (create_recipe, ban_user, etc.) |
 | `user_role` | Links users to roles (many-to-many) |
@@ -114,8 +114,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 - **Serving-based ingredient scaling** — `recipe.servings` stores the base serving count. `recipe_ingredient.quantity` stores the amount for that base. Scaling (e.g. 4 servings → 2 servings) is done in app logic: `adjusted = quantity * (desired / base)`.
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
 - **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its steps, ingredients, and favourites.
-- **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship).
-  - **TODO:** Decide whether to keep this behavior when a user is deleted.
+- **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship). TOS should state that published recipes remain after account deletion with authorship anonymized.
 
 ## Accessing the Database
 
@@ -159,7 +158,7 @@ make
 
 ## Adding New Tables (Future Migrations)
 
-1. Create a new file: `src/database/002_descriptive_name.sql`
+1. Create a new file: `src/database/migrations/NNN_descriptive_name.sql`
 2. Write your `CREATE TABLE` or `ALTER TABLE` statements
 3. Delete the volume and restart to re-initialize: `make dbclean`
 4. Or run the SQL manually via Adminer or psql

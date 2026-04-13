@@ -68,7 +68,9 @@ Get all users.
     "email": "user@example.com",
     "name": "Jane",
     "display_name": "jane_cooks",
-    "created_at": "2026-04-09T12:00:00Z"
+    "created_at": "2026-04-09T12:00:00Z",
+    "updated_at": "2026-04-09T12:00:00Z",
+    "roles": ["user"]
   }
 ]
 ```
@@ -108,7 +110,9 @@ Get a single user by ID.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
-  "created_at": "2026-04-09T12:00:00Z"
+  "created_at": "2026-04-09T12:00:00Z",
+  "updated_at": "2026-04-09T12:00:00Z",
+  "roles": ["user"]
 }
 ```
 
@@ -140,7 +144,9 @@ Create a new user.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
-  "created_at": "2026-04-09T12:00:00Z"
+  "created_at": "2026-04-09T12:00:00Z",
+  "updated_at": "2026-04-09T12:00:00Z",
+  "roles": ["user"]
 }
 ```
 

@@ -10,7 +10,7 @@ fclean: clean
 	docker rmi --force transcendence_frontend:dev_1.0
 
 dbclean:
-	docker volume rm -f src_postgres_data
+	docker compose --file ./src/compose.yaml down -v
 
 
 re: fclean all

@@ -132,6 +132,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 ### Via command line
 
 ```bash
+# Replace with your POSTGRES_USER and POSTGRES_DB from .env
 docker exec -it postgres psql -U dbuser -d ft_transcendence
 ```
 

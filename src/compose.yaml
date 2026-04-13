@@ -55,7 +55,7 @@ services:
 
   adminer:
     container_name: adminer
-    image: adminer:latest
+    image: adminer:5.4.2
     networks:
       - transcendence_network
     ports:

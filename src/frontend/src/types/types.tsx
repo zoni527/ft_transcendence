@@ -17,5 +17,5 @@ export interface Recipe {
   is_published: boolean;
   created_at: string;
   updated_at: string;
-  has_been_favorite_times: number;
+  has_been_favourite_times: number;
 }

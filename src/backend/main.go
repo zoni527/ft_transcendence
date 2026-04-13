@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"ft_transcendence/backend/handlers"
 	"ft_transcendence/backend/repository"
@@ -11,12 +11,11 @@ import (
 )
 
 func main() {
-	fmt.Println("ft_transcendence")
+	log.Println("ft_transcendence")
 
 	err := repository.ConnectPool()
 	if err != nil {
-		fmt.Println("Database connection failed:", err)
-		return
+		log.Fatal("Database connection failed:", err)
 	}
 	defer repository.ClosePool()
 
@@ -35,7 +34,6 @@ func main() {
 	router.POST("/api/recipes", handlers.CreateRecipe)
 
 	if err := router.Run("0.0.0.0:8080"); err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal("Server failed to start:", err)
 	}
 }

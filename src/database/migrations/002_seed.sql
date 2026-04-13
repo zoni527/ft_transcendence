@@ -42,14 +42,15 @@ INSERT INTO role_permission (role_id, permission_id)
     WHERE r.name = 'moderator' AND p.name IN ('edit_recipe', 'delete_recipe', 'publish_recipe', 'moderate_content');
 
 -- chef permissions
+-- TODO: chefs can edit their own recipes via authorship check in handler
+--       (recipe.author_id == current_user.id), no edit_recipe permission needed
 INSERT INTO role_permission (role_id, permission_id)
     SELECT r.id, p.id FROM role r, permission p
     WHERE r.name = 'chef' AND p.name IN ('create_recipe', 'publish_recipe');
 
 -- user permissions
-INSERT INTO role_permission (role_id, permission_id)
-    SELECT r.id, p.id FROM role r, permission p
-    WHERE r.name = 'user' AND p.name IN ('create_recipe');
+-- TODO: add favourite and comment permissions once those features are implemented
+--       browsing is implicit (no permission needed for public recipes)
 
 -- Assign roles to seed users
 INSERT INTO user_role (user_id, role_id) VALUES

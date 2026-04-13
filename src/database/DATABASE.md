@@ -84,6 +84,16 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 | `user_role` | Links users to roles (many-to-many) |
 | `role_permission` | Links roles to permissions (many-to-many) |
 
+**Role → Permission Breakdown:**
+| Role | Permissions |
+|---|---|
+| `admin` | All permissions |
+| `moderator` | `edit_recipe`, `delete_recipe`, `publish_recipe`, `moderate_content` |
+| `chef` | `create_recipe`, `publish_recipe` |
+| `user` | None (browsing is implicit; `favourite`/`comment` permissions TBD) |
+
+> **Note:** Users can have multiple roles. Chefs can edit their own recipes via authorship check in handler logic (no `edit_recipe` permission needed).
+
 **Recipes:**
 | Table | Purpose |
 |---|---|

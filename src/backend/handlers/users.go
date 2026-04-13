@@ -10,6 +10,7 @@ package handlers
 // [TODO] SearchUsers   — GET /api/users/search?q=
 
 import (
+	"log"
 	"net/http"
 
 	"ft_transcendence/backend/repository"
@@ -21,7 +22,8 @@ import (
 func GetUsers(c *gin.Context) {
 	users, err := repository.GetAllUsers()
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("GetUsers error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, users)
@@ -40,7 +42,8 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("GetUserById error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, user)

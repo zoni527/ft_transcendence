@@ -10,6 +10,7 @@ package handlers
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
 import (
+	"log"
 	"net/http"
 
 	"ft_transcendence/backend/repository"
@@ -21,7 +22,8 @@ import (
 func GetAllRecipes(c *gin.Context) {
 	recipes, err := repository.GetAllRecipes()
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("GetAllRecipes error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, recipes)
@@ -40,7 +42,8 @@ func GetRecipeById(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("GetRecipeById error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, recipe)

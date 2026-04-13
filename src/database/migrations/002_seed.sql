@@ -5,6 +5,7 @@
 -- USERS
 -- =====================
 
+-- TODO: replace plaintext passwords with bcrypt hashes when auth is implemented
 INSERT INTO "user" (email, password_hash, name, display_name) VALUES
     ('alice@test.com', 'hash001', 'Alice Smith', 'alice'),
     ('bob@test.com', 'hash002', 'Bob Jones', 'bobby'),

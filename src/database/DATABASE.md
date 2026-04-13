@@ -169,10 +169,10 @@ The backend connects to PostgreSQL using the `pgx` driver (via a connection pool
 
 **How it works:**
 
-- `db.go` — contains `ConnectDB()` and `CloseDB()` functions
-- `ConnectDB()` reads the `DATABASE_URL` environment variable and opens a connection pool
+- `repository/connect.go` — contains `ConnectPool()` and `ClosePool()` functions
+- `ConnectPool()` reads the `DATABASE_URL` environment variable and opens a connection pool
 - A **connection pool** manages multiple connections so the backend can handle concurrent requests without opening a new connection each time
-- `main.go` calls `ConnectDB()` on startup and `CloseDB()` on shutdown via `defer`
+- `main.go` calls `ConnectPool()` on startup and `ClosePool()` on shutdown via `defer`
 
 **`DATABASE_URL` format:**
 

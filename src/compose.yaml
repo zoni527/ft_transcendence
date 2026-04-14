@@ -5,11 +5,16 @@ services:
       context: backend
     image: transcendence_backend:dev_1.0
     pull_policy: build
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
     networks:
       - transcendence_network
     ports:
       - 127.0.0.1:8080:8080
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     container_name: frontend
@@ -26,6 +31,41 @@ services:
     ports:
       - 127.0.0.1:5173:5173
     restart: unless-stopped
+
+  postgres:
+    container_name: postgres
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - transcendence_network
+    ports:
+      - 127.0.0.1:5433:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  adminer:
+    container_name: adminer
+    image: adminer:5.4.2
+    networks:
+      - transcendence_network
+    ports:
+      - 127.0.0.1:8081:8080
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
 
 networks:
   transcendence_network:

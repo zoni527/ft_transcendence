@@ -68,7 +68,7 @@ const RecipeDetail = () => {
               <DetailField label={'Difficulty'} value={recipe.difficulty} />
               <DetailField
                 label={'Likes'}
-                value={recipe.has_been_favorite_times}
+                value={recipe.has_been_favourite_times}
               />
             </div>
 
@@ -87,7 +87,7 @@ const RecipeDetail = () => {
           {/* Like */}
           <div className="mt-6">
             <p className="text-md max-w-[80%]">
-              Like: {recipe.has_been_favorite_times}
+              Like: {recipe.has_been_favourite_times}
             </p>
             <button
               className="text-amber-500 transition-colors hover:cursor-pointer hover:text-amber-600 hover:shadow-xl"

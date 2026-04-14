@@ -2,8 +2,13 @@
 *.txt
 *.tmp
 *.temp
+.claude
+CLAUDE.md
 *.swp
 .vscode
+.DS_Store
+.env
+architecture.html
 
 # Frontend
 src/frontend/node_modules

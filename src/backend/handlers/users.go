@@ -10,17 +10,17 @@ package handlers
 // [TODO] SearchUsers   — GET /api/users/search?q=
 
 import (
+	"errors"
+	"ft_transcendence/backend/models"
+	"ft_transcendence/backend/repository"
 	"log"
 	"net/http"
 	"strings"
-	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 	"github.com/nbutton23/zxcvbn-go"
-
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GetUsers(c *gin.Context) {
@@ -54,27 +54,40 @@ func GetUserById(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-	var req CreateUserRequest
+	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(),})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data",})
 		return
 	}
-	if req.Password != req.Password_confirm || !PasswordStrength(req.Password) 
-		|| hashedPassword := HashPassword(req.Password) == nil{
-		return c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(),})
+	if !IsPasswordStrong(req.Password){
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Password is too weak",})
+		return 
 	}
-	user := User {
-		ID = uuid.New()
-		Email = strings.ToLower(req.Email)
-		Password_hash = hashedPassword
-		Name = req.Name
-		Display_name = req.Display_name
-	}
-	err := repository.CreateUser()
+	hashedPassword, err := HashPassword(req.Password)
 	if err != nil {
-
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error",})
+		return 
 	}
-	go GreetNewUser()
+	userParams := models.CreateUserParams {
+		Email : strings.ToLower(req.Email),
+		Password_hashed : hashedPassword,
+		Name : req.Name,
+		Display_name : req.Display_name,
+	}
+	data, err := repository.CreateUser(userParams)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserAlreadyExists){
+			c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error",})
+		return 
+	}
+	go func(email string){
+		GreetNewUser(email)
+	}(data.Email)
+	//Return more data? to be confirmed
+	c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
 }
 
 func UpdateUser(c *gin.Context) {
@@ -83,12 +96,13 @@ func UpdateUser(c *gin.Context) {
 }
 
 //Create a hashed password to store in Database
-func HashPassword(password string) ([]byte, bool) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func HashPassword(password string) (string, error) {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, false
+		return "", err
 	}
-	return hashedPassword, true
+	hashedString := string(hashedBytes)
+	return hashedString, nil
 }
 
 //Use zxcvbn to assess password strength: 0 = very weak, 4 = very strong
@@ -98,7 +112,7 @@ func IsPasswordStrong(password string) bool {
 }
 
 //Call API that will send a greeting email to new user created, will be launched in a routine
-func GreetNewUser(){
+func GreetNewUser(email string){
 
 }
 

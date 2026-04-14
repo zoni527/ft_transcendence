@@ -14,11 +14,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"ft_transcendence/backend/models"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // GetRolesByUserId returns the role names for a given user.
@@ -128,7 +130,29 @@ func GetUserById(id string) (models.User, error) {
 	return u, nil
 }
 
+var ErrUserAlreadyExists = errors.New("user already exists")
+
 //Add new user to database, Database validates email and username uniqueness, checked at this level to avoid race conditions
-func CreateUser([]string, error) []string, error{
-	
+func CreateUser(params models.CreateUserParams)(models.User, error) {
+	sql := `INSERT INTO "user"(email, password_hash, name, display_name)
+			VALUES($1, $2, $3, $4)
+			RETURNING id, email, name, display_name, created_at, updated_at;`
+	var u models.User
+	err := Pool.QueryRow(context.Background(), sql, params.Email, params.Password_hashed,
+		params.Name, params.Display_name).Scan(
+		&u.Id,
+		&u.Email,
+		&u.Name,
+		&u.Display_name,
+		&u.Created_at,
+		&u.Updated_at,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return models.User{}, ErrUserAlreadyExists
+		}
+		return models.User{}, fmt.Errorf("create user: %w", err)
+	}
+	return u, nil
 }

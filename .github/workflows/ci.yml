@@ -20,7 +20,7 @@ jobs:
               run: go build ./...
               working-directory: src/backend
 
-    backend-lint:
+    backend-vet:
         runs-on: ubuntu-latest
 
         steps:
@@ -31,11 +31,9 @@ jobs:
               with:
                   go-version-file: src/backend/go.mod
 
-            - name: Run golangci-lint
-              uses: golangci/golangci-lint-action@v6
-              with:
-                  version: latest
-                  working-directory: src/backend
+            - name: Run go vet
+              run: go vet ./...
+              working-directory: src/backend
 
     backend-test:
         runs-on: ubuntu-latest

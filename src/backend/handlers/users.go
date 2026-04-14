@@ -12,11 +12,15 @@ package handlers
 import (
 	"log"
 	"net/http"
-
+	"strings"
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+	"github.com/nbutton23/zxcvbn-go"
+
 )
 
 func GetUsers(c *gin.Context) {
@@ -50,11 +54,51 @@ func GetUserById(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-	// TODO: validate + hash password + call db.CreateUser()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	var req CreateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(),})
+		return
+	}
+	if req.Password != req.Password_confirm || !PasswordStrength(req.Password) 
+		|| hashedPassword := HashPassword(req.Password) == nil{
+		return c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(),})
+	}
+	user := User {
+		ID = uuid.New()
+		Email = strings.ToLower(req.Email)
+		Password_hash = hashedPassword
+		Name = req.Name
+		Display_name = req.Display_name
+	}
+	err := repository.CreateUser()
+	if err != nil {
+
+	}
+	go GreetNewUser()
 }
 
 func UpdateUser(c *gin.Context) {
 	// TODO: call db.UpdateUser()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
+
+//Create a hashed password to store in Database
+func HashPassword(password string) ([]byte, bool) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, false
+	}
+	return hashedPassword, true
+}
+
+//Use zxcvbn to assess password strength: 0 = very weak, 4 = very strong
+func IsPasswordStrong(password string) bool {
+	result := zxcvbn.PasswordStrength(password, nil)
+	return result.Score >= 3 
+}
+
+//Call API that will send a greeting email to new user created, will be launched in a routine
+func GreetNewUser(){
+
+}
+

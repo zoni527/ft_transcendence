@@ -127,3 +127,8 @@ func GetUserById(id string) (models.User, error) {
 
 	return u, nil
 }
+
+//Add new user to database, Database validates email and username uniqueness, checked at this level to avoid race conditions
+func CreateUser([]string, error) []string, error{
+	
+}

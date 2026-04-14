@@ -3,7 +3,7 @@ package repository
 // Recipe repository functions needed:
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
-// [TODO] CreateRecipe      — POST /api/recipes (transaction: insert recipe + steps + ingredients)
+// [....] CreateRecipe      — POST /api/recipes (transaction: insert recipe + steps + ingredients)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] PatchRecipe       — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
@@ -73,6 +73,7 @@ func GetAllRecipes() ([]models.Recipe, error) {
 	return recipes, nil
 }
 
+// TODO: change id parameter to *string
 // GetRecipeById returns a single recipe by UUID.
 func GetRecipeById(id string) (models.Recipe, error) {
 	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
@@ -103,4 +104,8 @@ func GetRecipeById(id string) (models.Recipe, error) {
 	}
 
 	return r, nil
+}
+
+func CreateRecipe(r *models.Recipe) error {
+	return nil
 }

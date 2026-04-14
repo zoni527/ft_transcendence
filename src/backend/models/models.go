@@ -46,7 +46,15 @@ type Recipe struct {
 type CreateUserRequest struct {
 	Email 			string 		`json:"email" binding:"required,email"`
 	Password 		string 		`json:"password" binding:"required,min=8"`
-	Password_confirm string `json:"password_confirm" binding:"required,eqfield=Password"`
+	Password_confirm string 	`json:"password_confirm" binding:"required,eqfield=Password"`
 	Name			string		`json:"name"`
 	Display_name	string		`json:"display_name" binding:"required,min=3,max=15"`
 }
+
+type CreateUserParams struct {
+	Email 			string 		`json:"email"`
+	Password_hashed	string 		`json:"password_hashed"`
+	Name			string		`json:"name"`
+	Display_name	string		`json:"display_name"`
+}
+

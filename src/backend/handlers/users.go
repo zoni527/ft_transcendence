@@ -59,16 +59,16 @@ func GetUserById(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data",})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data",})
 		return
 	}
 	if !IsPasswordStrong(req.Password){
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Password is too weak",})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak",})
 		return 
 	}
 	hashedPassword, err := HashPassword(req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error",})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error",})
 		return 
 	}
 	userParams := models.CreateUserParams {
@@ -80,10 +80,10 @@ func CreateUser(c *gin.Context) {
 	data, err := repository.CreateUser(userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists){
-			c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
+			c.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error",})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error",})
 		return 
 	}
 	go func(email string, displayName string) {

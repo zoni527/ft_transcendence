@@ -52,7 +52,7 @@ type CreateUserRequest struct {
 
 type CreateUserParams struct {
 	Email 			string 		`json:"email"`
-	Password_hashed	string 		`json:"password_hashed"`
+	Password_hashed	string 		`json:"-"`
 	Name			string		`json:"name"`
 	Display_name	string		`json:"display_name"`
 }

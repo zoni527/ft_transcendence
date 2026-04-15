@@ -59,39 +59,39 @@ func GetUserById(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data",})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	if !IsPasswordStrong(req.Password){
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak",})
-		return 
+	if !IsPasswordStrong(req.Password) {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+		return
 	}
 	hashedPassword, err := HashPassword(req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error",})
-		return 
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
 	}
-	userParams := models.CreateUserParams {
-		Email : strings.ToLower(req.Email),
-		Password_hashed : hashedPassword,
-		Name : req.Name,
-		Display_name : req.Display_name,
+	userParams := models.CreateUserParams{
+		Email:           strings.ToLower(req.Email),
+		Password_hashed: hashedPassword,
+		Name:            req.Name,
+		Display_name:    req.Display_name,
 	}
 	data, err := repository.CreateUser(userParams)
 	if err != nil {
-		if errors.Is(err, repository.ErrUserAlreadyExists){
+		if errors.Is(err, repository.ErrUserAlreadyExists) {
 			c.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error",})
-		return 
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
 	}
 	go func(email string, displayName string) {
 		if err := GreetNewUser(email, displayName); err != nil {
 			log.Printf("welcome email not sent for %s: %v", email, err)
 		}
 	}(data.Email, data.Display_name)
-	//Return more data? to be confirmed
+
 	c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
 }
 
@@ -135,4 +135,3 @@ func GreetNewUser(email string, displayName string) error {
 	}
 	return nil
 }
-

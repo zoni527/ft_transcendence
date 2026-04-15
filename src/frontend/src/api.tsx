@@ -4,6 +4,7 @@ interface SignupPayload {
   username: string;
   email: string;
   password: string;
+  confirmedPassword: string;
 }
 
 interface SignupResponse {

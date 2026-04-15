@@ -26,15 +26,15 @@ const Signup = () => {
     const username = getStringValue('username');
     const email = getStringValue('email');
     const password = getStringValue('password');
-    const confirmPassword = getStringValue('confirmPassword');
+    const confirmedPassword = getStringValue('confirmedPassword');
 
     // Basic input validation
-    if (!username || !email || !password || !confirmPassword) {
+    if (!username || !email || !password || !confirmedPassword) {
       setError('All fields are required.');
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (password !== confirmedPassword) {
       setError('Passwords do not match.');
       return;
     }
@@ -42,7 +42,7 @@ const Signup = () => {
     setLoading(true);
 
     // POST Signup API call
-    postSignup({ username, email, password })
+    postSignup({ username, email, password, confirmedPassword })
       .then(() => {
         void navigate('/dashboard');
       })
@@ -91,8 +91,8 @@ const Signup = () => {
 
         {/* Confirm Password */}
         <InputField
-          id="confirmPassword"
-          name="confirmPassword"
+          id="confirmedPassword"
+          name="confirmedPassword"
           label="Confirm Password"
           type="password"
           placeholder="Re-enter your password"

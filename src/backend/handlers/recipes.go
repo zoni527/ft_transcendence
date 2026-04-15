@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"unicode"
 
 	"ft_transcendence/backend/models"
@@ -53,85 +52,13 @@ func GetRecipeById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, recipe)
 }
 
-func intParamParse(c *gin.Context, s string, r *models.Recipe) bool {
-	var iPtr *int
-
-	switch s {
-	case "prep_time_min":
-		iPtr = &r.Prep_time_min
-	case "cook_time_min":
-		iPtr = &r.Cook_time_min
-	case "servings":
-		iPtr = &r.Servings
-	case "calories":
-		iPtr = &r.Calories
-	default:
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
-		})
-		return false
-	}
-
-	var err error = nil
-
-	// int parameters aren required fields in the database, thus "" -> 0 isn't validated
-	// at the moment
-	if c.Param(s) != "" {
-		*iPtr, err = strconv.Atoi(c.Param(s))
-		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintln("%v: not a valid int: %v", s, c.Param(s)),
-			})
-			return false
-		}
-	}
-
-	return true
-}
-
-func floatParamParse(c *gin.Context, s string, r *models.Recipe) bool {
-	var fPtr *float64
-
-	switch s {
-	case "protein_g":
-		fPtr = &r.Protein_g
-	case "carbs_g":
-		fPtr = &r.Carbs_g
-	case "Fat_g":
-		fPtr = &r.Fat_g
-	default:
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
-		})
-		return false
-	}
-
-	var err error = nil
-	if c.Param(s) != "" {
-		*fPtr, err = strconv.ParseFloat(s, 64)
-		if err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintln("%v: not a valid float: %v", s, c.Param(s)),
-			})
-			return false
-		}
-	}
-
-	return true
-}
-
 func CreateRecipe(c *gin.Context) {
-	// -----------------
-	// string parameters
-	// -----------------
-	r := models.Recipe{
-		Author_id:   c.Param("author_id"),
-		Title:       c.Param("title"),
-		Description: c.Param("description"),
-		Difficulty:  c.Param("difficulty"),
-		Cuisine:     c.Param("cuisine"),
-		Meal_type:   c.Param("meal_type"),
-		Image_url:   c.Param("image_url"),
+	var r models.Recipe
+
+	// BindJSON calls a function that will respond 400 if there is an error,
+	// not possible to get further details
+	if err := c.BindJSON(&r); err != nil {
+		return
 	}
 
 	// Check if author_id exists in database, if not, no go
@@ -151,10 +78,17 @@ func CreateRecipe(c *gin.Context) {
 	// int parameters
 	// --------------
 
-	if !intParamParse(c, "prep_time_min", &r) ||
-		!intParamParse(c, "cook_time_min", &r) ||
-		!intParamParse(c, "servings", &r) ||
-		!intParamParse(c, "calories", &r) {
+	// I know these values are ridiculous, but with this you could feed 100 sumo wrestlers
+	const PREP_TIME_MAX = 60 * 1000 // 1000 hours max
+	const COOK_TIME_MAX = 60 * 100  // 100 hours max
+	const SERVINGS_MAX = 100
+	const CALORIES_MAX = 1000000
+
+	switch {
+	case !intFieldOk(c, &r.Prep_time_min, "prep time", 0, PREP_TIME_MAX),
+		!intFieldOk(c, &r.Cook_time_min, "cook time", 0, COOK_TIME_MAX),
+		!intFieldOk(c, &r.Servings, "servings", 1, SERVINGS_MAX),
+		!intFieldOk(c, &r.Calories, "calories", 0, CALORIES_MAX): // Allows one serving of ice water
 		return
 	}
 
@@ -162,37 +96,55 @@ func CreateRecipe(c *gin.Context) {
 	// float64 parameters
 	// ------------------
 
-	if !floatParamParse(c, "protein_g", &r) ||
-		!floatParamParse(c, "carbs_g", &r) ||
-		!floatParamParse(c, "fat_g", &r) {
+	const PROTEIN_MAX = 1000 * 100 // 100 kg
+	const CARBS_MAX = 1000 * 100   // 100 kg
+	const FAT_MAX = 1000 * 100     // 100 kg
+
+	switch {
+	case !floatFieldOk(c, &r.Protein_g, "protein grams", 0, PROTEIN_MAX),
+		!floatFieldOk(c, &r.Carbs_g, "carbs grams", 0, CARBS_MAX),
+		!floatFieldOk(c, &r.Fat_g, "calories", 0, FAT_MAX):
 		return
 	}
 
-	// --------------
-	// bool parameter
-	// --------------
-
-	isPublished := c.Param("is_published")
-	if isPublished != "true" && isPublished != "false" {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": fmt.Sprintf("bad value for is_publised: %v", isPublished),
+	newRecipe, err := repository.CreateRecipe(&r)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": fmt.Sprintf("internal server error: %w", err),
 		})
-		return
 	}
-	r.Is_published = isPublished == "true"
-
-	// TODO: call repository.CreateRecipe()
-	repository.CreateRecipe(&r)
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	c.IndentedJSON(http.StatusOK, newRecipe)
 }
 
 //------------------------------------------------------------------------------
+// helper functions
+// ----------------
+
+func intFieldOk(c *gin.Context, field *int, fieldName string, fieldMin, fieldMax int) bool {
+	if *field < fieldMin || *field > fieldMax {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": fmt.Sprintf("bad %v value: %v", fieldName, *field),
+		})
+		return false
+	}
+	return true
+}
+
+func floatFieldOk(c *gin.Context, field *float64, fieldName string, fieldMin, fieldMax float64) bool {
+	if *field < fieldMin || *field > fieldMax {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": fmt.Sprintf("bad %v value: %v", fieldName, *field),
+		})
+		return false
+	}
+	return true
+}
 
 const TITLE_MAX_LEN = 20
 
 func IsValidTitle(t *string) error {
 	if *t == "" {
-		return fmt.Errorf("empty string")
+		return fmt.Errorf("title: empty string")
 	}
 
 	if len(*t) > TITLE_MAX_LEN {

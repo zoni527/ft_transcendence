@@ -3,6 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { postSignup } from '../api';
 import InputField from '../components/InputField';
 import { cardBase, buttonBase } from '../styles/styles';
+import { z } from 'zod';
+
+const signupSchema = z
+  .object({
+    username: z.string().min(1, 'Username is required'),
+    email: z
+      .string()
+      .email({ message: 'Invalid email' })
+      .min(1, { message: 'Email is required' }),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmedPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmedPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmedPassword'],
+  });
 
 const Signup = () => {
   const [error, setError] = useState('');
@@ -23,34 +39,34 @@ const Signup = () => {
       return '';
     }
 
-    const username = getStringValue('username');
-    const email = getStringValue('email');
-    const password = getStringValue('password');
-    const confirmPassword = getStringValue('confirmPassword');
-
     // Basic input validation
-    if (!username || !email || !password || !confirmPassword) {
-      setError('All fields are required.');
-      return;
-    }
+    const result = signupSchema.safeParse({
+      username: getStringValue('username'),
+      email: getStringValue('email'),
+      password: getStringValue('password'),
+      confirmedPassword: getStringValue('confirmedPassword'),
+    });
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+    if (!result.success) {
+      setError(result.error.issues[0]?.message || 'Invalid input');
+    } else {
+      setLoading(true);
 
-    setLoading(true);
-
-    // POST Signup API call
-    postSignup({ username, email, password })
-      .then(() => {
-        void navigate('/dashboard');
+      // POST Signup API call
+      postSignup({
+        username: result.data.username,
+        email: result.data.email,
+        password: result.data.password,
       })
-      .catch((err: unknown) => {
-        if (err instanceof Error) setError(err.message);
-        else setError('Something went wrong. Please try again.');
-      })
-      .finally(() => setLoading(false));
+        .then(() => {
+          void navigate('/dashboard');
+        })
+        .catch((err: unknown) => {
+          if (err instanceof Error) setError(err.message);
+          else setError('Something went wrong');
+        })
+        .finally(() => setLoading(false));
+    }
   };
 
   return (
@@ -91,8 +107,8 @@ const Signup = () => {
 
         {/* Confirm Password */}
         <InputField
-          id="confirmPassword"
-          name="confirmPassword"
+          id="confirmedPassword"
+          name="confirmedPassword"
           label="Confirm Password"
           type="password"
           placeholder="Re-enter your password"

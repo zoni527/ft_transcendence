@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
+	"html"
 	"log"
 	"net/http"
 	"os"
@@ -123,11 +124,12 @@ func GreetNewUser(email string, displayName string) error {
 		return errors.New("RESEND_KEY is not set")
 	}
 	client := resend.NewClient(apiKey)
+	safeName := html.EscapeString(displayName)
 	params := &resend.SendEmailRequest{
 		From:    "onboarding@resend.dev",
 		To:      []string{email},
 		Subject: "Welcome to Recipes",
-		Html:    fmt.Sprintf("<p>Hello %s, welcome to <strong>Recipes.fi</strong>!</p>", displayName),
+		Html:    fmt.Sprintf("<p>Hello %s, welcome to <strong>Recipes.fi</strong>!</p>", safeName),
 	}
 	_, err := client.Emails.Send(params)
 	if err != nil {

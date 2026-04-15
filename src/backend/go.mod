@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.12.0
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354
+	github.com/resend/resend-go/v3 v3.4.0
 	golang.org/x/crypto v0.48.0
 )
 

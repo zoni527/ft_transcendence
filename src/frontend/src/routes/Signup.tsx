@@ -13,11 +13,11 @@ const signupSchema = z
       .email({ message: 'Invalid email' })
       .min(1, { message: 'Email is required' }),
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmedPassword: z.string().min(1, 'Please confirm your password'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
-  .refine((data) => data.password === data.confirmedPassword, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
-    path: ['confirmedPassword'],
+    path: ['confirmPassword'],
   });
 
 const Signup = () => {
@@ -44,7 +44,7 @@ const Signup = () => {
       username: getStringValue('username'),
       email: getStringValue('email'),
       password: getStringValue('password'),
-      confirmedPassword: getStringValue('confirmedPassword'),
+      confirmPassword: getStringValue('confirmPassword'),
     });
 
     if (!result.success) {
@@ -107,8 +107,8 @@ const Signup = () => {
 
         {/* Confirm Password */}
         <InputField
-          id="confirmedPassword"
-          name="confirmedPassword"
+          id="confirmPassword"
+          name="confirmPassword"
           label="Confirm Password"
           type="password"
           placeholder="Re-enter your password"

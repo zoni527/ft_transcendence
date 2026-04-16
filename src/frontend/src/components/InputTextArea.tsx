@@ -1,4 +1,4 @@
-import { cardBase, inputFieldBase } from '../styles/styles';
+import { cardBase, inputFieldBase, inputLabelText } from '../styles/styles';
 
 interface InputTextAreaProps {
   id: string;
@@ -17,7 +17,7 @@ const InputTextArea = ({
 }: InputTextAreaProps) => {
   return (
     <div>
-      <label htmlFor={id} className="text-md block font-medium text-gray-700">
+      <label htmlFor={id} className={`${inputLabelText}`}>
         {label}
       </label>
 

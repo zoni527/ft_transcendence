@@ -107,33 +107,35 @@ func GetRecipeById(id string) (models.Recipe, error) {
 }
 
 func CreateRecipe(r *models.Recipe) (*models.Recipe, error) {
-	var newRecipe models.Recipe
-
 	sql := `
 		INSERT INTO recipe (
-			author_id, description, prep_time_min, cook_time_min, servings,
-			difficulty, cuisine, meal_type, calories, protein_g,
-			carbs_g, fat_g, is_published
+			author_id, title, description, prep_time_min, cook_time_min,
+			servings, difficulty, cuisine, meal_type, image_url,
+			calories, protein_g, carbs_g, fat_g, is_published
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
-		) RETURNING id, author_id, description, prep_time_min, cook_time_min, servings,
-			difficulty, cuisine, meal_type, calories, protein_g,
-			carbs_g, fat_g, is_published`
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+		) RETURNING id,
+			author_id, title, description, prep_time_min, cook_time_min,
+			servings, difficulty, cuisine, meal_type, image_url,
+			calories, protein_g, carbs_g, fat_g, is_published,
+			created_at, updated_at`
 
-	rows, err := Pool.Query(context.Background(), sql,
-		r.Author_id, r.Description, r.Prep_time_min, r.Cook_time_min, r.Servings,
-		r.Difficulty, r.Cuisine, r.Meal_type, r.Calories, r.Protein_g,
-		r.Carbs_g, r.Fat_g, r.Is_published,
+	var newR models.Recipe
+
+	err := Pool.QueryRow(context.Background(), sql,
+		r.Author_id, r.Title, r.Description, r.Prep_time_min, r.Cook_time_min,
+		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
+		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
+	).Scan(
+		&newR.Id,
+		&newR.Author_id, &newR.Title, &newR.Description, &newR.Prep_time_min, &newR.Cook_time_min,
+		&newR.Servings, &newR.Difficulty, &newR.Cuisine, &newR.Meal_type, &newR.Image_url,
+		&newR.Calories, &newR.Protein_g, &newR.Carbs_g, &newR.Fat_g, &newR.Is_published,
+		&newR.Created_at, &newR.Updated_at,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating recipe: %w", err)
 	}
-	defer rows.Close()
 
-	newRecipe, err = pgx.RowToStructByName[models.Recipe](rows)
-	if err != nil {
-		return nil, fmt.Errorf("error creating recipe: %w", err)
-	}
-
-	return &newRecipe, nil
+	return &newR, nil
 }

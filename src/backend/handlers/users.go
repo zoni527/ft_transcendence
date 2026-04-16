@@ -14,6 +14,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"unicode"
 
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
@@ -59,6 +60,13 @@ func CreateUser(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
+	}
+	req.Name = strings.TrimSpace(req.Name)
+	if req.Name != "" {
+		if !isNameValid(req.Name) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
+			return
+		}
 	}
 	if !IsPasswordStrong(req.Password) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
@@ -106,4 +114,38 @@ func HashPassword(password string) (string, error) {
 func IsPasswordStrong(password string) bool {
 	result := zxcvbn.PasswordStrength(password, nil)
 	return result.Score >= 3
+}
+
+// Custom name validator: Allows letters + separators (space, apostrophe, hyphen),
+// but rejects separator-only names like "-----".
+func isNameValid(name string) bool {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return false
+	}
+
+	var letters int
+	var prevSep bool
+
+	for i, r := range name {
+		isLetter := unicode.IsLetter(r)
+		isSep := r == ' ' || r == '\'' || r == '-'
+
+		if !isLetter && !isSep {
+			return false
+		}
+		if isLetter {
+			letters++
+			prevSep = false
+			continue
+		}
+		if i == 0 || i == len(name)-1 {
+			return false
+		}
+		if prevSep {
+			return false
+		}
+		prevSep = true
+	}
+	return letters >= 2
 }

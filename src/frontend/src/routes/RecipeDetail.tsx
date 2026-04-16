@@ -66,15 +66,12 @@ const RecipeDetail = () => {
               />
               <DetailField label={'Servings'} value={recipe.servings} />
               <DetailField label={'Difficulty'} value={recipe.difficulty} />
-              <DetailField
-                label={'Likes'}
-                value={recipe.has_been_favourite_times}
-              />
+              <DetailField label={'Likes'} value={'PLACEHOLDER VALUE'} />
             </div>
 
             {/* Right */}
             <div className="flex-1 space-y-2">
-              <DetailField label="Calories" value={recipe.calories} />
+              <DetailField label="Calories (kcal)" value={recipe.calories} />
               <DetailField label={'Protein (grams)'} value={recipe.protein_g} />
               <DetailField
                 label={'Carbohydrates (grams)'}
@@ -84,11 +81,8 @@ const RecipeDetail = () => {
             </div>
           </div>
 
-          {/* Like */}
-          <div className="mt-6">
-            <p className="text-md max-w-[80%]">
-              Like: {recipe.has_been_favourite_times}
-            </p>
+          {/* Like Button */}
+          <div className="mt-2">
             <button
               className="text-amber-500 transition-colors hover:cursor-pointer hover:text-amber-600 hover:shadow-xl"
               aria-label="Like"

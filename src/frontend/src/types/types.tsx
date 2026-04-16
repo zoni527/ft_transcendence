@@ -1,5 +1,5 @@
 export interface Recipe {
-  id: number;
+  id: string;
   author_id: string;
   title: string;
   description: string;
@@ -17,5 +17,4 @@ export interface Recipe {
   is_published: boolean;
   created_at: string;
   updated_at: string;
-  has_been_favourite_times: number;
 }

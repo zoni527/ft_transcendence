@@ -63,10 +63,15 @@ func CreateUser(c *gin.Context) {
 	}
 	req.Name = strings.TrimSpace(req.Name)
 	if req.Name != "" {
-		if !isNameValid(req.Name) {
+		if !isValidName(req.Name) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
 			return
 		}
+	}
+	req.Display_name = strings.TrimSpace(req.Display_name)
+	if !isValidDisplayName(req.Display_name) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
+		return
 	}
 	if !IsPasswordStrong(req.Password) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
@@ -118,7 +123,7 @@ func IsPasswordStrong(password string) bool {
 
 // Custom name validator: Allows letters + separators (space, apostrophe, hyphen),
 // but rejects separator-only names like "-----".
-func isNameValid(name string) bool {
+func isValidName(name string) bool {
 	name = strings.TrimSpace(name)
 	if name == "" {
 		return false
@@ -148,4 +153,39 @@ func isNameValid(name string) bool {
 		prevSep = true
 	}
 	return letters >= 2
+}
+
+// Username validator: allows letters, numbers and separators (_ . -).
+// but rejects separators at start/end, spaces, and only symbols
+func isValidDisplayName(displayName string) bool {
+	displayName = strings.TrimSpace(displayName)
+	if displayName == "" {
+		return false
+	}
+
+	var hasAlphaNum bool
+	var prevSep bool
+
+	for i, r := range displayName {
+		isAlphaNum := unicode.IsLetter(r) || unicode.IsDigit(r)
+		isSep := r == '_' || r == '.' || r == '-'
+
+		if !isAlphaNum && !isSep {
+			return false
+		}
+		if isAlphaNum {
+			hasAlphaNum = true
+			prevSep = false
+			continue
+		}
+		if i == 0 || i == len(displayName)-1 {
+			return false
+		}
+		if prevSep {
+			return false
+		}
+		prevSep = true
+	}
+
+	return hasAlphaNum
 }

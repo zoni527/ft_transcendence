@@ -132,8 +132,8 @@ func GetUserById(id string) (models.User, error) {
 
 var ErrUserAlreadyExists = errors.New("user already exists")
 
-//Add new user to database, Database validates email and username uniqueness, checked at this level to avoid race conditions
-func CreateUser(params models.CreateUserParams)(models.User, error) {
+// Add new user to database, Database validates email and username uniqueness, checked at this level to avoid race conditions
+func CreateUser(params models.CreateUserParams) (models.User, error) {
 	tx, err := Pool.Begin(context.Background())
 	if err != nil {
 		return models.User{}, fmt.Errorf("start transaction: %w", err)

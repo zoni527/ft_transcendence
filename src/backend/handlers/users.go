@@ -11,19 +11,16 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
-	"ft_transcendence/backend/models"
-	"ft_transcendence/backend/repository"
-	"html"
 	"log"
 	"net/http"
-	"os"
 	"strings"
+
+	"ft_transcendence/backend/models"
+	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 	"github.com/nbutton23/zxcvbn-go"
-	"github.com/resend/resend-go/v3"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -87,12 +84,6 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	go func(email string, displayName string) {
-		if err := GreetNewUser(email, displayName); err != nil {
-			log.Printf("welcome email not sent for %s: %v", email, err)
-		}
-	}(data.Email, data.Display_name)
-
 	c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
 }
 
@@ -101,7 +92,7 @@ func UpdateUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
-//Create a hashed password to store in Database
+// Create a hashed password to store in Database
 func HashPassword(password string) (string, error) {
 	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -111,29 +102,8 @@ func HashPassword(password string) (string, error) {
 	return hashedString, nil
 }
 
-//Use zxcvbn to assess password strength: 0 = very weak, 4 = very strong
+// Use zxcvbn to assess password strength: 0 = very weak, 4 = very strong
 func IsPasswordStrong(password string) bool {
 	result := zxcvbn.PasswordStrength(password, nil)
 	return result.Score >= 3
-}
-
-//Call API that will send a greeting email to new user created, will be launched in a routine
-func GreetNewUser(email string, displayName string) error {
-	apiKey := os.Getenv("RESEND_KEY")
-	if apiKey == "" {
-		return errors.New("RESEND_KEY is not set")
-	}
-	client := resend.NewClient(apiKey)
-	safeName := html.EscapeString(displayName)
-	params := &resend.SendEmailRequest{
-		From:    "onboarding@resend.dev",
-		To:      []string{email},
-		Subject: "Welcome to Recipes",
-		Html:    fmt.Sprintf("<p>Hello %s, welcome to <strong>Recipes.fi</strong>!</p>", safeName),
-	}
-	_, err := client.Emails.Send(params)
-	if err != nil {
-		return err
-	}
-	return nil
 }

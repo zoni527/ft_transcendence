@@ -45,6 +45,13 @@ export const inputFieldBase = `
   focus:outline-none
 `;
 
+export const inputLabelText = `
+  text-md
+  block
+  font-medium
+  text-gray-700
+`;
+
 export const cardHighlight = `
   transition-all
   duration-300

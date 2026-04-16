@@ -10,7 +10,9 @@ export const cardBase = `
 `;
 
 export const buttonBase = `
-  w-full
+  w-fit
+  block
+  mx-auto
   rounded-lg
   bg-amber-600
   px-4

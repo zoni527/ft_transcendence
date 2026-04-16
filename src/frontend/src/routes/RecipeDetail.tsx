@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import DetailField from '../components/DetailField';
+import DataField from '../components/DataField';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -55,29 +55,29 @@ const RecipeDetail = () => {
           <div className="mt-6 flex gap-8">
             {/* Left */}
             <div className="flex-1 space-y-2">
-              <DetailField label="Author" value={recipe.author_id} />
-              <DetailField
+              <DataField label="Author" value={recipe.author_id} />
+              <DataField
                 label={'Preparation (minutes)'}
                 value={recipe.prep_time_min}
               />
-              <DetailField
+              <DataField
                 label={'Cooking (minutes)'}
                 value={recipe.cook_time_min}
               />
-              <DetailField label={'Servings'} value={recipe.servings} />
-              <DetailField label={'Difficulty'} value={recipe.difficulty} />
-              <DetailField label={'Likes'} value={'PLACEHOLDER VALUE'} />
+              <DataField label={'Servings'} value={recipe.servings} />
+              <DataField label={'Difficulty'} value={recipe.difficulty} />
+              <DataField label={'Likes'} value={'PLACEHOLDER VALUE'} />
             </div>
 
             {/* Right */}
             <div className="flex-1 space-y-2">
-              <DetailField label="Calories (kcal)" value={recipe.calories} />
-              <DetailField label={'Protein (grams)'} value={recipe.protein_g} />
-              <DetailField
+              <DataField label="Calories (kcal)" value={recipe.calories} />
+              <DataField label={'Protein (grams)'} value={recipe.protein_g} />
+              <DataField
                 label={'Carbohydrates (grams)'}
                 value={recipe.carbs_g}
               />
-              <DetailField label={'Fat (grams)'} value={recipe.fat_g} />
+              <DataField label={'Fat (grams)'} value={recipe.fat_g} />
             </div>
           </div>
 

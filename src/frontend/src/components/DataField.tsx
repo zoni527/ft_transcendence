@@ -1,9 +1,9 @@
-interface DetailFieldProps {
+interface DataFieldProps {
   label: string;
   value: string | number;
 }
 
-const DetailField = ({ label, value }: DetailFieldProps) => {
+const DataField = ({ label, value }: DataFieldProps) => {
   return (
     <p className={`text-lg`}>
       <strong>{label}:</strong> {value}
@@ -11,4 +11,4 @@ const DetailField = ({ label, value }: DetailFieldProps) => {
   );
 };
 
-export default DetailField;
+export default DataField;

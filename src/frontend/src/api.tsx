@@ -7,10 +7,14 @@ interface SignupPayload {
   display_name: string;
 }
 
-interface SignupResponse {
-  error?: string;
-  userId?: string;
-}
+type SignupResponse = {
+  id: string;
+  email: string;
+};
+
+type ApiError = {
+  error: string;
+};
 
 const baseUrl = 'http://localhost:8080/api';
 
@@ -52,14 +56,22 @@ export const postSignup = async (
     body: JSON.stringify(payload),
   });
 
-  const data = (await response
-    .json()
-    .catch(() => null)) as SignupResponse | null;
+  let data: unknown;
 
-  if (!response.ok) {
-    const errorMessage = data?.error ?? 'Signup failed';
-    throw new Error(errorMessage);
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error('Invalid server response');
   }
 
-  return data ?? {};
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' && data !== null && 'error' in data
+        ? (data as ApiError).error
+        : 'Signup failed';
+
+    throw new Error(message);
+  }
+
+  return data as SignupResponse;
 };

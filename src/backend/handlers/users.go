@@ -106,7 +106,7 @@ func UpdateUser(c *gin.Context) {
 }
 
 // Create a hashed password to store in Database
-func HashPassword(password string) (string, error) {
+func hashPassword(password string) (string, error) {
 	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
@@ -117,7 +117,7 @@ func HashPassword(password string) (string, error) {
 
 // Use zxcvbn to assess password strength: 0 = very weak, 4 = very strong
 // Set to 0 for development phase, to be set on 3 when it is ready
-func IsPasswordStrong(password string) bool {
+func isPasswordStrong(password string) bool {
 	result := zxcvbn.PasswordStrength(password, nil)
 	return result.Score >= 0
 }

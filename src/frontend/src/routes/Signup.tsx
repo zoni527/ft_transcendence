@@ -5,9 +5,11 @@ import InputField from '../components/InputField';
 import { cardBase, buttonBase } from '../styles/styles';
 import { z } from 'zod';
 
+// Validation schema
 const signupSchema = z
   .object({
-    username: z.string().min(1, 'Username is required'),
+    name: z.string().min(1, 'Name is required'),
+    displayName: z.string().min(1, 'Display name is required'),
     email: z
       .string()
       .email({ message: 'Invalid email' })
@@ -41,7 +43,8 @@ const Signup = () => {
 
     // Basic input validation
     const result = signupSchema.safeParse({
-      username: getStringValue('username'),
+      name: getStringValue('name'),
+      displayName: getStringValue('displayName'),
       email: getStringValue('email'),
       password: getStringValue('password'),
       confirmPassword: getStringValue('confirmPassword'),
@@ -54,9 +57,10 @@ const Signup = () => {
 
       // POST Signup API call
       postSignup({
-        username: result.data.username,
-        email: result.data.email,
-        password: result.data.password,
+        Email: result.data.email,
+        Password: result.data.password,
+        Name: result.data.name,
+        Display_name: result.data.displayName,
       })
         .then(() => {
           void navigate('/dashboard');
@@ -78,13 +82,22 @@ const Signup = () => {
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Username */}
+        {/* Name */}
         <InputField
-          id="username"
-          name="username"
-          label="Username"
+          id="name"
+          name="name"
+          label="Name"
           type="text"
-          placeholder="Enter your username"
+          placeholder="Enter your name"
+        />
+
+        {/* Display Name */}
+        <InputField
+          id="displayName"
+          name="displayName"
+          label="Display Name"
+          type="text"
+          placeholder="Enter your display name"
         />
 
         {/* Email */}

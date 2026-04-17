@@ -162,7 +162,7 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	}
 
 	floatFields := []floatValidation{
-		{r.Protein_g, "progein_g", 0, PROTEIN_MAX},
+		{r.Protein_g, "protein_g", 0, PROTEIN_MAX},
 		{r.Carbs_g, "carbs_g", 0, CARBS_MAX},
 		{r.Fat_g, "fat_g", 0, FAT_MAX},
 	}

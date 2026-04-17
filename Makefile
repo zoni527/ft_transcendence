@@ -25,5 +25,5 @@ down: clean
 
 nuke: fclean
 # ---------------------------------------------------------------------------- #
-.PHONY: all clean fclean dbclean re check
+.PHONY: all clean fclean dbclean re check up down nuke
 # ---------------------------------------------------------------------------- #

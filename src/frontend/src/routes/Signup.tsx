@@ -67,7 +67,7 @@ const Signup = () => {
         })
         .catch((err: unknown) => {
           if (err instanceof Error) setError(err.message);
-          else setError('Something went wrong');
+          else setError('Something went wrong. Please try again.');
         })
         .finally(() => setLoading(false));
     }

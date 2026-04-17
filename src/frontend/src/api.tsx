@@ -1,14 +1,14 @@
 import type { Recipe } from './types/types';
 
 interface SignupPayload {
-  Email: string;
-  Password: string;
-  Name: string;
-  Display_name: string;
+  email: string;
+  password: string;
+  name: string;
+  display_name: string;
 }
 
 interface SignupResponse {
-  error: string;
+  error?: string;
   userId?: string;
 }
 
@@ -52,11 +52,14 @@ export const postSignup = async (
     body: JSON.stringify(payload),
   });
 
+  const data = (await response
+    .json()
+    .catch(() => null)) as SignupResponse | null;
+
   if (!response.ok) {
-    const errorData = (await response.json()) as { error?: string } | undefined;
-    throw new Error(errorData?.error ?? 'Signup failed');
+    const errorMessage = data?.error ?? 'Signup failed';
+    throw new Error(errorMessage);
   }
 
-  const data = (await response.json()) as SignupResponse;
-  return data;
+  return data ?? {};
 };

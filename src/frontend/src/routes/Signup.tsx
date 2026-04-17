@@ -12,8 +12,8 @@ const signupSchema = z
     displayName: z.string().min(1, 'Display name is required'),
     email: z
       .string()
-      .email({ message: 'Invalid email' })
-      .min(1, { message: 'Email is required' }),
+      .min(1, { message: 'Email is required' })
+      .email({ message: 'Invalid email' }),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
@@ -57,10 +57,10 @@ const Signup = () => {
 
       // POST Signup API call
       postSignup({
-        Email: result.data.email,
-        Password: result.data.password,
-        Name: result.data.name,
-        Display_name: result.data.displayName,
+        email: result.data.email,
+        password: result.data.password,
+        name: result.data.name,
+        display_name: result.data.displayName,
       })
         .then(() => {
           void navigate('/dashboard');

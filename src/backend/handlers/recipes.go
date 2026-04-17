@@ -78,7 +78,9 @@ func CreateRecipe(c *gin.Context) {
 	if err != nil {
 		log.Printf("CreateRecipe error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
 	}
+
 	c.IndentedJSON(http.StatusOK, newRecipe)
 }
 

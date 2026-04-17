@@ -73,11 +73,11 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
 		return
 	}
-	if !IsPasswordStrong(req.Password) {
+	if !isPasswordStrong(req.Password) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
 		return
 	}
-	hashedPassword, err := HashPassword(req.Password)
+	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return

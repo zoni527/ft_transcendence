@@ -3,7 +3,7 @@ package handlers
 // Recipe handlers needed:
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
-// [....] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
+// [done] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] PatchRecipe       — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
@@ -83,6 +83,26 @@ func CreateRecipe(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, newRecipe)
 }
 
+func UpdateRecipe(c *gin.Context) {
+	// TODO: call repository.UpdateRecipe()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+func PatchRecipe(c *gin.Context) {
+	// TODO: call repository.PatchRecipe()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+func DeleteRecipe(c *gin.Context) {
+	// TODO: call repository.DeleteRecipe()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+func UploadRecipeImage(c *gin.Context) {
+	// TODO: call repository.UploadRecipeImage()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
 //------------------------------------------------------------------------------
 // helper functions
 // ----------------
@@ -120,7 +140,7 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	}
 
 	for _, v := range intFields {
-		if err := NumFieldOk(v.val, v.s, v.min, v.max); err != nil {
+		if err := NumFieldOk(v.val, &v.s, v.min, v.max); err != nil {
 			return err
 		}
 	}
@@ -142,7 +162,7 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	}
 
 	for _, v := range floatFields {
-		if err := NumFieldOk(v.val, v.s, v.min, v.max); err != nil {
+		if err := NumFieldOk(v.val, &v.s, v.min, v.max); err != nil {
 			return err
 		}
 	}
@@ -208,9 +228,9 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	return nil
 }
 
-func NumFieldOk[T int | float64](field T, fieldName string, fieldMin, fieldMax T) error {
+func NumFieldOk[T int | float64](field T, fieldName *string, fieldMin, fieldMax T) error {
 	if field < fieldMin || field > fieldMax {
-		return fmt.Errorf("%v: bad  value: %v", fieldName, field)
+		return fmt.Errorf("%v: bad  value: %v", *fieldName, field)
 	}
 	return nil
 }

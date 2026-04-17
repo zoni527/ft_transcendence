@@ -50,11 +50,26 @@ func GetUserById(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-	// TODO: validate + hash password + call db.CreateUser()
+	// TODO: validate + hash password + call repository.CreateUser()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
 func UpdateUser(c *gin.Context) {
-	// TODO: call db.UpdateUser()
+	// TODO: call repository.UpdateUser()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+func PatchUser(c *gin.Context) {
+	// TODO: call repository.PatchUser()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+func DeleteUser(c *gin.Context) {
+	// TODO: call repository.DeleteUser()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+func SearchUsers(c *gin.Context) {
+	// TODO: call repository.SearchUsers()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }

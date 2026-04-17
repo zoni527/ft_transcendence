@@ -1,2 +1,2 @@
-# ft_transendence
+# ft_transcendence
 Full-stack web dev project

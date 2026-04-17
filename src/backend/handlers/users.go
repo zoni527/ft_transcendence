@@ -58,28 +58,28 @@ func GetUserById(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
 	req.Name = strings.TrimSpace(req.Name)
 	if req.Name != "" {
 		if !isValidName(req.Name) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
 			return
 		}
 	}
 	req.Display_name = strings.TrimSpace(req.Display_name)
 	if !isValidDisplayName(req.Display_name) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
 		return
 	}
 	if !isPasswordStrong(req.Password) {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+		c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
 		return
 	}
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	userParams := models.CreateUserParams{
@@ -91,13 +91,13 @@ func CreateUser(c *gin.Context) {
 	data, err := repository.CreateUser(userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
+	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
 }
 
 func UpdateUser(c *gin.Context) {

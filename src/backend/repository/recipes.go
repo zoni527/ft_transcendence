@@ -3,7 +3,7 @@ package repository
 // Recipe repository functions needed:
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
-// [....] CreateRecipe      — POST /api/recipes (transaction: insert recipe + steps + ingredients)
+// [done] CreateRecipe      — POST /api/recipes (transaction: insert recipe + steps + ingredients)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] PatchRecipe       — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
@@ -73,9 +73,8 @@ func GetAllRecipes() ([]models.Recipe, error) {
 	return recipes, nil
 }
 
-// TODO: change id parameter to *string
 // GetRecipeById returns a single recipe by UUID.
-func GetRecipeById(id string) (models.Recipe, error) {
+func GetRecipeById(id *string) (models.Recipe, error) {
 	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
 				COALESCE(prep_time_min, 0), COALESCE(cook_time_min, 0),
 				servings, COALESCE(difficulty, ''), COALESCE(cuisine, ''),
@@ -87,7 +86,7 @@ func GetRecipeById(id string) (models.Recipe, error) {
 			WHERE id = $1 AND is_published = true`
 
 	var r models.Recipe
-	err := Pool.QueryRow(context.Background(), sql, id).Scan(
+	err := Pool.QueryRow(context.Background(), sql, *id).Scan(
 		&r.Id, &r.Author_id, &r.Title, &r.Description,
 		&r.Prep_time_min, &r.Cook_time_min, &r.Servings,
 		&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,

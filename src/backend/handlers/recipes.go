@@ -39,7 +39,7 @@ func GetRecipeById(c *gin.Context) {
 		return
 	}
 
-	recipe, err := repository.GetRecipeById(id)
+	recipe, err := repository.GetRecipeById(&id)
 	if err == pgx.ErrNoRows {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
@@ -61,7 +61,12 @@ func CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	// Check if author_id exists in database, if not, no go
+	if !isValidUUID(r.Author_id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid author_id format"})
+		return
+	}
+	// Not sure if I should prefetch this from the DB for validation or let the creation fail later,
+	// but it might show up as an internal server error instead if the SQL query fails
 	if _, err := repository.GetUserById(r.Author_id); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": fmt.Sprintf("author_id %v not in database", r.Author_id),

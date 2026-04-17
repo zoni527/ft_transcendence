@@ -164,6 +164,11 @@ func isValidDisplayName(displayName string) bool {
 		return false
 	}
 
+	runeLen := len([]rune(displayName))
+	if runeLen < 3 || runeLen > 15 {
+		return false
+	}
+
 	var hasAlphaNum bool
 	var prevSep bool
 

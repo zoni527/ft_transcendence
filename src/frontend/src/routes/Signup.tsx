@@ -8,14 +8,14 @@ import { z } from 'zod';
 // Validation schema
 const signupSchema = z
   .object({
-    name: z.string().min(1, 'Name is required'),
-    displayName: z.string().min(1, 'Display name is required'),
+    fullName: z.string().min(1, 'Full name is required'),
+    username: z.string().min(1, 'Username / alias is required'),
     email: z
       .string()
       .min(1, { message: 'Email is required' })
       .email({ message: 'Invalid email' }),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string().min(8, 'Please confirm your password'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -41,10 +41,10 @@ const Signup = () => {
       return '';
     }
 
-    // Basic input validation
+    // Input validation
     const result = signupSchema.safeParse({
-      name: getStringValue('name'),
-      displayName: getStringValue('displayName'),
+      fullName: getStringValue('fullName'),
+      username: getStringValue('username'),
       email: getStringValue('email'),
       password: getStringValue('password'),
       confirmPassword: getStringValue('confirmPassword'),
@@ -59,8 +59,8 @@ const Signup = () => {
       postSignup({
         email: result.data.email,
         password: result.data.password,
-        name: result.data.name,
-        display_name: result.data.displayName,
+        name: result.data.fullName,
+        display_name: result.data.username,
       })
         .then(() => {
           void navigate('/dashboard');
@@ -82,22 +82,22 @@ const Signup = () => {
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Name */}
+        {/* Full Name */}
         <InputField
-          id="name"
-          name="name"
-          label="Name"
+          id="fullName"
+          name="fullName"
+          label="Full Name"
           type="text"
-          placeholder="Enter your name"
+          placeholder="Enter your full name"
         />
 
-        {/* Display Name */}
+        {/* Username */}
         <InputField
-          id="displayName"
-          name="displayName"
-          label="Display Name"
+          id="username"
+          name="username"
+          label="Username / Alias"
           type="text"
-          placeholder="Enter your display name"
+          placeholder="Enter your username / alias"
         />
 
         {/* Email */}

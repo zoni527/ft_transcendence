@@ -3,7 +3,7 @@ package handlers
 // User handlers needed:
 // [done] GetUsers      — GET /api/users
 // [done] GetUserById   — GET /api/users/:id
-// [TODO] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
+// [done] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
 // [TODO] UpdateUser    — PUT /api/users/:id
 // [TODO] PatchUser     — PATCH /api/users/:id
 // [TODO] DeleteUser    — DELETE /api/users/:id
@@ -61,14 +61,13 @@ func CreateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	req.Name = strings.TrimSpace(req.Name)
+	normalizeCreateUserRequest(&req)
 	if req.Name != "" {
 		if !isValidName(req.Name) {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
 			return
 		}
 	}
-	req.Display_name = strings.TrimSpace(req.Display_name)
 	if !isValidDisplayName(req.Display_name) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
 		return
@@ -79,11 +78,12 @@ func CreateUser(c *gin.Context) {
 	}
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
+		log.Printf("CreateUser hashPassword error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	userParams := models.CreateUserParams{
-		Email:           strings.ToLower(req.Email),
+		Email:           req.Email,
 		Password_hashed: hashedPassword,
 		Name:            req.Name,
 		Display_name:    req.Display_name,
@@ -94,6 +94,7 @@ func CreateUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
+		log.Printf("CreateUser repository.CreateUser error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -103,6 +104,13 @@ func CreateUser(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	// TODO: call db.UpdateUser()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+// Function to trim leading and trailing blank spaces, set email to lowercase
+func normalizeCreateUserRequest(req *models.CreateUserRequest) {
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
+	req.Name = strings.TrimSpace(req.Name)
+	req.Display_name = strings.TrimSpace(req.Display_name)
 }
 
 // Create a hashed password to store in Database
@@ -116,7 +124,7 @@ func hashPassword(password string) (string, error) {
 }
 
 // Use zxcvbn to assess password strength: 0 = very weak, 4 = very strong
-// Set to 0 for development phase, to be set on 3 when it is ready
+// Set to 0 for development phase, to be set to 3
 func isPasswordStrong(password string) bool {
 	result := zxcvbn.PasswordStrength(password, nil)
 	return result.Score >= 0

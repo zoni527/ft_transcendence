@@ -72,6 +72,10 @@ func CreateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
 		return
 	}
+	if err := validatePassword(req.Password); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	if !isPasswordStrong(req.Password) {
 		c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
 		return
@@ -121,6 +125,17 @@ func hashPassword(password string) (string, error) {
 	}
 	hashedString := string(hashedBytes)
 	return hashedString, nil
+}
+
+// Password validation helper to check if password has control characters
+// Any extra validations would come in this step
+func validatePassword(password string) error {
+	for _, r := range password {
+		if unicode.IsControl(r) {
+			return errors.New("password contains invalid control characters")
+		}
+	}
+	return nil
 }
 
 // Use zxcvbn to assess password strength: 0 = very weak, 4 = very strong

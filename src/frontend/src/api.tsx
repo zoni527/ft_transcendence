@@ -1,5 +1,9 @@
 import type { Recipe } from './types/types';
 
+interface ApiError {
+  error: string;
+}
+
 interface SignupPayload {
   email: string;
   password: string;
@@ -7,18 +11,14 @@ interface SignupPayload {
   display_name: string;
 }
 
-type SignupResponse = {
+interface SignupResponse {
   id: string;
   email: string;
-};
-
-type ApiError = {
-  error: string;
-};
+}
 
 const baseUrl = 'http://localhost:8080/api';
 
-// GET Recipes
+// GET /api/recipes (get all published recipes)
 export const getRecipes = async (): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
 
@@ -32,7 +32,7 @@ export const getRecipes = async (): Promise<Recipe[]> => {
   return data;
 };
 
-// GET Recipe by ID
+// GET /api/recipes/:id (get a single recipe by ID)
 export const getRecipeById = async (id: string): Promise<Recipe> => {
   const response = await fetch(`${baseUrl}/recipes/${id}`);
 
@@ -44,7 +44,7 @@ export const getRecipeById = async (id: string): Promise<Recipe> => {
   return data;
 };
 
-// POST Signup
+// POST /api/users (create a new user)
 export const postSignup = async (
   payload: SignupPayload,
 ): Promise<SignupResponse> => {

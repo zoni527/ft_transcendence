@@ -13,13 +13,16 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 	"strings"
+	"time"
 	"unicode"
 
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/nbutton23/zxcvbn-go"
 	"golang.org/x/crypto/bcrypt"
@@ -101,6 +104,10 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
+}
+
+func LoginUser(c *gin.Context) {
+
 }
 
 func UpdateUser(c *gin.Context) {
@@ -230,4 +237,28 @@ func isValidDisplayName(displayName string) bool {
 	}
 
 	return hasAlphaNum
+}
+
+// Secret key used to sign every generated JWT - passed as env variable once
+var jwtSecret []byte
+
+// Load env var to package variable for use. To be done only once when the backend starts
+func LoadJWTSecret() {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Fatal("error loading JWT secret")
+	}
+	jwtSecret = []byte(secret)
+}
+
+// Function to generate JSON web tokens -
+func generateJWTToken(userID string) (string, error) {
+	now := time.Now()
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     now.Add(time.Hour * 24).Unix(),
+		"iat":     now.Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
 }

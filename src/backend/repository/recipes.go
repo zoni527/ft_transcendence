@@ -3,7 +3,7 @@ package repository
 // Recipe repository functions needed:
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
-// [....] CreateRecipe      — POST /api/recipes (transaction: insert recipe + steps + ingredients)
+// [done] CreateRecipe      — POST /api/recipes (transaction: insert recipe + steps + ingredients)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] PatchRecipe       — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
@@ -73,9 +73,8 @@ func GetAllRecipes() ([]models.Recipe, error) {
 	return recipes, nil
 }
 
-// TODO: change id parameter to *string
 // GetRecipeById returns a single recipe by UUID.
-func GetRecipeById(id string) (models.Recipe, error) {
+func GetRecipeById(id *string) (models.Recipe, error) {
 	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
 				COALESCE(prep_time_min, 0), COALESCE(cook_time_min, 0),
 				servings, COALESCE(difficulty, ''), COALESCE(cuisine, ''),
@@ -87,7 +86,7 @@ func GetRecipeById(id string) (models.Recipe, error) {
 			WHERE id = $1 AND is_published = true`
 
 	var r models.Recipe
-	err := Pool.QueryRow(context.Background(), sql, id).Scan(
+	err := Pool.QueryRow(context.Background(), sql, *id).Scan(
 		&r.Id, &r.Author_id, &r.Title, &r.Description,
 		&r.Prep_time_min, &r.Cook_time_min, &r.Servings,
 		&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,
@@ -106,6 +105,36 @@ func GetRecipeById(id string) (models.Recipe, error) {
 	return r, nil
 }
 
-func CreateRecipe(r *models.Recipe) error {
-	return nil
+func CreateRecipe(r *models.Recipe) (*models.Recipe, error) {
+	sql := `
+		INSERT INTO recipe (
+			author_id, title, description, prep_time_min, cook_time_min,
+			servings, difficulty, cuisine, meal_type, image_url,
+			calories, protein_g, carbs_g, fat_g, is_published
+		) VALUES (
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+		) RETURNING id,
+			author_id, title, description, prep_time_min, cook_time_min,
+			servings, difficulty, cuisine, meal_type, image_url,
+			calories, protein_g, carbs_g, fat_g, is_published,
+			created_at, updated_at`
+
+	var newR models.Recipe
+
+	err := Pool.QueryRow(context.Background(), sql,
+		r.Author_id, r.Title, r.Description, r.Prep_time_min, r.Cook_time_min,
+		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
+		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
+	).Scan(
+		&newR.Id,
+		&newR.Author_id, &newR.Title, &newR.Description, &newR.Prep_time_min, &newR.Cook_time_min,
+		&newR.Servings, &newR.Difficulty, &newR.Cuisine, &newR.Meal_type, &newR.Image_url,
+		&newR.Calories, &newR.Protein_g, &newR.Carbs_g, &newR.Fat_g, &newR.Is_published,
+		&newR.Created_at, &newR.Updated_at,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error creating recipe: %w", err)
+	}
+
+	return &newR, nil
 }

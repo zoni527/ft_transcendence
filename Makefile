@@ -23,7 +23,7 @@ up: all
 
 down: clean
 
-nuke: fclean
+nuke: fclean dbclean
 # ---------------------------------------------------------------------------- #
 .PHONY: all clean fclean dbclean re check up down nuke
 # ---------------------------------------------------------------------------- #

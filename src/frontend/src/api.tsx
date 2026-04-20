@@ -1,15 +1,20 @@
 import type { Recipe } from './types/types';
 
 interface SignupPayload {
-  username: string;
   email: string;
   password: string;
+  name: string;
+  display_name: string;
 }
 
-interface SignupResponse {
-  message: string;
-  userId?: string;
-}
+type SignupResponse = {
+  id: string;
+  email: string;
+};
+
+type ApiError = {
+  error: string;
+};
 
 const baseUrl = 'http://localhost:8080/api';
 
@@ -51,13 +56,22 @@ export const postSignup = async (
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    const errorData = (await response.json()) as
-      | { message?: string }
-      | undefined;
-    throw new Error(errorData?.message ?? 'Signup failed');
+  let data: unknown;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error('Invalid server response');
   }
 
-  const data = (await response.json()) as SignupResponse;
-  return data;
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' && data !== null && 'error' in data
+        ? (data as ApiError).error
+        : 'Signup failed';
+
+    throw new Error(message);
+  }
+
+  return data as SignupResponse;
 };

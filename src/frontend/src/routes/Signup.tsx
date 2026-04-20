@@ -3,6 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { postSignup } from '../api';
 import InputField from '../components/InputField';
 import { cardBase, buttonBase } from '../styles/styles';
+import { z } from 'zod';
+
+// Validation schema
+const signupSchema = z
+  .object({
+    fullName: z.string().min(1, 'Full name is required'),
+    username: z.string().min(1, 'Username / alias is required'),
+    email: z
+      .string()
+      .min(1, { message: 'Email is required' })
+      .email({ message: 'Invalid email' }),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string().min(8, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 const Signup = () => {
   const [error, setError] = useState('');
@@ -23,34 +41,36 @@ const Signup = () => {
       return '';
     }
 
-    const username = getStringValue('username');
-    const email = getStringValue('email');
-    const password = getStringValue('password');
-    const confirmPassword = getStringValue('confirmPassword');
+    // Input validation
+    const result = signupSchema.safeParse({
+      fullName: getStringValue('fullName'),
+      username: getStringValue('username'),
+      email: getStringValue('email'),
+      password: getStringValue('password'),
+      confirmPassword: getStringValue('confirmPassword'),
+    });
 
-    // Basic input validation
-    if (!username || !email || !password || !confirmPassword) {
-      setError('All fields are required.');
-      return;
-    }
+    if (!result.success) {
+      setError(result.error.issues[0]?.message || 'Invalid input');
+    } else {
+      setLoading(true);
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    setLoading(true);
-
-    // POST Signup API call
-    postSignup({ username, email, password })
-      .then(() => {
-        void navigate('/dashboard');
+      // POST Signup API call
+      postSignup({
+        email: result.data.email,
+        password: result.data.password,
+        name: result.data.fullName,
+        display_name: result.data.username,
       })
-      .catch((err: unknown) => {
-        if (err instanceof Error) setError(err.message);
-        else setError('Something went wrong. Please try again.');
-      })
-      .finally(() => setLoading(false));
+        .then(() => {
+          void navigate('/dashboard');
+        })
+        .catch((err: unknown) => {
+          if (err instanceof Error) setError(err.message);
+          else setError('Something went wrong. Please try again.');
+        })
+        .finally(() => setLoading(false));
+    }
   };
 
   return (
@@ -62,13 +82,22 @@ const Signup = () => {
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Full Name */}
+        <InputField
+          id="fullName"
+          name="fullName"
+          label="Full Name"
+          type="text"
+          placeholder="Enter your full name"
+        />
+
         {/* Username */}
         <InputField
           id="username"
           name="username"
-          label="Username"
+          label="Username / Alias"
           type="text"
-          placeholder="Enter your username"
+          placeholder="Enter your username / alias"
         />
 
         {/* Email */}

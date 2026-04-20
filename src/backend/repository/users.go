@@ -14,11 +14,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"ft_transcendence/backend/models"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // GetRolesByUserId returns the role names for a given user.
@@ -125,5 +127,49 @@ func GetUserById(id string) (models.User, error) {
 	}
 	u.Roles = roles
 
+	return u, nil
+}
+
+var ErrUserAlreadyExists = errors.New("user already exists")
+
+// Add new user to database, Database validates email and username uniqueness, checked at this level to avoid race conditions
+func CreateUser(params models.CreateUserParams) (models.User, error) {
+	tx, err := Pool.Begin(context.Background())
+	if err != nil {
+		return models.User{}, fmt.Errorf("start transaction: %w", err)
+	}
+	defer tx.Rollback(context.Background())
+
+	sql := `INSERT INTO "user"(email, password_hash, name, display_name)
+			VALUES($1, $2, $3, $4)
+			RETURNING id, email, name, display_name, created_at, updated_at;`
+	var u models.User
+	err = tx.QueryRow(context.Background(), sql, params.Email, params.Password_hashed,
+		params.Name, params.Display_name).Scan(
+		&u.Id,
+		&u.Email,
+		&u.Name,
+		&u.Display_name,
+		&u.Created_at,
+		&u.Updated_at,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return models.User{}, ErrUserAlreadyExists
+		}
+		return models.User{}, fmt.Errorf("create user: %w", err)
+	}
+
+	roleSQL := `INSERT INTO user_role(user_id, role_id)
+				VALUES($1, (SELECT id FROM role WHERE name = $2))`
+	_, err = tx.Exec(context.Background(), roleSQL, u.Id, "user")
+	if err != nil {
+		return models.User{}, fmt.Errorf("assign role: %w", err)
+	}
+	err = tx.Commit(context.Background())
+	if err != nil {
+		return models.User{}, fmt.Errorf("commit transaction: %w", err)
+	}
 	return u, nil
 }

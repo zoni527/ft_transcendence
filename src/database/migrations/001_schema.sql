@@ -13,7 +13,7 @@ CREATE TABLE "user" (
     email           VARCHAR UNIQUE NOT NULL,
     password_hash   VARCHAR NOT NULL,
     name            VARCHAR,
-    display_name    VARCHAR NOT NULL,
+    display_name    VARCHAR UNIQUE NOT NULL,
     created_at      TIMESTAMP DEFAULT now(),
     updated_at      TIMESTAMP DEFAULT now()
 );

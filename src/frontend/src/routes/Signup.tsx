@@ -55,7 +55,7 @@ const Signup = () => {
     } else {
       setLoading(true);
 
-      // POST Signup API call
+      // POST /api/users (create a new user)
       postSignup({
         email: result.data.email,
         password: result.data.password,

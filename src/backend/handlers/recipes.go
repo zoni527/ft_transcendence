@@ -62,6 +62,8 @@ func CreateRecipe(c *gin.Context) {
 		return
 	}
 
+	// TODO:	currently anyone can create a recipe as any user, need further
+	//			validation later
 	if !isValidUUID(r.Author_id) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid author_id format"})
 		return

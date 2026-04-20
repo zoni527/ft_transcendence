@@ -246,7 +246,7 @@ func ValidateRecipeFields(r *models.Recipe) error {
 
 func NumFieldOk[T int | float64](field T, fieldName *string, fieldMin, fieldMax T) error {
 	if field < fieldMin || field > fieldMax {
-		return fmt.Errorf("%v: bad  value: %v", *fieldName, field)
+		return fmt.Errorf("%v: bad value: %v", *fieldName, field)
 	}
 	return nil
 }

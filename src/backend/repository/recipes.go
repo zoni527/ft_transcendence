@@ -105,7 +105,7 @@ func GetRecipeById(id *string) (models.Recipe, error) {
 	return r, nil
 }
 
-func CreateRecipe(r *models.Recipe) (*models.Recipe, error) {
+func CreateRecipe(r *models.Recipe) (string, error) {
 	sql := `
 		INSERT INTO recipe (
 			author_id, title, description, prep_time_min, cook_time_min,
@@ -113,28 +113,18 @@ func CreateRecipe(r *models.Recipe) (*models.Recipe, error) {
 			calories, protein_g, carbs_g, fat_g, is_published
 		) VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
-		) RETURNING id,
-			author_id, title, description, prep_time_min, cook_time_min,
-			servings, difficulty, cuisine, meal_type, image_url,
-			calories, protein_g, carbs_g, fat_g, is_published,
-			created_at, updated_at`
+		) RETURNING id`
 
-	var newR models.Recipe
+	var newId string
 
 	err := Pool.QueryRow(context.Background(), sql,
 		r.Author_id, r.Title, r.Description, r.Prep_time_min, r.Cook_time_min,
 		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
 		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
-	).Scan(
-		&newR.Id,
-		&newR.Author_id, &newR.Title, &newR.Description, &newR.Prep_time_min, &newR.Cook_time_min,
-		&newR.Servings, &newR.Difficulty, &newR.Cuisine, &newR.Meal_type, &newR.Image_url,
-		&newR.Calories, &newR.Protein_g, &newR.Carbs_g, &newR.Fat_g, &newR.Is_published,
-		&newR.Created_at, &newR.Updated_at,
-	)
+	).Scan(&newId)
 	if err != nil {
-		return nil, fmt.Errorf("error creating recipe: %w", err)
+		return "", fmt.Errorf("error creating recipe: %w", err)
 	}
 
-	return &newR, nil
+	return newId, nil
 }

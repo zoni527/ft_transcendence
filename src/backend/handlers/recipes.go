@@ -80,14 +80,14 @@ func CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	newRecipe, err := repository.CreateRecipe(&r)
+	newRecipeId, err := repository.CreateRecipe(&r)
 	if err != nil {
 		log.Printf("CreateRecipe error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, newRecipe)
+	c.IndentedJSON(http.StatusCreated, gin.H{"id": newRecipeId})
 }
 
 func UpdateRecipe(c *gin.Context) {

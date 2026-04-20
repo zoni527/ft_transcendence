@@ -62,11 +62,9 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	normalizeCreateUserRequest(&req)
-	if req.Name != "" {
-		if !isValidName(req.Name) {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
-			return
-		}
+	if req.Name != "" && !isValidName(req.Name) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
+		return
 	}
 	if !isValidDisplayName(req.Display_name) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})

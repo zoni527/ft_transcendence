@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"unicode"
 
 	"ft_transcendence/backend/models"
@@ -125,6 +126,7 @@ const FAT_MAX = 1000 * 100     // 100 kg
 
 const TITLE_LEN_MIN = 3
 const TITLE_LEN_MAX = 60
+const DESCRIPTION_LEN_MIN = 50
 const DESCRIPTION_LEN_MAX = 10000
 const CUISINE_LEN_MAX = 50
 const IMAGE_URL_LEN_MAX = 100
@@ -178,22 +180,28 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	// -----------------
 
 	type stringLenValidation struct {
-		field  *string
-		tag    string
-		maxLen int
+		field          *string
+		tag            string
+		minLen, maxLen int
 	}
 
-	// If some of these values are shared we could put them in a config/env file
+	r.Title = strings.TrimSpace(r.Title)
+	r.Description = strings.TrimSpace(r.Description)
+	r.Cuisine = strings.TrimSpace(r.Cuisine)
+	r.Image_url = strings.TrimSpace(r.Image_url)
 
-	maxStringLengths := []stringLenValidation{
-		{&r.Title, "title", TITLE_LEN_MAX},
-		{&r.Description, "description", DESCRIPTION_LEN_MAX},
-		{&r.Cuisine, "cuisine", CUISINE_LEN_MAX},
-		{&r.Image_url, "image_url", IMAGE_URL_LEN_MAX},
+	stringLimits := []stringLenValidation{
+		{&r.Title, "title", TITLE_LEN_MIN, TITLE_LEN_MAX},
+		{&r.Description, "description", DESCRIPTION_LEN_MIN, DESCRIPTION_LEN_MAX},
+		{&r.Cuisine, "cuisine", 0, CUISINE_LEN_MAX},
+		{&r.Image_url, "image_url", 0, IMAGE_URL_LEN_MAX},
 	}
 
-	for _, v := range maxStringLengths {
-		if len(*v.field) > v.maxLen {
+	for _, v := range stringLimits {
+		runeLen := len([]rune(*v.field))
+		if runeLen < v.minLen {
+			return fmt.Errorf("%v: too short", v.tag)
+		} else if runeLen > v.maxLen {
 			return fmt.Errorf("%v: too long", v.tag)
 		}
 	}
@@ -246,11 +254,12 @@ func IsValidTitle(t *string) error {
 		return fmt.Errorf("empty string")
 	}
 
+	runeLen := len([]rune(*t))
 	switch {
-	case len(*t) > TITLE_LEN_MAX:
-		return fmt.Errorf("too long")
-	case len(*t) < TITLE_LEN_MIN:
+	case runeLen < TITLE_LEN_MIN:
 		return fmt.Errorf("too short")
+	case runeLen > TITLE_LEN_MAX:
+		return fmt.Errorf("too long")
 	}
 
 	for _, c := range *t {

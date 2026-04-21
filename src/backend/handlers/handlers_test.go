@@ -144,6 +144,7 @@ var badTestRecipes = []models.Recipe{
 	{
 		Title:       "Too many calories",
 		Description: strings.Repeat("-", descriptionLenMin),
+		Servings:    1,
 		Calories:    caloriesMax + 1,
 		Difficulty:  "easy",
 		Meal_type:   "snack",
@@ -151,6 +152,7 @@ var badTestRecipes = []models.Recipe{
 	{
 		Title:       "Too much protein",
 		Description: strings.Repeat("-", descriptionLenMin),
+		Servings:    1,
 		Protein_g:   proteinMax + 1,
 		Difficulty:  "easy",
 		Meal_type:   "snack",
@@ -158,6 +160,7 @@ var badTestRecipes = []models.Recipe{
 	{
 		Title:       "Too much carbs",
 		Description: strings.Repeat("-", descriptionLenMin),
+		Servings:    1,
 		Carbs_g:     carbsMax + 1,
 		Difficulty:  "easy",
 		Meal_type:   "snack",
@@ -165,13 +168,7 @@ var badTestRecipes = []models.Recipe{
 	{
 		Title:       "Too much fat",
 		Description: strings.Repeat("-", descriptionLenMin),
-		Fat_g:       fatMax + 1,
-		Difficulty:  "easy",
-		Meal_type:   "snack",
-	},
-	{
-		Title:       "Too much fat",
-		Description: strings.Repeat("-", descriptionLenMin),
+		Servings:    1,
 		Fat_g:       fatMax + 1,
 		Difficulty:  "easy",
 		Meal_type:   "snack",

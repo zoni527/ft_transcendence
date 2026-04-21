@@ -106,11 +106,12 @@ func CreateUser(c *gin.Context) {
 	token, err := generateJWTToken(data.Id)
 	if err != nil {
 		log.Printf("CreateUser generateJWTToken error: %v", err)
-		c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false, "message": "account created. please log in."})
+		c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false})
 		return
 	}
-
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "token": token, "authenticated": true, "message": "account created and logged in successfully."})
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", token, 3600, "/", "", false, true)
+	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 
 func LoginUser(c *gin.Context) {
@@ -140,8 +141,9 @@ func LoginUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-
-	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "token": token})
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", token, 3600, "/", "", false, true)
+	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 
 func UpdateUser(c *gin.Context) {

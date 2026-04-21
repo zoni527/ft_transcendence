@@ -3,7 +3,7 @@ package repository
 // Recipe repository functions needed:
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
-// [done] CreateRecipe      — POST /api/recipes (transaction: insert recipe + steps + ingredients)
+// [done] CreateRecipe      — POST /api/recipes (currently inserts the recipe row only)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] PatchRecipe       — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id

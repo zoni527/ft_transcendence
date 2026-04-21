@@ -79,7 +79,7 @@ var goodTestRecipes = []models.Recipe{
 	},
 	{
 		Title:       "Max description length",
-		Description: strings.Repeat("-", DESCRIPTION_LEN_MIN),
+		Description: strings.Repeat("-", DESCRIPTION_LEN_MAX),
 		Servings:    1,
 		Difficulty:  "easy",
 		Meal_type:   "snack",

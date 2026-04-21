@@ -59,9 +59,8 @@ func GetRecipeById(c *gin.Context) {
 func CreateRecipe(c *gin.Context) {
 	var r models.Recipe
 
-	// BindJSON calls a function that will respond 400 if there is an error,
-	// not possible to get further details
-	if err := c.BindJSON(&r); err != nil {
+	if err := c.ShouldBindJSON(&r); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
 

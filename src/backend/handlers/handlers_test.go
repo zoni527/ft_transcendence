@@ -87,7 +87,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max cuisine length",
 		Description: strings.Repeat("-", descriptionLenMin),
-		Cuisine:     strings.Repeat(" ", cuisineLenMax),
+		Cuisine:     strings.Repeat("-", cuisineLenMax),
 		Servings:    1,
 		Difficulty:  "easy",
 		Meal_type:   "snack",

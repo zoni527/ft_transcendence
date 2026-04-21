@@ -10,6 +10,7 @@ package handlers
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,7 +21,9 @@ import (
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func GetAllRecipes(c *gin.Context) {
@@ -68,14 +71,6 @@ func CreateRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid author_id format"})
 		return
 	}
-	// Not sure if I should prefetch this from the DB for validation or let the creation fail later,
-	// but it might show up as an internal server error instead if the SQL query fails
-	if _, err := repository.GetUserById(r.Author_id); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": fmt.Sprintf("author_id %v not in database", r.Author_id),
-		})
-		return
-	}
 
 	if err := ValidateRecipeFields(&r); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
@@ -84,6 +79,21 @@ func CreateRecipe(c *gin.Context) {
 
 	newRecipeId, err := repository.CreateRecipe(&r)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case pgerrcode.ForeignKeyViolation:
+				c.IndentedJSON(http.StatusBadRequest, gin.H{
+					"error": fmt.Sprintf("author id %v not in database", r.Author_id),
+				})
+				return
+			case pgerrcode.CheckViolation:
+				c.IndentedJSON(http.StatusBadRequest, gin.H{
+					"error": fmt.Sprintf("constraint %v violated", pgErr.ConstraintName),
+				})
+				return
+			}
+		}
 		log.Printf("CreateRecipe error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return

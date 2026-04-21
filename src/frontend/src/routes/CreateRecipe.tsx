@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
 import SelectField from '../components/SelectField';
-import { cardBase, buttonBase } from '../styles/styles';
 import { postCreateRecipe } from '../api';
+import { cardBase, buttonBase } from '../styles/styles';
 import { z } from 'zod';
 
 // Validation schema

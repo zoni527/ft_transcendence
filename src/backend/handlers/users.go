@@ -103,11 +103,45 @@ func CreateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
+	token, err := generateJWTToken(data.Id)
+	if err != nil {
+		log.Printf("CreateUser generateJWTToken error: %v", err)
+		c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false, "message": "account created. please log in."})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "token": token, "authenticated": true, "message": "account created and logged in successfully."})
 }
 
 func LoginUser(c *gin.Context) {
+	var req models.LoginUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
+	data, err := repository.GetUserCredentialsByEmail(req.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+			return
+		}
+		log.Printf("LoginUser repository.GetUserCredentialsByEmail error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(data.Password_hash), []byte(req.Password)); err != nil {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		return
+	}
+	token, err := generateJWTToken(data.Id)
+	if err != nil {
+		log.Printf("LoginUser generateJWTToken error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
 
+	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "token": token})
 }
 
 func UpdateUser(c *gin.Context) {
@@ -251,7 +285,7 @@ func LoadJWTSecret() {
 	jwtSecret = []byte(secret)
 }
 
-// Function to generate JWT to be sent to frontend for authentication on successful login 
+// Function to generate JWT to be sent to frontend for authentication on successful login
 func generateJWTToken(userID string) (string, error) {
 	now := time.Now()
 	claims := jwt.RegisteredClaims{

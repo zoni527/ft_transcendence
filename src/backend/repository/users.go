@@ -131,6 +131,27 @@ func GetUserById(id string) (models.User, error) {
 	return u, nil
 }
 
+// GetUserCredentialsByEmail returns a single user credentials by email
+func GetUserCredentialsByEmail(email string) (models.User, error) {
+	sql := `SELECT id, email, password_hash
+			FROM "user"
+			WHERE email = $1`
+
+	var u models.User
+	err := Pool.QueryRow(context.Background(), sql, email).Scan(
+		&u.Id,
+		&u.Email,
+		&u.Password_hash,
+	)
+	if err == pgx.ErrNoRows {
+		return models.User{}, pgx.ErrNoRows
+	}
+	if err != nil {
+		return models.User{}, fmt.Errorf("error getting user by email: %w", err)
+	}
+	return u, nil
+}
+
 var ErrUserAlreadyExists = errors.New("user already exists")
 
 // Add new user to database, Database validates email and username uniqueness, checked at this level to avoid race conditions
@@ -144,6 +165,7 @@ func CreateUser(params models.CreateUserParams) (models.User, error) {
 	sql := `INSERT INTO "user"(email, password_hash, name, display_name)
 			VALUES($1, $2, $3, $4)
 			RETURNING id, email, name, display_name, created_at, updated_at;`
+
 	var u models.User
 	err = tx.QueryRow(context.Background(), sql, params.Email, params.Password_hashed,
 		params.Name, params.Display_name).Scan(

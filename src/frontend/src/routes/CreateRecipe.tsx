@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
 import SelectField from '../components/SelectField';
@@ -41,6 +42,7 @@ const signupSchema = z.object({
 const CreateRecipe = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -101,7 +103,9 @@ const CreateRecipe = () => {
         carbs_g: result.data.carbs_g,
         fat_g: result.data.fat_g,
       })
-        .then()
+        .then((recipe) => {
+          void navigate(`/recipe/${recipe.id}`);
+        })
         .catch((err: unknown) => {
           if (err instanceof Error) setError(err.message);
           else setError('Something went wrong. Please try again.');

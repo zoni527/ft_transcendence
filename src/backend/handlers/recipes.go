@@ -88,9 +88,8 @@ func CreateRecipe(c *gin.Context) {
 				})
 				return
 			case pgerrcode.CheckViolation:
-				c.IndentedJSON(http.StatusBadRequest, gin.H{
-					"error": fmt.Sprintf("constraint %v violated", pgErr.ConstraintName),
-				})
+				log.Printf("%v: %v", pgErr.ColumnName, pgErr.ConstraintName)
+				c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "bad recipe field"})
 				return
 			}
 		}

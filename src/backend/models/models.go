@@ -56,3 +56,8 @@ type CreateUserParams struct {
 	Name            string `json:"name"`
 	Display_name    string `json:"display_name"`
 }
+
+type LoginUserRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}

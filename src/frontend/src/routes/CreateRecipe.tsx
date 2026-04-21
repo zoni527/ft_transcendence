@@ -25,39 +25,108 @@ const CreateRecipe = () => {
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
-        <InputField id="title" name="title" label="Title" />
+        <InputField
+          id="title"
+          name="title"
+          label="Recipe Name"
+          placeholder="Enter recipe name"
+        />
 
         {/* Description */}
         <InputTextArea
           id="description"
           name="description"
           label="Short description"
+          placeholder="Enter short description"
         />
 
-        {/* Ingredients */}
-        <InputTextArea
-          id="ingredients"
-          name="ingredients"
-          label="Ingredients (one per line)"
+        {/* Preparation Time */}
+        <InputField
+          id="prep_time_min"
+          name="prep_time_min"
+          label="Preparation time (min)"
+          placeholder="Enter preparation time in minutes"
         />
 
-        {/* Instructions */}
-        <InputTextArea
-          id="instructions"
-          name="instructions"
-          label="Instructions"
+        {/* Cooking Time */}
+        <InputField
+          id="cook_time_min"
+          name="cook_time_min"
+          label="Cooking time (min)"
+          placeholder="Enter cooking time in minutes"
         />
 
-        {/* Category */}
+        {/* Servings */}
+        <InputField
+          id="servings"
+          name="servings"
+          label="Servings"
+          placeholder="Enter number of servings"
+        />
+
+        {/* Difficulty */}
         <SelectField
-          id="category"
-          name="category"
-          label="Category"
+          id="difficulty"
+          name="difficulty"
+          label="Difficulty"
+          options={[
+            { value: 'easy', label: 'Easy' },
+            { value: 'medium', label: 'Medium' },
+            { value: 'hard', label: 'Hard' },
+          ]}
+        />
+
+        {/* Cuisine */}
+        <InputField
+          id="cuisine"
+          name="cuisine"
+          label="Cuisine"
+          placeholder="Enter the type of cuisine"
+        />
+
+        {/* Meal Type */}
+        <SelectField
+          id="meal_type"
+          name="meal_type"
+          label="Meal Type"
           options={[
             { value: 'breakfast', label: 'Breakfast' },
             { value: 'lunch', label: 'Lunch' },
             { value: 'dinner', label: 'Dinner' },
+            { value: 'snack', label: 'Snack' },
           ]}
+        />
+
+        {/* Calories */}
+        <InputField
+          id="calories"
+          name="calories"
+          label="Calories (kcal)"
+          placeholder="Enter the amount of calories in kcal"
+        />
+
+        {/* Protein */}
+        <InputField
+          id="protein"
+          name="protein"
+          label="Protein (grams)"
+          placeholder="Enter the amount of protein in grams"
+        />
+
+        {/* Carbohydrates */}
+        <InputField
+          id="carbs"
+          name="carbs"
+          label="Carbohydrates (grams)"
+          placeholder="Enter the amount of carbohydrates in grams"
+        />
+
+        {/* Fat */}
+        <InputField
+          id="fat"
+          name="fat"
+          label="Fat (grams)"
+          placeholder="Enter the amount of fat in grams"
         />
 
         {/* Image Upload */}

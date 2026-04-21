@@ -11,8 +11,7 @@ const Recipes = () => {
   useEffect(() => {
     getRecipes()
       .then(setRecipes)
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         setError('Failed to load recipes');
       })
       .finally(() => setLoading(false));

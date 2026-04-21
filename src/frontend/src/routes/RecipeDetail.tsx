@@ -7,33 +7,26 @@ import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
-  const state = location.state as { recipe?: Recipe } | null;
-
+  const { state } = useLocation() as { state?: { recipe?: Recipe } };
   const [recipe, setRecipe] = useState<Recipe | null>(state?.recipe ?? null);
-  const [loading, setLoading] = useState(!recipe);
   const [error, setError] = useState<string | null>(null);
 
+  const cachedRecipe = state?.recipe;
+
   useEffect(() => {
-    if (!recipe && id) {
-      getRecipeById(id)
-        .then(setRecipe)
-        .catch((err) => {
-          console.error(err);
-          setError('Failed to load recipe');
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [id, recipe]);
+    if (!id || cachedRecipe) return;
+
+    getRecipeById(id)
+      .then(setRecipe)
+      .catch(() => setError('Failed to load recipe'));
+  }, [id, cachedRecipe]);
 
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
-      {loading ? (
-        <p className="justify-self-start">Loading recipe...</p>
-      ) : error ? (
+      {error ? (
         <p className="justify-self-start text-red-500">{error}</p>
       ) : !recipe ? (
-        <p>Failed to load recipe</p>
+        <p>Loading...</p>
       ) : (
         <>
           {/* Recipe Image */}

@@ -3,6 +3,40 @@ import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
 import SelectField from '../components/SelectField';
 import { cardBase, buttonBase } from '../styles/styles';
+import { postCreateRecipe } from '../api';
+import { z } from 'zod';
+
+// Validation schema
+const signupSchema = z.object({
+  title: z.string().min(1, 'Recipe name is required'),
+  description: z.string().min(1, 'Description is required'),
+  prep_time_min: z.coerce
+    .number()
+    .min(1, { message: 'Preparation time must be at least 1 minute' }),
+  cook_time_min: z.coerce
+    .number()
+    .min(1, { message: 'Cooking time must be at least 1 minute' }),
+  servings: z.coerce
+    .number()
+    .min(1, { message: 'Recipe must have at least 1 serving' }),
+  difficulty: z.enum(['easy', 'medium', 'hard'], {
+    errorMap: () => ({ message: 'Please select a difficulty' }),
+  }),
+  cuisine: z.string().min(1, 'Cuisine type is required'),
+  meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
+    errorMap: () => ({ message: 'Please select a difficulty' }),
+  }),
+  calories: z.coerce
+    .number()
+    .min(1, { message: 'Recipe must have a calorie value' }),
+  protein_g: z.coerce
+    .number()
+    .min(1, { message: 'Recipe must have a protein value' }),
+  carbs_g: z.coerce
+    .number()
+    .min(1, { message: 'Recipe must have a carbohydrates value' }),
+  fat_g: z.coerce.number().min(1, { message: 'Recipe must have a fat value' }),
+});
 
 const CreateRecipe = () => {
   const [error, setError] = useState('');
@@ -12,7 +46,68 @@ const CreateRecipe = () => {
     e.preventDefault();
     setError('');
 
-    setLoading(true);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Helper to safely get string values
+    function getStringValue(name: string): string {
+      const value = formData.get(name);
+      if (typeof value === 'string') return value.trim();
+      return '';
+    }
+
+    // Helper to safely get number values
+    function getNumberValue(name: string): number {
+      const value = formData.get(name);
+      if (typeof value === 'number') return value;
+      return 0;
+    }
+
+    // Input validation
+    const result = signupSchema.safeParse({
+      title: getStringValue('title'),
+      description: getStringValue('description'),
+      prep_time_min: getNumberValue('prep_time_min'),
+      cook_time_min: getNumberValue('cook_time_min'),
+      servings: getNumberValue('servings'),
+      difficulty: getStringValue('difficulty'),
+      cuisine: getStringValue('cuisine'),
+      meal_type: getStringValue('meal_type'),
+      calories: getNumberValue('calories'),
+      protein_g: getNumberValue('protein_g'),
+      carbs_g: getNumberValue('carbs_g'),
+      fat_g: getNumberValue('fat_g'),
+    });
+
+    if (!result.success) {
+      setError(result.error.issues[0]?.message || 'Invalid input');
+    } else {
+      setLoading(true);
+
+      // POST /api/recipes (create a new recipe)
+      postCreateRecipe({
+        author_id: 'HARDCODED',
+        title: result.data.title,
+        description: result.data.description,
+        prep_time_min: result.data.prep_time_min,
+        cook_time_min: result.data.cook_time_min,
+        servings: result.data.servings,
+        difficulty: result.data.difficulty,
+        cuisine: result.data.cuisine,
+        meal_type: result.data.meal_type,
+        image_url: 'HARDCODED',
+        calories: result.data.calories,
+        protein_g: result.data.protein_g,
+        carbs_g: result.data.carbs_g,
+        fat_g: result.data.fat_g,
+      })
+        .then()
+        .catch((err: unknown) => {
+          if (err instanceof Error) setError(err.message);
+          else setError('Something went wrong. Please try again.');
+        })
+        .finally(() => setLoading(false));
+    }
   };
 
   return (

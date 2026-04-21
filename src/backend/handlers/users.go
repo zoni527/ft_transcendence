@@ -239,25 +239,25 @@ func isValidDisplayName(displayName string) bool {
 	return hasAlphaNum
 }
 
-// Secret key used to sign every generated JWT - passed as env variable once
+// Secret key used to sign every generated JWT
 var jwtSecret []byte
 
-// Load env var to package variable for use. To be done only once when the backend starts
+// Load JWT key to env var. Function ran once when the backend starts
 func LoadJWTSecret() {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		log.Fatal("error loading JWT secret")
+		log.Fatal("Error loading JWT secret")
 	}
 	jwtSecret = []byte(secret)
 }
 
-// Function to generate JSON web tokens -
+// Function to generate JWT to be sent to frontend for authentication on successful login 
 func generateJWTToken(userID string) (string, error) {
 	now := time.Now()
-	claims := jwt.MapClaims{
-		"user_id": userID,
-		"exp":     now.Add(time.Hour * 24).Unix(),
-		"iat":     now.Unix(),
+	claims := jwt.RegisteredClaims{
+		Subject:   userID,
+		ExpiresAt: jwt.NewNumericDate(now.Add(24 * time.Hour)),
+		IssuedAt:  jwt.NewNumericDate(now),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)

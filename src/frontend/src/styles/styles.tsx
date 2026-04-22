@@ -10,16 +10,15 @@ export const cardBase = `
 `;
 
 export const buttonBase = `
-  w-fit
-  block
-  mx-auto
+  inline-flex
+  items-center
+  justify-center
   rounded-lg
   bg-amber-600
   px-4
   py-2
   font-semibold
   text-white
-  text-center
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   hover:cursor-pointer
   hover:bg-amber-700

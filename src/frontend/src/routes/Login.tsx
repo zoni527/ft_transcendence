@@ -59,9 +59,11 @@ const Login = () => {
         </p>
 
         {/* Submit Button */}
-        <button type="submit" className={`${buttonBase}`}>
-          Continue
-        </button>
+        <div className="flex justify-center">
+          <button type="submit" className={`${buttonBase}`}>
+            Continue
+          </button>
+        </div>
       </form>
     </div>
   );

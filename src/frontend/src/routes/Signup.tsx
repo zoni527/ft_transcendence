@@ -127,9 +127,11 @@ const Signup = () => {
         </p>
 
         {/* Submit Button */}
-        <button type="submit" className={buttonBase} disabled={loading}>
-          {loading && !error ? 'Signing up...' : 'Continue'}
-        </button>
+        <div className="flex justify-center">
+          <button type="submit" className={buttonBase} disabled={loading}>
+            {loading && !error ? 'Signing up...' : 'Continue'}
+          </button>
+        </div>
       </form>
     </div>
   );

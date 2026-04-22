@@ -237,9 +237,11 @@ const CreateRecipe = () => {
         </p>
 
         {/* Submit Button */}
-        <button type="submit" className={buttonBase} disabled={loading}>
-          {loading && !error ? 'Submitting recipe...' : 'Submit recipe'}
-        </button>
+        <div className="flex justify-center">
+          <button type="submit" className={buttonBase} disabled={loading}>
+            {loading && !error ? 'Submitting recipe...' : 'Submit recipe'}
+          </button>
+        </div>
       </form>
     </div>
   );

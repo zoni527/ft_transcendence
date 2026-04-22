@@ -8,7 +8,7 @@ import { cardBase, buttonBase } from '../styles/styles';
 import { z } from 'zod';
 
 // Validation schema
-const signupSchema = z.object({
+const createRecipeSchema = z.object({
   title: z.string().min(1, 'Recipe name is required'),
   description: z.string().min(1, 'Description is required'),
   prep_time_min: z.coerce
@@ -25,7 +25,7 @@ const signupSchema = z.object({
   }),
   cuisine: z.string().min(1, 'Cuisine type is required'),
   meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
-    errorMap: () => ({ message: 'Please select a difficulty' }),
+    errorMap: () => ({ message: 'Please select a meal type' }),
   }),
   calories: z.coerce
     .number()
@@ -66,7 +66,7 @@ const CreateRecipe = () => {
     }
 
     // Input validation
-    const result = signupSchema.safeParse({
+    const result = createRecipeSchema.safeParse({
       title: getStringValue('title'),
       description: getStringValue('description'),
       prep_time_min: getNumberValue('prep_time_min'),
@@ -206,24 +206,24 @@ const CreateRecipe = () => {
 
         {/* Protein */}
         <InputField
-          id="protein"
-          name="protein"
+          id="protein_g"
+          name="protein_g"
           label="Protein (grams)"
           placeholder="Enter the amount of protein in grams"
         />
 
         {/* Carbohydrates */}
         <InputField
-          id="carbs"
-          name="carbs"
+          id="carbs_g"
+          name="carbs_g"
           label="Carbohydrates (grams)"
           placeholder="Enter the amount of carbohydrates in grams"
         />
 
         {/* Fat */}
         <InputField
-          id="fat"
-          name="fat"
+          id="fat_g"
+          name="fat_g"
           label="Fat (grams)"
           placeholder="Enter the amount of fat in grams"
         />

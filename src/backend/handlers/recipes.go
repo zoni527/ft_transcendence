@@ -71,7 +71,7 @@ func CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	if err := ValidateRecipeFields(&r); err != nil {
+	if err := validateRecipeFields(&r); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
 		return
 	}
@@ -141,7 +141,7 @@ const descriptionLenMax = 10000
 const cuisineLenMax = 50
 const imageUrlLenMax = 100
 
-func ValidateRecipeFields(r *models.Recipe) error {
+func validateRecipeFields(r *models.Recipe) error {
 
 	type intValidation struct {
 		val      int
@@ -158,7 +158,7 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	}
 
 	for _, v := range intFields {
-		if err := NumFieldOk(v.val, v.s, v.min, v.max); err != nil {
+		if err := numFieldOk(v.val, v.s, v.min, v.max); err != nil {
 			return err
 		}
 	}
@@ -180,7 +180,7 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	}
 
 	for _, v := range floatFields {
-		if err := NumFieldOk(v.val, v.s, v.min, v.max); err != nil {
+		if err := numFieldOk(v.val, v.s, v.min, v.max); err != nil {
 			return err
 		}
 	}
@@ -216,18 +216,18 @@ func ValidateRecipeFields(r *models.Recipe) error {
 		}
 	}
 
-	if err := IsValidTitle(r.Title); err != nil {
+	if err := isValidTitle(r.Title); err != nil {
 		return fmt.Errorf("title: %w", err)
 	}
 
-	if err := OnlyGraphicChars(r.Description); err != nil {
+	if err := isValidDescription(r.Description); err != nil {
 		return fmt.Errorf("description: %w", err)
 	}
 
 	switch r.Difficulty {
 	case "easy", "medium", "hard":
 	default:
-		return fmt.Errorf("difficulty: must be easy, medium, or hard")
+		return errors.New("difficulty: must be easy, medium, or hard")
 	}
 
 	for _, c := range r.Cuisine {
@@ -242,34 +242,30 @@ func ValidateRecipeFields(r *models.Recipe) error {
 	switch r.Meal_type {
 	case "breakfast", "lunch", "dinner", "snack":
 	default:
-		return fmt.Errorf("meal_type: must be breakfast, lunch, dinner, or snack")
+		return errors.New("meal_type: must be breakfast, lunch, dinner, or snack")
 	}
 
-	if err := OnlyGraphicChars(r.Image_url); err != nil {
+	if err := onlyGraphicChars(r.Image_url); err != nil {
 		return fmt.Errorf("image_url: %w", err)
 	}
 
 	return nil
 }
 
-func NumFieldOk[T int | float64](field T, fieldName string, fieldMin, fieldMax T) error {
+func numFieldOk[T int | float64](field T, fieldName string, fieldMin, fieldMax T) error {
 	if field < fieldMin || field > fieldMax {
 		return fmt.Errorf("%v: bad value: %v", fieldName, field)
 	}
 	return nil
 }
 
-func IsValidTitle(t string) error {
-	if t == "" {
-		return fmt.Errorf("empty string")
-	}
-
+func isValidTitle(t string) error {
 	runeLen := len([]rune(t))
 	switch {
 	case runeLen < titleLenMin:
-		return fmt.Errorf("too short")
+		return fmt.Errorf("too short, min length is %v", titleLenMin)
 	case runeLen > titleLenMax:
-		return fmt.Errorf("too long")
+		return fmt.Errorf("too long, max length is %v", titleLenMax)
 	}
 
 	for _, c := range t {
@@ -285,7 +281,25 @@ func IsValidTitle(t string) error {
 	return nil
 }
 
-func OnlyGraphicChars(s string) error {
+func isValidDescription(d string) error {
+	runeLen := len([]rune(d))
+	switch {
+	case runeLen < descriptionLenMin:
+		return fmt.Errorf("too short, min length is %v", titleLenMin)
+	case runeLen > descriptionLenMax:
+		return fmt.Errorf("too long, max length is %v", titleLenMax)
+	}
+
+	for _, c := range d {
+		if !(unicode.IsGraphic(c) || unicode.IsSpace(c)) {
+			return fmt.Errorf("forbidden character: %v", c)
+		}
+	}
+
+	return nil
+}
+
+func onlyGraphicChars(s string) error {
 	for _, c := range s {
 		if !unicode.IsGraphic(c) {
 			return fmt.Errorf("invalid character: %v", c)

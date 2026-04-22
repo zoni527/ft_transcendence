@@ -100,6 +100,14 @@ var goodTestRecipes = []models.Recipe{
 		Difficulty:  "easy",
 		Meal_type:   "snack",
 	},
+	{
+		Title:       "Newlines in description",
+		Description: "Testing\nnewlines\nin\na\ndescription",
+		Image_url:   strings.Repeat("-", imageUrlLenMax),
+		Servings:    1,
+		Difficulty:  "easy",
+		Meal_type:   "snack",
+	},
 }
 
 var badTestRecipes = []models.Recipe{
@@ -280,28 +288,28 @@ var badTitles = []string{
 
 func TestRecipeValidation(t *testing.T) {
 	for _, v := range goodTestRecipes {
-		if err := ValidateRecipeFields(&v); err != nil {
-			t.Errorf(`ValidateRecipeFields(%#v) = %v, want %v`, v, err, nil)
+		if err := validateRecipeFields(&v); err != nil {
+			t.Errorf(`validateRecipeFields(%#v) = %v, want %v`, v, err, nil)
 		}
 	}
 
 	for _, v := range badTestRecipes {
-		if err := ValidateRecipeFields(&v); err == nil {
-			t.Errorf(`ValidateRecipeFields(%#v) = %v, expected error`, v, err)
+		if err := validateRecipeFields(&v); err == nil {
+			t.Errorf(`validateRecipeFields(%#v) = %v, expected error`, v, err)
 		}
 	}
 }
 
 func TestTitles(t *testing.T) {
 	for _, v := range goodTitles {
-		if err := IsValidTitle(v); err != nil {
-			t.Errorf(`IsValidTitle(%#v) = %v, want %v`, v, err, nil)
+		if err := isValidTitle(v); err != nil {
+			t.Errorf(`isValidTitle(%#v) = %v, want %v`, v, err, nil)
 		}
 	}
 
 	for _, v := range badTitles {
-		if err := IsValidTitle(v); err == nil {
-			t.Errorf(`IsValidTitle(%#v) = %v, expected error`, v, err)
+		if err := isValidTitle(v); err == nil {
+			t.Errorf(`isValidTitle(%#v) = %v, expected error`, v, err)
 		}
 	}
 }

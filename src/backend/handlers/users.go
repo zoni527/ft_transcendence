@@ -11,6 +11,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -297,4 +298,41 @@ func generateJWTToken(userID string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)
+}
+
+// Function to validate JWT sent by frontend
+func ValidateJWTToken(token string) (*jwt.RegisteredClaims, error) {
+	claims := &jwt.RegisteredClaims{}
+	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
+		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+			return nil, fmt.Errorf("unexpected signing method %s", t.Method.Alg())
+		}
+		return jwtSecret, nil
+	})
+	if err != nil || !parsedToken.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+	if claims.Subject == "" {
+		return nil, fmt.Errorf("missing userID")
+	}
+	return claims, nil
+}
+
+// Middleware to check cookies validity and JWT before granting access to restricted paths
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := c.Cookie("token")
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+		claims, err := ValidateJWTToken(token)
+		if err != nil {
+			log.Printf("ValidateJWTToken failed: %v", err)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			return
+		}
+		c.Set("userID", claims.Subject)
+		c.Next()
+	}
 }

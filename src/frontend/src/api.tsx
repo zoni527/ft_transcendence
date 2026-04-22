@@ -37,7 +37,7 @@ interface SignupResponse {
 const baseUrl = 'http://localhost:8080/api';
 
 // Validation for CreateRecipeResponse
-function isCreateRecipeResponse(data: unknown): data is SignupResponse {
+function isCreateRecipeResponse(data: unknown): data is CreateRecipeResponse {
   if (typeof data !== 'object' || data === null) {
     return false;
   }
@@ -59,7 +59,7 @@ function isSignupResponse(data: unknown): data is SignupResponse {
 }
 
 // Get an error message safely
-function getErrorMessage(data: unknown, fallback = 'Signup failed'): string {
+function getErrorMessage(data: unknown, fallback: string): string {
   if (typeof data === 'object' && data !== null) {
     const obj = data as Record<string, unknown>;
     if (typeof obj.error === 'string') {
@@ -116,7 +116,7 @@ export const postCreateRecipe = async (
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data, 'Create recipe failed'));
   }
 
   if (!isCreateRecipeResponse(data)) {
@@ -147,7 +147,7 @@ export const postSignup = async (
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data));
+    throw new Error(getErrorMessage(data, 'Signup failed'));
   }
 
   if (!isSignupResponse(data)) {

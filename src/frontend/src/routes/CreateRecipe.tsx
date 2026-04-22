@@ -1,25 +1,29 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
 import SelectField from '../components/SelectField';
 import { postCreateRecipe } from '../api';
+import { getStringValue } from '../utils/utils';
 import { cardBase, buttonBase } from '../styles/styles';
-import { z } from 'zod';
+
+// Helper function for checking number fields in the validation schema
+const requiredNumber = (field: string) =>
+  z.coerce
+    .number({
+      required_error: `${field} is required`,
+      invalid_type_error: `${field} must be a number`,
+    })
+    .min(1, `${field} must be at least 1`);
 
 // Validation schema
 const createRecipeSchema = z.object({
   title: z.string().min(1, 'Recipe name is required'),
   description: z.string().min(1, 'Description is required'),
-  prep_time_min: z.coerce
-    .number()
-    .min(1, { message: 'Preparation time must be at least 1 minute' }),
-  cook_time_min: z.coerce
-    .number()
-    .min(1, { message: 'Cooking time must be at least 1 minute' }),
-  servings: z.coerce
-    .number()
-    .min(1, { message: 'Recipe must have at least 1 serving' }),
+  prep_time_min: requiredNumber('Prep time'),
+  cook_time_min: requiredNumber('Cook time'),
+  servings: requiredNumber('Servings'),
   difficulty: z.enum(['easy', 'medium', 'hard'], {
     errorMap: () => ({ message: 'Please select a difficulty' }),
   }),
@@ -27,16 +31,10 @@ const createRecipeSchema = z.object({
   meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
     errorMap: () => ({ message: 'Please select a meal type' }),
   }),
-  calories: z.coerce
-    .number()
-    .min(1, { message: 'Recipe must have a calorie value' }),
-  protein_g: z.coerce
-    .number()
-    .min(1, { message: 'Recipe must have a protein value' }),
-  carbs_g: z.coerce
-    .number()
-    .min(1, { message: 'Recipe must have a carbohydrates value' }),
-  fat_g: z.coerce.number().min(1, { message: 'Recipe must have a fat value' }),
+  calories: requiredNumber('Calories'),
+  protein_g: requiredNumber('Protein'),
+  carbs_g: requiredNumber('Carbs'),
+  fat_g: requiredNumber('Fat'),
 });
 
 const CreateRecipe = () => {
@@ -51,34 +49,20 @@ const CreateRecipe = () => {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Helper to safely get string values
-    function getStringValue(name: string): string {
-      const value = formData.get(name);
-      if (typeof value === 'string') return value.trim();
-      return '';
-    }
-
-    // Helper to safely get number values
-    function getNumberValue(name: string): number {
-      const value = formData.get(name);
-      if (typeof value === 'number') return value;
-      return 0;
-    }
-
     // Input validation
     const result = createRecipeSchema.safeParse({
-      title: getStringValue('title'),
-      description: getStringValue('description'),
-      prep_time_min: getNumberValue('prep_time_min'),
-      cook_time_min: getNumberValue('cook_time_min'),
-      servings: getNumberValue('servings'),
-      difficulty: getStringValue('difficulty'),
-      cuisine: getStringValue('cuisine'),
-      meal_type: getStringValue('meal_type'),
-      calories: getNumberValue('calories'),
-      protein_g: getNumberValue('protein_g'),
-      carbs_g: getNumberValue('carbs_g'),
-      fat_g: getNumberValue('fat_g'),
+      title: getStringValue(formData, 'title'),
+      description: getStringValue(formData, 'description'),
+      prep_time_min: getStringValue(formData, 'prep_time_min'),
+      cook_time_min: getStringValue(formData, 'cook_time_min'),
+      servings: getStringValue(formData, 'servings'),
+      difficulty: getStringValue(formData, 'difficulty'),
+      cuisine: getStringValue(formData, 'cuisine'),
+      meal_type: getStringValue(formData, 'meal_type'),
+      calories: getStringValue(formData, 'calories'),
+      protein_g: getStringValue(formData, 'protein_g'),
+      carbs_g: getStringValue(formData, 'carbs_g'),
+      fat_g: getStringValue(formData, 'fat_g'),
     });
 
     if (!result.success) {

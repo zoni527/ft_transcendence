@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { postSignup } from '../api';
-import InputField from '../components/InputField';
-import { cardBase, buttonBase } from '../styles/styles';
 import { z } from 'zod';
+import InputField from '../components/InputField';
+import { postSignup } from '../api';
+import { getStringValue } from '../utils/utils';
+import { cardBase, buttonBase } from '../styles/styles';
 
 // Validation schema
 const signupSchema = z
@@ -34,20 +35,13 @@ const Signup = () => {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Helper to safely get string values
-    function getStringValue(name: string): string {
-      const value = formData.get(name);
-      if (typeof value === 'string') return value.trim();
-      return '';
-    }
-
     // Input validation
     const result = signupSchema.safeParse({
-      fullName: getStringValue('fullName'),
-      username: getStringValue('username'),
-      email: getStringValue('email'),
-      password: getStringValue('password'),
-      confirmPassword: getStringValue('confirmPassword'),
+      fullName: getStringValue(formData, 'fullName'),
+      username: getStringValue(formData, 'username'),
+      email: getStringValue(formData, 'email'),
+      password: getStringValue(formData, 'password'),
+      confirmPassword: getStringValue(formData, 'confirmPassword'),
     });
 
     if (!result.success) {

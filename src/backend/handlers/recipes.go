@@ -285,9 +285,9 @@ func isValidDescription(d string) error {
 	runeLen := len([]rune(d))
 	switch {
 	case runeLen < descriptionLenMin:
-		return fmt.Errorf("too short, min length is %v", titleLenMin)
+		return fmt.Errorf("too short, min length is %v", descriptionLenMin)
 	case runeLen > descriptionLenMax:
-		return fmt.Errorf("too long, max length is %v", titleLenMax)
+		return fmt.Errorf("too long, max length is %v", descriptionLenMax)
 	}
 
 	for _, c := range d {

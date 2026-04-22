@@ -9,21 +9,21 @@ import { getStringValue } from '../utils/utils';
 import { cardBase, buttonBase } from '../styles/styles';
 
 // Helper function for checking number fields in the validation schema
-const requiredNumber = (field: string) =>
+const requiredNumber = (field: string, value: number) =>
   z.coerce
     .number({
       required_error: `${field} is required`,
       invalid_type_error: `${field} must be a number`,
     })
-    .min(1, `${field} must be at least 1`);
+    .min(value, `${field} must be at least ${value}`);
 
 // Validation schema
 const createRecipeSchema = z.object({
   title: z.string().min(1, 'Recipe name is required'),
   description: z.string().min(1, 'Description is required'),
-  prep_time_min: requiredNumber('Prep time'),
-  cook_time_min: requiredNumber('Cook time'),
-  servings: requiredNumber('Servings'),
+  prep_time_min: requiredNumber('Prep time', 0),
+  cook_time_min: requiredNumber('Cook time', 0),
+  servings: requiredNumber('Servings', 1),
   difficulty: z.enum(['easy', 'medium', 'hard'], {
     errorMap: () => ({ message: 'Please select a difficulty' }),
   }),
@@ -31,10 +31,13 @@ const createRecipeSchema = z.object({
   meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
     errorMap: () => ({ message: 'Please select a meal type' }),
   }),
-  calories: requiredNumber('Calories'),
-  protein_g: requiredNumber('Protein'),
-  carbs_g: requiredNumber('Carbs'),
-  fat_g: requiredNumber('Fat'),
+  calories: requiredNumber('Calories', 0),
+  protein_g: requiredNumber('Protein', 0),
+  carbs_g: requiredNumber('Carbs', 0),
+  fat_g: requiredNumber('Fat', 0),
+  is_published: z.enum(['yes', 'no'], {
+    errorMap: () => ({ message: 'Please select a publish option' }),
+  }),
 });
 
 const CreateRecipe = () => {
@@ -63,6 +66,7 @@ const CreateRecipe = () => {
       protein_g: getStringValue(formData, 'protein_g'),
       carbs_g: getStringValue(formData, 'carbs_g'),
       fat_g: getStringValue(formData, 'fat_g'),
+      is_published: getStringValue(formData, 'is_published'),
     });
 
     if (!result.success) {
@@ -86,6 +90,7 @@ const CreateRecipe = () => {
         protein_g: result.data.protein_g,
         carbs_g: result.data.carbs_g,
         fat_g: result.data.fat_g,
+        is_published: result.data.is_published === 'yes',
       })
         .then((recipe) => {
           void navigate(`/recipe/${recipe.id}`);
@@ -210,6 +215,17 @@ const CreateRecipe = () => {
           name="fat_g"
           label="Fat (grams)"
           placeholder="Enter the amount of fat in grams"
+        />
+
+        {/* Publish Recipe? */}
+        <SelectField
+          id="is_published"
+          name="is_published"
+          label="Publish Recipe?"
+          options={[
+            { value: 'yes', label: 'Yes' },
+            { value: 'no', label: 'No' },
+          ]}
         />
 
         {/* Image Upload */}

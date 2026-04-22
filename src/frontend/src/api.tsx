@@ -15,6 +15,7 @@ interface CreateRecipePayload {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
+  is_published: boolean;
 }
 
 interface CreateRecipeResponse {

@@ -19,6 +19,7 @@ import (
 
 	"ft_transcendence/backend/models"
 
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -155,7 +156,7 @@ func CreateUser(params models.CreateUserParams) (models.User, error) {
 	)
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 			return models.User{}, ErrUserAlreadyExists
 		}
 		return models.User{}, fmt.Errorf("create user: %w", err)

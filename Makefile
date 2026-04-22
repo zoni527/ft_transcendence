@@ -18,6 +18,12 @@ re: fclean all
 # this rule check if files can be compiled without spitting out any executable file 
 check:
 	cd src/backend && go build ./...
+
+up: all
+
+down: clean
+
+nuke: fclean dbclean
 # ---------------------------------------------------------------------------- #
-.PHONY: all clean fclean dbclean re check
+.PHONY: all clean fclean dbclean re check up down nuke
 # ---------------------------------------------------------------------------- #

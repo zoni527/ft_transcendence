@@ -25,7 +25,7 @@ func main() {
 
 	// Users
 	router.GET("/api/users", handlers.GetUsers)
-	router.GET("/api/users/:id", handlers.AuthMiddleware(), handlers.GetUserById) // Added middleware param to test restriction
+	router.GET("/api/users/:id", handlers.GetUserById)
 	router.POST("/api/users", handlers.CreateUser)
 	router.PUT("/api/users/:id", handlers.UpdateUser)     // not implemented yet
 	router.PATCH("/api/users/:id", handlers.PatchUser)    // not implemented yet

@@ -1,39 +1,32 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import DetailField from '../components/DetailField';
+import DataField from '../components/DataField';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
-  const state = location.state as { recipe?: Recipe } | null;
-
+  const { state } = useLocation() as { state?: { recipe?: Recipe } };
   const [recipe, setRecipe] = useState<Recipe | null>(state?.recipe ?? null);
-  const [loading, setLoading] = useState(!recipe);
   const [error, setError] = useState<string | null>(null);
 
+  const cachedRecipe = state?.recipe;
+
   useEffect(() => {
-    if (!recipe && id) {
-      getRecipeById(id)
-        .then(setRecipe)
-        .catch((err) => {
-          console.error(err);
-          setError('Failed to load recipe');
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [id, recipe]);
+    if (!id || cachedRecipe) return;
+
+    getRecipeById(id)
+      .then(setRecipe)
+      .catch(() => setError('Failed to load recipe'));
+  }, [id, cachedRecipe]);
 
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
-      {loading ? (
-        <p className="justify-self-start">Loading recipe...</p>
-      ) : error ? (
+      {error ? (
         <p className="justify-self-start text-red-500">{error}</p>
       ) : !recipe ? (
-        <p>Failed to load recipe</p>
+        <p>Loading...</p>
       ) : (
         <>
           {/* Recipe Image */}
@@ -55,40 +48,34 @@ const RecipeDetail = () => {
           <div className="mt-6 flex gap-8">
             {/* Left */}
             <div className="flex-1 space-y-2">
-              <DetailField label="Author" value={recipe.author_id} />
-              <DetailField
+              <DataField label="Author" value={recipe.author_id} />
+              <DataField
                 label={'Preparation (minutes)'}
                 value={recipe.prep_time_min}
               />
-              <DetailField
+              <DataField
                 label={'Cooking (minutes)'}
                 value={recipe.cook_time_min}
               />
-              <DetailField label={'Servings'} value={recipe.servings} />
-              <DetailField label={'Difficulty'} value={recipe.difficulty} />
-              <DetailField
-                label={'Likes'}
-                value={recipe.has_been_favourite_times}
-              />
+              <DataField label={'Servings'} value={recipe.servings} />
+              <DataField label={'Difficulty'} value={recipe.difficulty} />
+              <DataField label={'Likes'} value={'PLACEHOLDER VALUE'} />
             </div>
 
             {/* Right */}
             <div className="flex-1 space-y-2">
-              <DetailField label="Calories" value={recipe.calories} />
-              <DetailField label={'Protein (grams)'} value={recipe.protein_g} />
-              <DetailField
+              <DataField label="Calories (kcal)" value={recipe.calories} />
+              <DataField label={'Protein (grams)'} value={recipe.protein_g} />
+              <DataField
                 label={'Carbohydrates (grams)'}
                 value={recipe.carbs_g}
               />
-              <DetailField label={'Fat (grams)'} value={recipe.fat_g} />
+              <DataField label={'Fat (grams)'} value={recipe.fat_g} />
             </div>
           </div>
 
-          {/* Like */}
-          <div className="mt-6">
-            <p className="text-md max-w-[80%]">
-              Like: {recipe.has_been_favourite_times}
-            </p>
+          {/* Like Button */}
+          <div className="mt-2">
             <button
               className="text-amber-500 transition-colors hover:cursor-pointer hover:text-amber-600 hover:shadow-xl"
               aria-label="Like"

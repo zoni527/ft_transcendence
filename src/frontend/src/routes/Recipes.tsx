@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getRecipes } from '../api';
 import RecipeCard from '../components/RecipeCard';
+import { getRecipes } from '../api';
 import type { Recipe } from '../types/types';
 
 const Recipes = () => {
@@ -11,8 +11,7 @@ const Recipes = () => {
   useEffect(() => {
     getRecipes()
       .then(setRecipes)
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         setError('Failed to load recipes');
       })
       .finally(() => setLoading(false));

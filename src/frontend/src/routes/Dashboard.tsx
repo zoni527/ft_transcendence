@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DetailField from '../components/DetailField';
+import DataField from '../components/DataField';
 import { cardBase } from '../styles/styles';
 
 // This whole section up will get modified when we get user api endpoint
@@ -36,27 +36,21 @@ const Dashboard = () => {
             <div className="flex gap-8">
               {/* Left */}
               <div className="flex-1 space-y-2">
-                <DetailField label="Username" value={user.displayName} />
-                <DetailField label="Email" value={user.email} />
+                <DataField label="Username" value={user.displayName} />
+                <DataField label="Email" value={user.email} />
               </div>
 
               {/* Right */}
               <div className="flex-1 space-y-2">
-                <DetailField label="ID" value={user.id} />
+                <DataField label="ID" value={user.id} />
               </div>
             </div>
 
             {/* Bottom */}
             <div className="w-full space-y-2">
-              <DetailField
-                label="Followers"
-                value={user.followers.join(', ')}
-              />
-              <DetailField
-                label="Following"
-                value={user.following.join(', ')}
-              />
-              <DetailField
+              <DataField label="Followers" value={user.followers.join(', ')} />
+              <DataField label="Following" value={user.following.join(', ')} />
+              <DataField
                 label="Favourite Recipes"
                 value={user.recipe_favourite.join(', ')}
               />

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import InputField from '../components/InputField';
+import { getStringValue } from '../utils/utils';
 import { cardBase, buttonBase } from '../styles/styles';
 
 const Login = () => {
@@ -14,15 +15,10 @@ const Login = () => {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Helper to safely get string values
-    function getStringValue(name: string): string {
-      const value = formData.get(name);
-      if (typeof value === 'string') return value.trim();
-      return '';
-    }
-
-    const email = getStringValue('email');
-    const password = getStringValue('password');
+    // Input Validation
+    // (this is gonna be expanded to zod validation schema in its own branch)
+    const email = getStringValue(formData, 'email');
+    const password = getStringValue(formData, 'password');
 
     if (!email || !password) {
       setError('All fields are required.');
@@ -63,9 +59,11 @@ const Login = () => {
         </p>
 
         {/* Submit Button */}
-        <button type="submit" className={`${buttonBase}`}>
-          Continue
-        </button>
+        <div className="flex justify-center">
+          <button type="submit" className={`${buttonBase}`}>
+            Continue
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -1,5 +1,27 @@
 import type { Recipe } from './types/types';
 
+interface CreateRecipePayload {
+  author_id: string;
+  title: string;
+  description: string;
+  prep_time_min: number;
+  cook_time_min: number;
+  servings: number;
+  difficulty: string;
+  cuisine: string;
+  meal_type: string;
+  image_url: string;
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  is_published: boolean;
+}
+
+interface CreateRecipeResponse {
+  id: string;
+}
+
 interface SignupPayload {
   email: string;
   password: string;
@@ -7,18 +29,47 @@ interface SignupPayload {
   display_name: string;
 }
 
-type SignupResponse = {
+interface SignupResponse {
   id: string;
   email: string;
-};
-
-type ApiError = {
-  error: string;
-};
+}
 
 const baseUrl = 'http://localhost:8080/api';
 
-// GET Recipes
+// Validation for CreateRecipeResponse
+function isCreateRecipeResponse(data: unknown): data is CreateRecipeResponse {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return typeof obj.id === 'string';
+}
+
+// Validation for SignupResponse
+function isSignupResponse(data: unknown): data is SignupResponse {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return typeof obj.id === 'string' && typeof obj.email === 'string';
+}
+
+// Get an error message safely
+function getErrorMessage(data: unknown, fallback: string): string {
+  if (typeof data === 'object' && data !== null) {
+    const obj = data as Record<string, unknown>;
+    if (typeof obj.error === 'string') {
+      return obj.error;
+    }
+  }
+  return fallback;
+}
+
+// GET /api/recipes (get all published recipes)
 export const getRecipes = async (): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
 
@@ -32,7 +83,7 @@ export const getRecipes = async (): Promise<Recipe[]> => {
   return data;
 };
 
-// GET Recipe by ID
+// GET /api/recipes/:id (get a single recipe by ID)
 export const getRecipeById = async (id: string): Promise<Recipe> => {
   const response = await fetch(`${baseUrl}/recipes/${id}`);
 
@@ -44,7 +95,38 @@ export const getRecipeById = async (id: string): Promise<Recipe> => {
   return data;
 };
 
-// POST Signup
+// POST /api/recipes (create a new recipe)
+export const postCreateRecipe = async (
+  payload: CreateRecipePayload,
+): Promise<CreateRecipeResponse> => {
+  const response = await fetch(`${baseUrl}/recipes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  let data: unknown;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error('Invalid server response');
+  }
+
+  if (!response.ok) {
+    throw new Error(getErrorMessage(data, 'Create recipe failed'));
+  }
+
+  if (!isCreateRecipeResponse(data)) {
+    throw new Error('Invalid create recipe response');
+  }
+
+  return data;
+};
+
+// POST /api/users (create a new user)
 export const postSignup = async (
   payload: SignupPayload,
 ): Promise<SignupResponse> => {
@@ -65,13 +147,12 @@ export const postSignup = async (
   }
 
   if (!response.ok) {
-    const message =
-      typeof data === 'object' && data !== null && 'error' in data
-        ? (data as ApiError).error
-        : 'Signup failed';
-
-    throw new Error(message);
+    throw new Error(getErrorMessage(data, 'Signup failed'));
   }
 
-  return data as SignupResponse;
+  if (!isSignupResponse(data)) {
+    throw new Error('Invalid signup response');
+  }
+
+  return data;
 };

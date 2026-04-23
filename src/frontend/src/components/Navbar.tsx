@@ -18,6 +18,9 @@ const Navbar = () => {
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
+        <NavButton path="/create" className={`${buttonBase}`}>
+          Create Recipe
+        </NavButton>
         <NavButton path="/signup" className={`${buttonBase}`}>
           Sign up
         </NavButton>

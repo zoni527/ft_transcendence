@@ -10,14 +10,15 @@ export const cardBase = `
 `;
 
 export const buttonBase = `
-  w-full
+  inline-flex
+  items-center
+  justify-center
   rounded-lg
   bg-amber-600
   px-4
   py-2
   font-semibold
   text-white
-  text-center
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   hover:cursor-pointer
   hover:bg-amber-700
@@ -41,6 +42,13 @@ export const inputFieldBase = `
   focus:ring-2
   focus:ring-amber-500
   focus:outline-none
+`;
+
+export const inputLabelText = `
+  text-md
+  block
+  font-medium
+  text-gray-700
 `;
 
 export const cardHighlight = `

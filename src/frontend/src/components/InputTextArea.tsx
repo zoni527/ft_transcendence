@@ -1,35 +1,35 @@
 import { cardBase, inputFieldBase, inputLabelText } from '../styles/styles';
 
-interface InputFieldProps {
+interface InputTextAreaProps {
   id: string;
   name: string;
   label: string;
-  type?: string;
+  rows?: number;
   placeholder?: string;
 }
 
-const InputField = ({
+const InputTextArea = ({
   id,
   name,
   label,
-  type = 'text',
+  rows = 4,
   placeholder = '...',
-}: InputFieldProps) => {
+}: InputTextAreaProps) => {
   return (
     <div>
       <label htmlFor={id} className={`${inputLabelText}`}>
         {label}
       </label>
 
-      <input
+      <textarea
         id={id}
         name={name}
-        type={type}
+        rows={rows}
         placeholder={placeholder}
-        className={`${cardBase} ${inputFieldBase}`}
+        className={`${cardBase} ${inputFieldBase} resize-none`}
       />
     </div>
   );
 };
 
-export default InputField;
+export default InputTextArea;

@@ -298,7 +298,7 @@ func isValidDisplayName(displayName string) bool {
 // Secret key used to sign every generated JWT
 var jwtSecret []byte
 
-// Load JWT key to env var. Function ran once when the backend starts
+// Initialize JWT secret from JWT_SECRET at startup.
 func LoadJWTSecret() {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {

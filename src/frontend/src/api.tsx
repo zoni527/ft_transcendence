@@ -138,7 +138,7 @@ export const postLogin = async (payload: LoginPayload): Promise<void> => {
     headers: {
       'Content-Type': 'application/json',
     },
-    credentials: 'include', // Include cookies for session
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 

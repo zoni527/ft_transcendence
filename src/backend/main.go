@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"time"
 
 	"ft_transcendence/backend/handlers"
 	"ft_transcendence/backend/repository"

@@ -22,6 +22,11 @@ interface CreateRecipeResponse {
   id: string;
 }
 
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
 interface SignupPayload {
   email: string;
   password: string;
@@ -107,12 +112,12 @@ export const postCreateRecipe = async (
     body: JSON.stringify(payload),
   });
 
-  let data: unknown;
+  let data: unknown = null;
 
   try {
     data = await response.json();
   } catch {
-    throw new Error('Invalid server response');
+    // Keep data as null
   }
 
   if (!response.ok) {
@@ -124,6 +129,30 @@ export const postCreateRecipe = async (
   }
 
   return data;
+};
+
+// POST /api/users/login (user login)
+export const postLogin = async (payload: LoginPayload): Promise<void> => {
+  const response = await fetch(`${baseUrl}/users/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include', // Include cookies for session
+    body: JSON.stringify(payload),
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    // Keep data as null
+  }
+
+  if (!response.ok) {
+    throw new Error(getErrorMessage(data, 'Login failed'));
+  }
 };
 
 // POST /api/users (create a new user)
@@ -138,12 +167,12 @@ export const postSignup = async (
     body: JSON.stringify(payload),
   });
 
-  let data: unknown;
+  let data: unknown = null;
 
   try {
     data = await response.json();
   } catch {
-    throw new Error('Invalid server response');
+    // Keep data as null
   }
 
   if (!response.ok) {

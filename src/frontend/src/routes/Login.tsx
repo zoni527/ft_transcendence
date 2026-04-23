@@ -1,12 +1,24 @@
 import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import InputField from '../components/InputField';
+import { postLogin } from '../api';
 import { getStringValue } from '../utils/utils';
 import { cardBase, buttonBase } from '../styles/styles';
 
+// Validation schema
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: 'Email is required' })
+    .email({ message: 'Invalid email' }),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
 const Login = () => {
   const [error, setError] = useState('');
-  //   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -15,14 +27,30 @@ const Login = () => {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Input Validation
-    // (this is gonna be expanded to zod validation schema in its own branch)
-    const email = getStringValue(formData, 'email');
-    const password = getStringValue(formData, 'password');
+    // Input validation
+    const result = loginSchema.safeParse({
+      email: getStringValue(formData, 'email'),
+      password: getStringValue(formData, 'password'),
+    });
 
-    if (!email || !password) {
-      setError('All fields are required.');
-      return;
+    if (!result.success) {
+      setError(result.error.issues[0]?.message || 'Invalid input');
+    } else {
+      setLoading(true);
+
+      // POST /api/users/login (user login)
+      postLogin({
+        email: result.data.email,
+        password: result.data.password,
+      })
+        .then(() => {
+          void navigate('/dashboard');
+        })
+        .catch((err: unknown) => {
+          if (err instanceof Error) setError(err.message);
+          else setError('Something went wrong. Please try again.');
+        })
+        .finally(() => setLoading(false));
     }
   };
 
@@ -60,8 +88,8 @@ const Login = () => {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button type="submit" className={`${buttonBase}`}>
-            Continue
+          <button type="submit" className={buttonBase} disabled={loading}>
+            {loading && !error ? 'Logging in...' : 'Continue'}
           </button>
         </div>
       </form>

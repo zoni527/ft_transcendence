@@ -59,6 +59,25 @@ func GetUserById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, user)
 }
 
+func GetMe(c *gin.Context) {
+	id := c.GetString("userID")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+	user, err := repository.GetUserById(id)
+	if err == pgx.ErrNoRows {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+	if err != nil {
+		log.Printf("repository.GetUserById error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, user)
+}
+
 func CreateUser(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

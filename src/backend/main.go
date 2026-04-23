@@ -32,6 +32,7 @@ func main() {
 	router.DELETE("/api/users/:id", handlers.DeleteUser)  // not implemented yet
 	router.GET("/api/users/search", handlers.SearchUsers) // not implemented yet
 	router.POST("/api/users/login", handlers.LoginUser)
+	router.GET("/api/users/me", handlers.AuthMiddleware(), handlers.GetMe)
 
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)

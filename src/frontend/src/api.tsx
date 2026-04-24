@@ -117,7 +117,7 @@ export const postCreateRecipe = async (
   try {
     data = await response.json();
   } catch {
-    // Keep data as null
+    data = null;
   }
 
   if (!response.ok) {
@@ -147,7 +147,7 @@ export const postLogin = async (payload: LoginPayload): Promise<void> => {
   try {
     data = await response.json();
   } catch {
-    // Keep data as null
+    data = null;
   }
 
   if (!response.ok) {
@@ -172,7 +172,7 @@ export const postSignup = async (
   try {
     data = await response.json();
   } catch {
-    // Keep data as null
+    data = null;
   }
 
   if (!response.ok) {

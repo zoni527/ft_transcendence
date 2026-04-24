@@ -6,6 +6,7 @@ package handlers
 // [done] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
+// [done] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
 import (
@@ -26,15 +27,12 @@ import (
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgerrcode"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func GetAllRecipes(c *gin.Context) {
 	recipes, err := repository.GetAllRecipes()
 	if err != nil {
-		log.Printf("GetAllRecipes error: %v", err)
+		log.Printf("handlers.GetAllRecipes: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -44,17 +42,18 @@ func GetAllRecipes(c *gin.Context) {
 func GetRecipeById(c *gin.Context) {
 	id := c.Param("id")
 	if !isValidUUID(id) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe ID format"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe id"})
 		return
 	}
 
 	recipe, err := repository.GetRecipeById(id)
-	if err == pgx.ErrNoRows {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
-		return
-	}
 	if err != nil {
-		log.Printf("GetRecipeById error: %v", err)
+		var ue *repository.UserError
+		if errors.As(err, &ue) {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": ue.Error()})
+			return
+		}
+		log.Printf("handlers.GetRecipeById: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -80,21 +79,12 @@ func CreateRecipe(c *gin.Context) {
 
 	newRecipeId, err := repository.CreateRecipe(&r)
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			switch pgErr.Code {
-			case pgerrcode.ForeignKeyViolation:
-				c.IndentedJSON(http.StatusBadRequest, gin.H{
-					"error": fmt.Sprintf("author id %v not in database", r.Author_id),
-				})
-				return
-			case pgerrcode.CheckViolation:
-				log.Printf("%v: %v", pgErr.ColumnName, pgErr.ConstraintName)
-				c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "bad recipe field"})
-				return
-			}
+		var ue *repository.UserError
+		if errors.As(err, &ue) {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": ue.Error()})
+			return
 		}
-		log.Printf("CreateRecipe error: %v", err)
+		log.Printf("handlers.CreateRecipe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -108,8 +98,24 @@ func UpdateRecipe(c *gin.Context) {
 }
 
 func DeleteRecipe(c *gin.Context) {
-	// TODO: call repository.DeleteRecipe()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	id := c.Param("id")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe id"})
+		return
+	}
+
+	if err := repository.DeleteRecipe(id); err != nil {
+		var ue *repository.UserError
+		if errors.As(err, &ue) {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": ue.Error()})
+			return
+		}
+		log.Printf("handlers.DeleteRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
 
 func UploadRecipeImage(c *gin.Context) {

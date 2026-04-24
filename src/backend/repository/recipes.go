@@ -6,7 +6,7 @@ package repository
 // [done] CreateRecipe      — POST /api/recipes (currently inserts the recipe row only)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
 // [TODO] PatchRecipe       — PATCH /api/recipes/:id
-// [TODO] DeleteRecipe      — DELETE /api/recipes/:id
+// [done] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] GetAllRecipes should support ?include_drafts=true for admins (once auth is implemented)
 // [TODO] Add GET /api/users/:id/recipes so authors can see their own unpublished recipes
 // [TODO] Add sorting (?sort=created_at&order=desc) to GetAllRecipes
@@ -14,11 +14,14 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"ft_transcendence/backend/models"
 
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // GetAllRecipes returns all published recipes.
@@ -95,7 +98,7 @@ func GetRecipeById(id string) (models.Recipe, error) {
 	)
 
 	if err == pgx.ErrNoRows {
-		return models.Recipe{}, pgx.ErrNoRows
+		return models.Recipe{}, &UserError{"recipe not found"}
 	}
 
 	if err != nil {
@@ -123,8 +126,42 @@ func CreateRecipe(r *models.Recipe) (string, error) {
 		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
 	).Scan(&newId)
 	if err != nil {
-		return "", fmt.Errorf("error creating recipe: %w", err)
+		var pgErr *pgconn.PgError
+		if !errors.As(err, &pgErr) {
+			return "", fmt.Errorf("repository.CreateRecipe: %w", err)
+		}
+		switch pgErr.Code {
+		case pgerrcode.ForeignKeyViolation:
+			return "", &UserError{"invalid author_id"}
+		case pgerrcode.CheckViolation:
+			return "", &UserError{fmt.Sprintf("%v: constraint %v violated",
+				pgErr.ColumnName, pgErr.ConstraintName),
+			}
+		default:
+			return "", fmt.Errorf("repository.CreateRecipe: %w", err)
+		}
 	}
 
 	return newId, nil
+}
+
+func DeleteRecipe(id string) error {
+	sql := `DELETE FROM recipe WHERE id = $1`
+	res, err := Pool.Exec(context.Background(), sql, id)
+	if err != nil {
+		return fmt.Errorf("repository.DeleteRecipe: %w", err)
+	}
+	if res.RowsAffected() == 0 {
+		return &UserError{"invalid recipe id"}
+	}
+
+	return nil
+}
+
+type UserError struct {
+	msg string
+}
+
+func (e *UserError) Error() string {
+	return e.msg
 }

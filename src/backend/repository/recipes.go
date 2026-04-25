@@ -134,9 +134,7 @@ func CreateRecipe(r *models.Recipe) (string, error) {
 		case pgerrcode.ForeignKeyViolation:
 			return "", &UserError{"invalid author_id"}
 		case pgerrcode.CheckViolation:
-			return "", &UserError{fmt.Sprintf("%v: constraint %v violated",
-				pgErr.ColumnName, pgErr.ConstraintName),
-			}
+			return "", &UserError{"invalid recipe data"}
 		default:
 			return "", fmt.Errorf("repository.CreateRecipe: %w", err)
 		}

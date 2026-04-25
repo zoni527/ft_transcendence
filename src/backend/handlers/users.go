@@ -71,7 +71,7 @@ func GetMe(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		log.Printf("repository.GetUserById error: %v", err)
+		log.Printf("Getme error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -119,7 +119,7 @@ func CreateUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
-		log.Printf("CreateUser repository.CreateUser error: %v", err)
+		log.Printf("CreateUser error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -147,7 +147,7 @@ func LoginUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 			return
 		}
-		log.Printf("LoginUser repository.GetUserCredentialsByEmail error: %v", err)
+		log.Printf("LoginUser error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import InputField from '../components/InputField';
+import SubmitButton from '../components/SubmitButton';
 import { postLogin } from '../api';
 import { getStringValue } from '../utils/utils';
-import { cardBase, buttonBase } from '../styles/styles';
+import { cardBase } from '../styles/styles';
 
 // Validation schema
 const loginSchema = z.object({
@@ -88,9 +89,11 @@ const Login = () => {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button type="submit" className={buttonBase} disabled={loading}>
-            {loading && !error ? 'Logging in...' : 'Continue'}
-          </button>
+          <SubmitButton
+            isLoading={loading}
+            pendingText="Logging in"
+            defaultText="Continue"
+          />
         </div>
       </form>
     </div>

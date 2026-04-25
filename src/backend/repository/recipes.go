@@ -150,7 +150,7 @@ func DeleteRecipe(id string) error {
 		return fmt.Errorf("repository.DeleteRecipe: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return &UserError{"invalid recipe id"}
+		return &UserError{"recipe not found"}
 	}
 
 	return nil

@@ -107,7 +107,7 @@ func DeleteRecipe(c *gin.Context) {
 	if err := repository.DeleteRecipe(id); err != nil {
 		var ue *repository.UserError
 		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": ue.Error()})
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": ue.Error()})
 			return
 		}
 		log.Printf("handlers.DeleteRecipe: %v", err)

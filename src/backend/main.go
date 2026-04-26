@@ -19,8 +19,14 @@ func main() {
 	}
 	defer repository.ClosePool()
 
+	handlers.LoadJWTSecret()
 	router := gin.Default()
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowCredentials: true,
+	}))
 
 	// Users
 	router.GET("/api/users", handlers.GetUsers)
@@ -30,6 +36,8 @@ func main() {
 	router.PATCH("/api/users/:id", handlers.PatchUser)    // not implemented yet
 	router.DELETE("/api/users/:id", handlers.DeleteUser)  // not implemented yet
 	router.GET("/api/users/search", handlers.SearchUsers) // not implemented yet
+	router.POST("/api/users/login", handlers.LoginUser)
+	router.GET("/api/users/me", handlers.AuthMiddleware(), handlers.GetMe)
 
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)

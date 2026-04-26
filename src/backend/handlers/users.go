@@ -11,15 +11,19 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
+	"time"
 	"unicode"
 
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/nbutton23/zxcvbn-go"
 	"golang.org/x/crypto/bcrypt"
@@ -49,6 +53,25 @@ func GetUserById(c *gin.Context) {
 	}
 	if err != nil {
 		log.Printf("GetUserById error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func GetMe(c *gin.Context) {
+	id := c.GetString("userID")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+	user, err := repository.GetUserById(id)
+	if err == pgx.ErrNoRows {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+	if err != nil {
+		log.Printf("Getme error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -96,11 +119,51 @@ func CreateUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
-		log.Printf("CreateUser repository.CreateUser error: %v", err)
+		log.Printf("CreateUser error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email})
+	token, err := generateJWTToken(data.Id)
+	if err != nil {
+		log.Printf("CreateUser generateJWTToken error: %v", err)
+		c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false})
+		return
+	}
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", token, 3600, "/", "", false, true)
+	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
+}
+
+func LoginUser(c *gin.Context) {
+	var req models.LoginUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
+	data, err := repository.GetUserCredentialsByEmail(req.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+			return
+		}
+		log.Printf("LoginUser error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(data.Password_hash), []byte(req.Password)); err != nil {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		return
+	}
+	token, err := generateJWTToken(data.Id)
+	if err != nil {
+		log.Printf("LoginUser generateJWTToken error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", token, 3600, "/", "", false, true)
+	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 
 func UpdateUser(c *gin.Context) {
@@ -230,4 +293,65 @@ func isValidDisplayName(displayName string) bool {
 	}
 
 	return hasAlphaNum
+}
+
+// Secret key used to sign every generated JWT
+var jwtSecret []byte
+
+// Initialize JWT secret from JWT_SECRET at startup.
+func LoadJWTSecret() {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Fatal("Error loading JWT secret")
+	}
+	jwtSecret = []byte(secret)
+}
+
+// Function to generate JWT to be sent to frontend for authentication on successful login
+func generateJWTToken(userID string) (string, error) {
+	now := time.Now()
+	claims := jwt.RegisteredClaims{
+		Subject:   userID,
+		ExpiresAt: jwt.NewNumericDate(now.Add(24 * time.Hour)),
+		IssuedAt:  jwt.NewNumericDate(now),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
+}
+
+// Function to validate JWT sent by frontend
+func ValidateJWTToken(token string) (*jwt.RegisteredClaims, error) {
+	claims := &jwt.RegisteredClaims{}
+	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
+		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+			return nil, fmt.Errorf("unexpected signing method %s", t.Method.Alg())
+		}
+		return jwtSecret, nil
+	})
+	if err != nil || !parsedToken.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+	if claims.Subject == "" {
+		return nil, fmt.Errorf("missing userID")
+	}
+	return claims, nil
+}
+
+// Middleware to check cookies validity and JWT before granting access to restricted paths
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := c.Cookie("token")
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+		claims, err := ValidateJWTToken(token)
+		if err != nil {
+			log.Printf("ValidateJWTToken failed: %v", err)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			return
+		}
+		c.Set("userID", claims.Subject)
+		c.Next()
+	}
 }

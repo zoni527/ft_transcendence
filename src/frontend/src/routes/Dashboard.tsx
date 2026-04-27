@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import DataField from '../components/DataField';
+import NavButton from '../components/NavButton';
 import { getUser } from '../api';
 import type { User } from '../types/types';
-import { cardBase } from '../styles/styles';
+import { cardBase, buttonBase } from '../styles/styles';
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -59,6 +60,9 @@ const Dashboard = () => {
           <DataField label="Updated at" value={user.updated_at} />
           <DataField label="Roles" value={user.roles.join(', ')} />
         </div>
+        <NavButton path="/create" className={`${buttonBase}`}>
+          Create Recipe
+        </NavButton>
       </div>
     </div>
   );

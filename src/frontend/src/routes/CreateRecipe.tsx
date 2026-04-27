@@ -48,6 +48,9 @@ const CreateRecipe = () => {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (loading) return;
+
     setError('');
 
     const form = e.currentTarget;

@@ -12,20 +12,20 @@ const Navbar = () => {
       {/* Left Side */}
       <div className="flex gap-6 text-xl font-semibold">
         <NavButton path="/" className={`${navLeftBase}`}>
-          {t('nav_recipes')}
+          {t('nav.recipes')}
         </NavButton>
         <NavButton path="/dashboard" className={`${navLeftBase}`}>
-          {t('nav_dashboard')}
+          {t('nav.dashboard')}
         </NavButton>
       </div>
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
         <NavButton path="/signup" className={`${buttonBase}`}>
-          {t('nav_signup')}
+          {t('nav.signup')}
         </NavButton>
         <NavButton path="/login" className={`${buttonBase}`}>
-          {t('nav_login')}
+          {t('nav.login')}
         </NavButton>
       </div>
     </nav>

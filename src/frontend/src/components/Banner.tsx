@@ -10,7 +10,7 @@ const Banner = () => {
       <div className="relative z-20 flex justify-end gap-2 p-4">
         <LangButton lang="en" label="EN" />
         <LangButton lang="fi" label="FI" />
-        <LangButton lang="cz" label="CZ" />
+        <LangButton lang="cs" label="CZ" />
       </div>
 
       {/* Center Overlay */}

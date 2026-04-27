@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { z } from 'zod';
 import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
@@ -10,41 +12,43 @@ import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Helper function for checking number fields in the validation schema
-const requiredNumber = (field: string, value: number) =>
+const requiredNumber = (field: string, value: number, t: TFunction) =>
   z.coerce
     .number({
-      required_error: `${field} is required`,
-      invalid_type_error: `${field} must be a number`,
+      required_error: t('validation.fieldRequired', { field }),
+      invalid_type_error: t('validation.numRequired', { field }),
     })
-    .min(value, `${field} must be at least ${value}`);
+    .min(value, t('validation.numMin', { field, value }));
 
 // Validation schema
-const createRecipeSchema = z.object({
-  title: z.string().min(1, 'Recipe name is required'),
-  description: z.string().min(1, 'Description is required'),
-  prep_time_min: requiredNumber('Prep time', 0),
-  cook_time_min: requiredNumber('Cook time', 0),
-  servings: requiredNumber('Servings', 1),
-  difficulty: z.enum(['easy', 'medium', 'hard'], {
-    errorMap: () => ({ message: 'Please select a difficulty' }),
-  }),
-  cuisine: z.string().min(1, 'Cuisine type is required'),
-  meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
-    errorMap: () => ({ message: 'Please select a meal type' }),
-  }),
-  calories: requiredNumber('Calories', 0),
-  protein_g: requiredNumber('Protein', 0),
-  carbs_g: requiredNumber('Carbs', 0),
-  fat_g: requiredNumber('Fat', 0),
-  is_published: z.enum(['yes', 'no'], {
-    errorMap: () => ({ message: 'Please select a publish option' }),
-  }),
-});
+const createRecipeSchema = (t: TFunction) =>
+  z.object({
+    title: z.string().min(1, t('validation.recipeNameRequired')),
+    description: z.string().min(1, t('validation.descriptionRequired')),
+    prep_time_min: requiredNumber(t('validation.prepTime'), 0, t),
+    cook_time_min: requiredNumber(t('validation.cookTime'), 0, t),
+    servings: requiredNumber(t('validation.servings'), 1, t),
+    difficulty: z.enum(['easy', 'medium', 'hard'], {
+      errorMap: () => ({ message: t('validation.selectDifficulty') }),
+    }),
+    cuisine: z.string().min(1, t('validation.cuisineRequired')),
+    meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
+      errorMap: () => ({ message: t('validation.selectMealType') }),
+    }),
+    calories: requiredNumber(t('validation.calories'), 0, t),
+    protein_g: requiredNumber(t('validation.protein'), 0, t),
+    carbs_g: requiredNumber(t('validation.carbs'), 0, t),
+    fat_g: requiredNumber(t('validation.fat'), 0, t),
+    is_published: z.enum(['yes', 'no'], {
+      errorMap: () => ({ message: t('validation.selectPublishOption') }),
+    }),
+  });
 
 const CreateRecipe = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,7 +61,10 @@ const CreateRecipe = () => {
     const formData = new FormData(form);
 
     // Input validation
-    const result = createRecipeSchema.safeParse({
+
+    const schema = createRecipeSchema(t);
+
+    const result = schema.safeParse({
       title: getStringValue(formData, 'title'),
       description: getStringValue(formData, 'description'),
       prep_time_min: getStringValue(formData, 'prep_time_min'),

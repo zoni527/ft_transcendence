@@ -217,6 +217,7 @@ export const postSignup = async (payload: SignupPayload) => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 

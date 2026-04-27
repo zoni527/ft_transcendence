@@ -4,7 +4,7 @@ package handlers
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
 // [done] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
-// [TODO] UpdateRecipe      — PUT /api/recipes/:id
+// [....] UpdateRecipe      — PUT /api/recipes/:id
 // [done] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
@@ -61,7 +61,6 @@ func GetRecipeById(c *gin.Context) {
 
 func CreateRecipe(c *gin.Context) {
 	var r models.Recipe
-
 	if err := c.ShouldBindJSON(&r); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
@@ -92,8 +91,30 @@ func CreateRecipe(c *gin.Context) {
 }
 
 func UpdateRecipe(c *gin.Context) {
-	// TODO: call repository.UpdateRecipe()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	id := c.Param("id")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe id"})
+		return
+	}
+
+	var r models.Recipe
+	if err := c.ShouldBindJSON(&r); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+	r.Id = id
+	if err := repository.UpdateRecipe(&r); err != nil {
+		var ue *repository.UserError
+		if errors.As(err, &ue) {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": ue.Error()})
+			return
+		}
+		log.Printf("handlers.CreateRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"id": id})
 }
 
 func DeleteRecipe(c *gin.Context) {

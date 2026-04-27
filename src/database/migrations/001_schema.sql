@@ -64,9 +64,11 @@ CREATE TABLE recipe (
     prep_time_min           INT,
     cook_time_min           INT,
     servings                INT DEFAULT 4,
-    difficulty              VARCHAR NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard')),
+    difficulty              VARCHAR NOT NULL CONSTRAINT recipe_difficulty_allowed_values
+                                CHECK (difficulty IN ('easy', 'medium', 'hard')),
     cuisine                 VARCHAR,
-    meal_type               VARCHAR NOT NULL CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
+    meal_type               VARCHAR NOT NULL CONSTRAINT recipe_meal_type_allowed_values
+                                CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
     image_url               VARCHAR,
     calories                INT,
     protein_g               DECIMAL,

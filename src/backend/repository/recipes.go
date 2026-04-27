@@ -15,6 +15,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"ft_transcendence/backend/models"
 
@@ -125,21 +126,38 @@ func CreateRecipe(r *models.Recipe) (string, error) {
 		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
 	).Scan(&newId)
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if !errors.As(err, &pgErr) {
-			return "", fmt.Errorf("repository.CreateRecipe: %w", err)
-		}
-		switch pgErr.Code {
-		case pgerrcode.ForeignKeyViolation:
-			return "", &UserError{"invalid author_id"}
-		case pgerrcode.CheckViolation:
-			return "", &UserError{"invalid recipe data"}
-		default:
-			return "", fmt.Errorf("repository.CreateRecipe: %w", err)
-		}
+		return "", recipePostgresErrorClassification("repository.CreateRecipe", err)
 	}
 
 	return newId, nil
+}
+
+func UpdateRecipe(r *models.Recipe) error {
+	sql := `
+		UPDATE recipe
+		SET (
+			author_id, title, description, prep_time_min, cook_time_min,
+			servings, difficulty, cuisine, meal_type, image_url,
+			calories, protein_g, carbs_g, fat_g, is_published
+		) = (
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+		)
+		WHERE id = $16`
+
+	res, err := Pool.Exec(context.Background(), sql,
+		r.Author_id, r.Title, r.Description, r.Prep_time_min, r.Cook_time_min,
+		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
+		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
+		r.Id,
+	)
+	if err != nil {
+		return recipePostgresErrorClassification("repository.UpdateRecipe", err)
+	}
+	if res.RowsAffected() == 0 {
+		return &UserError{"recipe not found"}
+	}
+
+	return nil
 }
 
 func DeleteRecipe(id string) error {
@@ -161,4 +179,40 @@ type UserError struct {
 
 func (e *UserError) Error() string {
 	return e.msg
+}
+
+// -----------------------------------------------------------------------------
+// helper functions
+
+func recipePostgresErrorClassification(functionName string, err error) error {
+	if err == nil {
+		return nil
+	}
+	var pgErr *pgconn.PgError
+	// Not a Postgres error -> internal server error
+	if !errors.As(err, &pgErr) {
+		return fmt.Errorf("%v: %w", functionName, err)
+	}
+	switch pgErr.Code {
+	case pgerrcode.ForeignKeyViolation:
+		if pgErr.ConstraintName == "fk_author_id" {
+			return &UserError{"invalid author id"}
+		}
+		log.Printf("%v: foreign key violation: %v", functionName, pgErr.ConstraintName)
+		return &UserError{"invalid recipe data"}
+
+	case pgerrcode.CheckViolation:
+		switch pgErr.ConstraintName {
+		case "recipe_difficulty_allowed_values":
+			return &UserError{"invalid difficulty value"}
+		case "recipe_meal_type_allowed_values":
+			return &UserError{"invalid meal type value"}
+		default:
+			log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
+			return &UserError{"invalid recipe data"}
+		}
+
+	default:
+		return fmt.Errorf("%v: %w", functionName, err)
+	}
 }

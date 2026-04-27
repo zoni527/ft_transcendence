@@ -1,20 +1,13 @@
-import { useTranslation } from 'react-i18next';
 import { langButtonBase } from '../styles/styles';
 
 type Props = {
-  lang: string;
   label: string;
+  onClick: () => void;
 };
 
-const LangButton = ({ lang, label }: Props) => {
-  const { i18n } = useTranslation();
-
-  const changeLang = () => {
-    void i18n.changeLanguage(lang);
-  };
-
+const LangButton = ({ label, onClick }: Props) => {
   return (
-    <button onClick={changeLang} className={`${langButtonBase}`}>
+    <button onClick={onClick} className={langButtonBase}>
       {label}
     </button>
   );

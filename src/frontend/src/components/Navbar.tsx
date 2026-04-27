@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import LangDropdown from './LangDropDown';
 import NavButton from './NavButton';
 import { cardBase, buttonBase, navLeftBase } from '../styles/styles';
 
@@ -27,6 +28,7 @@ const Navbar = () => {
         <NavButton path="/login" className={`${buttonBase}`}>
           {t('nav.login')}
         </NavButton>
+        <LangDropdown />
       </div>
     </nav>
   );

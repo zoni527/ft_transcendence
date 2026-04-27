@@ -22,16 +22,15 @@ export const buttonBase = `
 
 export const langButtonBase = `
   cursor-pointer
-  rounded-lg
   border
   border-orange-900
   px-3
   py-1
   text-sm
   font-bold
-  text-orange-950
+  text-orange-700
   transition
-  hover:bg-orange-900
+  hover:bg-orange-800
   hover:text-white
   active:scale-95"
 `;

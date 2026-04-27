@@ -211,9 +211,7 @@ export const postLogin = async (payload: LoginPayload) => {
 };
 
 // POST /api/users (user signup)
-export const postSignup = async (
-  payload: SignupPayload,
-): Promise<LoginSignupResponse> => {
+export const postSignup = async (payload: SignupPayload) => {
   const response = await fetch(`${baseUrl}/users`, {
     method: 'POST',
     headers: {
@@ -243,6 +241,4 @@ export const postSignup = async (
       'Signup succeeded but automatic login failed. Please log in.',
     );
   }
-
-  return data;
 };

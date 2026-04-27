@@ -1,4 +1,4 @@
-import type { Recipe, User } from './types/types';
+import type { Recipe, User, LoginSignupResponse } from './types/types';
 
 interface CreateRecipePayload {
   author_id: string;
@@ -32,12 +32,6 @@ interface SignupPayload {
   password: string;
   name: string;
   display_name: string;
-}
-
-interface LoginSignupResponse {
-  id: string;
-  email: string;
-  authenticated: boolean;
 }
 
 const baseUrl = 'http://localhost:8080/api';
@@ -183,7 +177,7 @@ export const getUser = async (): Promise<User> => {
 };
 
 // POST /api/users/login (user login)
-export const postLogin = async (payload: LoginPayload): Promise<User> => {
+export const postLogin = async (payload: LoginPayload) => {
   const response = await fetch(`${baseUrl}/users/login`, {
     method: 'POST',
     headers: {
@@ -208,13 +202,12 @@ export const postLogin = async (payload: LoginPayload): Promise<User> => {
   if (!isLoginSignupResponse(data)) {
     throw new Error('Invalid login response');
   }
-
-  const user = await getUser();
-  return user;
 };
 
 // POST /api/users (user signup)
-export const postSignup = async (payload: SignupPayload): Promise<User> => {
+export const postSignup = async (
+  payload: SignupPayload,
+): Promise<LoginSignupResponse> => {
   const response = await fetch(`${baseUrl}/users`, {
     method: 'POST',
     headers: {
@@ -239,6 +232,5 @@ export const postSignup = async (payload: SignupPayload): Promise<User> => {
     throw new Error('Invalid signup response');
   }
 
-  const user = await getUser();
-  return user;
+  return data;
 };

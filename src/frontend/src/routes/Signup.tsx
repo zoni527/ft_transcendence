@@ -5,6 +5,7 @@ import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
 import { postSignup } from '../api';
 import { getStringValue } from '../utils/utils';
+import type { LoginSignupResponse } from '../types/types';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
@@ -57,8 +58,9 @@ const Signup = () => {
         name: result.data.fullName,
         display_name: result.data.username,
       })
-        .then(() => {
-          void navigate('/dashboard');
+        .then((response: LoginSignupResponse) => {
+          if (response.authenticated) void navigate('/dashboard');
+          else void navigate('/login');
         })
         .catch((err: unknown) => {
           if (err instanceof Error) setError(err.message);

@@ -28,3 +28,9 @@ export interface User {
   updated_at: string;
   roles: string[];
 }
+
+export interface LoginSignupResponse {
+  id: string;
+  email: string;
+  authenticated: boolean;
+}

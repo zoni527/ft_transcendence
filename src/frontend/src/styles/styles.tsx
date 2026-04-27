@@ -25,6 +25,22 @@ export const buttonBase = `
   whitespace-nowrap
 `;
 
+export const langButtonBase = `
+  cursor-pointer
+  rounded-lg
+  border
+  border-amber-900
+  px-3
+  py-1
+  text-sm
+  font-bold
+  text-amber-950
+  transition
+  hover:bg-amber-900
+  hover:text-white
+  active:scale-95"
+`;
+
 export const navLeftBase = `
   text-amber-900
   hover:cursor-pointer

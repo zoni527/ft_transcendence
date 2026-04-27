@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { z } from 'zod';
+import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
 import SelectField from '../components/SelectField';
@@ -61,7 +62,6 @@ const CreateRecipe = () => {
     const formData = new FormData(form);
 
     // Input validation
-
     const schema = createRecipeSchema(t);
 
     const result = schema.safeParse({
@@ -117,9 +117,7 @@ const CreateRecipe = () => {
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-xl p-8`}>
       {/* Header */}
-      <h1 className="mb-6 text-center text-2xl font-semibold text-amber-900">
-        Create Recipe
-      </h1>
+      <FormHeader title="Create Recipe" />
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">

@@ -35,7 +35,7 @@ const Dashboard = () => {
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
       {/* Header */}
-      <h1 className="mb-6 text-2xl font-semibold text-amber-900">
+      <h1 className="mb-6 text-2xl font-semibold text-orange-700">
         Welcome, {user.name}!
       </h1>
 

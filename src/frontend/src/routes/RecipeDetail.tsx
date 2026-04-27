@@ -47,7 +47,7 @@ const RecipeDetail = () => {
       />
 
       {/* Header */}
-      <h1 className="mb-6 text-2xl font-semibold text-amber-900">
+      <h1 className="mb-6 text-2xl font-semibold text-orange-700">
         {recipe.title}
       </h1>
 

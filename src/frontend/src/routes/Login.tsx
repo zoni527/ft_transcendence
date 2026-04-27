@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
 import { postLogin } from '../api';
@@ -61,9 +62,7 @@ const Login = () => {
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-sm p-8`}>
       {/* Header */}
-      <h1 className="mb-6 text-center text-2xl font-semibold text-amber-900">
-        Log in
-      </h1>
+      <FormHeader title="Log in" />
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">

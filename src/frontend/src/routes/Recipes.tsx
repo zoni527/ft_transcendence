@@ -28,7 +28,7 @@ const Recipes = () => {
 
   return (
     <div>
-      <h1 className="mt-8 px-6 text-xl font-semibold text-amber-900">
+      <h1 className="mt-8 px-6 text-xl font-semibold text-orange-700">
         All Recipes
       </h1>
 

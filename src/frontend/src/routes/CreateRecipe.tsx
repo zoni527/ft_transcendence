@@ -4,9 +4,10 @@ import { z } from 'zod';
 import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
 import SelectField from '../components/SelectField';
+import SubmitButton from '../components/SubmitButton';
 import { postCreateRecipe } from '../api';
 import { getStringValue } from '../utils/utils';
-import { cardBase, buttonBase } from '../styles/styles';
+import { cardBase } from '../styles/styles';
 
 // Helper function for checking number fields in the validation schema
 const requiredNumber = (field: string, value: number) =>
@@ -47,6 +48,9 @@ const CreateRecipe = () => {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (loading) return;
+
     setError('');
 
     const form = e.currentTarget;
@@ -238,9 +242,11 @@ const CreateRecipe = () => {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button type="submit" className={buttonBase} disabled={loading}>
-            {loading && !error ? 'Submitting recipe...' : 'Submit recipe'}
-          </button>
+          <SubmitButton
+            isLoading={loading}
+            pendingText="Submitting recipe"
+            defaultText="Submit"
+          />
         </div>
       </form>
     </div>

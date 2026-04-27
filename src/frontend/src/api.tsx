@@ -1,4 +1,4 @@
-import type { Recipe } from './types/types';
+import type { Recipe, User } from './types/types';
 
 interface CreateRecipePayload {
   author_id: string;
@@ -22,6 +22,11 @@ interface CreateRecipeResponse {
   id: string;
 }
 
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
 interface SignupPayload {
   email: string;
   password: string;
@@ -29,9 +34,10 @@ interface SignupPayload {
   display_name: string;
 }
 
-interface SignupResponse {
+interface LoginSignupResponse {
   id: string;
   email: string;
+  authenticated: boolean;
 }
 
 const baseUrl = 'http://localhost:8080/api';
@@ -47,15 +53,39 @@ function isCreateRecipeResponse(data: unknown): data is CreateRecipeResponse {
   return typeof obj.id === 'string';
 }
 
-// Validation for SignupResponse
-function isSignupResponse(data: unknown): data is SignupResponse {
+// Validation for UserResponse
+function isUserResponse(data: unknown): data is User {
   if (typeof data !== 'object' || data === null) {
     return false;
   }
 
   const obj = data as Record<string, unknown>;
 
-  return typeof obj.id === 'string' && typeof obj.email === 'string';
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.email === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.display_name === 'string' &&
+    typeof obj.created_at === 'string' &&
+    typeof obj.updated_at === 'string' &&
+    Array.isArray(obj.roles) &&
+    obj.roles.every((role) => typeof role === 'string')
+  );
+}
+
+// Validation for LoginSignupResponse
+function isLoginSignupResponse(data: unknown): data is LoginSignupResponse {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.email === 'string' &&
+    typeof obj.authenticated === 'boolean'
+  );
 }
 
 // Get an error message safely
@@ -107,12 +137,12 @@ export const postCreateRecipe = async (
     body: JSON.stringify(payload),
   });
 
-  let data: unknown;
+  let data: unknown = null;
 
   try {
     data = await response.json();
   } catch {
-    throw new Error('Invalid server response');
+    data = null;
   }
 
   if (!response.ok) {
@@ -126,33 +156,90 @@ export const postCreateRecipe = async (
   return data;
 };
 
-// POST /api/users (create a new user)
-export const postSignup = async (
-  payload: SignupPayload,
-): Promise<SignupResponse> => {
+// GET /api/users/me (user authentication)
+export const getUser = async (): Promise<User> => {
+  const response = await fetch(`${baseUrl}/users/me`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getErrorMessage(data, 'Failed to load authenticated user'));
+  }
+
+  if (!isUserResponse(data)) {
+    throw new Error('Invalid authentication response');
+  }
+
+  return data;
+};
+
+// POST /api/users/login (user login)
+export const postLogin = async (payload: LoginPayload) => {
+  const response = await fetch(`${baseUrl}/users/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getErrorMessage(data, 'Login failed'));
+  }
+
+  if (!isLoginSignupResponse(data)) {
+    throw new Error('Invalid login response');
+  }
+};
+
+// POST /api/users (user signup)
+export const postSignup = async (payload: SignupPayload) => {
   const response = await fetch(`${baseUrl}/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 
-  let data: unknown;
+  let data: unknown = null;
 
   try {
     data = await response.json();
   } catch {
-    throw new Error('Invalid server response');
+    data = null;
   }
 
   if (!response.ok) {
     throw new Error(getErrorMessage(data, 'Signup failed'));
   }
 
-  if (!isSignupResponse(data)) {
+  if (!isLoginSignupResponse(data)) {
     throw new Error('Invalid signup response');
   }
 
-  return data;
+  if (!data.authenticated) {
+    throw new Error(
+      'Signup succeeded but automatic login failed. Please log in.',
+    );
+  }
 };

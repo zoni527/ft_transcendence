@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import InputField from '../components/InputField';
+import SubmitButton from '../components/SubmitButton';
 import { postSignup } from '../api';
 import { getStringValue } from '../utils/utils';
-import { cardBase, buttonBase } from '../styles/styles';
+import { cardBase } from '../styles/styles';
 
 // Validation schema
 const signupSchema = z
@@ -30,6 +31,9 @@ const Signup = () => {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (loading) return;
+
     setError('');
 
     const form = e.currentTarget;
@@ -128,9 +132,11 @@ const Signup = () => {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button type="submit" className={buttonBase} disabled={loading}>
-            {loading && !error ? 'Signing up...' : 'Continue'}
-          </button>
+          <SubmitButton
+            isLoading={loading}
+            pendingText="Signing up"
+            defaultText="Continue"
+          />
         </div>
       </form>
     </div>

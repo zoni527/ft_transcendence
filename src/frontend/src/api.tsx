@@ -1,4 +1,4 @@
-import type { Recipe, User, LoginSignupResponse } from './types/types';
+import type { Recipe, User } from './types/types';
 
 interface CreateRecipePayload {
   author_id: string;
@@ -32,6 +32,12 @@ interface SignupPayload {
   password: string;
   name: string;
   display_name: string;
+}
+
+interface LoginSignupResponse {
+  id: string;
+  email: string;
+  authenticated: boolean;
 }
 
 const baseUrl = 'http://localhost:8080/api';
@@ -230,6 +236,12 @@ export const postSignup = async (
 
   if (!isLoginSignupResponse(data)) {
     throw new Error('Invalid signup response');
+  }
+
+  if (!data.authenticated) {
+    throw new Error(
+      'Signup succeeded but automatic login failed. Please log in.',
+    );
   }
 
   return data;

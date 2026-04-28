@@ -89,7 +89,7 @@ func CreateRecipe(c *gin.Context) {
 func UpdateRecipe(c *gin.Context) {
 	id := c.Param("id")
 	if !isValidUUID(id) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe id"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 

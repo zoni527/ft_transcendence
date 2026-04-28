@@ -34,6 +34,7 @@ const enTranslations = {
     snack: 'Snack',
   },
   common: {
+    bannerTitle: 'Recipes worth rising for',
     welcome: 'Welcome',
   },
 };
@@ -70,6 +71,7 @@ const fiTranslations = {
     snack: 'Välipala',
   },
   common: {
+    bannerTitle: 'Reseptejä, joita kannattaa herätä varten',
     welcome: 'Tervetuloa',
   },
 };
@@ -106,6 +108,7 @@ const csTranslations = {
     snack: 'Svačina',
   },
   common: {
+    bannerTitle: 'Reseptejä, joita kannattaa herätä varten',
     welcome: 'Vítejte',
   },
 };

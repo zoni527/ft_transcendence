@@ -1,6 +1,10 @@
+import { useTranslation } from 'react-i18next';
+
+const imgUrl: string =
+  'https://media.hellofresh.com/q_100,w_3840,f_auto,c_limit,fl_auto/hellofresh_website/recipe-developers/assets/recipe_dev_hero_redesign_header.jpg';
+
 const Banner = () => {
-  const imgUrl: string =
-    'https://media.hellofresh.com/q_100,w_3840,f_auto,c_limit,fl_auto/hellofresh_website/recipe-developers/assets/recipe_dev_hero_redesign_header.jpg';
+  const { t } = useTranslation();
 
   return (
     <div
@@ -8,7 +12,7 @@ const Banner = () => {
       style={{ backgroundImage: `url(${imgUrl})` }}
     >
       {/* Tint */}
-      <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-red-100/20 via-red-200/20 to-red-300/20" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/10 via-black/30 to-black/50" />
 
       {/* Center Overlay */}
       <div className="absolute inset-0 z-10 flex items-center justify-center text-center text-white">
@@ -19,7 +23,7 @@ const Banner = () => {
           }}
           className="text-8xl font-bold"
         >
-          Recipes worth rising for!
+          {t('common.bannerTitle')}
         </h1>
       </div>
     </div>

@@ -1,7 +1,7 @@
+import type { TFunction } from 'i18next';
 import type { Recipe, User } from './types/types';
 
 interface CreateRecipePayload {
-  author_id: string;
   title: string;
   description: string;
   prep_time_min: number;
@@ -99,6 +99,22 @@ function getErrorMessage(data: unknown, fallback: string): string {
   return fallback;
 }
 
+// Function to get translated error messages based on status code
+function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
+  switch (statusCode) {
+    case 400:
+      return t('error.badRequest');
+    case 401:
+      return t('error.unauthorized');
+    case 404:
+      return t('error.notFound');
+    case 500:
+      return t('error.serverError');
+    default:
+      return t('error.genericError', { statusCode });
+  }
+}
+
 // GET /api/recipes (get all published recipes)
 export const getRecipes = async (): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
@@ -128,6 +144,7 @@ export const getRecipeById = async (id: string): Promise<Recipe> => {
 // POST /api/recipes (create a new recipe)
 export const postCreateRecipe = async (
   payload: CreateRecipePayload,
+  t: TFunction,
 ): Promise<CreateRecipeResponse> => {
   const response = await fetch(`${baseUrl}/recipes`, {
     method: 'POST',
@@ -146,11 +163,12 @@ export const postCreateRecipe = async (
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Create recipe failed'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isCreateRecipeResponse(data)) {
-    throw new Error('Invalid create recipe response');
+    throw new Error(t('error.invalidResponse'));
   }
 
   return data;

@@ -16,32 +16,32 @@ import { cardBase } from '../styles/styles';
 const requiredNumber = (field: string, value: number, t: TFunction) =>
   z.coerce
     .number({
-      required_error: t('validation.fieldRequired', { field }),
-      invalid_type_error: t('validation.numRequired', { field }),
+      required_error: t('recValidation.fieldRequired', { field }),
+      invalid_type_error: t('recValidation.numRequired', { field }),
     })
-    .min(value, t('validation.numMin', { field, value }));
+    .min(value, t('recValidation.numMin', { field, value }));
 
 // Validation schema
 const createRecipeSchema = (t: TFunction) =>
   z.object({
-    title: z.string().min(1, t('validation.recipeNameRequired')),
-    description: z.string().min(1, t('validation.descriptionRequired')),
-    prep_time_min: requiredNumber(t('validation.prepTime'), 0, t),
-    cook_time_min: requiredNumber(t('validation.cookTime'), 0, t),
-    servings: requiredNumber(t('validation.servings'), 1, t),
+    title: z.string().min(1, t('recValidation.recipeNameRequired')),
+    description: z.string().min(1, t('recValidation.descriptionRequired')),
+    prep_time_min: requiredNumber(t('recValidation.prepTime'), 0, t),
+    cook_time_min: requiredNumber(t('recValidation.cookTime'), 0, t),
+    servings: requiredNumber(t('recValidation.servings'), 1, t),
     difficulty: z.enum(['easy', 'medium', 'hard'], {
-      errorMap: () => ({ message: t('validation.selectDifficulty') }),
+      errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
     }),
-    cuisine: z.string().min(1, t('validation.cuisineRequired')),
+    cuisine: z.string().min(1, t('recValidation.cuisineRequired')),
     meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
-      errorMap: () => ({ message: t('validation.selectMealType') }),
+      errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),
-    calories: requiredNumber(t('validation.calories'), 0, t),
-    protein_g: requiredNumber(t('validation.protein'), 0, t),
-    carbs_g: requiredNumber(t('validation.carbs'), 0, t),
-    fat_g: requiredNumber(t('validation.fat'), 0, t),
+    calories: requiredNumber(t('recValidation.calories'), 0, t),
+    protein_g: requiredNumber(t('recValidation.protein'), 0, t),
+    carbs_g: requiredNumber(t('recValidation.carbs'), 0, t),
+    fat_g: requiredNumber(t('recValidation.fat'), 0, t),
     is_published: z.enum(['yes', 'no'], {
-      errorMap: () => ({ message: t('validation.selectPublishOption') }),
+      errorMap: () => ({ message: t('recValidation.selectPublishOption') }),
     }),
   });
 
@@ -86,29 +86,31 @@ const CreateRecipe = () => {
       setLoading(true);
 
       // POST /api/recipes (create a new recipe)
-      postCreateRecipe({
-        author_id: 'HARDCODED',
-        title: result.data.title,
-        description: result.data.description,
-        prep_time_min: result.data.prep_time_min,
-        cook_time_min: result.data.cook_time_min,
-        servings: result.data.servings,
-        difficulty: result.data.difficulty,
-        cuisine: result.data.cuisine,
-        meal_type: result.data.meal_type,
-        image_url: 'HARDCODED',
-        calories: result.data.calories,
-        protein_g: result.data.protein_g,
-        carbs_g: result.data.carbs_g,
-        fat_g: result.data.fat_g,
-        is_published: result.data.is_published === 'yes',
-      })
+      postCreateRecipe(
+        {
+          title: result.data.title,
+          description: result.data.description,
+          prep_time_min: result.data.prep_time_min,
+          cook_time_min: result.data.cook_time_min,
+          servings: result.data.servings,
+          difficulty: result.data.difficulty,
+          cuisine: result.data.cuisine,
+          meal_type: result.data.meal_type,
+          image_url: 'HARDCODED',
+          calories: result.data.calories,
+          protein_g: result.data.protein_g,
+          carbs_g: result.data.carbs_g,
+          fat_g: result.data.fat_g,
+          is_published: result.data.is_published === 'yes',
+        },
+        t,
+      )
         .then((recipe) => {
           void navigate(`/recipe/${recipe.id}`);
         })
         .catch((err: unknown) => {
           if (err instanceof Error) setError(err.message);
-          else setError('Something went wrong. Please try again.');
+          else setError(t('genericError'));
         })
         .finally(() => setLoading(false));
     }
@@ -117,7 +119,7 @@ const CreateRecipe = () => {
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-xl p-8`}>
       {/* Header */}
-      <FormHeader title="Create Recipe" />
+      <FormHeader title={t('recipes.header')} />
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -125,51 +127,51 @@ const CreateRecipe = () => {
         <InputField
           id="title"
           name="title"
-          label="Recipe Name"
-          placeholder="Enter recipe name"
+          label={t('recipes.title')}
+          placeholder={t('recipes.titlePlace')}
         />
 
         {/* Description */}
         <InputTextArea
           id="description"
           name="description"
-          label="Short description"
-          placeholder="Enter short description"
+          label={t('recipes.description')}
+          placeholder={t('recipes.descriptionPlace')}
         />
 
         {/* Preparation Time */}
         <InputField
           id="prep_time_min"
           name="prep_time_min"
-          label="Preparation time (min)"
-          placeholder="Enter preparation time in minutes"
+          label={t('recipes.prep')}
+          placeholder={t('recipes.prepPlace')}
         />
 
         {/* Cooking Time */}
         <InputField
           id="cook_time_min"
           name="cook_time_min"
-          label="Cooking time (min)"
-          placeholder="Enter cooking time in minutes"
+          label={t('recipes.cook')}
+          placeholder={t('recipes.cookPlace')}
         />
 
         {/* Servings */}
         <InputField
           id="servings"
           name="servings"
-          label="Servings"
-          placeholder="Enter number of servings"
+          label={t('recipes.servings')}
+          placeholder={t('recipes.servingsPlace')}
         />
 
         {/* Difficulty */}
         <SelectField
           id="difficulty"
           name="difficulty"
-          label="Difficulty"
+          label={t('recipes.difficulty')}
           options={[
-            { value: 'easy', label: 'Easy' },
-            { value: 'medium', label: 'Medium' },
-            { value: 'hard', label: 'Hard' },
+            { value: 'easy', label: t('recipes.easy') },
+            { value: 'medium', label: t('recipes.medium') },
+            { value: 'hard', label: t('recipes.hard') },
           ]}
         />
 
@@ -177,20 +179,20 @@ const CreateRecipe = () => {
         <InputField
           id="cuisine"
           name="cuisine"
-          label="Cuisine"
-          placeholder="Enter the type of cuisine"
+          label={t('recipes.cuisine')}
+          placeholder={t('recipes.cuisinePlace')}
         />
 
         {/* Meal Type */}
         <SelectField
           id="meal_type"
           name="meal_type"
-          label="Meal Type"
+          label={t('recipes.meal')}
           options={[
-            { value: 'breakfast', label: 'Breakfast' },
-            { value: 'lunch', label: 'Lunch' },
-            { value: 'dinner', label: 'Dinner' },
-            { value: 'snack', label: 'Snack' },
+            { value: 'breakfast', label: t('recipes.breakfast') },
+            { value: 'lunch', label: t('recipes.lunch') },
+            { value: 'dinner', label: t('recipes.dinner') },
+            { value: 'snack', label: t('recipes.snack') },
           ]}
         />
 
@@ -198,42 +200,42 @@ const CreateRecipe = () => {
         <InputField
           id="calories"
           name="calories"
-          label="Calories (kcal)"
-          placeholder="Enter the amount of calories in kcal"
+          label={t('recipes.calories')}
+          placeholder={t('recipes.caloriesPlace')}
         />
 
         {/* Protein */}
         <InputField
           id="protein_g"
           name="protein_g"
-          label="Protein (grams)"
-          placeholder="Enter the amount of protein in grams"
+          label={t('recipes.protein')}
+          placeholder={t('recipes.proteinPlace')}
         />
 
         {/* Carbohydrates */}
         <InputField
           id="carbs_g"
           name="carbs_g"
-          label="Carbohydrates (grams)"
-          placeholder="Enter the amount of carbohydrates in grams"
+          label={t('recipes.carbs')}
+          placeholder={t('recipes.carbsPlace')}
         />
 
         {/* Fat */}
         <InputField
           id="fat_g"
           name="fat_g"
-          label="Fat (grams)"
-          placeholder="Enter the amount of fat in grams"
+          label={t('recipes.fat')}
+          placeholder={t('recipes.fatPlace')}
         />
 
         {/* Publish Recipe? */}
         <SelectField
           id="is_published"
           name="is_published"
-          label="Publish Recipe?"
+          label={t('recipes.publish')}
           options={[
-            { value: 'yes', label: 'Yes' },
-            { value: 'no', label: 'No' },
+            { value: 'yes', label: t('recipes.yes') },
+            { value: 'no', label: t('recipes.no') },
           ]}
         />
 
@@ -249,8 +251,8 @@ const CreateRecipe = () => {
         <div className="flex justify-center">
           <SubmitButton
             isLoading={loading}
-            pendingText="Submitting recipe"
-            defaultText="Submit"
+            pendingText={t('recipe.submitPending')}
+            defaultText={t('recipe.submit')}
           />
         </div>
       </form>

@@ -5,6 +5,18 @@ export const csTranslations = {
     signup: 'Registrovat se',
     login: 'Přihlásit se',
   },
+  recipeDetail: {
+    author: 'Autor',
+    prep: 'Doba přípravy (min)',
+    cook: 'Doba vaření (min)',
+    servings: 'Porce',
+    difficulty: 'Obtížnost',
+    likes: 'Líbí se',
+    calories: 'Kalorie (kcal)',
+    protein: 'Bílkoviny (g)',
+    carbs: 'Sacharidy (g)',
+    fat: 'Tuky (g)',
+  },
   dashboard: {
     username: 'Uživatelské jméno',
     email: 'E-mail',
@@ -22,7 +34,7 @@ export const csTranslations = {
     submit: 'Pokračovat',
     submitPending: 'Přihlašování',
   },
-  recipes: {
+  createRecipes: {
     header: 'Vytvořit recept',
     title: 'Název receptu',
     titlePlace: 'Zadejte název receptu',
@@ -91,6 +103,7 @@ export const csTranslations = {
     error: 'Chyba:',
     input: 'Neplatný vstup.',
     userNotFound: 'Uživatel nenalezen.',
+    recipeNotFound: 'Recept nenalezen.',
     genericError: 'Došlo k chybě. Zkuste to prosím později.',
     invalidResponse: 'Neplatná odpověď databáze.',
     badRequest:

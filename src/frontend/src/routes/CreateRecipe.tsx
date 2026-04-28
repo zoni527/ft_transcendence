@@ -119,7 +119,7 @@ const CreateRecipe = () => {
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-xl p-8`}>
       {/* Header */}
-      <FormHeader title={t('recipes.header')} />
+      <FormHeader title={t('createRecipes.header')} />
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -127,51 +127,51 @@ const CreateRecipe = () => {
         <InputField
           id="title"
           name="title"
-          label={t('recipes.title')}
-          placeholder={t('recipes.titlePlace')}
+          label={t('createRecipes.title')}
+          placeholder={t('createRecipes.titlePlace')}
         />
 
         {/* Description */}
         <InputTextArea
           id="description"
           name="description"
-          label={t('recipes.description')}
-          placeholder={t('recipes.descriptionPlace')}
+          label={t('createRecipes.description')}
+          placeholder={t('createRecipes.descriptionPlace')}
         />
 
         {/* Preparation Time */}
         <InputField
           id="prep_time_min"
           name="prep_time_min"
-          label={t('recipes.prep')}
-          placeholder={t('recipes.prepPlace')}
+          label={t('createRecipes.prep')}
+          placeholder={t('createRecipes.prepPlace')}
         />
 
         {/* Cooking Time */}
         <InputField
           id="cook_time_min"
           name="cook_time_min"
-          label={t('recipes.cook')}
-          placeholder={t('recipes.cookPlace')}
+          label={t('createRecipes.cook')}
+          placeholder={t('createRecipes.cookPlace')}
         />
 
         {/* Servings */}
         <InputField
           id="servings"
           name="servings"
-          label={t('recipes.servings')}
-          placeholder={t('recipes.servingsPlace')}
+          label={t('createRecipes.servings')}
+          placeholder={t('createRecipes.servingsPlace')}
         />
 
         {/* Difficulty */}
         <SelectField
           id="difficulty"
           name="difficulty"
-          label={t('recipes.difficulty')}
+          label={t('createRecipes.difficulty')}
           options={[
-            { value: 'easy', label: t('recipes.easy') },
-            { value: 'medium', label: t('recipes.medium') },
-            { value: 'hard', label: t('recipes.hard') },
+            { value: 'easy', label: t('createRecipes.easy') },
+            { value: 'medium', label: t('createRecipes.medium') },
+            { value: 'hard', label: t('createRecipes.hard') },
           ]}
         />
 
@@ -179,20 +179,20 @@ const CreateRecipe = () => {
         <InputField
           id="cuisine"
           name="cuisine"
-          label={t('recipes.cuisine')}
-          placeholder={t('recipes.cuisinePlace')}
+          label={t('createRecipes.cuisine')}
+          placeholder={t('createRecipes.cuisinePlace')}
         />
 
         {/* Meal Type */}
         <SelectField
           id="meal_type"
           name="meal_type"
-          label={t('recipes.meal')}
+          label={t('createRecipes.meal')}
           options={[
-            { value: 'breakfast', label: t('recipes.breakfast') },
-            { value: 'lunch', label: t('recipes.lunch') },
-            { value: 'dinner', label: t('recipes.dinner') },
-            { value: 'snack', label: t('recipes.snack') },
+            { value: 'breakfast', label: t('createRecipes.breakfast') },
+            { value: 'lunch', label: t('createRecipes.lunch') },
+            { value: 'dinner', label: t('createRecipes.dinner') },
+            { value: 'snack', label: t('createRecipes.snack') },
           ]}
         />
 
@@ -200,42 +200,42 @@ const CreateRecipe = () => {
         <InputField
           id="calories"
           name="calories"
-          label={t('recipes.calories')}
-          placeholder={t('recipes.caloriesPlace')}
+          label={t('createRecipes.calories')}
+          placeholder={t('createRecipes.caloriesPlace')}
         />
 
         {/* Protein */}
         <InputField
           id="protein_g"
           name="protein_g"
-          label={t('recipes.protein')}
-          placeholder={t('recipes.proteinPlace')}
+          label={t('createRecipes.protein')}
+          placeholder={t('createRecipes.proteinPlace')}
         />
 
         {/* Carbohydrates */}
         <InputField
           id="carbs_g"
           name="carbs_g"
-          label={t('recipes.carbs')}
-          placeholder={t('recipes.carbsPlace')}
+          label={t('createRecipes.carbs')}
+          placeholder={t('createRecipes.carbsPlace')}
         />
 
         {/* Fat */}
         <InputField
           id="fat_g"
           name="fat_g"
-          label={t('recipes.fat')}
-          placeholder={t('recipes.fatPlace')}
+          label={t('createRecipes.fat')}
+          placeholder={t('createRecipes.fatPlace')}
         />
 
         {/* Publish Recipe? */}
         <SelectField
           id="is_published"
           name="is_published"
-          label={t('recipes.publish')}
+          label={t('createRecipes.publish')}
           options={[
-            { value: 'yes', label: t('recipes.yes') },
-            { value: 'no', label: t('recipes.no') },
+            { value: 'yes', label: t('createRecipes.yes') },
+            { value: 'no', label: t('createRecipes.no') },
           ]}
         />
 
@@ -251,8 +251,8 @@ const CreateRecipe = () => {
         <div className="flex justify-center">
           <SubmitButton
             isLoading={loading}
-            pendingText={t('recipe.submitPending')}
-            defaultText={t('recipe.submit')}
+            pendingText={t('createRecipe.submitPending')}
+            defaultText={t('createRecipe.submit')}
           />
         </div>
       </form>

@@ -5,6 +5,18 @@ export const fiTranslations = {
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
   },
+  recipeDetail: {
+    author: 'Tekijä',
+    prep: 'Valmisteluaika (min)',
+    cook: 'Kypsennysaika (min)',
+    servings: 'Annosta',
+    difficulty: 'Vaikeusaste',
+    likes: 'Tykkäykset',
+    calories: 'Kalorit (kcal)',
+    protein: 'Proteiini (g)',
+    carbs: 'Hiilihydraatit (g)',
+    fat: 'Rasva (g)',
+  },
   dashboard: {
     username: 'Käyttäjätunnus',
     email: 'Sähköposti',
@@ -22,7 +34,7 @@ export const fiTranslations = {
     submit: 'Jatka',
     submitPending: 'Kirjaudutaan sisään',
   },
-  recipes: {
+  createRecipes: {
     header: 'Luo resepti',
     title: 'Reseptin nimi',
     titlePlace: 'Syötä reseptin nimi',
@@ -91,6 +103,7 @@ export const fiTranslations = {
     error: 'Virhe:',
     input: 'Virheellinen syöte.',
     userNotFound: 'Käyttäjää ei löytynyt.',
+    recipeNotFound: 'Resepti ei löytynyt.',
     genericError: 'Tapahtui virhe. Yritä myöhemmin uudelleen.',
     invalidResponse: 'Virheellinen tietokannan vastaus.',
     badRequest: 'Virheellinen pyyntö. Tarkista syötteesi.',

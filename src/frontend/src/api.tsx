@@ -130,13 +130,16 @@ export const getRecipes = async (): Promise<Recipe[]> => {
 };
 
 // GET /api/recipes/:id (get a single recipe by ID)
-export const getRecipeById = async (id: string): Promise<Recipe> => {
+export const getRecipeById = async (
+  id: string,
+  t: TFunction,
+): Promise<Recipe> => {
   const response = await fetch(`${baseUrl}/recipes/${id}`);
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch recipe with id ${id}`);
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
-
   const data = (await response.json()) as Recipe;
   return data;
 };

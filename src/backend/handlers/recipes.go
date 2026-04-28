@@ -47,9 +47,7 @@ func GetRecipeById(c *gin.Context) {
 
 	recipe, err := repository.GetRecipeById(id)
 	if err != nil {
-		var ue *repository.UserError
-		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"error": ue.Error()})
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
 		log.Printf("handlers.GetRecipeById: %v", err)
@@ -77,9 +75,7 @@ func CreateRecipe(c *gin.Context) {
 
 	newRecipeId, err := repository.CreateRecipe(&r)
 	if err != nil {
-		var ue *repository.UserError
-		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": ue.Error()})
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
 		log.Printf("handlers.CreateRecipe: %v", err)
@@ -104,9 +100,7 @@ func UpdateRecipe(c *gin.Context) {
 	}
 	r.Id = id
 	if err := repository.UpdateRecipe(&r); err != nil {
-		var ue *repository.UserError
-		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": ue.Error()})
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
 		log.Printf("handlers.CreateRecipe: %v", err)
@@ -449,4 +443,19 @@ func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
 		}
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 	}
+}
+
+func identifyAndRespondToUserError(c *gin.Context, err error) bool {
+	var br *repository.BadRequestError
+	var nf *repository.NotFoundError
+	switch {
+	case errors.As(err, &br):
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": br.Error()})
+		return true
+	case errors.As(err, &nf):
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
+		return true
+	}
+
+	return false
 }

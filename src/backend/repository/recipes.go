@@ -98,11 +98,11 @@ func GetRecipeById(id string) (models.Recipe, error) {
 	)
 
 	if err == pgx.ErrNoRows {
-		return models.Recipe{}, &UserError{"recipe not found"}
+		return models.Recipe{}, &NotFoundError{"recipe not found"}
 	}
 
 	if err != nil {
-		return models.Recipe{}, fmt.Errorf("error getting recipe by id: %w", err)
+		return models.Recipe{}, fmt.Errorf("repository.GetRecipeById: %w", err)
 	}
 
 	return r, nil
@@ -154,7 +154,7 @@ func UpdateRecipe(r *models.Recipe) error {
 		return recipePostgresErrorClassification("repository.UpdateRecipe", err)
 	}
 	if res.RowsAffected() == 0 {
-		return &UserError{"recipe not found"}
+		return &NotFoundError{"recipe not found"}
 	}
 
 	return nil
@@ -167,22 +167,30 @@ func DeleteRecipe(id string) error {
 		return fmt.Errorf("repository.DeleteRecipe: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return &UserError{"recipe not found"}
+		return &NotFoundError{"recipe not found"}
 	}
 
 	return nil
 }
 
-type UserError struct {
+// -----------------------------------------------------------------------------
+// helper functions
+
+type BadRequestError struct {
 	msg string
 }
 
-func (e *UserError) Error() string {
+func (e *BadRequestError) Error() string {
 	return e.msg
 }
 
-// -----------------------------------------------------------------------------
-// helper functions
+type NotFoundError struct {
+	msg string
+}
+
+func (e *NotFoundError) Error() string {
+	return e.msg
+}
 
 func recipePostgresErrorClassification(functionName string, err error) error {
 	if err == nil {
@@ -196,20 +204,20 @@ func recipePostgresErrorClassification(functionName string, err error) error {
 	switch pgErr.Code {
 	case pgerrcode.ForeignKeyViolation:
 		if pgErr.ConstraintName == "fk_author_id" {
-			return &UserError{"invalid author id"}
+			return &BadRequestError{"invalid author id"}
 		}
 		log.Printf("%v: foreign key violation: %v", functionName, pgErr.ConstraintName)
-		return &UserError{"invalid recipe data"}
+		return &BadRequestError{"invalid recipe data"}
 
 	case pgerrcode.CheckViolation:
 		switch pgErr.ConstraintName {
 		case "recipe_difficulty_allowed_values":
-			return &UserError{"invalid difficulty value"}
+			return &BadRequestError{"invalid difficulty value"}
 		case "recipe_meal_type_allowed_values":
-			return &UserError{"invalid meal type value"}
+			return &BadRequestError{"invalid meal type value"}
 		default:
 			log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
-			return &UserError{"invalid recipe data"}
+			return &BadRequestError{"invalid recipe data"}
 		}
 
 	default:

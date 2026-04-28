@@ -4,7 +4,7 @@ package repository
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
 // [done] CreateRecipe      — POST /api/recipes (currently inserts the recipe row only)
-// [TODO] UpdateRecipe      — PUT /api/recipes/:id
+// [....] UpdateRecipe      — PUT /api/recipes/:id
 // [done] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] GetAllRecipes should support ?include_drafts=true for admins (once auth is implemented)
 // [TODO] Add GET /api/users/:id/recipes so authors can see their own unpublished recipes
@@ -193,9 +193,6 @@ func (e *NotFoundError) Error() string {
 }
 
 func recipePostgresErrorClassification(functionName string, err error) error {
-	if err == nil {
-		return nil
-	}
 	var pgErr *pgconn.PgError
 	// Not a Postgres error -> internal server error
 	if !errors.As(err, &pgErr) {

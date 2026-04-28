@@ -10,11 +10,17 @@ package handlers
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"sort"
+	"strconv"
 	"strings"
+	"time"
 	"unicode"
 
 	"ft_transcendence/backend/models"
@@ -105,24 +111,45 @@ func UpdateRecipe(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
-func PatchRecipe(c *gin.Context) {
-	// TODO: call repository.PatchRecipe()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
-}
-
 func DeleteRecipe(c *gin.Context) {
 	// TODO: call repository.DeleteRecipe()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
-func GetRecipeSignature(c *gin.Context) {
-	id := c.GetString("userID")
-	if authPermissions(id); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Printf(%v), err})
+// Cloudinary API details to generate signature
+var cloudinarySecret []byte
+var cloudinaryUser []byte
+var cloudinaryKey []byte
+
+func LoadCloudinaryVars() error {
+	secret := strings.TrimSpace(os.Getenv("CLOUDINARY_SECRET"))
+	user := strings.TrimSpace(os.Getenv("CLOUDINARY_USER"))
+	key := strings.TrimSpace(os.Getenv("CLOUDINARY_KEY"))
+	if secret == "" || user == "" || key == "" {
+		return errors.New("missing or empty Cloudinary env variables")
 	}
-	key := cloudinaryKey;
-	signature := generateCloudinarySignature(key)
-	c.IndentedJSON(http.StatusCreated, signature)
+	cloudinarySecret = []byte(secret)
+	cloudinaryUser = []byte(user)
+	cloudinaryKey = []byte(key)
+	return nil
+}
+
+func RecipeImageSignature(c *gin.Context) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	params := map[string]string{
+		"resource_type": "image",
+		"timestamp":     timestamp,
+		"folder":        "recipes",
+	}
+	signature := generateCloudinarySignature(params)
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"signature":     signature,
+		"api_key":       string(cloudinaryKey),
+		"cloud_name":    string(cloudinaryUser),
+		"resource_type": "image",
+		"timestamp":     timestamp,
+		"folder":        "recipes",
+	})
 }
 
 func UploadRecipeImage(c *gin.Context) {
@@ -318,18 +345,50 @@ func onlyGraphicChars(s string) error {
 	return nil
 }
 
-func authPermissions(id string) error {
-	userID := id
-	if !isValidUUID(userID) {
-		return Error.New("invalid user id")
+func generateCloudinarySignature(params map[string]string) string {
+	keys := make([]string, 0, len(params))
+	for k := range params {
+		keys = append(keys, k)
 	}
-	user := repository.GetUserById(id)
-	if user.Roles != "chef" || "moderator" || "admin" {
-		return Error.New("invalid permissions")
+	sort.Strings(keys)
+
+	var strToSign []string
+	for _, k := range keys {
+		strToSign = append(strToSign, fmt.Sprintf("%s=%s", k, params[k]))
 	}
-	return nil
+
+	queryString := strings.Join(strToSign, "&")
+	fullString := queryString + string(cloudinarySecret)
+
+	h := sha1.New()
+	h.Write([]byte(fullString))
+
+	return hex.EncodeToString(h.Sum(nil))
 }
 
-func generateCloudinarySignature(params map[string]string) string{
-
+func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
+	allowedRoles := map[string]bool{}
+	for _, r := range allowed {
+		allowedRoles[r] = true
+	}
+	return func(c *gin.Context) {
+		userID := c.GetString("userID")
+		if !isValidUUID(userID) {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+		roles, err := repository.GetRolesByUserId(userID)
+		if err != nil {
+			log.Printf("GetRolesByUserId: %v", err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			return
+		}
+		for _, r := range roles {
+			if allowedRoles[r] {
+				c.Next()
+				return
+			}
+		}
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+	}
 }

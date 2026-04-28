@@ -5,6 +5,14 @@ export const fiTranslations = {
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
   },
+  dashboard: {
+    username: 'Käyttäjätunnus',
+    email: 'Sähköposti',
+    createdAt: 'Luotu',
+    updatedAt: 'Päivitetty',
+    roles: 'Roolit',
+    createRecipe: 'Luo resepti',
+  },
   recipes: {
     header: 'Luo resepti',
     title: 'Reseptin nimi',
@@ -62,9 +70,12 @@ export const fiTranslations = {
   },
   common: {
     bannerTitle: 'Reseptejä, joita kannattaa herätä varten',
+    loading: 'Ladataan...',
     welcome: 'Tervetuloa',
   },
   error: {
+    error: 'Virhe:',
+    userNotFound: 'Käyttäjää ei löytynyt.',
     genericError: 'Tapahtui virhe. Yritä myöhemmin uudelleen.',
     invalidResponse: 'Virheellinen tietokannan vastaus.',
     badRequest: 'Virheellinen pyyntö. Tarkista syötteesi.',

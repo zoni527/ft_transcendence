@@ -5,6 +5,14 @@ export const csTranslations = {
     signup: 'Registrovat se',
     login: 'Přihlásit se',
   },
+  dashboard: {
+    username: 'Uživatelské jméno',
+    email: 'E-mail',
+    createdAt: 'Vytvořeno',
+    updatedAt: 'Aktualizováno',
+    roles: 'Role',
+    createRecipe: 'Vytvořit recept',
+  },
   recipes: {
     header: 'Vytvořit recept',
     title: 'Název receptu',
@@ -62,9 +70,12 @@ export const csTranslations = {
   },
   common: {
     bannerTitle: 'Recepty, které stojí za probuzení',
+    loading: 'Načítání...',
     welcome: 'Vítejte',
   },
   error: {
+    error: 'Chyba:',
+    userNotFound: 'Uživatel nenalezen.',
     genericError: 'Došlo k chybě. Zkuste to prosím později.',
     invalidResponse: 'Neplatná odpověď databáze.',
     badRequest:

@@ -175,7 +175,7 @@ export const postCreateRecipe = async (
 };
 
 // GET /api/users/me (user authentication)
-export const getUser = async (): Promise<User> => {
+export const getUser = async (t: TFunction): Promise<User> => {
   const response = await fetch(`${baseUrl}/users/me`, {
     method: 'GET',
     credentials: 'include',
@@ -190,11 +190,12 @@ export const getUser = async (): Promise<User> => {
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Failed to load authenticated user'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isUserResponse(data)) {
-    throw new Error('Invalid authentication response');
+    throw new Error(t('error.invalidResponse'));
   }
 
   return data;

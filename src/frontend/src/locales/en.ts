@@ -5,6 +5,14 @@ export const enTranslations = {
     signup: 'Sign up',
     login: 'Login',
   },
+  dashboard: {
+    username: 'Username',
+    email: 'E-mail',
+    createdAt: 'Created at',
+    updatedAt: 'Updated at',
+    roles: 'Roles',
+    createRecipe: 'Create recipe',
+  },
   recipes: {
     header: 'Create recipe',
     title: 'Recipe name',
@@ -62,11 +70,14 @@ export const enTranslations = {
   },
   common: {
     bannerTitle: 'Recipes worth rising for',
+    loading: 'Loading...',
     welcome: 'Welcome',
   },
   error: {
+    error: 'Error:',
+    userNotFound: 'User not found.',
     genericError: 'An error occurred. Please try again later.',
-    invalidResponse: 'Invalid database response',
+    invalidResponse: 'Invalid database response.',
     badRequest: 'Invalid request. Please check your input.',
     unauthorized: 'You are not authorized to perform this action.',
     notFound: 'The requested page could not be found.',

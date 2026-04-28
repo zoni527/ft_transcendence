@@ -5,6 +5,9 @@ export const enTranslations = {
     signup: 'Sign up',
     login: 'Login',
   },
+  recipes: {
+    header: 'All recipes',
+  },
   recipeDetail: {
     author: 'Author',
     prep: 'Preparation time (min)',

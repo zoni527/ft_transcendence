@@ -5,6 +5,9 @@ export const csTranslations = {
     signup: 'Registrovat se',
     login: 'Přihlásit se',
   },
+  recipes: {
+    header: 'Všechny recepty',
+  },
   recipeDetail: {
     author: 'Autor',
     prep: 'Doba přípravy (min)',

@@ -116,13 +116,12 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
 }
 
 // GET /api/recipes (get all published recipes)
-export const getRecipes = async (): Promise<Recipe[]> => {
+export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch recipes: ${response.status} ${response.statusText}`,
-    );
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   const data = (await response.json()) as Recipe[];
@@ -140,6 +139,7 @@ export const getRecipeById = async (
     const errorMessage = getTranslatedErrorMessage(response.status, t);
     throw new Error(errorMessage);
   }
+
   const data = (await response.json()) as Recipe;
   return data;
 };

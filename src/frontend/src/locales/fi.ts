@@ -5,6 +5,9 @@ export const fiTranslations = {
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
   },
+  recipes: {
+    header: 'Kaikki reseptit',
+  },
   recipeDetail: {
     author: 'Tekijä',
     prep: 'Valmisteluaika (min)',

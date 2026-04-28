@@ -86,7 +86,12 @@ const RecipeDetail = () => {
           />
           <DataField
             label={t('recipeDetail.difficulty')}
-            value={recipe.difficulty}
+            value={t(`recipeDetail.difficulty_${recipe.difficulty}`)}
+          />
+          <DataField label={t('recipeDetail.cuisine')} value={recipe.cuisine} />
+          <DataField
+            label={t('recipeDetail.meal')}
+            value={t(`recipeDetail.meal_${recipe.meal_type}`)}
           />
           <DataField
             label={t('recipeDetail.likes')}

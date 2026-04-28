@@ -22,7 +22,7 @@ const requiredNumber = (field: string, value: number, t: TFunction) =>
     .min(value, t('recValidation.numMin', { field, value }));
 
 // Validation schema
-const createRecipeSchema = (t: TFunction) =>
+const createRecipechema = (t: TFunction) =>
   z.object({
     title: z.string().min(1, t('recValidation.recipeNameRequired')),
     description: z.string().min(1, t('recValidation.descriptionRequired')),
@@ -62,7 +62,7 @@ const CreateRecipe = () => {
     const formData = new FormData(form);
 
     // Input validation
-    const schema = createRecipeSchema(t);
+    const schema = createRecipechema(t);
 
     const result = schema.safeParse({
       title: getStringValue(formData, 'title'),
@@ -119,7 +119,7 @@ const CreateRecipe = () => {
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-xl p-8`}>
       {/* Header */}
-      <FormHeader title={t('createRecipes.header')} />
+      <FormHeader title={t('createRecipe.header')} />
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -127,51 +127,51 @@ const CreateRecipe = () => {
         <InputField
           id="title"
           name="title"
-          label={t('createRecipes.title')}
-          placeholder={t('createRecipes.titlePlace')}
+          label={t('createRecipe.title')}
+          placeholder={t('createRecipe.titlePlace')}
         />
 
         {/* Description */}
         <InputTextArea
           id="description"
           name="description"
-          label={t('createRecipes.description')}
-          placeholder={t('createRecipes.descriptionPlace')}
+          label={t('createRecipe.description')}
+          placeholder={t('createRecipe.descriptionPlace')}
         />
 
         {/* Preparation Time */}
         <InputField
           id="prep_time_min"
           name="prep_time_min"
-          label={t('createRecipes.prep')}
-          placeholder={t('createRecipes.prepPlace')}
+          label={t('createRecipe.prep')}
+          placeholder={t('createRecipe.prepPlace')}
         />
 
         {/* Cooking Time */}
         <InputField
           id="cook_time_min"
           name="cook_time_min"
-          label={t('createRecipes.cook')}
-          placeholder={t('createRecipes.cookPlace')}
+          label={t('createRecipe.cook')}
+          placeholder={t('createRecipe.cookPlace')}
         />
 
         {/* Servings */}
         <InputField
           id="servings"
           name="servings"
-          label={t('createRecipes.servings')}
-          placeholder={t('createRecipes.servingsPlace')}
+          label={t('createRecipe.servings')}
+          placeholder={t('createRecipe.servingsPlace')}
         />
 
         {/* Difficulty */}
         <SelectField
           id="difficulty"
           name="difficulty"
-          label={t('createRecipes.difficulty')}
+          label={t('createRecipe.difficulty')}
           options={[
-            { value: 'easy', label: t('createRecipes.easy') },
-            { value: 'medium', label: t('createRecipes.medium') },
-            { value: 'hard', label: t('createRecipes.hard') },
+            { value: 'easy', label: t('createRecipe.difficulty_easy') },
+            { value: 'medium', label: t('createRecipe.difficulty_medium') },
+            { value: 'hard', label: t('createRecipe.difficulty_hard') },
           ]}
         />
 
@@ -179,20 +179,20 @@ const CreateRecipe = () => {
         <InputField
           id="cuisine"
           name="cuisine"
-          label={t('createRecipes.cuisine')}
-          placeholder={t('createRecipes.cuisinePlace')}
+          label={t('createRecipe.cuisine')}
+          placeholder={t('createRecipe.cuisinePlace')}
         />
 
         {/* Meal Type */}
         <SelectField
           id="meal_type"
           name="meal_type"
-          label={t('createRecipes.meal')}
+          label={t('createRecipe.meal')}
           options={[
-            { value: 'breakfast', label: t('createRecipes.breakfast') },
-            { value: 'lunch', label: t('createRecipes.lunch') },
-            { value: 'dinner', label: t('createRecipes.dinner') },
-            { value: 'snack', label: t('createRecipes.snack') },
+            { value: 'breakfast', label: t('createRecipe.meal_breakfast') },
+            { value: 'lunch', label: t('createRecipe.meal_lunch') },
+            { value: 'dinner', label: t('createRecipe.meal_dinner') },
+            { value: 'snack', label: t('createRecipe.meal_snack') },
           ]}
         />
 
@@ -200,42 +200,42 @@ const CreateRecipe = () => {
         <InputField
           id="calories"
           name="calories"
-          label={t('createRecipes.calories')}
-          placeholder={t('createRecipes.caloriesPlace')}
+          label={t('createRecipe.calories')}
+          placeholder={t('createRecipe.caloriesPlace')}
         />
 
         {/* Protein */}
         <InputField
           id="protein_g"
           name="protein_g"
-          label={t('createRecipes.protein')}
-          placeholder={t('createRecipes.proteinPlace')}
+          label={t('createRecipe.protein')}
+          placeholder={t('createRecipe.proteinPlace')}
         />
 
         {/* Carbohydrates */}
         <InputField
           id="carbs_g"
           name="carbs_g"
-          label={t('createRecipes.carbs')}
-          placeholder={t('createRecipes.carbsPlace')}
+          label={t('createRecipe.carbs')}
+          placeholder={t('createRecipe.carbsPlace')}
         />
 
         {/* Fat */}
         <InputField
           id="fat_g"
           name="fat_g"
-          label={t('createRecipes.fat')}
-          placeholder={t('createRecipes.fatPlace')}
+          label={t('createRecipe.fat')}
+          placeholder={t('createRecipe.fatPlace')}
         />
 
         {/* Publish Recipe? */}
         <SelectField
           id="is_published"
           name="is_published"
-          label={t('createRecipes.publish')}
+          label={t('createRecipe.publish')}
           options={[
-            { value: 'yes', label: t('createRecipes.yes') },
-            { value: 'no', label: t('createRecipes.no') },
+            { value: 'yes', label: t('createRecipe.yes') },
+            { value: 'no', label: t('createRecipe.no') },
           ]}
         />
 

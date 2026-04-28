@@ -5,7 +5,6 @@ package handlers
 // [done] GetRecipeById     — GET /api/recipes/:id
 // [done] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
 // [TODO] UpdateRecipe      — PUT /api/recipes/:id
-// [TODO] PatchRecipe       — PATCH /api/recipes/:id
 // [TODO] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
@@ -137,7 +136,6 @@ func LoadCloudinaryVars() error {
 func RecipeImageSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	params := map[string]string{
-		"resource_type": "image",
 		"timestamp":     timestamp,
 		"folder":        "recipes",
 	}
@@ -146,7 +144,6 @@ func RecipeImageSignature(c *gin.Context) {
 		"signature":     signature,
 		"api_key":       string(cloudinaryKey),
 		"cloud_name":    string(cloudinaryUser),
-		"resource_type": "image",
 		"timestamp":     timestamp,
 		"folder":        "recipes",
 	})

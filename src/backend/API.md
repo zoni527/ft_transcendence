@@ -428,12 +428,7 @@ Partially update a recipe. Only include the fields you want to change.
 
 Delete a recipe. Cascades: removes its steps, ingredients, and favourites.
 
-**Response** `200 OK`
-```json
-{
-  "message": "recipe deleted"
-}
-```
+**Response** `204 No Content`
 
 **Errors:**
 | Status | When |

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import DataField from '../components/DataField';
+import StatusBox from '../components/StatusBox';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -26,15 +27,15 @@ const RecipeDetail = () => {
   }, [id, cachedRecipe]);
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <StatusBox message={`Error: ${error}`} className="text-red-500" />;
   }
 
   if (loading) {
-    return <p>Loading recipe...</p>;
+    return <StatusBox message="Loading recipe..." className="text-black" />;
   }
 
   if (!recipe) {
-    return <p>Recipe not found</p>;
+    return <StatusBox message={`Recipe not found`} className="text-red-500" />;
   }
 
   return (

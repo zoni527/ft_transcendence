@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import RecipeCard from '../components/RecipeCard';
+import StatusBox from '../components/StatusBox';
 import { getRecipes } from '../api';
 import type { Recipe } from '../types/types';
 
@@ -19,11 +20,11 @@ const Recipes = () => {
   }, []);
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <StatusBox message={`Error: ${error}`} className="text-red-500" />;
   }
 
   if (loading) {
-    return <p>Loading recipes...</p>;
+    return <StatusBox message="Loading recipes..." className="text-black" />;
   }
 
   return (

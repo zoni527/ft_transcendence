@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import DataField from '../components/DataField';
 import NavButton from '../components/NavButton';
+import StatusBox from '../components/StatusBox';
 import { getUser } from '../api';
 import type { User } from '../types/types';
 import { cardBase, buttonBase } from '../styles/styles';
@@ -21,15 +22,15 @@ const Dashboard = () => {
   }, []);
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <StatusBox message={`Error: ${error}`} className="text-red-500" />;
   }
 
   if (loading) {
-    return <p>Loading user...</p>;
+    return <StatusBox message="Loading user..." className="text-black" />;
   }
 
   if (!user) {
-    return <p>User not found</p>;
+    return <StatusBox message={`User not found`} className="text-red-500" />;
   }
 
   return (

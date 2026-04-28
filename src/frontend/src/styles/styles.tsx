@@ -68,3 +68,9 @@ export const cardHighlight = `
   hover:cursor-pointer
   hover:shadow-[0px_0px_10px_0px_rgba(0,0,0,0.4)]
 `;
+
+export const statusBoxBase = `
+  mt-8
+  px-6
+  text-xl
+`;

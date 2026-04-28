@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import LangButton from './LangButton';
 import { useTranslation } from 'react-i18next';
 
 const LangDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { i18n } = useTranslation(); //
+  const { i18n } = useTranslation();
   const [selectedLang, setSelectedLang] = useState(i18n.language);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Toggle dropdown visibility
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
@@ -18,14 +21,33 @@ const LangDropdown = () => {
     setIsOpen(false);
   };
 
+  // Close the dropdown if the click is outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Clean up the event listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative z-20">
+    <div className="relative z-20" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className={`text-md flex items-center gap-2 rounded-md px-4 py-2 font-bold text-orange-700`}
+        className={`text-md flex items-center gap-2 rounded-md px-4 py-2 font-bold text-orange-700 hover:cursor-pointer`}
       >
         <span>{selectedLang.toUpperCase()}</span>{' '}
-        {/* Show the selected language */}
         <svg
           className="h-4 w-4"
           xmlns="http://www.w3.org/2000/svg"

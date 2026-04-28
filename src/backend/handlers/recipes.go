@@ -115,8 +115,18 @@ func DeleteRecipe(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
+func GetRecipeSignature(c *gin.Context) {
+	id := c.GetString("userID")
+	if authPermissions(id); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Printf(%v), err})
+	}
+	key := cloudinaryKey;
+	signature := generateCloudinarySignature(key)
+	c.IndentedJSON(http.StatusCreated, signature)
+}
+
 func UploadRecipeImage(c *gin.Context) {
-	// TODO: call repository.UploadRecipeImage()
+	// TODO: call repository.DeleteRecipe()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
@@ -306,4 +316,20 @@ func onlyGraphicChars(s string) error {
 		}
 	}
 	return nil
+}
+
+func authPermissions(id string) error {
+	userID := id
+	if !isValidUUID(userID) {
+		return Error.New("invalid user id")
+	}
+	user := repository.GetUserById(id)
+	if user.Roles != "chef" || "moderator" || "admin" {
+		return Error.New("invalid permissions")
+	}
+	return nil
+}
+
+func generateCloudinarySignature(params map[string]string) string{
+
 }

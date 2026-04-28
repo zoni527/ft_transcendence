@@ -20,6 +20,8 @@ func main() {
 	defer repository.ClosePool()
 
 	handlers.LoadJWTSecret()
+
+
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"},
@@ -46,7 +48,8 @@ func main() {
 	router.PUT("/api/recipes/:id", handlers.UpdateRecipe)             // not implemented yet
 	router.PATCH("/api/recipes/:id", handlers.PatchRecipe)            // not implemented yet
 	router.DELETE("/api/recipes/:id", handlers.DeleteRecipe)          // not implemented yet
-	router.POST("/api/recipes/:id/image", handlers.UploadRecipeImage) // not implemented yet
+	router.GET("/api/recipes/imagesignature", handlers.AuthMiddleware(), handlers.GetImageSignature)
+	router.POST("/api/recipes/:id/image", handlers.AuthMiddleware(), handlers.UploadRecipeImage)
 
 	if err := router.Run("0.0.0.0:8080"); err != nil {
 		log.Fatal("Server failed to start:", err)

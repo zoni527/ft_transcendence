@@ -13,6 +13,15 @@ export const csTranslations = {
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
   },
+  login: {
+    header: 'Přihlášení',
+    email: 'E-mail',
+    emailPlace: 'Zadejte svůj e-mail',
+    password: 'Heslo',
+    passwordPlace: 'Zadejte své heslo',
+    submit: 'Pokračovat',
+    submitPending: 'Přihlašování',
+  },
   recipes: {
     header: 'Vytvořit recept',
     title: 'Název receptu',
@@ -50,6 +59,11 @@ export const csTranslations = {
     submit: 'Odeslat',
     submitPending: 'Odesílám recept',
   },
+  loginValidation: {
+    emailRequired: 'E-mail je povinný.',
+    invalidEmail: 'Neplatný e-mail.',
+    passwordLen: 'Heslo musí mít alespoň 8 znaků.',
+  },
   recValidation: {
     recipeNameRequired: 'Název receptu je povinný.',
     descriptionRequired: 'Popis je povinný.',
@@ -75,6 +89,7 @@ export const csTranslations = {
   },
   error: {
     error: 'Chyba:',
+    input: 'Neplatný vstup.',
     userNotFound: 'Uživatel nenalezen.',
     genericError: 'Došlo k chybě. Zkuste to prosím později.',
     invalidResponse: 'Neplatná odpověď databáze.',

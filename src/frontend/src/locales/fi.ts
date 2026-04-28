@@ -13,6 +13,15 @@ export const fiTranslations = {
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
   },
+  login: {
+    header: 'Kirjaudu sisään',
+    email: 'Sähköposti',
+    emailPlace: 'Syötä sähköpostiosoite',
+    password: 'Salasana',
+    passwordPlace: 'Syötä salasana',
+    submit: 'Jatka',
+    submitPending: 'Kirjaudutaan sisään',
+  },
   recipes: {
     header: 'Luo resepti',
     title: 'Reseptin nimi',
@@ -50,6 +59,11 @@ export const fiTranslations = {
     submit: 'Lähetä',
     submitPending: 'Lähetetään reseptiä',
   },
+  loginValidation: {
+    emailRequired: 'Sähköposti on pakollinen.',
+    invalidEmail: 'Virheellinen sähköpostiosoite.',
+    passwordLen: 'Salasanan on oltava vähintään 8 merkkiä pitkä.',
+  },
   recValidation: {
     recipeNameRequired: 'Reseptin nimi on pakollinen.',
     descriptionRequired: 'Kuvaus on pakollinen.',
@@ -75,6 +89,7 @@ export const fiTranslations = {
   },
   error: {
     error: 'Virhe:',
+    input: 'Virheellinen syöte.',
     userNotFound: 'Käyttäjää ei löytynyt.',
     genericError: 'Tapahtui virhe. Yritä myöhemmin uudelleen.',
     invalidResponse: 'Virheellinen tietokannan vastaus.',

@@ -202,7 +202,7 @@ export const getUser = async (t: TFunction): Promise<User> => {
 };
 
 // POST /api/users/login (user login)
-export const postLogin = async (payload: LoginPayload) => {
+export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   const response = await fetch(`${baseUrl}/users/login`, {
     method: 'POST',
     headers: {
@@ -221,11 +221,12 @@ export const postLogin = async (payload: LoginPayload) => {
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Login failed'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isLoginSignupResponse(data)) {
-    throw new Error('Invalid login response');
+    throw new Error(t('error.invalidResponse'));
   }
 };
 

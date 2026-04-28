@@ -13,6 +13,15 @@ export const enTranslations = {
     roles: 'Roles',
     createRecipe: 'Create recipe',
   },
+  login: {
+    header: 'Log in',
+    email: 'Email',
+    emailPlace: 'Enter your email',
+    password: 'Password',
+    passwordPlace: 'Enter your password',
+    submit: 'Continue',
+    submitPending: 'Logging in',
+  },
   recipes: {
     header: 'Create recipe',
     title: 'Recipe name',
@@ -50,6 +59,11 @@ export const enTranslations = {
     submit: 'Submit',
     submitPending: 'Submitting recipe',
   },
+  loginValidation: {
+    emailRequired: 'Email is required.',
+    invalidEmail: 'Invalid email.',
+    passwordLen: 'Password must be at least 8 characters.',
+  },
   recValidation: {
     recipeNameRequired: 'Recipe name is required.',
     descriptionRequired: 'Description is required.',
@@ -75,6 +89,7 @@ export const enTranslations = {
   },
   error: {
     error: 'Error:',
+    input: 'Invalid input.',
     userNotFound: 'User not found.',
     genericError: 'An error occurred. Please try again later.',
     invalidResponse: 'Invalid database response.',

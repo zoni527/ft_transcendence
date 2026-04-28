@@ -81,7 +81,7 @@ const CreateRecipe = () => {
     });
 
     if (!result.success) {
-      setError(result.error.issues[0]?.message || 'Invalid input');
+      setError(result.error.issues[0]?.message || t('error.input'));
     } else {
       setLoading(true);
 
@@ -110,7 +110,7 @@ const CreateRecipe = () => {
         })
         .catch((err: unknown) => {
           if (err instanceof Error) setError(err.message);
-          else setError(t('genericError'));
+          else setError(t('error.genericError'));
         })
         .finally(() => setLoading(false));
     }

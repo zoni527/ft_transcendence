@@ -1,8 +1,14 @@
 const Banner = () => {
+  const imgUrl: string =
+    'https://media.hellofresh.com/q_100,w_3840,f_auto,c_limit,fl_auto/hellofresh_website/recipe-developers/assets/recipe_dev_hero_redesign_header.jpg';
+
   return (
-    <div className="relative h-100 w-full bg-[url('/assets/banner.jpg')] bg-cover bg-center">
+    <div
+      className="relative h-100 w-full bg-cover bg-center"
+      style={{ backgroundImage: `url(${imgUrl})` }}
+    >
       {/* Tint */}
-      <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/50 via-black/30 to-black/70" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-red-100/20 via-red-200/20 to-red-300/20" />
 
       {/* Center Overlay */}
       <div className="absolute inset-0 z-10 flex items-center justify-center text-center text-white">

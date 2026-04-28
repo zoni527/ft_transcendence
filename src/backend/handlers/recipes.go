@@ -42,7 +42,7 @@ func GetAllRecipes(c *gin.Context) {
 func GetRecipeById(c *gin.Context) {
 	id := c.Param("id")
 	if !isValidUUID(id) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe id"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
@@ -100,7 +100,7 @@ func UpdateRecipe(c *gin.Context) {
 func DeleteRecipe(c *gin.Context) {
 	id := c.Param("id")
 	if !isValidUUID(id) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid recipe id"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 

@@ -88,17 +88,6 @@ function isLoginSignupResponse(data: unknown): data is LoginSignupResponse {
   );
 }
 
-// Get an error message safely
-function getErrorMessage(data: unknown, fallback: string): string {
-  if (typeof data === 'object' && data !== null) {
-    const obj = data as Record<string, unknown>;
-    if (typeof obj.error === 'string') {
-      return obj.error;
-    }
-  }
-  return fallback;
-}
-
 // Function to get translated error messages based on status code
 function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
   switch (statusCode) {
@@ -234,7 +223,7 @@ export const postLogin = async (payload: LoginPayload, t: TFunction) => {
 };
 
 // POST /api/users (user signup)
-export const postSignup = async (payload: SignupPayload) => {
+export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   const response = await fetch(`${baseUrl}/users`, {
     method: 'POST',
     headers: {
@@ -253,16 +242,15 @@ export const postSignup = async (payload: SignupPayload) => {
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Signup failed'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isLoginSignupResponse(data)) {
-    throw new Error('Invalid signup response');
+    throw new Error(t('error.invalidResponse'));
   }
 
   if (!data.authenticated) {
-    throw new Error(
-      'Signup succeeded but automatic login failed. Please log in.',
-    );
+    throw new Error(t('error.authError'));
   }
 };

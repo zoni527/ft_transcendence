@@ -37,6 +37,21 @@ export const csTranslations = {
     submit: 'Pokračovat',
     submitPending: 'Přihlašování',
   },
+  signup: {
+    header: 'Registrovat se',
+    name: 'Celé jméno',
+    namePlace: 'Zadejte své celé jméno',
+    username: 'Uživatelské jméno / Přezdívka',
+    usernamePlace: 'Zadejte své uživatelské jméno / přezdívku.',
+    email: 'E-mail',
+    emailPlace: 'Zadejte svůj e-mail',
+    password: 'Heslo',
+    passwordPlace: 'Zadejte své heslo',
+    rePassword: 'Potvrďte heslo',
+    rePasswordPlace: 'Zadejte své heslo znovu',
+    submit: 'Pokračovat',
+    submitPending: 'Vytváření účtu',
+  },
   createRecipes: {
     header: 'Vytvořit recept',
     title: 'Název receptu',
@@ -79,6 +94,15 @@ export const csTranslations = {
     invalidEmail: 'Neplatný e-mail.',
     passwordLen: 'Heslo musí mít alespoň 8 znaků.',
   },
+  signupValidation: {
+    nameRequired: 'Celé jméno je povinné.',
+    usernameRequired: 'Uživatelské jméno / Přezdívka je povinné.',
+    emailRequired: 'E-mail je povinný.',
+    invalidEmail: 'Neplatný e-mail.',
+    passwordLen: 'Heslo musí mít alespoň 8 znaků.',
+    passwordConfirm: 'Prosím potvrďte své heslo.',
+    passwordMatch: 'Hesla se neshodují.',
+  },
   recValidation: {
     recipeNameRequired: 'Název receptu je povinný.',
     descriptionRequired: 'Popis je povinný.',
@@ -114,5 +138,7 @@ export const csTranslations = {
     unauthorized: 'Nemáte oprávnění k provedení této akce.',
     notFound: 'Požadovaná stránka nebyla nalezena.',
     serverError: 'Došlo k interní chybě serveru. Zkuste to prosím později.',
+    authError:
+      'Registrace byla úspěšná, ale automatické přihlášení selhalo. Přihlaste se prosím ručně.',
   },
 };

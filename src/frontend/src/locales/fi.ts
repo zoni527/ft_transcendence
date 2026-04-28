@@ -37,6 +37,21 @@ export const fiTranslations = {
     submit: 'Jatka',
     submitPending: 'Kirjaudutaan sisään',
   },
+  signup: {
+    header: 'Rekisteröidy',
+    name: 'Täydellinen nimi',
+    namePlace: 'Syötä koko nimesi',
+    username: 'Käyttäjätunnus / Alias',
+    usernamePlace: 'Syötä käyttäjätunnuksesi / aliasesi.',
+    email: 'Sähköposti',
+    emailPlace: 'Syötä sähköpostiosoitteesi',
+    password: 'Salasana',
+    passwordPlace: 'Syötä salasanasi',
+    rePassword: 'Vahvista salasana',
+    rePasswordPlace: 'Syötä salasanasi uudelleen',
+    submit: 'Jatka',
+    submitPending: 'Rekisteröidään',
+  },
   createRecipes: {
     header: 'Luo resepti',
     title: 'Reseptin nimi',
@@ -79,6 +94,15 @@ export const fiTranslations = {
     invalidEmail: 'Virheellinen sähköpostiosoite.',
     passwordLen: 'Salasanan on oltava vähintään 8 merkkiä pitkä.',
   },
+  signupValidation: {
+    nameRequired: 'Nimi on pakollinen.',
+    usernameRequired: 'Käyttäjätunnus / Alias on pakollinen.',
+    emailRequired: 'Sähköposti on pakollinen.',
+    invalidEmail: 'Virheellinen sähköpostiosoite.',
+    passwordLen: 'Salasanan on oltava vähintään 8 merkkiä pitkä.',
+    passwordConfirm: 'Vahvista salasanasi.',
+    passwordMatch: 'Salasanat eivät täsmää.',
+  },
   recValidation: {
     recipeNameRequired: 'Reseptin nimi on pakollinen.',
     descriptionRequired: 'Kuvaus on pakollinen.',
@@ -113,5 +137,7 @@ export const fiTranslations = {
     unauthorized: 'Sinulla ei ole oikeuksia suorittaa tätä toimintoa.',
     notFound: 'Haettua sivua ei löydy.',
     serverError: 'Sisäinen palvelinvirhe. Yritä myöhemmin uudelleen.',
+    authError:
+      'Rekisteröinti onnistui, mutta automaattinen kirjautuminen epäonnistui. Kirjaudu sisään manuaalisesti.',
   },
 };

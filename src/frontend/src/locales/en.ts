@@ -37,6 +37,74 @@ export const enTranslations = {
   },
   termsService: {
     header: 'Terms of Service',
+    terms_intro:
+      'Welcome to rise. By using our recipe-sharing platform, you agree to these Terms of Service ("Terms"). Please read them carefully.',
+
+    acceptance_title: '1. Acceptance of these Terms',
+    acceptance_text:
+      'By creating an account or otherwise using RISE, you accept these Terms and our Privacy Policy. If you do not agree, please do not use the service.',
+
+    eligibility_title: '2. Eligibility',
+    eligibility_text:
+      'You must be at least 13 years old to use RISE. If you are under 18, your parent or guardian must read and agree to these Terms on your behalf.',
+
+    account_title: '3. Your account',
+    account_items_0:
+      'Provide accurate and current information when registering.',
+    account_items_1: 'Keep your password confidential and secure.',
+    account_items_2:
+      'You are responsible for all activity that occurs under your account.',
+    account_items_3: 'Notify us immediately of any unauthorised access.',
+
+    content_title: '4. Your content',
+    content_text:
+      'You retain ownership of recipes, photos, comments, and other content you upload to RISE. By posting, you grant us a worldwide, non-exclusive, royalty-free licence to display, reproduce, and distribute your content within the platform and its features (search, recommendations, social sharing).',
+    content_items_0:
+      'Violate any law or third-party rights, including copyright.',
+    content_items_1:
+      'Contain hate speech, harassment, or content harmful to others.',
+    content_items_2: 'Misrepresent ingredients or omit allergen information.',
+    content_items_3: 'Promote unsafe food-handling practices.',
+
+    acceptable_title: '5. Acceptable use',
+    acceptable_items_0:
+      'Scrape or copy content at scale without written permission.',
+    acceptable_items_1:
+      'Attempt to compromise the security of the service or other accounts.',
+    acceptable_items_2: 'Submit false reports or abuse moderation tools.',
+    acceptable_items_3: 'Impersonate any person or organisation.',
+    acceptable_items_4:
+      'Send spam, advertise without consent, or distribute malware.',
+    acceptable_items_5:
+      'Reverse-engineer or interfere with the operation of the service.',
+
+    ip_title: '6. Intellectual property',
+    ip_text:
+      'The RISE name, logo, design system, and underlying source code are owned by the RISE team. You may not copy, modify, or reuse them without our prior written permission. Community-contributed recipes remain the property of their authors.',
+
+    termination_title: '7. Termination',
+    termination_text:
+      'We may suspend or terminate accounts that violate these Terms. You may delete your account at any time from your settings; doing so will remove your personal data in accordance with our Privacy Policy.',
+
+    disclaimers_title: '8. Disclaimers',
+    disclaimers_text:
+      'Recipes are provided "as is" by community members. RISE does not verify the accuracy of nutritional information, allergens, or food-safety claims. Cook responsibly and consult a qualified professional for dietary, medical, or allergy concerns.',
+
+    liability_title: '9. Limitation of liability',
+    liability_text:
+      'To the fullest extent permitted by law, RISE and its contributors are not liable for indirect, incidental, special, or consequential damages arising from your use of the service.',
+
+    changes_title: '10. Changes to these Terms',
+    changes_text:
+      'We may update these Terms from time to time. Continued use of the service after changes take effect constitutes acceptance of the updated Terms.',
+
+    law_title: '11. Governing law',
+    law_text:
+      'These Terms are governed by the laws of France. Any disputes will be resolved in the competent courts of Paris, France.',
+
+    contact_title: '12. Contact',
+    contact_text:
+      'Questions about these Terms can be sent via the Contact page.',
   },
   login: {
     header: 'Log in',

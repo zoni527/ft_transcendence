@@ -68,14 +68,6 @@ func CreateRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-
-	// TODO:	currently anyone can create a recipe as any user, need further
-	//			validation later
-	if !isValidUUID(r.Author_id) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid author_id format"})
-		return
-	}
-
 	if err := validateRecipeFields(&r); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
 		return
@@ -115,6 +107,11 @@ func DeleteRecipe(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
+func UploadRecipeImage(c *gin.Context) {
+	// TODO: call repository.DeleteRecipe()
+	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
 // Cloudinary API details to generate signature
 var cloudinarySecret []byte
 var cloudinaryUser []byte
@@ -147,11 +144,6 @@ func RecipeImageSignature(c *gin.Context) {
 		"timestamp":  timestamp,
 		"folder":     "recipes",
 	})
-}
-
-func UploadRecipeImage(c *gin.Context) {
-	// TODO: call repository.DeleteRecipe()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
 //------------------------------------------------------------------------------

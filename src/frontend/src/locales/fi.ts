@@ -77,6 +77,8 @@ export const fiTranslations = {
     publish: 'Julkaistaanko resepti?',
     yes: 'Kyllä',
     no: 'Ei',
+    uploadImage: 'Lataa kuva',
+    noFile: 'Ei tiedostoa valittu',
     submit: 'Lähetä',
     submitPending: 'Lähetetään reseptiä',
   },
@@ -124,6 +126,7 @@ export const fiTranslations = {
     fieldRequired: '{{field}} on pakollinen.',
     numRequired: '{{field}} täytyy olla numero.',
     numMin: '{{field}} täytyy olla vähintään {{value}}.',
+    imageRequired: 'Kuva vaaditaan.',
   },
   common: {
     bannerTitle: 'Reseptejä, joita varten kannattaa herätä',

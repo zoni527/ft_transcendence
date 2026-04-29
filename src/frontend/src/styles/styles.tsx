@@ -9,15 +9,17 @@ export const buttonBase = `
   items-center
   justify-center
   rounded-full
-  bg-orange-700
+  bg-[#C04D31]
   px-4
   py-2
   font-semibold
   text-white
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   hover:cursor-pointer
-  hover:bg-orange-800
+  hover:bg-orange-900
   whitespace-nowrap
+  transition-colors
+  duration-300
 `;
 
 export const langButtonBase = `
@@ -28,9 +30,10 @@ export const langButtonBase = `
   py-1
   text-sm
   font-bold
-  text-orange-700
+  text-[#C04D31]
   transition
-  hover:bg-orange-800
+  duration-300
+  hover:bg-orange-900
   hover:text-white
   active:scale-95
 `;
@@ -54,10 +57,11 @@ export const uploadButtonBase = `
 `;
 
 export const navLeftBase = `
-  text-orange-700
+  text-[#C04D31]
   hover:cursor-pointer
-  hover:text-orange-800
-  hover:underline
+  hover:text-orange-900
+  transition-colors
+  duration-300
 `;
 
 export const inputFieldBase = `

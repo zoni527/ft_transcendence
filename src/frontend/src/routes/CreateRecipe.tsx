@@ -167,11 +167,11 @@ const CreateRecipe = () => {
         <SelectField
           id="difficulty"
           name="difficulty"
-          label={t('createRecipe.difficulty')}
+          label={t('difficulty.type')}
           options={[
-            { value: 'easy', label: t('createRecipe.difficulty_easy') },
-            { value: 'medium', label: t('createRecipe.difficulty_medium') },
-            { value: 'hard', label: t('createRecipe.difficulty_hard') },
+            { value: 'easy', label: t('difficulty.type_easy') },
+            { value: 'medium', label: t('difficulty.type_medium') },
+            { value: 'hard', label: t('difficulty.type_hard') },
           ]}
         />
 
@@ -187,12 +187,12 @@ const CreateRecipe = () => {
         <SelectField
           id="meal_type"
           name="meal_type"
-          label={t('createRecipe.meal')}
+          label={t('meal.type')}
           options={[
-            { value: 'breakfast', label: t('createRecipe.meal_breakfast') },
-            { value: 'lunch', label: t('createRecipe.meal_lunch') },
-            { value: 'dinner', label: t('createRecipe.meal_dinner') },
-            { value: 'snack', label: t('createRecipe.meal_snack') },
+            { value: 'breakfast', label: t('meal.type_breakfast') },
+            { value: 'lunch', label: t('meal.type_lunch') },
+            { value: 'dinner', label: t('meal.type_dinner') },
+            { value: 'snack', label: t('meal.type_snack') },
           ]}
         />
 

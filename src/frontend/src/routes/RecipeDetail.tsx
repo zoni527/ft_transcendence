@@ -85,13 +85,13 @@ const RecipeDetail = () => {
             value={recipe.servings}
           />
           <DataField
-            label={t('recipeDetail.difficulty')}
-            value={t(`recipeDetail.difficulty_${recipe.difficulty}`)}
+            label={t('difficulty.type')}
+            value={t(`difficulty.type_${recipe.difficulty}`)}
           />
           <DataField label={t('recipeDetail.cuisine')} value={recipe.cuisine} />
           <DataField
-            label={t('recipeDetail.meal')}
-            value={t(`recipeDetail.meal_${recipe.meal_type}`)}
+            label={t('meal.type')}
+            value={t(`meal.type_${recipe.meal_type}`)}
           />
           <DataField
             label={t('recipeDetail.likes')}

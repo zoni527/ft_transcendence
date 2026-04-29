@@ -114,18 +114,18 @@ func UploadRecipeImage(c *gin.Context) {
 
 // Cloudinary API details to generate signature
 var cloudinarySecret []byte
-var cloudinaryUser []byte
+var cloudinaryCloudName []byte
 var cloudinaryKey []byte
 
 func LoadCloudinaryVars() error {
 	secret := strings.TrimSpace(os.Getenv("CLOUDINARY_SECRET"))
-	user := strings.TrimSpace(os.Getenv("CLOUDINARY_USER"))
+	cloudName := strings.TrimSpace(os.Getenv("CLOUDINARY_CLOUD_NAME"))
 	key := strings.TrimSpace(os.Getenv("CLOUDINARY_KEY"))
-	if secret == "" || user == "" || key == "" {
+	if secret == "" || cloudName == "" || key == "" {
 		return errors.New("missing or empty Cloudinary env variables")
 	}
 	cloudinarySecret = []byte(secret)
-	cloudinaryUser = []byte(user)
+	cloudinaryCloudName = []byte(cloudName)
 	cloudinaryKey = []byte(key)
 	return nil
 }
@@ -140,7 +140,7 @@ func RecipeImageSignature(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"signature":  signature,
 		"api_key":    string(cloudinaryKey),
-		"cloud_name": string(cloudinaryUser),
+		"cloud_name": string(cloudinaryCloudName),
 		"timestamp":  timestamp,
 		"folder":     "recipes",
 	})

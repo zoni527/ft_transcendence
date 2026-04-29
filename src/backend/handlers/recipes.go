@@ -173,7 +173,7 @@ const titleLenMax = 60
 const descriptionLenMin = 0
 const descriptionLenMax = 10000
 const cuisineLenMax = 50
-const imageUrlLenMax = 100
+const imageUrlLenMax = 255
 
 func validateRecipeFields(r *models.Recipe) error {
 

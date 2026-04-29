@@ -1,7 +1,7 @@
+import type { TFunction } from 'i18next';
 import type { Recipe, User } from './types/types';
 
 interface CreateRecipePayload {
-  author_id: string;
   title: string;
   description: string;
   prep_time_min: number;
@@ -88,25 +88,29 @@ function isLoginSignupResponse(data: unknown): data is LoginSignupResponse {
   );
 }
 
-// Get an error message safely
-function getErrorMessage(data: unknown, fallback: string): string {
-  if (typeof data === 'object' && data !== null) {
-    const obj = data as Record<string, unknown>;
-    if (typeof obj.error === 'string') {
-      return obj.error;
-    }
+// Function to get translated error messages based on status code
+function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
+  switch (statusCode) {
+    case 400:
+      return t('error.badRequest');
+    case 401:
+      return t('error.unauthorized');
+    case 404:
+      return t('error.notFound');
+    case 500:
+      return t('error.serverError');
+    default:
+      return t('error.genericError', { statusCode });
   }
-  return fallback;
 }
 
 // GET /api/recipes (get all published recipes)
-export const getRecipes = async (): Promise<Recipe[]> => {
+export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch recipes: ${response.status} ${response.statusText}`,
-    );
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   const data = (await response.json()) as Recipe[];
@@ -114,11 +118,15 @@ export const getRecipes = async (): Promise<Recipe[]> => {
 };
 
 // GET /api/recipes/:id (get a single recipe by ID)
-export const getRecipeById = async (id: string): Promise<Recipe> => {
+export const getRecipeById = async (
+  id: string,
+  t: TFunction,
+): Promise<Recipe> => {
   const response = await fetch(`${baseUrl}/recipes/${id}`);
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch recipe with id ${id}`);
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   const data = (await response.json()) as Recipe;
@@ -128,6 +136,7 @@ export const getRecipeById = async (id: string): Promise<Recipe> => {
 // POST /api/recipes (create a new recipe)
 export const postCreateRecipe = async (
   payload: CreateRecipePayload,
+  t: TFunction,
 ): Promise<CreateRecipeResponse> => {
   const response = await fetch(`${baseUrl}/recipes`, {
     method: 'POST',
@@ -146,18 +155,19 @@ export const postCreateRecipe = async (
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Create recipe failed'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isCreateRecipeResponse(data)) {
-    throw new Error('Invalid create recipe response');
+    throw new Error(t('error.invalidResponse'));
   }
 
   return data;
 };
 
 // GET /api/users/me (user authentication)
-export const getUser = async (): Promise<User> => {
+export const getUser = async (t: TFunction): Promise<User> => {
   const response = await fetch(`${baseUrl}/users/me`, {
     method: 'GET',
     credentials: 'include',
@@ -172,18 +182,19 @@ export const getUser = async (): Promise<User> => {
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Failed to load authenticated user'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isUserResponse(data)) {
-    throw new Error('Invalid authentication response');
+    throw new Error(t('error.invalidResponse'));
   }
 
   return data;
 };
 
 // POST /api/users/login (user login)
-export const postLogin = async (payload: LoginPayload) => {
+export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   const response = await fetch(`${baseUrl}/users/login`, {
     method: 'POST',
     headers: {
@@ -202,16 +213,17 @@ export const postLogin = async (payload: LoginPayload) => {
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Login failed'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isLoginSignupResponse(data)) {
-    throw new Error('Invalid login response');
+    throw new Error(t('error.invalidResponse'));
   }
 };
 
 // POST /api/users (user signup)
-export const postSignup = async (payload: SignupPayload) => {
+export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   const response = await fetch(`${baseUrl}/users`, {
     method: 'POST',
     headers: {
@@ -230,16 +242,15 @@ export const postSignup = async (payload: SignupPayload) => {
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, 'Signup failed'));
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 
   if (!isLoginSignupResponse(data)) {
-    throw new Error('Invalid signup response');
+    throw new Error(t('error.invalidResponse'));
   }
 
   if (!data.authenticated) {
-    throw new Error(
-      'Signup succeeded but automatic login failed. Please log in.',
-    );
+    throw new Error(t('error.authError'));
   }
 };

@@ -1,19 +1,29 @@
-const Banner = () => {
-  return (
-    <div className="relative h-80 w-full bg-[url('/assets/banner.jpg')] bg-cover bg-center">
-      {/* Background Tint */}
-      <div className="absolute inset-0 bg-amber-700/40" />
+import { useTranslation } from 'react-i18next';
 
-      {/* Text Box */}
-      <div className="relative z-10 flex h-full items-center justify-center text-center text-amber-950">
+const imgUrl: string =
+  'https://media.hellofresh.com/q_100,w_3840,f_auto,c_limit,fl_auto/hellofresh_website/recipe-developers/assets/recipe_dev_hero_redesign_header.jpg';
+
+const Banner = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div
+      className="relative h-96 w-full bg-cover bg-center"
+      style={{ backgroundImage: `url(${imgUrl})` }}
+    >
+      {/* Tint */}
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/10 via-black/30 to-black/50" />
+
+      {/* Center Overlay */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center text-center text-white">
         <h1
           style={{
             fontFamily: 'Dancing Script, cursive',
-            textShadow: '2px 2px 4px rgba(255, 255, 255, 1)',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 1)',
           }}
           className="text-8xl font-bold"
         >
-          Honey I Cooked It!
+          {t('common.bannerTitle')}
         </h1>
       </div>
     </div>

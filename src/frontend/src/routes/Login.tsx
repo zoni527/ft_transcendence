@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { z } from 'zod';
+import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
 import { postLogin } from '../api';
@@ -8,18 +11,20 @@ import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: 'Email is required' })
-    .email({ message: 'Invalid email' }),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
+const loginSchema = (t: TFunction) =>
+  z.object({
+    email: z
+      .string()
+      .min(1, t('loginValidation.emailRequired'))
+      .email(t('loginValidation.invalidEmail')),
+    password: z.string().min(8, t('loginValidation.passwordLen')),
+  });
 
 const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,27 +37,32 @@ const Login = () => {
     const formData = new FormData(form);
 
     // Input validation
-    const result = loginSchema.safeParse({
+    const schema = loginSchema(t);
+
+    const result = schema.safeParse({
       email: getStringValue(formData, 'email'),
       password: getStringValue(formData, 'password'),
     });
 
     if (!result.success) {
-      setError(result.error.issues[0]?.message || 'Invalid input');
+      setError(result.error.issues[0]?.message || t('error.input'));
     } else {
       setLoading(true);
 
       // POST /api/users/login (user login)
-      postLogin({
-        email: result.data.email,
-        password: result.data.password,
-      })
+      postLogin(
+        {
+          email: result.data.email,
+          password: result.data.password,
+        },
+        t,
+      )
         .then(() => {
           void navigate('/dashboard');
         })
         .catch((err: unknown) => {
           if (err instanceof Error) setError(err.message);
-          else setError('Something went wrong. Please try again.');
+          else setError(t('error.genericError'));
         })
         .finally(() => setLoading(false));
     }
@@ -61,9 +71,7 @@ const Login = () => {
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-sm p-8`}>
       {/* Header */}
-      <h1 className="mb-6 text-center text-2xl font-semibold text-amber-900">
-        Log in
-      </h1>
+      <FormHeader title={t('login.header')} />
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -71,18 +79,18 @@ const Login = () => {
         <InputField
           id="email"
           name="email"
-          label="Email"
+          label={t('login.email')}
           type="email"
-          placeholder="Enter your email"
+          placeholder={t('login.emailPlace')}
         />
 
         {/* Password */}
         <InputField
           id="password"
           name="password"
-          label="Password"
+          label={t('login.password')}
           type="password"
-          placeholder="Enter your password"
+          placeholder={t('login.passwordPlace')}
         />
 
         {/* Errors & Warnings */}
@@ -94,8 +102,8 @@ const Login = () => {
         <div className="flex justify-center">
           <SubmitButton
             isLoading={loading}
-            pendingText="Logging in"
-            defaultText="Continue"
+            pendingText={t('login.submitPending')}
+            defaultText={t('login.submit')}
           />
         </div>
       </form>

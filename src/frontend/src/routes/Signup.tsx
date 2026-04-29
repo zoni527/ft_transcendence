@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { z } from 'zod';
+import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
 import { postSignup } from '../api';
@@ -8,26 +11,28 @@ import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
-const signupSchema = z
-  .object({
-    fullName: z.string().min(1, 'Full name is required'),
-    username: z.string().min(1, 'Username / alias is required'),
-    email: z
-      .string()
-      .min(1, { message: 'Email is required' })
-      .email({ message: 'Invalid email' }),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirmPassword: z.string().min(8, 'Please confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+const signupSchema = (t: TFunction) =>
+  z
+    .object({
+      fullName: z.string().min(1, t('signupValidation.nameRequired')),
+      username: z.string().min(1, t('signupValidation.usernameRequired')),
+      email: z
+        .string()
+        .min(1, t('signupValidation.emailRequired'))
+        .email(t('signupValidation.invalidEmail')),
+      password: z.string().min(8, t('signupValidation.passwordLen')),
+      confirmPassword: z.string().min(8, t('signupValidation.passwordConfirm')),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t('signupValidation.passwordMatch'),
+      path: ['confirmPassword'],
+    });
 
 const Signup = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,7 +45,9 @@ const Signup = () => {
     const formData = new FormData(form);
 
     // Input validation
-    const result = signupSchema.safeParse({
+    const schema = signupSchema(t);
+
+    const result = schema.safeParse({
       fullName: getStringValue(formData, 'fullName'),
       username: getStringValue(formData, 'username'),
       email: getStringValue(formData, 'email'),
@@ -49,23 +56,26 @@ const Signup = () => {
     });
 
     if (!result.success) {
-      setError(result.error.issues[0]?.message || 'Invalid input');
+      setError(result.error.issues[0]?.message || t('error.input'));
     } else {
       setLoading(true);
 
       // POST /api/users (create a new user)
-      postSignup({
-        email: result.data.email,
-        password: result.data.password,
-        name: result.data.fullName,
-        display_name: result.data.username,
-      })
+      postSignup(
+        {
+          email: result.data.email,
+          password: result.data.password,
+          name: result.data.fullName,
+          display_name: result.data.username,
+        },
+        t,
+      )
         .then(() => {
           void navigate('/dashboard');
         })
         .catch((err: unknown) => {
           if (err instanceof Error) setError(err.message);
-          else setError('Something went wrong. Please try again.');
+          else setError(t('error.genericError'));
         })
         .finally(() => setLoading(false));
     }
@@ -74,9 +84,7 @@ const Signup = () => {
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-sm p-8`}>
       {/* Header */}
-      <h1 className="mb-6 text-center text-2xl font-semibold text-amber-900">
-        Sign up
-      </h1>
+      <FormHeader title={t('signup.header')} />
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -84,45 +92,45 @@ const Signup = () => {
         <InputField
           id="fullName"
           name="fullName"
-          label="Full Name"
+          label={t('signup.name')}
           type="text"
-          placeholder="Enter your full name"
+          placeholder={t('signup.namePlace')}
         />
 
         {/* Username */}
         <InputField
           id="username"
           name="username"
-          label="Username / Alias"
+          label={t('signup.username')}
           type="text"
-          placeholder="Enter your username / alias"
+          placeholder={t('signup.usernamePlace')}
         />
 
         {/* Email */}
         <InputField
           id="email"
           name="email"
-          label="Email"
+          label={t('signup.email')}
           type="email"
-          placeholder="Enter your email"
+          placeholder={t('signup.emailPlace')}
         />
 
         {/* Password */}
         <InputField
           id="password"
           name="password"
-          label="Password"
+          label={t('signup.password')}
           type="password"
-          placeholder="Enter your password"
+          placeholder={t('signup.passwordPlace')}
         />
 
         {/* Confirm Password */}
         <InputField
           id="confirmPassword"
           name="confirmPassword"
-          label="Confirm Password"
+          label={t('signup.rePassword')}
           type="password"
-          placeholder="Re-enter your password"
+          placeholder={t('signup.rePasswordPlace')}
         />
 
         {/* Errors & Warnings */}
@@ -134,8 +142,8 @@ const Signup = () => {
         <div className="flex justify-center">
           <SubmitButton
             isLoading={loading}
-            pendingText="Signing up"
-            defaultText="Continue"
+            pendingText={t('signup.submitPending')}
+            defaultText={t('signup.submit')}
           />
         </div>
       </form>

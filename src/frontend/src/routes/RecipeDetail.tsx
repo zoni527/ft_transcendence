@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
+import StatusBox from '../components/StatusBox';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -10,6 +12,7 @@ const RecipeDetail = () => {
   const { state } = useLocation() as { state?: { recipe?: Recipe } };
   const [recipe, setRecipe] = useState<Recipe | null>(state?.recipe ?? null);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const cachedRecipe = state?.recipe;
   const loading = !recipe && !error;
@@ -17,37 +20,44 @@ const RecipeDetail = () => {
   useEffect(() => {
     if (!id || cachedRecipe) return;
 
-    getRecipeById(id)
+    getRecipeById(id, t)
       .then(setRecipe)
       .catch((err: unknown) => {
         if (err instanceof Error) setError(err.message);
-        else setError('Failed to load recipe');
+        else setError(t('error.genericError'));
       });
-  }, [id, cachedRecipe]);
+  }, [id, cachedRecipe, t]);
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return (
+      <StatusBox
+        message={`${t('error.error')} ${error}`}
+        className="text-red-500"
+      />
+    );
   }
 
   if (loading) {
-    return <p>Loading recipe...</p>;
+    return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
   if (!recipe) {
-    return <p>Recipe not found</p>;
+    return (
+      <StatusBox message={t('error.recipeNotFound')} className="text-black" />
+    );
   }
 
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
       {/* Recipe Image */}
       <img
-        src={`/assets/${recipe.id}.jpg`}
+        src={`https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/spaghetti_and_meatballs_69603_16x9.jpg`}
         alt={recipe.title}
         className="mb-8 h-64 w-full rounded object-cover shadow-md md:h-80"
       />
 
       {/* Header */}
-      <h1 className="mb-6 text-2xl font-semibold text-amber-900">
+      <h1 className="mb-6 text-2xl font-semibold text-orange-700">
         {recipe.title}
       </h1>
 
@@ -58,23 +68,49 @@ const RecipeDetail = () => {
       <div className="mt-6 flex gap-8">
         {/* Left */}
         <div className="flex-1 space-y-2">
-          <DataField label="Author" value={recipe.author_id} />
           <DataField
-            label={'Preparation (minutes)'}
+            label={t('recipeDetail.author')}
+            value={recipe.author_id}
+          />
+          <DataField
+            label={t('recipeDetail.prep')}
             value={recipe.prep_time_min}
           />
-          <DataField label={'Cooking (minutes)'} value={recipe.cook_time_min} />
-          <DataField label={'Servings'} value={recipe.servings} />
-          <DataField label={'Difficulty'} value={recipe.difficulty} />
-          <DataField label={'Likes'} value={'PLACEHOLDER VALUE'} />
+          <DataField
+            label={t('recipeDetail.cook')}
+            value={recipe.cook_time_min}
+          />
+          <DataField
+            label={t('recipeDetail.servings')}
+            value={recipe.servings}
+          />
+          <DataField
+            label={t('difficulty.type')}
+            value={t(`difficulty.type_${recipe.difficulty}`)}
+          />
+          <DataField label={t('recipeDetail.cuisine')} value={recipe.cuisine} />
+          <DataField
+            label={t('meal.type')}
+            value={t(`meal.type_${recipe.meal_type}`)}
+          />
+          <DataField
+            label={t('recipeDetail.likes')}
+            value={'PLACEHOLDER VALUE'}
+          />
         </div>
 
         {/* Right */}
         <div className="flex-1 space-y-2">
-          <DataField label="Calories (kcal)" value={recipe.calories} />
-          <DataField label={'Protein (grams)'} value={recipe.protein_g} />
-          <DataField label={'Carbohydrates (grams)'} value={recipe.carbs_g} />
-          <DataField label={'Fat (grams)'} value={recipe.fat_g} />
+          <DataField
+            label={t('recipeDetail.calories')}
+            value={recipe.calories}
+          />
+          <DataField
+            label={t('recipeDetail.protein')}
+            value={recipe.protein_g}
+          />
+          <DataField label={t('recipeDetail.carbs')} value={recipe.carbs_g} />
+          <DataField label={t('recipeDetail.fat')} value={recipe.fat_g} />
         </div>
       </div>
 

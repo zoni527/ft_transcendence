@@ -1,8 +1,3 @@
-// Primary text color: text-amber-900
-// Primary text color (emphasized): text-amber-950
-
-// Secondary text color: text-gray-700
-
 export const cardBase = `
   rounded-lg
   bg-white
@@ -13,22 +8,37 @@ export const buttonBase = `
   inline-flex
   items-center
   justify-center
-  rounded-lg
-  bg-amber-600
+  rounded-full
+  bg-orange-700
   px-4
   py-2
   font-semibold
   text-white
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   hover:cursor-pointer
-  hover:bg-amber-700
+  hover:bg-orange-800
   whitespace-nowrap
 `;
 
+export const langButtonBase = `
+  cursor-pointer
+  border
+  border-orange-900
+  px-3
+  py-1
+  text-sm
+  font-bold
+  text-orange-700
+  transition
+  hover:bg-orange-800
+  hover:text-white
+  active:scale-95
+`;
+
 export const navLeftBase = `
-  text-amber-900
+  text-orange-700
   hover:cursor-pointer
-  hover:text-amber-950
+  hover:text-orange-800
   hover:underline
 `;
 
@@ -40,7 +50,7 @@ export const inputFieldBase = `
   px-4
   py-2
   focus:ring-2
-  focus:ring-amber-500
+  focus:ring-orange-500
   focus:outline-none
 `;
 
@@ -57,4 +67,10 @@ export const cardHighlight = `
   hover:-translate-y-2
   hover:cursor-pointer
   hover:shadow-[0px_0px_10px_0px_rgba(0,0,0,0.4)]
+`;
+
+export const statusBoxBase = `
+  mt-8
+  px-6
+  text-xl
 `;

@@ -18,7 +18,7 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
     >
       {/* Recipe Image */}
       <img
-        src={`/assets/${recipe.id}.jpg`}
+        src={`https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/spaghetti_and_meatballs_69603_16x9.jpg`}
         alt={recipe.title}
         className="h-40 w-full rounded object-cover"
       />

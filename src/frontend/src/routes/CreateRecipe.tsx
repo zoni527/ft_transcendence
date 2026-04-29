@@ -8,7 +8,11 @@ import InputField from '../components/InputField';
 import InputTextArea from '../components/InputTextArea';
 import SelectField from '../components/SelectField';
 import SubmitButton from '../components/SubmitButton';
-import { postCreateRecipe } from '../api';
+import {
+  postCreateRecipe,
+  getCloudinarySignature,
+  getCloudinaryUrl,
+} from '../api';
 import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
@@ -53,66 +57,67 @@ const CreateRecipe = () => {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    void handleSubmitAsync(e);
+  };
 
+  const handleSubmitAsync = async (
+    e: React.SyntheticEvent<HTMLFormElement>,
+  ) => {
     if (loading) return;
 
     setError('');
+    setLoading(true);
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    try {
+      const form = e.currentTarget;
+      const formData = new FormData(form);
 
-    // Input validation
-    const schema = createRecipeSchema(t);
+      const image = formData.get('image');
 
-    const result = schema.safeParse({
-      title: getStringValue(formData, 'title'),
-      description: getStringValue(formData, 'description'),
-      prep_time_min: getStringValue(formData, 'prep_time_min'),
-      cook_time_min: getStringValue(formData, 'cook_time_min'),
-      servings: getStringValue(formData, 'servings'),
-      difficulty: getStringValue(formData, 'difficulty'),
-      cuisine: getStringValue(formData, 'cuisine'),
-      meal_type: getStringValue(formData, 'meal_type'),
-      calories: getStringValue(formData, 'calories'),
-      protein_g: getStringValue(formData, 'protein_g'),
-      carbs_g: getStringValue(formData, 'carbs_g'),
-      fat_g: getStringValue(formData, 'fat_g'),
-      is_published: getStringValue(formData, 'is_published'),
-    });
+      if (!(image instanceof File) || image.size === 0) {
+        throw new Error(t('error.imageRequired'));
+      }
 
-    if (!result.success) {
-      setError(result.error.issues[0]?.message || t('error.input'));
-    } else {
-      setLoading(true);
+      const schema = createRecipeSchema(t);
 
-      // POST /api/recipes (create a new recipe)
-      postCreateRecipe(
+      const result = schema.safeParse({
+        title: getStringValue(formData, 'title'),
+        description: getStringValue(formData, 'description'),
+        prep_time_min: getStringValue(formData, 'prep_time_min'),
+        cook_time_min: getStringValue(formData, 'cook_time_min'),
+        servings: getStringValue(formData, 'servings'),
+        difficulty: getStringValue(formData, 'difficulty'),
+        cuisine: getStringValue(formData, 'cuisine'),
+        meal_type: getStringValue(formData, 'meal_type'),
+        calories: getStringValue(formData, 'calories'),
+        protein_g: getStringValue(formData, 'protein_g'),
+        carbs_g: getStringValue(formData, 'carbs_g'),
+        fat_g: getStringValue(formData, 'fat_g'),
+        is_published: getStringValue(formData, 'is_published'),
+      });
+
+      if (!result.success) {
+        throw new Error(result.error.issues[0]?.message || t('error.input'));
+      }
+
+      const signature = await getCloudinarySignature(t);
+      const image_url = await getCloudinaryUrl(image, signature, t);
+
+      const recipe = await postCreateRecipe(
         {
-          title: result.data.title,
-          description: result.data.description,
-          prep_time_min: result.data.prep_time_min,
-          cook_time_min: result.data.cook_time_min,
-          servings: result.data.servings,
-          difficulty: result.data.difficulty,
-          cuisine: result.data.cuisine,
-          meal_type: result.data.meal_type,
-          image_url: 'HARDCODED',
-          calories: result.data.calories,
-          protein_g: result.data.protein_g,
-          carbs_g: result.data.carbs_g,
-          fat_g: result.data.fat_g,
+          ...result.data,
+          image_url,
           is_published: result.data.is_published === 'yes',
         },
         t,
-      )
-        .then((recipe) => {
-          void navigate(`/recipe/${recipe.id}`);
-        })
-        .catch((err: unknown) => {
-          if (err instanceof Error) setError(err.message);
-          else setError(t('error.genericError'));
-        })
-        .finally(() => setLoading(false));
+      );
+
+      void navigate(`/recipe/${recipe.id}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError(t('error.genericError'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -240,7 +245,7 @@ const CreateRecipe = () => {
         />
 
         {/* Image Upload */}
-        <input type="file" name="image" accept="image/*" className="w-full" />
+        <input type="file" name="image" accept="image/*" required />
 
         {/* Errors & Warnings */}
         <p className="text-md min-h-5 text-center text-red-500">

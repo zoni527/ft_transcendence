@@ -59,7 +59,7 @@ export const enTranslations = {
     rePassword: 'Confirm password',
     rePasswordPlace: 'Re-enter your password',
     submit: 'Continue',
-    submitPending: 'Signing in',
+    submitPending: 'Signing up',
   },
   createRecipe: {
     header: 'Create recipe',

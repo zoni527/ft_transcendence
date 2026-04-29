@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 const LangDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { i18n } = useTranslation();
-  const [selectedLang, setSelectedLang] = useState(i18n.language);
+  const selectedLang = i18n.resolvedLanguage ?? i18n.language;
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -17,7 +17,6 @@ const LangDropdown = () => {
   // Function to change the language and update the selectedLang state
   const handleLangChange = (lang: string) => {
     void i18n.changeLanguage(lang);
-    setSelectedLang(lang);
     setIsOpen(false);
   };
 

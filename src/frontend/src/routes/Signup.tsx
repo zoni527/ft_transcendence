@@ -21,7 +21,7 @@ const signupSchema = (t: TFunction) =>
         .min(1, t('signupValidation.emailRequired'))
         .email(t('signupValidation.invalidEmail')),
       password: z.string().min(8, t('signupValidation.passwordLen')),
-      confirmPassword: z.string().min(1, t('signupValidation.passwordConfirm')),
+      confirmPassword: z.string().min(8, t('signupValidation.passwordConfirm')),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t('signupValidation.passwordMatch'),

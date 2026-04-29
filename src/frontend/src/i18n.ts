@@ -17,8 +17,8 @@ void i18n
     },
     fallbackLng: 'en',
     detection: {
-      order: ['localStorage', 'cookie', 'querystring', 'navigator'],
-      caches: ['localStorage', 'cookie'],
+      order: ['localStorage', 'querystring', 'navigator'],
+      caches: ['localStorage'],
     },
     interpolation: {
       escapeValue: false,

@@ -28,6 +28,16 @@ export const enTranslations = {
     roles: 'Roles',
     createRecipe: 'Create recipe',
   },
+  footer: {
+    privacy: 'Privacy Policy',
+    terms: 'Terms of Service',
+  },
+  privacyPolicy: {
+    header: 'Privacy Policy',
+  },
+  termsService: {
+    header: 'Terms of Service',
+  },
   login: {
     header: 'Log in',
     email: 'Email',
@@ -132,6 +142,7 @@ export const enTranslations = {
     bannerTitle: 'Recipes worth rising for',
     loading: 'Loading...',
     welcome: 'Welcome',
+    rightsReserved: 'RISE. All Rights Reserved.',
   },
   error: {
     error: 'Error:',

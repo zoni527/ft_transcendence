@@ -51,7 +51,7 @@ const RecipeDetail = () => {
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
       {/* Recipe Image */}
       <img
-        src={`https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/spaghetti_and_meatballs_69603_16x9.jpg`}
+        src={recipe.image_url}
         alt={recipe.title}
         className="mb-8 h-64 w-full rounded object-cover shadow-md md:h-80"
       />

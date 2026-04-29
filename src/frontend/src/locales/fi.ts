@@ -28,6 +28,16 @@ export const fiTranslations = {
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
   },
+  footer: {
+    privacy: 'Tietosuojakäytäntö',
+    terms: 'Käyttöehdot',
+  },
+  privacyPolicy: {
+    header: 'Tietosuojakäytäntö',
+  },
+  termsService: {
+    header: 'Käyttöehdot',
+  },
   login: {
     header: 'Kirjaudu sisään',
     email: 'Sähköposti',
@@ -132,6 +142,7 @@ export const fiTranslations = {
     bannerTitle: 'Reseptejä, joita varten kannattaa herätä',
     loading: 'Ladataan...',
     welcome: 'Tervetuloa',
+    rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
   },
   error: {
     error: 'Virhe:',

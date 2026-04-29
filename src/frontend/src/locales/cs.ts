@@ -28,6 +28,16 @@ export const csTranslations = {
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
   },
+  footer: {
+    privacy: 'Zásady ochrany osobních údajů',
+    terms: 'Podmínky služby',
+  },
+  privacyPolicy: {
+    header: 'Zásady ochrany osobních údajů',
+  },
+  termsService: {
+    header: 'Podmínky služby',
+  },
   login: {
     header: 'Přihlášení',
     email: 'E-mail',
@@ -132,6 +142,7 @@ export const csTranslations = {
     bannerTitle: 'Recepty, které stojí za probuzení',
     loading: 'Načítání...',
     welcome: 'Vítejte',
+    rightsReserved: 'RISE. Všechna práva vyhrazena.',
   },
   error: {
     error: 'Chyba:',

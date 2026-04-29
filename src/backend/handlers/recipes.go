@@ -136,16 +136,16 @@ func LoadCloudinaryVars() error {
 func RecipeImageSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	params := map[string]string{
-		"timestamp":     timestamp,
-		"folder":        "recipes",
+		"timestamp": timestamp,
+		"folder":    "recipes",
 	}
 	signature := generateCloudinarySignature(params)
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"signature":     signature,
-		"api_key":       string(cloudinaryKey),
-		"cloud_name":    string(cloudinaryUser),
-		"timestamp":     timestamp,
-		"folder":        "recipes",
+		"signature":  signature,
+		"api_key":    string(cloudinaryKey),
+		"cloud_name": string(cloudinaryUser),
+		"timestamp":  timestamp,
+		"folder":     "recipes",
 	})
 }
 

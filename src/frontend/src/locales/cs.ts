@@ -77,6 +77,8 @@ export const csTranslations = {
     publish: 'Zveřejnit recept?',
     yes: 'Ano',
     no: 'Ne',
+    uploadImage: 'Nahrát obrázek',
+    noFile: 'Žádný soubor nebyl vybrán',
     submit: 'Odeslat',
     submitPending: 'Odesílám recept',
   },
@@ -124,6 +126,7 @@ export const csTranslations = {
     fieldRequired: '{{field}} je povinné.',
     numRequired: '{{field}} musí být číslo.',
     numMin: '{{field}} musí být alespoň {{value}}.',
+    imageRequired: 'Obrázek je povinný.',
   },
   common: {
     bannerTitle: 'Recepty, které stojí za probuzení',

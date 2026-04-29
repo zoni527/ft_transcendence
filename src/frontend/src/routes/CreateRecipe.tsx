@@ -14,7 +14,7 @@ import {
   getCloudinaryUrl,
 } from '../api';
 import { getStringValue } from '../utils/utils';
-import { cardBase } from '../styles/styles';
+import { cardBase, uploadButtonBase } from '../styles/styles';
 
 // Helper function for checking number fields in the validation schema
 const requiredNumber = (field: string, value: number, t: TFunction) =>
@@ -52,6 +52,7 @@ const createRecipeSchema = (t: TFunction) =>
 const CreateRecipe = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fileName, setFileName] = useState('');
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -71,12 +72,6 @@ const CreateRecipe = () => {
     try {
       const form = e.currentTarget;
       const formData = new FormData(form);
-
-      const image = formData.get('image');
-
-      if (!(image instanceof File) || image.size === 0) {
-        throw new Error(t('error.imageRequired'));
-      }
 
       const schema = createRecipeSchema(t);
 
@@ -98,6 +93,12 @@ const CreateRecipe = () => {
 
       if (!result.success) {
         throw new Error(result.error.issues[0]?.message || t('error.input'));
+      }
+
+      const image = formData.get('image');
+
+      if (!(image instanceof File) || image.size === 0) {
+        throw new Error(t('recValidation.imageRequired'));
       }
 
       const signature = await getCloudinarySignature(t);
@@ -245,7 +246,27 @@ const CreateRecipe = () => {
         />
 
         {/* Image Upload */}
-        <input type="file" name="image" accept="image/*" required />
+        <div className="flex items-center gap-3">
+          {/* Button */}
+          <label className={uploadButtonBase}>
+            📁 {t('createRecipe.uploadImage')}
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                setFileName(file ? file.name : '');
+              }}
+            />
+          </label>
+
+          {/* File name */}
+          <span className="text-sm text-gray-600">
+            {fileName || t('createRecipe.noFile')}
+          </span>
+        </div>
 
         {/* Errors & Warnings */}
         <p className="text-md min-h-5 text-center text-red-500">

@@ -77,6 +77,8 @@ export const enTranslations = {
     publish: 'Publish recipe?',
     yes: 'Yes',
     no: 'No',
+    uploadImage: 'Upload image',
+    noFile: 'No file chosen',
     submit: 'Submit',
     submitPending: 'Submitting recipe',
   },
@@ -124,6 +126,7 @@ export const enTranslations = {
     fieldRequired: '{{field}} is required.',
     numRequired: '{{field}} must be a number.',
     numMin: '{{field}} must be at least {{value}}.',
+    imageRequired: 'Image required.',
   },
   common: {
     bannerTitle: 'Recipes worth rising for',

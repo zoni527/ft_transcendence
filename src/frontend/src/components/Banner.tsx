@@ -8,7 +8,7 @@ const Banner = () => {
 
   return (
     <div
-      className="relative h-100 w-full bg-cover bg-center"
+      className="relative h-96 w-full bg-cover bg-center"
       style={{ backgroundImage: `url(${imgUrl})` }}
     >
       {/* Tint */}

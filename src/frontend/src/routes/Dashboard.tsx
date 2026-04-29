@@ -19,7 +19,7 @@ const Dashboard = () => {
       .then(setUser)
       .catch((err: unknown) => {
         if (err instanceof Error) setError(err.message);
-        else setError(t('genericError'));
+        else setError(t('error.genericError'));
       });
   }, [t]);
 

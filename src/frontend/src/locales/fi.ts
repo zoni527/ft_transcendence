@@ -65,7 +65,7 @@ export const fiTranslations = {
     header: 'Luo resepti',
     title: 'Reseptin nimi',
     titlePlace: 'Syötä reseptin nimi',
-    description: ':Lyhyt kuvaus',
+    description: 'Lyhyt kuvaus',
     descriptionPlace: 'Syötä lyhyt kuvaus',
     prep: 'Valmistusaika (min)',
     prepPlace: 'Syötä valmistusaika minuutteina',

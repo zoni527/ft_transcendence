@@ -32,7 +32,7 @@ export const langButtonBase = `
   transition
   hover:bg-orange-800
   hover:text-white
-  active:scale-95"
+  active:scale-95
 `;
 
 export const navLeftBase = `

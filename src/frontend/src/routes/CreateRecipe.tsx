@@ -22,7 +22,7 @@ const requiredNumber = (field: string, value: number, t: TFunction) =>
     .min(value, t('recValidation.numMin', { field, value }));
 
 // Validation schema
-const createRecipechema = (t: TFunction) =>
+const createRecipeSchema = (t: TFunction) =>
   z.object({
     title: z.string().min(1, t('recValidation.recipeNameRequired')),
     description: z.string().min(1, t('recValidation.descriptionRequired')),
@@ -62,7 +62,7 @@ const CreateRecipe = () => {
     const formData = new FormData(form);
 
     // Input validation
-    const schema = createRecipechema(t);
+    const schema = createRecipeSchema(t);
 
     const result = schema.safeParse({
       title: getStringValue(formData, 'title'),

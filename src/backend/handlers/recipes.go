@@ -108,7 +108,7 @@ func DeleteRecipe(c *gin.Context) {
 }
 
 func UploadRecipeImage(c *gin.Context) {
-	// TODO: call repository.DeleteRecipe()
+	// TODO: call repository.UploadRecipeImage()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 

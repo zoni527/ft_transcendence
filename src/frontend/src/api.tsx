@@ -298,7 +298,7 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   }
 };
 
-// GET /api/recipes/image-signature (gets a UploadConfif for Cloudinary)
+// GET /api/recipes/image-signature (gets an UploadConfig for Cloudinary)
 export const getCloudinarySignature = async (
   t: TFunction,
 ): Promise<CloudinaryUploadConfig> => {

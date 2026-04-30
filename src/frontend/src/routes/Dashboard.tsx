@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
-import NavLink from '../components/NavLink';
+import NavButton from '../components/NavButton';
 import StatusBox from '../components/StatusBox';
 import { getUser } from '../api';
 import type { User } from '../types/types';
@@ -76,9 +76,9 @@ const Dashboard = () => {
             value={user.roles.join(', ')}
           />
         </div>
-        <NavLink to="/create" className={`${buttonBase}`}>
+        <NavButton to="/create" className={`${buttonBase}`}>
           {t('dashboard.createRecipe')}
-        </NavLink>
+        </NavButton>
       </div>
     </div>
   );

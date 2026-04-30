@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import LangDropdown from './LangDropDown';
-import NavLink from './NavLink';
+import NavButton from './NavButton';
 import { cardBase, buttonBase, navLeftBase } from '../styles/styles';
 
 const Navbar = () => {
@@ -12,22 +12,22 @@ const Navbar = () => {
     >
       {/* Left Side */}
       <div className="flex gap-6 text-xl font-semibold">
-        <NavLink to="/" className={`${navLeftBase}`}>
+        <NavButton to="/" className={`${navLeftBase}`}>
           {t('nav.recipes')}
-        </NavLink>
-        <NavLink to="/dashboard" className={`${navLeftBase}`}>
+        </NavButton>
+        <NavButton to="/dashboard" className={`${navLeftBase}`}>
           {t('nav.dashboard')}
-        </NavLink>
+        </NavButton>
       </div>
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
-        <NavLink to="/signup" className={`${buttonBase}`}>
+        <NavButton to="/signup" className={`${buttonBase}`}>
           {t('nav.signup')}
-        </NavLink>
-        <NavLink to="/login" className={`${buttonBase}`}>
+        </NavButton>
+        <NavButton to="/login" className={`${buttonBase}`}>
           {t('nav.login')}
-        </NavLink>
+        </NavButton>
         <LangDropdown />
       </div>
     </nav>

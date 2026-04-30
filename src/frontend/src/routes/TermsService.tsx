@@ -16,12 +16,12 @@ const TermsService = () => {
       <div className="bg-surface-bright mt-10 rounded-xl border border-stone-300 p-6 md:p-10">
         {/* Intro */}
         <div className="flex justify-center py-6 md:py-10">
-          <h1
+          <p
             style={{ fontFamily: 'Newsreader' }}
             className="text-text-secondary max-w-2xl text-center text-lg leading-relaxed md:text-2xl"
           >
             {t('termsService.intro')}
-          </h1>
+          </p>
         </div>
 
         {/* Sections */}

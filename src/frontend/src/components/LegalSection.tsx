@@ -16,16 +16,19 @@ const LegalSection = ({ title, text }: LegalSectionProps) => {
       </h2>
 
       <div className="text-text-secondary mt-3 space-y-3 text-sm leading-relaxed md:text-lg">
-        {text.split('\n').map((line, i) => (
-          <p
-            style={{
-              fontFamily: 'Newsreader',
-            }}
-            key={i}
-          >
-            {line}
-          </p>
-        ))}
+        {text
+          .split('\n')
+          .filter((line) => line.trim() !== '')
+          .map((line, i) => (
+            <p
+              style={{
+                fontFamily: 'Newsreader',
+              }}
+              key={i}
+            >
+              {line}
+            </p>
+          ))}
       </div>
     </section>
   );

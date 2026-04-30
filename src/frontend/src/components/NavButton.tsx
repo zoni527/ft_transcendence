@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
-interface NavLinkProps {
+interface NavButtonProps {
   to: string;
   children: ReactNode;
   className: string;
 }
 
-const NavLink = ({ to, className, children }: NavLinkProps) => {
+const NavButton = ({ to, className, children }: NavButtonProps) => {
   return (
     <Link to={to} className={className}>
       {children}
@@ -15,4 +15,4 @@ const NavLink = ({ to, className, children }: NavLinkProps) => {
   );
 };
 
-export default NavLink;
+export default NavButton;

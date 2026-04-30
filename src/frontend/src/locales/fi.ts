@@ -37,6 +37,67 @@ export const fiTranslations = {
   },
   termsService: {
     header: 'Käyttöehdot',
+
+    terms_intro: `Tervetuloa RISE-palveluun.
+      Käyttämällä reseptien jakamiseen tarkoitettua alustaamme hyväksyt nämä käyttöehdot ("ehdot").
+      Lue ehdot huolellisesti.`,
+
+    section1_title: '1. Ehtojen hyväksyminen',
+    section1_text: `Luomalla tilin tai käyttämällä RISE-palvelua hyväksyt nämä ehdot sekä tietosuojakäytäntömme.
+      Jos et hyväksy ehtoja, älä käytä palvelua.`,
+
+    section2_title: '2. Käyttöoikeus',
+    section2_text: `Sinun on oltava vähintään 13-vuotias käyttääksesi RISE-palvelua.
+      Jos olet alle 18-vuotias, vanhempasi tai huoltajasi tulee hyväksyä nämä ehdot puolestasi.`,
+
+    section3_title: '3. Tilisi',
+    section3_text: `Anna rekisteröityessäsi oikeat ja ajantasaiset tiedot.
+      Pidä salasanasi luottamuksellisena ja turvallisena.
+      Olet vastuussa kaikesta tililläsi tapahtuvasta toiminnasta.`,
+
+    section4_title: '4. Sisältösi',
+    section4_text: `Säilytät omistusoikeuden lataamiisi resepteihin, kuviin ja kommentteihin.
+      Antamalla sisältöä myönnät meille maailmanlaajuisen, ei-yksinomaisen ja rojaltivapaan lisenssin näyttää, tallentaa ja jakaa sisältöä palvelussa.
+
+      Et saa julkaista sisältöä, joka:
+      - rikkoo lakia tai kolmansien osapuolten oikeuksia
+      - sisältää vihapuhetta tai häirintää
+      - vääristää ainesosia tai jättää ilmoittamatta allergeeneja
+      - edistää vaarallisia ruoan käsittelytapoja`,
+
+    section5_title: '5. Sallittu käyttö',
+    section5_text: `Käyttäjät EIVÄT saa:
+      - kerätä tai kopioida sisältöä laajamittaisesti ilman lupaa
+      - yrittää murtaa palvelun tai muiden käyttäjien turvallisuutta
+      - tehdä vääriä ilmoituksia tai väärinkäyttää moderointia
+      - esiintyä toisena henkilönä tai organisaationa
+      - lähettää roskapostia tai haittaohjelmia
+      - käänteismallintaa tai häiritä palvelun toimintaa`,
+
+    section6_title: '6. Immateriaalioikeudet',
+    section6_text: `RISE-nimi, logo, käyttöliittymä ja lähdekoodi kuuluvat RISE-tiimille.
+      Niitä ei saa kopioida tai käyttää ilman kirjallista lupaa.
+      Yhteisön reseptit kuuluvat niiden tekijöille.`,
+
+    section7_title: '7. Tilin päättäminen',
+    section7_text: `Voimme jäädyttää tai sulkea tilejä, jotka rikkovat näitä ehtoja.
+      Voit poistaa tilisi milloin tahansa asetuksista, jolloin tietosi poistetaan tietosuojakäytäntömme mukaisesti.`,
+
+    section8_title: '8. Vastuuvapauslauseke',
+    section8_text: `Reseptit tarjoavat käyttäjät sellaisenaan.
+      RISE ei tarkista ravintoarvoja, allergeeneja tai turvallisuustietoja.
+      Valmista ruokaa vastuullisesti ja tarvittaessa konsultoi asiantuntijaa.`,
+
+    section9_title: '9. Vastuunrajoitus',
+    section9_text: `Sovellettavan lain sallimissa rajoissa RISE ei ole vastuussa epäsuorista tai välillisistä vahingoista.`,
+
+    section10_title: '10. Ehtojen muutokset',
+    section10_text: `Voimme päivittää näitä ehtoja.
+      Palvelun jatkokäyttö tarkoittaa muutosten hyväksymistä.`,
+
+    section11_title: '11. Sovellettava laki',
+    section11_text: `Näihin ehtoihin sovelletaan Suomen lakia.
+      Riidat ratkaistaan Suomen tuomioistuimissa.`,
   },
   login: {
     header: 'Kirjaudu sisään',

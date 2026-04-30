@@ -37,74 +37,66 @@ export const enTranslations = {
   },
   termsService: {
     header: 'Terms of Service',
-    terms_intro:
-      'Welcome to rise. By using our recipe-sharing platform, you agree to these Terms of Service ("Terms"). Please read them carefully.',
+    terms_intro: `Welcome to RISE.
+      By using our recipe-sharing platform, you agree to these Terms of Service ("Terms").
+      Please read them carefully.`,
 
-    acceptance_title: '1. Acceptance of these Terms',
-    acceptance_text:
-      'By creating an account or otherwise using RISE, you accept these Terms and our Privacy Policy. If you do not agree, please do not use the service.',
+    section1_title: '1. Acceptance of these Terms',
+    section1_text: `By creating an account or otherwise using RISE, you accept these Terms and our Privacy Policy.
+      If you do not agree, please do not use the service.`,
 
-    eligibility_title: '2. Eligibility',
-    eligibility_text:
-      'You must be at least 13 years old to use RISE. If you are under 18, your parent or guardian must read and agree to these Terms on your behalf.',
+    section2_title: '2. Eligibility',
+    section2_text: `You must be at least 13 years old to use RISE.
+      If you are under 18, your parent or guardian must read and agree to these Terms on your behalf.`,
 
-    account_title: '3. Your account',
-    account_items_0:
-      'Provide accurate and current information when registering.',
-    account_items_1: 'Keep your password confidential and secure.',
-    account_items_2:
-      'You are responsible for all activity that occurs under your account.',
-    account_items_3: 'Notify us immediately of any unauthorised access.',
+    section3_title: '3. Your account',
+    section3_text: `Provide accurate and current information when registering.
+      Keep your password confidential and secure.
+      You are responsible for all activity that occurs under your account.`,
 
-    content_title: '4. Your content',
-    content_text:
-      'You retain ownership of recipes, photos, comments, and other content you upload to RISE. By posting, you grant us a worldwide, non-exclusive, royalty-free licence to display, reproduce, and distribute your content within the platform and its features (search, recommendations, social sharing).',
-    content_items_0:
-      'Violate any law or third-party rights, including copyright.',
-    content_items_1:
-      'Contain hate speech, harassment, or content harmful to others.',
-    content_items_2: 'Misrepresent ingredients or omit allergen information.',
-    content_items_3: 'Promote unsafe food-handling practices.',
+    section4_title: '4. Your content',
+    section4_text: `You retain ownership of the recipes, photos, comments, and other content you upload to RISE.
+      By posting content, you grant us a worldwide, non-exclusive, royalty-free licence to display, reproduce, and distribute it within the platform and its features.
 
-    acceptable_title: '5. Acceptable use',
-    acceptable_items_0:
-      'Scrape or copy content at scale without written permission.',
-    acceptable_items_1:
-      'Attempt to compromise the security of the service or other accounts.',
-    acceptable_items_2: 'Submit false reports or abuse moderation tools.',
-    acceptable_items_3: 'Impersonate any person or organisation.',
-    acceptable_items_4:
-      'Send spam, advertise without consent, or distribute malware.',
-    acceptable_items_5:
-      'Reverse-engineer or interfere with the operation of the service.',
+      You agree not to upload content that:
+      - violates any law or third-party rights, including copyright
+      - contains hate speech, harassment, or content harmful to others
+      - misrepresents ingredients or omits allergen information
+      - promotes unsafe food-handling practices.`,
 
-    ip_title: '6. Intellectual property',
-    ip_text:
-      'The RISE name, logo, design system, and underlying source code are owned by the RISE team. You may not copy, modify, or reuse them without our prior written permission. Community-contributed recipes remain the property of their authors.',
+    section5_title: '5. Accepted use',
+    section5_text: `Users must NOT engage in following activities:
+      - scrape or copy content at scale without written permission.
+      - attempt to compromise the security of the service or other accounts.
+      - submit false reports or abuse moderation tools.
+      - impersonate any person or organisation.
+      - send spam, advertise without consent, or distribute malware.
+      - reverse-engineer or interfere with the operation of the service.`,
 
-    termination_title: '7. Termination',
-    termination_text:
-      'We may suspend or terminate accounts that violate these Terms. You may delete your account at any time from your settings; doing so will remove your personal data in accordance with our Privacy Policy.',
+    section6_title: '6. Intellectual property',
+    section6_text: `The RISE name, logo, design system, and underlying source code are owned by the RISE team.
+      You may not copy, modify, or reuse them without our prior written permission.
+      Community-contributed recipes remain the property of their authors.`,
 
-    disclaimers_title: '8. Disclaimers',
-    disclaimers_text:
-      'Recipes are provided "as is" by community members. RISE does not verify the accuracy of nutritional information, allergens, or food-safety claims. Cook responsibly and consult a qualified professional for dietary, medical, or allergy concerns.',
+    section7_title: '7. Termination',
+    section7_text: `We may suspend or terminate accounts that violate these Terms.
+      You may delete your account at any time from your settings; doing so will remove your personal data in accordance with our Privacy Policy.`,
 
-    liability_title: '9. Limitation of liability',
-    liability_text:
-      'To the fullest extent permitted by law, RISE and its contributors are not liable for indirect, incidental, special, or consequential damages arising from your use of the service.',
+    section8_title: '8. Disclaimers',
+    section8_text: `Recipes are provided "as is" by community members.
+      RISE does not verify the accuracy of nutritional information, allergens, or food-safety claims.
+      Cook responsibly and consult a qualified professional for dietary, medical, or allergy concerns.`,
 
-    changes_title: '10. Changes to these Terms',
-    changes_text:
-      'We may update these Terms from time to time. Continued use of the service after changes take effect constitutes acceptance of the updated Terms.',
+    section9_title: '9. Limitation of liability',
+    section9_text: `To the fullest extent permitted by law, RISE and its contributors are not liable for indirect, incidental, special, or consequential damages arising from your use of the service.`,
 
-    law_title: '11. Governing law',
-    law_text:
-      'These Terms are governed by the laws of France. Any disputes will be resolved in the competent courts of Paris, France.',
+    section10_title: '10. Changes to these Terms',
+    section10_text: `We may update these Terms from time to time.
+      Continued use of the service after changes take effect constitutes acceptance of the updated Terms.`,
 
-    contact_title: '12. Contact',
-    contact_text:
-      'Questions about these Terms can be sent via the Contact page.',
+    section11_title: '11. Governing law',
+    section11_text: `These Terms are governed by the laws of Finland.
+      Any disputes will be resolved in the competent courts of Finland.`,
   },
   login: {
     header: 'Log in',

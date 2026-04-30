@@ -5,7 +5,7 @@
 -- USERS
 -- =====================
 
--- done: replace plaintext passwords with bcrypt hashes when auth is implemented - password:12345678
+-- done: plaintext seed passwords were replaced with bcrypt hashes
 INSERT INTO "user" (email, password_hash, name, display_name) VALUES
     ('alice@test.com', '$2a$10$8itNfZYoxGTax6bH88u1S.Y5Lb0FycCXLMFPR0Ws2NkQWM8hI83su', 'Alice Smith', 'alice'),
     ('bob@test.com', '$2a$10$eOL1lNs3wsyncOqXHyofg.pZMH.R/6lqDcV0/prDyF38hI3OZ5D6O', 'Bob Jones', 'bobby'),

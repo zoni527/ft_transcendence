@@ -1,8 +1,35 @@
 services:
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    image: transcendence_frontend:dev_1.0
+    pull_policy: build
+    volumes:
+      - ./frontend/src:/app/src
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+
+  reverse_proxy:
+    container_name: reverse_proxy
+    image: nginx:1.29.8-alpine
+    volumes:
+      - ./reverse_proxy/templates:/etc/nginx/templates
+    ports:
+      - "127.0.0.1:8080:80"
+    environment:
+      - NGINX_PORT=80
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+
   backend:
     container_name: backend
-    build:
-      context: backend
+    build: ./backend
     image: transcendence_backend:dev_1.0
     pull_policy: build
     environment:
@@ -13,28 +40,10 @@ services:
       CLOUDINARY_KEY: ${CLOUDINARY_KEY}
     networks:
       - transcendence_network
-    ports:
-      - 127.0.0.1:8080:8080
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
-
-  frontend:
-    container_name: frontend
-    build:
-      context: frontend
-    image: transcendence_frontend:dev_1.0
-    pull_policy: build
-    volumes:
-      - type: bind
-        source: ./frontend/src
-        target: /app/src
-    networks:
-      - transcendence_network
-    ports:
-      - 127.0.0.1:5173:5173
-    restart: unless-stopped
 
   postgres:
     container_name: postgres
@@ -48,8 +57,8 @@ services:
       - ./database/migrations:/docker-entrypoint-initdb.d
     networks:
       - transcendence_network
-    ports:
-      - 127.0.0.1:5433:5432
+    expose:
+      - "5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s

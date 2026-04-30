@@ -11,7 +11,7 @@ const TermsService = () => {
   return (
     <div className={`${cardBase} mt-8 p-6 md:p-8`}>
       {/* Header */}
-      <FormHeader title={t('termsService.header')} />
+      <FormHeader title={t('footer.terms')} />
 
       <div className="bg-surface-bright mt-10 rounded-xl border border-stone-300 p-6 md:p-10">
         {/* Intro */}
@@ -20,7 +20,7 @@ const TermsService = () => {
             style={{ fontFamily: 'Newsreader' }}
             className="text-text-secondary max-w-2xl text-center text-lg leading-relaxed md:text-2xl"
           >
-            {t('termsService.terms_intro')}
+            {t('termsService.intro')}
           </h1>
         </div>
 

@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------- #
-all:
+all: env_validation
 	docker compose --file ./src/compose.yaml up --detach
 
 clean:
@@ -12,12 +12,14 @@ fclean: clean
 dbclean:
 	docker compose --file ./src/compose.yaml down -v
 
-
 re: fclean all
-
+# ---------------------------------------------------------------------------- #
 # this rule check if files can be compiled without spitting out any executable file 
-check:
+check_backend:
 	cd src/backend && go build ./...
+
+env_validation:
+	@./scripts/env_validation.sh
 
 up: all
 
@@ -25,5 +27,5 @@ down: clean
 
 nuke: fclean dbclean
 # ---------------------------------------------------------------------------- #
-.PHONY: all clean fclean dbclean re check up down nuke
+.PHONY: all clean fclean dbclean re check_backend can_start up down nuke
 # ---------------------------------------------------------------------------- #

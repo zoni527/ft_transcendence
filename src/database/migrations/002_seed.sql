@@ -5,13 +5,13 @@
 -- USERS
 -- =====================
 
--- TODO: replace plaintext passwords with bcrypt hashes when auth is implemented
+-- done: plaintext seed passwords were replaced with bcrypt hashes
 INSERT INTO "user" (email, password_hash, name, display_name) VALUES
-    ('alice@test.com', 'hash001', 'Alice Smith', 'alice'),
-    ('bob@test.com', 'hash002', 'Bob Jones', 'bobby'),
-    ('charlie@test.com', 'hash003', 'Charlie Brown', 'charlie'),
-    ('diana@test.com', 'hash004', 'Diana Prince', 'wonder_di'),
-    ('eve@test.com', 'hash005', 'Eve Taylor', 'evee');
+    ('alice@test.com', '$2a$10$8itNfZYoxGTax6bH88u1S.Y5Lb0FycCXLMFPR0Ws2NkQWM8hI83su', 'Alice Smith', 'alice'),
+    ('bob@test.com', '$2a$10$eOL1lNs3wsyncOqXHyofg.pZMH.R/6lqDcV0/prDyF38hI3OZ5D6O', 'Bob Jones', 'bobby'),
+    ('charlie@test.com', '$2a$10$rHjQ4lhx4ADVZZFn7s09VeS5ACXRIpJT8uIJqHCHZuwIzO9Z3POny', 'Charlie Brown', 'charlie'),
+    ('diana@test.com', '$2a$10$97upNVAA7dZtvC5HldOA9ej6kqHSoqRGrjSfhKPEQikswTlUY.twa', 'Diana Prince', 'wonder_di'),
+    ('eve@test.com', '$2a$10$fQ75Z8j00RiA6me0/DshI.YvkEYGZlpx6PwqJ1Xmym5TuCOyNayry', 'Eve Taylor', 'evee');
 
 -- =====================
 -- ROLES & PERMISSIONS
@@ -94,15 +94,15 @@ INSERT INTO ingredient (name, category_id, default_unit) VALUES
 -- RECIPES
 -- =====================
 
-INSERT INTO recipe (author_id, title, description, prep_time_min, cook_time_min, servings, difficulty, cuisine, meal_type, calories, protein_g, carbs_g, fat_g, is_published) VALUES
+INSERT INTO recipe (author_id, title, description, prep_time_min, cook_time_min, servings, difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g, is_published) VALUES
     ((SELECT id FROM "user" WHERE email = 'alice@test.com'),
-     'Pasta Carbonara', 'Classic Roman pasta with eggs, cheese, and pancetta', 10, 20, 4, 'medium', 'Italian', 'dinner', 550, 25.0, 60.0, 22.0, true),
+     'Pasta Carbonara', 'Classic Roman pasta with eggs, cheese, and pancetta', 10, 20, 4, 'medium', 'Italian', 'dinner', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539163/ko9mymntptndrupaw8ib.jpg', 550, 25.0, 60.0, 22.0, true),
     ((SELECT id FROM "user" WHERE email = 'bob@test.com'),
-     'Chicken Fried Rice', 'Quick and easy weeknight fried rice', 15, 15, 2, 'easy', 'Asian', 'dinner', 450, 30.0, 55.0, 12.0, true),
+     'Chicken Fried Rice', 'Quick and easy weeknight fried rice', 15, 15, 2, 'easy', 'Asian', 'dinner', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539232/pkxfz0nto6t4kzfgys4q.jpg', 450, 30.0, 55.0, 12.0, true),
     ((SELECT id FROM "user" WHERE email = 'charlie@test.com'),
-     'Garlic Tomato Bruschetta', 'Simple Italian appetizer with fresh tomatoes', 15, 5, 4, 'easy', 'Italian', 'snack', 180, 4.0, 22.0, 8.0, true),
+     'Garlic Tomato Bruschetta', 'Simple Italian appetizer with fresh tomatoes', 15, 5, 4, 'easy', 'Italian', 'snack', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539266/dxssmqprpxhsgyxjupql.jpg', 180, 4.0, 22.0, 8.0, true),
     ((SELECT id FROM "user" WHERE email = 'alice@test.com'),
-     'Draft Pasta Salad', 'Work in progress recipe', 20, 10, 6, 'easy', 'Italian', 'lunch', 300, 10.0, 40.0, 12.0, false);
+     'Draft Pasta Salad', 'Work in progress recipe', 20, 10, 6, 'easy', 'Italian', 'lunch', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539308/uof4c0bvl1kb6csvchdn.jpg', 300, 10.0, 40.0, 12.0, false);
 
 -- =====================
 -- RECIPE STEPS

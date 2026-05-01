@@ -19,7 +19,8 @@ export const csTranslations = {
     protein: 'Bílkoviny (g)',
     carbs: 'Sacharidy (g)',
     fat: 'Tuky (g)',
-    deleteRecipe: 'Smazat recept',
+    submit: 'Smazat recept',
+    submitPending: 'Mažu recept...',
   },
   dashboard: {
     username: 'Uživatelské jméno',
@@ -158,7 +159,7 @@ export const csTranslations = {
     password: 'Heslo',
     passwordPlace: 'Zadejte své heslo',
     submit: 'Pokračovat',
-    submitPending: 'Přihlašování',
+    submitPending: 'Přihlašování...',
   },
   signup: {
     header: 'Registrovat se',
@@ -173,7 +174,7 @@ export const csTranslations = {
     rePassword: 'Potvrďte heslo',
     rePasswordPlace: 'Zadejte své heslo znovu',
     submit: 'Pokračovat',
-    submitPending: 'Vytváření účtu',
+    submitPending: 'Vytváření účtu...',
   },
   createRecipe: {
     header: 'Vytvořit recept',
@@ -203,7 +204,7 @@ export const csTranslations = {
     uploadImage: 'Nahrát obrázek',
     noFile: 'Žádný soubor nebyl vybrán',
     submit: 'Odeslat',
-    submitPending: 'Odesílám recept',
+    submitPending: 'Odesílám recept...',
   },
   difficulty: {
     type: 'Obtížnost',

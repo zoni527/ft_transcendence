@@ -19,7 +19,8 @@ export const enTranslations = {
     protein: 'Protein (g)',
     carbs: 'Carbohydrates (g)',
     fat: 'Fat (g)',
-    deleteRecipe: 'Delete recipe',
+    submit: 'Delete recipe',
+    submitPending: 'Deleting recipe...',
   },
   dashboard: {
     username: 'Username',
@@ -159,7 +160,7 @@ export const enTranslations = {
     password: 'Password',
     passwordPlace: 'Enter your password',
     submit: 'Continue',
-    submitPending: 'Logging in',
+    submitPending: 'Logging in...',
   },
   signup: {
     header: 'Sign up',
@@ -174,7 +175,7 @@ export const enTranslations = {
     rePassword: 'Confirm password',
     rePasswordPlace: 'Re-enter your password',
     submit: 'Continue',
-    submitPending: 'Signing up',
+    submitPending: 'Signing up...',
   },
   createRecipe: {
     header: 'Create recipe',
@@ -204,7 +205,7 @@ export const enTranslations = {
     uploadImage: 'Upload image',
     noFile: 'No file chosen',
     submit: 'Submit',
-    submitPending: 'Submitting recipe',
+    submitPending: 'Submitting recipe...',
   },
   difficulty: {
     type: 'Difficulty',

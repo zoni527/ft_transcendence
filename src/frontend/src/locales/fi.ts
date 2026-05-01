@@ -19,7 +19,8 @@ export const fiTranslations = {
     protein: 'Proteiini (g)',
     carbs: 'Hiilihydraatit (g)',
     fat: 'Rasva (g)',
-    deleteRecipe: 'Poista resepti',
+    submit: 'Poista resepti',
+    submitPending: 'Poistetaan reseptiä...',
   },
   dashboard: {
     username: 'Käyttäjätunnus',
@@ -159,7 +160,7 @@ export const fiTranslations = {
     password: 'Salasana',
     passwordPlace: 'Syötä salasana',
     submit: 'Jatka',
-    submitPending: 'Kirjaudutaan sisään',
+    submitPending: 'Kirjaudutaan sisään...',
   },
   signup: {
     header: 'Rekisteröidy',
@@ -174,7 +175,7 @@ export const fiTranslations = {
     rePassword: 'Vahvista salasana',
     rePasswordPlace: 'Syötä salasana uudelleen',
     submit: 'Jatka',
-    submitPending: 'Rekisteröintiä käsitellään',
+    submitPending: 'Rekisteröintiä käsitellään...',
   },
   createRecipe: {
     header: 'Luo resepti',
@@ -204,7 +205,7 @@ export const fiTranslations = {
     uploadImage: 'Lataa kuva',
     noFile: 'Ei tiedostoa valittu',
     submit: 'Lähetä',
-    submitPending: 'Lähetetään reseptiä',
+    submitPending: 'Lähetetään reseptiä...',
   },
   difficulty: {
     type: 'Vaikeusaste',

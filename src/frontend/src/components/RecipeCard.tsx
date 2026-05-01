@@ -12,7 +12,7 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
   return (
     <div
       onClick={() =>
-        void navigate(`/recipe/${recipe.id}`, { state: { recipe } })
+        void navigate(`/recipes/${recipe.id}`, { state: { recipe } })
       }
       className={`${cardBase} ${cardHighlight} flex w-full flex-col`}
     >

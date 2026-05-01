@@ -1,22 +1,43 @@
 import { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
-import NavButton from '../components/NavButton';
 import StatusBox from '../components/StatusBox';
-import { getRecipeById } from '../api';
+import { getRecipeById, deleteRecipe } from '../api';
 import type { Recipe } from '../types/types';
-import { cardBase, buttonBase } from '../styles/styles';
+import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { state } = useLocation() as { state?: { recipe?: Recipe } };
   const [recipe, setRecipe] = useState<Recipe | null>(state?.recipe ?? null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const cachedRecipe = state?.recipe;
-  const loading = !recipe && !error;
+
+  const handleDelete = (id: string) => {
+    if (loading) return;
+    if (!id) {
+      setError('Missing recipe id');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    deleteRecipe(id, t)
+      .then(() => {
+        void navigate('/dashboard');
+      })
+      .catch((err: unknown) => {
+        if (err instanceof Error) setError(err.message);
+        else setError(t('error.genericError'));
+      })
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
     if (!id || cachedRecipe) return;
@@ -36,10 +57,6 @@ const RecipeDetail = () => {
         className="text-red-500"
       />
     );
-  }
-
-  if (loading) {
-    return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
   if (!recipe) {
@@ -137,9 +154,11 @@ const RecipeDetail = () => {
           </svg>
         </button>
       </div>
-      <NavButton path="/create" className={`${buttonBase} mt-16`}>
-        {t('recipeDetail.deleteRecipe')}
-      </NavButton>
+
+      {/* Delete Button */}
+      <button onClick={() => handleDelete(id!)} disabled={loading}>
+        {loading ? t('loading') : t('delete')}
+      </button>
     </div>
   );
 };

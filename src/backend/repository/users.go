@@ -7,7 +7,6 @@ package repository
 
 // [TODO] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
 // [TODO] UpdateUser        — PUT /api/users/:id (full replace)
-// [TODO] UpdateUser        — PATCH /api/users/:id (partial update)
 // [TODO] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
 // [TODO] Add pagination (?page=1&limit=20) to GetAllUsers

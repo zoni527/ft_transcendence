@@ -181,29 +181,6 @@ Replace a user completely. All fields are required.
 
 ---
 
-### PATCH /api/users/:id
-
-Partially update a user. Only include the fields you want to change.
-
-**Request body (all fields optional):**
-```json
-{
-  "email": "new@example.com",
-  "name": "New Name",
-  "display_name": "new_display"
-}
-```
-
-**Response** `200 OK` — returns the updated user.
-
-**Errors:**
-| Status | When |
-|---|---|
-| 400 | Invalid data |
-| 404 | User not found |
-
----
-
 ### DELETE /api/users/:id
 
 Delete a user. Cascades: removes their roles and favourites. Recipes they authored keep existing with `author_id` set to NULL.
@@ -410,20 +387,6 @@ Replace a recipe completely. All fields are required.
 
 ---
 
-### PATCH /api/recipes/:id
-
-Partially update a recipe. Only include the fields you want to change.
-
-**Response** `200 OK` — returns the updated recipe.
-
-**Errors:**
-| Status | When |
-|---|---|
-| 400 | Invalid data |
-| 404 | Recipe not found |
-
----
-
 ### DELETE /api/recipes/:id
 
 Delete a recipe. Cascades: removes its steps, ingredients, and favourites.
@@ -587,14 +550,12 @@ Get all recipes a user has favourited.
 | GET /api/users/search?q= | TODO |
 | POST /api/users | TODO |
 | PUT /api/users/:id | TODO |
-| PATCH /api/users/:id | TODO |
 | DELETE /api/users/:id | TODO |
 | GET /api/recipes | done |
 | GET /api/recipes/:id | done |
 | POST /api/recipes | TODO |
 | POST /api/recipes/:id/image | TODO |
 | PUT /api/recipes/:id | TODO |
-| PATCH /api/recipes/:id | TODO |
 | DELETE /api/recipes/:id | TODO |
 | GET /api/ingredients | TODO |
 | POST /api/ingredients | TODO |

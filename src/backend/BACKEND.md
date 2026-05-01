@@ -140,7 +140,7 @@ func CreateUser(u user) (user, error) {
 
 | Code | Constant                          | When to use                              |
 |------|-----------------------------------|------------------------------------------|
-| 200  | `http.StatusOK`                   | Success (GET, PATCH)                     |
+| 200  | `http.StatusOK`                   | Success (GET, PUT)                       |
 | 201  | `http.StatusCreated`              | Successfully created a resource (POST)   |
 | 400  | `http.StatusBadRequest`           | User sent invalid/missing data           |
 | 404  | `http.StatusNotFound`             | Resource doesn't exist (wrong ID, etc.)  |

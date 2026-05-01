@@ -556,7 +556,7 @@ Get all recipes a user has favourited.
 | POST /api/recipes | TODO |
 | POST /api/recipes/:id/image | TODO |
 | PUT /api/recipes/:id | TODO |
-| DELETE /api/recipes/:id | TODO |
+| DELETE /api/recipes/:id | done |
 | GET /api/ingredients | TODO |
 | POST /api/ingredients | TODO |
 | GET /api/ingredient-categories | TODO |

@@ -17,11 +17,12 @@ env_vars="\
 "
 
 for v in ${env_vars}; do
-	if ! grep -q "${v}=" ./src/.env; then
+	match="$(grep -E "^[[:space:]]*${v}=" ./src/.env | head -n 1)"
+	if [ -z "${match}" ]; then
 		echo "${v} is missing from src/.env"
 		exit 1
 	fi
-	if [ ! -n "$(grep ${v} ./src/.env | cut -d '=' -f 2)" ]; then
+	if [ ! -n "$(printf '%s' "${match}" | cut -d '=' -f 2-)" ]; then
 		echo "${v} is not defined"
 		exit 1
 	fi

@@ -97,13 +97,51 @@ func UpdateRecipe(c *gin.Context) {
 }
 
 func DeleteRecipe(c *gin.Context) {
-	id := c.Param("id")
-	if !isValidUUID(id) {
+	recipeId := c.Param("id")
+	if !isValidUUID(recipeId) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
-	if err := repository.DeleteRecipe(id); err != nil {
+	userId := c.GetString("userID")
+	if !isValidUUID(userId) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	roles, err := repository.GetRolesByUserId(userId)
+	if err != nil {
+		log.Printf("handlers.DeleteRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	isModeratorOrAdmin := false
+	for _, r := range roles {
+		if r == "moderator" || r == "admin" {
+			isModeratorOrAdmin = true
+			break
+		}
+	}
+	if !isModeratorOrAdmin { // Check if client is the author of the recipe
+		recipe, err := repository.GetRecipeById(recipeId)
+		if err != nil {
+			var ue *repository.UserError
+			if errors.As(err, &ue) {
+				c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+				return
+			}
+			log.Printf("handlers.DeleteRecipe: %v", err)
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"error": "internal server error",
+			})
+			return
+		}
+		if userId != recipe.Author_id {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "can't delete this recipe"})
+			return
+		}
+	}
+
+	if err := repository.DeleteRecipe(recipeId); err != nil {
 		var ue *repository.UserError
 		if errors.As(err, &ue) {
 			c.IndentedJSON(http.StatusNotFound, gin.H{"error": ue.Error()})

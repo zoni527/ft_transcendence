@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 const imgUrl: string =
-  'https://media.hellofresh.com/q_100,w_3840,f_auto,c_limit,fl_auto/hellofresh_website/recipe-developers/assets/recipe_dev_hero_redesign_header.jpg';
+  'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777481532/ypcjju1if4bcgsumx0vu.webp';
 
 const Banner = () => {
   const { t } = useTranslation();

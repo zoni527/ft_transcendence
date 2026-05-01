@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import LangButton from './LangButton';
 import { useTranslation } from 'react-i18next';
+import { navLeftBase } from '../styles/styles';
 
 const LangDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +45,7 @@ const LangDropdown = () => {
     <div className="relative z-20" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className={`text-md flex items-center gap-2 rounded-md px-4 py-2 font-bold text-orange-700 hover:cursor-pointer`}
+        className={`${navLeftBase} text-md flex items-center gap-2 rounded-md px-4 py-2 font-bold`}
       >
         <span>{selectedLang.toUpperCase()}</span>{' '}
         <svg

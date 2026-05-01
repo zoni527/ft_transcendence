@@ -40,6 +40,18 @@ interface LoginSignupResponse {
   authenticated: boolean;
 }
 
+export interface CloudinaryUploadConfig {
+  signature: string;
+  api_key: string;
+  cloud_name: string;
+  timestamp: string;
+  folder: string;
+}
+
+export interface CloudinaryResponse {
+  secure_url: string;
+}
+
 const baseUrl = 'http://localhost:8080/api';
 
 // Validation for CreateRecipeResponse
@@ -86,6 +98,36 @@ function isLoginSignupResponse(data: unknown): data is LoginSignupResponse {
     typeof obj.email === 'string' &&
     typeof obj.authenticated === 'boolean'
   );
+}
+
+// Validation for CloudinaryUploadConfig from backend
+function isCloudinaryBackendResponse(
+  data: unknown,
+): data is CloudinaryUploadConfig {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    typeof obj.signature === 'string' &&
+    typeof obj.api_key === 'string' &&
+    typeof obj.cloud_name === 'string' &&
+    typeof obj.timestamp === 'string' &&
+    typeof obj.folder === 'string'
+  );
+}
+
+// Validation for CloudinaryResponse
+function isCloudinaryResponse(data: unknown): data is CloudinaryResponse {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return typeof obj.secure_url === 'string';
 }
 
 // Function to get translated error messages based on status code
@@ -143,6 +185,7 @@ export const postCreateRecipe = async (
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 
@@ -253,4 +296,77 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   if (!data.authenticated) {
     throw new Error(t('error.authError'));
   }
+};
+
+// GET /api/recipes/image-signature (gets an UploadConfig for Cloudinary)
+export const getCloudinarySignature = async (
+  t: TFunction,
+): Promise<CloudinaryUploadConfig> => {
+  const response = await fetch(`${baseUrl}/recipes/image-signature`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isCloudinaryBackendResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// POST Cloudinary (uploading an image to Cloudinary)
+export const getCloudinaryUrl = async (
+  file: File,
+  config: CloudinaryUploadConfig,
+  t: TFunction,
+): Promise<string> => {
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  Object.entries(config).forEach(([key, value]) => {
+    if (key !== 'cloud_name' && value !== undefined) {
+      formData.append(key, String(value));
+    }
+  });
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${config.cloud_name}/image/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    },
+  );
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isCloudinaryResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data.secure_url;
 };

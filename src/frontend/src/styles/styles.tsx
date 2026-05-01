@@ -35,6 +35,24 @@ export const langButtonBase = `
   active:scale-95
 `;
 
+export const uploadButtonBase = `
+  inline-flex
+  items-center
+  justify-center
+  rounded-lg
+  bg-white
+  px-2
+  py-1
+  text-gray-700
+  text-sm
+  shadow-[0px_0px_10px_0px_rgba(0,0,0,0.4)]
+  hover:cursor-pointer
+  whitespace-nowrap
+  border-2
+  border-transparent
+  hover:border-orange-800
+`;
+
 export const navLeftBase = `
   text-orange-700
   hover:cursor-pointer

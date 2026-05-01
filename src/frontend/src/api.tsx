@@ -175,7 +175,7 @@ export const getRecipeById = async (
   return data;
 };
 
-// GET /api/recipes/:id (get a single recipe by ID)
+// DELETE /api/recipes/:id (delete a single recipe by ID)
 export const deleteRecipe = async (id: string, t: TFunction) => {
   const response = await fetch(`${baseUrl}/recipes/${id}`, {
     method: 'DELETE',

@@ -113,7 +113,7 @@ const CreateRecipe = () => {
         t,
       );
 
-      void navigate(`/recipe/${recipe.id}`);
+      void navigate(`/recipes/${recipe.id}`);
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError(t('error.genericError'));

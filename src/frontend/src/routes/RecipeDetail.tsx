@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
+import NavButton from '../components/NavButton';
 import StatusBox from '../components/StatusBox';
 import { getRecipeById } from '../api';
 import type { Recipe } from '../types/types';
-import { cardBase } from '../styles/styles';
+import { cardBase, buttonBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -136,6 +137,9 @@ const RecipeDetail = () => {
           </svg>
         </button>
       </div>
+      <NavButton path="/create" className={`${buttonBase} mt-16`}>
+        {t('recipeDetail.deleteRecipe')}
+      </NavButton>
     </div>
   );
 };

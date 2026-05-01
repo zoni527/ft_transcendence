@@ -19,6 +19,7 @@ export const fiTranslations = {
     protein: 'Proteiini (g)',
     carbs: 'Hiilihydraatit (g)',
     fat: 'Rasva (g)',
+    deleteRecipe: 'Poista resepti',
   },
   dashboard: {
     username: 'Käyttäjätunnus',

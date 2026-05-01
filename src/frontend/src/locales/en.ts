@@ -19,6 +19,7 @@ export const enTranslations = {
     protein: 'Protein (g)',
     carbs: 'Carbohydrates (g)',
     fat: 'Fat (g)',
+    deleteRecipe: 'Delete recipe',
   },
   dashboard: {
     username: 'Username',

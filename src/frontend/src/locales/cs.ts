@@ -19,6 +19,7 @@ export const csTranslations = {
     protein: 'Bílkoviny (g)',
     carbs: 'Sacharidy (g)',
     fat: 'Tuky (g)',
+    deleteRecipe: 'Smazat recept',
   },
   dashboard: {
     username: 'Uživatelské jméno',

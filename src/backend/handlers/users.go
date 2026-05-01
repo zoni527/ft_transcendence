@@ -5,7 +5,6 @@ package handlers
 // [done] GetUserById   — GET /api/users/:id
 // [done] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
 // [TODO] UpdateUser    — PUT /api/users/:id
-// [TODO] PatchUser     — PATCH /api/users/:id
 // [TODO] DeleteUser    — DELETE /api/users/:id
 // [TODO] SearchUsers   — GET /api/users/search?q=
 
@@ -168,11 +167,6 @@ func LoginUser(c *gin.Context) {
 
 func UpdateUser(c *gin.Context) {
 	// TODO: call repository.UpdateUser()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
-}
-
-func PatchUser(c *gin.Context) {
-	// TODO: call repository.PatchUser()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 

@@ -55,8 +55,10 @@ func main() {
 		handlers.AuthMiddleware(),
 		handlers.RequiredRolesMiddleware("chef", "moderator", "admin"),
 		handlers.RecipeImageSignature)
-	router.PUT("/api/recipes/:id", handlers.UpdateRecipe)             // not implemented yet
-	router.DELETE("/api/recipes/:id", handlers.DeleteRecipe)          // not implemented yet
+	router.PUT("/api/recipes/:id", handlers.UpdateRecipe) // not implemented yet
+	router.DELETE("/api/recipes/:id",
+		handlers.AuthMiddleware(),
+		handlers.DeleteRecipe)
 	router.POST("/api/recipes/:id/image", handlers.UploadRecipeImage) // not implemented yet
 
 	if err := router.Run("0.0.0.0:8080"); err != nil {

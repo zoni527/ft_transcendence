@@ -14,18 +14,18 @@ dbclean:
 
 re: fclean all
 # ---------------------------------------------------------------------------- #
-# this rule check if files can be compiled without spitting out any executable file 
-check_backend:
-	cd src/backend && go build ./...
-
-env_validation:
-	@./scripts/env_validation.sh
-
 up: all
 
 down: clean
 
 nuke: fclean dbclean
 # ---------------------------------------------------------------------------- #
-.PHONY: all clean fclean dbclean re check_backend can_start up down nuke
+# This rule checks if the backend compiles, without producing an executable
+check_backend:
+	cd src/backend && go build ./...
+
+env_validation:
+	@./scripts/env_validation.sh
+# ---------------------------------------------------------------------------- #
+.PHONY: all clean fclean dbclean re check_backend env_validation up down nuke
 # ---------------------------------------------------------------------------- #

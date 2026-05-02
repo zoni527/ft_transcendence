@@ -77,11 +77,10 @@ const Signup = () => {
           void navigate('/dashboard');
         })
         .catch((err: unknown) => {
-          if (err instanceof Error) {
-            showNotification(err.message, 'error');
-          } else {
-            showNotification(t('error.genericError'), 'error');
-          }
+          const message =
+            err instanceof Error ? err.message : t('error.genericError');
+
+          showNotification(message, 'error');
         })
         .finally(() => setLoading(false));
     }

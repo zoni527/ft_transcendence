@@ -9,6 +9,7 @@ export const csTranslations = {
     signupSuccess: 'Účet vytvořen',
     loginSuccess: 'Přihlášení bylo úspěšné',
     createRecipeSuccess: 'Recept byl úspěšně vytvořen',
+    recipeDeleteSuccess: 'Recept byl úspěšně smazán',
   },
   recipes: {
     header: 'Všechny recepty',

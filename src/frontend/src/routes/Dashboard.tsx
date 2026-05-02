@@ -13,9 +13,8 @@ const Dashboard = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
-
-  const loading = !user;
 
   useEffect(() => {
     getUser(t)
@@ -26,17 +25,14 @@ const Dashboard = () => {
 
         showNotification(message, 'error');
         void navigate('/login');
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, [t, navigate, showNotification]);
 
-  if (loading) {
+  if (loading || !user) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
-  }
-
-  if (!user) {
-    return (
-      <StatusBox message={t('error.userNotFound')} className="text-black" />
-    );
   }
 
   return (

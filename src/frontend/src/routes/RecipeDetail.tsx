@@ -5,37 +5,41 @@ import DataField from '../components/DataField';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import { getRecipeById, deleteRecipe } from '../api';
+import { useNotification } from '../utils/NotifContext';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
+  const { showNotification } = useNotification();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { state } = useLocation() as { state?: { recipe?: Recipe } };
   const [recipe, setRecipe] = useState<Recipe | null>(state?.recipe ?? null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const cachedRecipe = state?.recipe;
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id?: string) => {
     if (loading) return;
     if (!id) {
-      setError('Missing recipe id');
+      showNotification(t('error.genericError'), 'error');
       return;
     }
 
     setLoading(true);
-    setError('');
 
     deleteRecipe(id, t)
       .then(() => {
-        void navigate('/dashboard');
+        showNotification(t('notification.recipeDeleteSuccess'), 'success');
+        void navigate('/');
       })
       .catch((err: unknown) => {
-        if (err instanceof Error) setError(err.message);
-        else setError(t('error.genericError'));
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+        void navigate('/');
       })
       .finally(() => setLoading(false));
   };
@@ -46,24 +50,16 @@ const RecipeDetail = () => {
     getRecipeById(id, t)
       .then(setRecipe)
       .catch((err: unknown) => {
-        if (err instanceof Error) setError(err.message);
-        else setError(t('error.genericError'));
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+        void navigate('/');
       });
-  }, [id, cachedRecipe, t]);
+  }, [id, cachedRecipe, t, navigate, showNotification]);
 
-  if (error) {
-    return (
-      <StatusBox
-        message={`${t('error.error')} ${error}`}
-        className="text-red-600"
-      />
-    );
-  }
-
-  if (!recipe) {
-    return (
-      <StatusBox message={t('error.recipeNotFound')} className="text-black" />
-    );
+  if (loading || !recipe) {
+    return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
   return (
@@ -165,7 +161,7 @@ const RecipeDetail = () => {
           isLoading={loading}
           pendingText={t('recipeDetail.submitPending')}
           defaultText={t('recipeDetail.submit')}
-          onClick={() => handleDelete(id!)}
+          onClick={() => handleDelete(id)}
           type="button"
         />
       </div>

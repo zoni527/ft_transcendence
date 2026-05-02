@@ -9,6 +9,7 @@ export const enTranslations = {
     signupSuccess: 'Account created',
     loginSuccess: 'Login successful',
     createRecipeSuccess: 'Recipe created successfully',
+    recipeDeleteSuccess: 'Recipe deleted successfully',
   },
   recipes: {
     header: 'All recipes',

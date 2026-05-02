@@ -9,6 +9,7 @@ export const fiTranslations = {
     signupSuccess: 'Tili luotu',
     loginSuccess: 'Kirjautuminen onnistui',
     createRecipeSuccess: 'Resepti luotiin onnistuneesti',
+    recipeDeleteSuccess: 'Resepti poistettiin onnistuneesti',
   },
   recipes: {
     header: 'Kaikki reseptit',

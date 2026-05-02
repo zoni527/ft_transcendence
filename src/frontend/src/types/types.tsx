@@ -34,4 +34,5 @@ export type AuthContextType = {
   login: (user: User) => void;
   logout: () => Promise<void>;
   loading: boolean;
+  hasRole: (roles: string[]) => boolean;
 };

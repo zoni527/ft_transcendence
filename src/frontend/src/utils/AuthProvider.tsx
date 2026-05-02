@@ -13,6 +13,10 @@ const AuthProvider = ({ children, t }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const hasRole = (roles: string[]) => {
+    return user?.roles.some((r) => roles.includes(r)) ?? false;
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -45,6 +49,7 @@ const AuthProvider = ({ children, t }: Props) => {
     setUser(userData);
   };
 
+  // this is missing an implementation on the backend
   const logout = async () => {
     await fetch('/api/logout', {
       method: 'POST',
@@ -55,7 +60,7 @@ const AuthProvider = ({ children, t }: Props) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, hasRole }}>
       {children}
     </AuthContext.Provider>
   );

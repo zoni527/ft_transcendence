@@ -6,7 +6,7 @@ import { useAuth } from '../utils/AuthContext';
 import { cardBase, buttonBase } from '../styles/styles';
 
 const Dashboard = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, hasRole } = useAuth();
   const { t } = useTranslation();
 
   if (loading) {
@@ -49,9 +49,11 @@ const Dashboard = () => {
 
         {/* Bottom */}
         <div className="w-full space-y-2"></div>
-        <NavButton to="/create" className={`${buttonBase}`}>
-          {t('dashboard.createRecipe')}
-        </NavButton>
+        {hasRole(['admin', 'moderator', 'chef']) && (
+          <NavButton to="/create" className={buttonBase}>
+            {t('dashboard.createRecipe')}
+          </NavButton>
+        )}
       </div>
     </div>
   );

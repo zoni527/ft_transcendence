@@ -49,12 +49,12 @@ const AuthProvider = ({ children, t }: Props) => {
     setUser(userData);
   };
 
-  // this is missing an implementation on the backend
-  const logout = async () => {
-    await fetch('/api/logout', {
-      method: 'POST',
-      credentials: 'include',
-    });
+  // This might need a backend implementation
+  const logout = () => {
+    // await fetch('/api/logout', {
+    //   method: 'POST',
+    //   credentials: 'include',
+    // });
 
     setUser(null);
   };

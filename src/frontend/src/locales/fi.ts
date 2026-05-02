@@ -4,10 +4,12 @@ export const fiTranslations = {
     dashboard: 'Käyttäjäprofiili',
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
+    logout: 'Kirjaudu ulos',
   },
   notification: {
     signupSuccess: 'Tili luotu',
     loginSuccess: 'Kirjautuminen onnistui',
+    logoutSuccess: 'Uloskirjautuminen onnistui',
     createRecipeSuccess: 'Resepti luotiin onnistuneesti',
     recipeDeleteSuccess: 'Resepti poistettiin onnistuneesti',
   },

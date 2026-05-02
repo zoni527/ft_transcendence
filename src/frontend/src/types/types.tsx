@@ -32,7 +32,7 @@ export interface User {
 export type AuthContextType = {
   user: User | null;
   login: (user: User) => void;
-  logout: () => Promise<void>;
+  logout: () => void;
   loading: boolean;
   hasRole: (roles: string[]) => boolean;
 };

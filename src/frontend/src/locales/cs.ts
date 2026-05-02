@@ -4,10 +4,12 @@ export const csTranslations = {
     dashboard: 'Profil',
     signup: 'Registrovat se',
     login: 'Přihlásit se',
+    logout: 'Odhlásit se',
   },
   notification: {
     signupSuccess: 'Účet vytvořen',
     loginSuccess: 'Přihlášení bylo úspěšné',
+    logoutSuccess: 'Odhlášení bylo úspěšné',
     createRecipeSuccess: 'Recept byl úspěšně vytvořen',
     recipeDeleteSuccess: 'Recept byl úspěšně smazán',
   },

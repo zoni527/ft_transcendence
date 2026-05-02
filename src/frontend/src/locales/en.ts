@@ -4,10 +4,12 @@ export const enTranslations = {
     dashboard: 'Profile',
     signup: 'Sign up',
     login: 'Log in',
+    logout: 'Log out',
   },
   notification: {
     signupSuccess: 'Account created',
     loginSuccess: 'Login successful',
+    logoutSuccess: 'Logout successful',
     createRecipeSuccess: 'Recipe created successfully',
     recipeDeleteSuccess: 'Recipe deleted successfully',
   },

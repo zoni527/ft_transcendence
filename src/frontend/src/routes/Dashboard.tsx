@@ -50,7 +50,7 @@ const Dashboard = () => {
         {/* Bottom */}
         <div className="w-full space-y-2"></div>
         {hasRole(['admin', 'moderator', 'chef']) && (
-          <NavButton to="/create" className={buttonBase}>
+          <NavButton path="/create" className={buttonBase}>
             {t('dashboard.createRecipe')}
           </NavButton>
         )}

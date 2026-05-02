@@ -6,8 +6,9 @@ import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
-import { postLogin } from '../api';
-import { useNotification } from '../utils/NotifContext';
+import { getUser, postLogin } from '../api';
+import { useAuth } from '../utils/AuthContext';
+import { useNotification } from '../utils/NotifContext.ts';
 import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
@@ -26,6 +27,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { login } = useAuth();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,7 +61,11 @@ const Login = () => {
         },
         t,
       )
-        .then(() => {
+        .then(async () => {
+          const user = await getUser(t);
+
+          login(user);
+
           showNotification(t('notification.loginSuccess'), 'success');
           void navigate('/dashboard');
         })

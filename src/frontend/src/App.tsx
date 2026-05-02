@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
+import AuthProvider from './utils/AuthProvider';
 import Banner from './components/Banner';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
@@ -14,13 +16,16 @@ import Signup from './routes/Signup';
 import TermsService from './routes/TermsService';
 
 const App = () => {
+  const { t } = useTranslation();
+
   return (
-    <NotificationProvider>
-      <Router>
-        <div className="flex min-h-screen flex-col">
+    <AuthProvider t={t}>
+      <NotificationProvider>
+        <Router>
+          <div className="flex min-h-screen flex-col"></div>
           <Banner />
           <div className="flex-1 p-4">
-            <div className="mx-auto max-w-7xl">
+            <div className="mx-auto max-w-5xl">
               <Navbar />
               <Routes>
                 <Route path="/" element={<Recipes />} />
@@ -33,11 +38,11 @@ const App = () => {
                 <Route path="/terms" element={<TermsService />} />
               </Routes>
             </div>
+            <Footer className="mt-20" />
           </div>
-          <Footer className="mt-20" />
-        </div>
-      </Router>
-    </NotificationProvider>
+        </Router>
+      </NotificationProvider>
+    </AuthProvider>
   );
 };
 

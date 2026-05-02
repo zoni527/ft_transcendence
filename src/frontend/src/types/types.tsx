@@ -28,3 +28,10 @@ export interface User {
   updated_at: string;
   roles: string[];
 }
+
+export type AuthContextType = {
+  user: User | null;
+  login: (user: User) => void;
+  logout: () => Promise<void>;
+  loading: boolean;
+};

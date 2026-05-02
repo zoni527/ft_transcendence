@@ -14,9 +14,7 @@ export const useNotification = (): NotificationContextType => {
   const context = useContext(NotificationContext);
 
   if (!context) {
-    return {
-      showNotification: () => {},
-    };
+    throw new Error('useNotification must be used within NotificationProvider');
   }
   return context;
 };

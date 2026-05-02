@@ -1,35 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
 import NavButton from '../components/NavButton';
 import StatusBox from '../components/StatusBox';
-import { getUser } from '../api';
-import { useNotification } from '../utils/NotifContext';
-import type { User } from '../types/types';
+import { useAuth } from '../utils/AuthContext';
 import { cardBase, buttonBase } from '../styles/styles';
 
 const Dashboard = () => {
-  const { showNotification } = useNotification();
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    getUser(t)
-      .then(setUser)
-      .catch((err: unknown) => {
-        const message =
-          err instanceof Error ? err.message : t('error.genericError');
-
-        showNotification(message, 'error');
-        void navigate('/login');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [t, navigate, showNotification]);
 
   if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;

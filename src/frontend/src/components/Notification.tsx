@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { NotificationVariant } from '../utils/NotifContext';
+import type { NotificationVariant } from '../utils/NotifContext.ts';
 
 type NotificationProps = {
   message: string;

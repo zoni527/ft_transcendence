@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import RecipeCard from '../components/RecipeCard';
 import StatusBox from '../components/StatusBox';
 import { getRecipes } from '../api';
-import { useNotification } from '../utils/NotifContext';
+import { useNotification } from '../utils/NotifContext.ts';
 import type { Recipe } from '../types/types';
 
 const Recipes = () => {

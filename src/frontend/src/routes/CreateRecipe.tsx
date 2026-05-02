@@ -13,7 +13,7 @@ import {
   getCloudinarySignature,
   uploadImageToCloudinary,
 } from '../api';
-import { useNotification } from '../utils/NotifContext';
+import { useNotification } from '../utils/NotifContext.ts';
 import { getStringValue } from '../utils/utils';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 

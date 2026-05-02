@@ -5,7 +5,7 @@ import DataField from '../components/DataField';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import { getRecipeById, deleteRecipe } from '../api';
-import { useNotification } from '../utils/NotifContext';
+import { useNotification } from '../utils/NotifContext.ts';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
 

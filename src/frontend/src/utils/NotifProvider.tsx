@@ -1,7 +1,7 @@
 import { useState, useMemo, type ReactNode } from 'react';
 import Notification from '../components/Notification';
-import { NotificationContext } from './NotifContext';
-import type { NotificationVariant } from './NotifContext';
+import { NotificationContext } from './NotifContext.ts';
+import type { NotificationVariant } from './NotifContext.ts';
 
 type NotificationState = {
   message: string;

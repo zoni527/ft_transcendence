@@ -1,10 +1,11 @@
+import React from 'react';
 import { buttonBase } from '../styles/styles';
 
 interface SubmitButtonProps {
   isLoading: boolean;
   defaultText: string;
   pendingText: string;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit';
 }
 

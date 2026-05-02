@@ -270,6 +270,7 @@ export const fiTranslations = {
     input: 'Virheellinen syöte',
     userNotFound: 'Käyttäjää ei löytynyt',
     recipeNotFound: 'Reseptiä ei löytynyt',
+    recipesNotFound: 'Ei reseptejä löytynyt',
     genericError: 'Tapahtui virhe, yritä myöhemmin uudelleen',
     invalidResponse: 'Virheellinen tietokannan vastaus',
     badRequest: 'Virheellinen pyyntö, tarkista syötteesi',

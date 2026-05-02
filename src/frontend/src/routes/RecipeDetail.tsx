@@ -58,8 +58,14 @@ const RecipeDetail = () => {
       });
   }, [id, cachedRecipe, t, navigate, showNotification]);
 
-  if (loading || !recipe) {
+  if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
+  }
+
+  if (!recipe) {
+    return (
+      <StatusBox message={t('error.recipeNotFound')} className="text-red-600" />
+    );
   }
 
   return (

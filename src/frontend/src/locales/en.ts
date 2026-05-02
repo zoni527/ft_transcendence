@@ -270,6 +270,7 @@ export const enTranslations = {
     input: 'Invalid input',
     userNotFound: 'User not found',
     recipeNotFound: 'Recipe not found',
+    recipesNotFound: 'No recipes found',
     genericError: 'An error occurred, please try again later',
     invalidResponse: 'Invalid database response',
     badRequest: 'Invalid request, please check your input',

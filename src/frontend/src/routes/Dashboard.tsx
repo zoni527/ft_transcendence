@@ -31,8 +31,14 @@ const Dashboard = () => {
       });
   }, [t, navigate, showNotification]);
 
-  if (loading || !user) {
+  if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
+  }
+
+  if (!user) {
+    return (
+      <StatusBox message={t('error.userNotFound')} className="text-red-600" />
+    );
   }
 
   return (

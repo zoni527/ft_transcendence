@@ -269,6 +269,7 @@ export const csTranslations = {
     input: 'Neplatný vstup',
     userNotFound: 'Uživatel nenalezen',
     recipeNotFound: 'Recept nenalezen',
+    recipesNotFound: 'Nebyly nalezeny žádné recepty',
     genericError: 'Došlo k chybě, zkuste to prosím později',
     invalidResponse: 'Neplatná odpověď databáze',
     badRequest:

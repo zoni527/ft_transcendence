@@ -24,8 +24,17 @@ const Recipes = () => {
       .finally(() => setLoading(false));
   }, [t, showNotification]);
 
-  if (loading || !recipes) {
+  if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
+  }
+
+  if (recipes.length === 0) {
+    return (
+      <StatusBox
+        message={t('error.recipesNotFound')}
+        className="text-red-600"
+      />
+    );
   }
 
   return (

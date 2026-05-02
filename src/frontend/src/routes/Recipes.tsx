@@ -39,11 +39,7 @@ const Recipes = () => {
 
   return (
     <div>
-      <h1 className="mt-8 px-6 text-xl font-semibold text-orange-700">
-        {t('recipes.header')}
-      </h1>
-
-      <div className="grid grid-cols-1 gap-6 bg-white p-6 sm:grid-cols-2 md:grid-cols-4">
+      <div className="mt-8 grid grid-cols-1 gap-6 bg-white p-6 sm:grid-cols-2 md:grid-cols-4">
         {recipes.map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}

@@ -13,9 +13,6 @@ export const csTranslations = {
     createRecipeSuccess: 'Recept byl úspěšně vytvořen',
     recipeDeleteSuccess: 'Recept byl úspěšně smazán',
   },
-  recipes: {
-    header: 'Všechny recepty',
-  },
   recipeDetail: {
     author: 'Autor',
     prep: 'Doba přípravy (min)',

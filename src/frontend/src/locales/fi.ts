@@ -13,9 +13,6 @@ export const fiTranslations = {
     createRecipeSuccess: 'Resepti luotiin onnistuneesti',
     recipeDeleteSuccess: 'Resepti poistettiin onnistuneesti',
   },
-  recipes: {
-    header: 'Kaikki reseptit',
-  },
   recipeDetail: {
     author: 'Tekijä',
     prep: 'Valmisteluaika (min)',

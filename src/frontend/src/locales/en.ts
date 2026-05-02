@@ -13,9 +13,6 @@ export const enTranslations = {
     createRecipeSuccess: 'Recipe created successfully',
     recipeDeleteSuccess: 'Recipe deleted successfully',
   },
-  recipes: {
-    header: 'All recipes',
-  },
   recipeDetail: {
     author: 'Author',
     prep: 'Preparation time (min)',

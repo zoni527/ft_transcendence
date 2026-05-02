@@ -6,11 +6,13 @@ import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import { getRecipeById, deleteRecipe } from '../api';
 import { useNotification } from '../utils/NotifContext.ts';
+import { useAuth } from '../utils/AuthContext';
 import type { Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { showNotification } = useNotification();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { state } = useLocation() as { state?: { recipe?: Recipe } };
@@ -67,6 +69,12 @@ const RecipeDetail = () => {
       <StatusBox message={t('error.recipeNotFound')} className="text-red-600" />
     );
   }
+
+  // Check if user has admin, moderator, or chef role, or if they are the recipe owner
+  const canDelete =
+    user &&
+    (user.roles.some((role) => ['admin', 'moderator', 'chef'].includes(role)) ||
+      user.id === recipe.author_id);
 
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
@@ -162,14 +170,16 @@ const RecipeDetail = () => {
           </button>
         </div>
 
-        {/* Delete Button */}
-        <SubmitButton
-          isLoading={loading}
-          pendingText={t('recipeDetail.submitPending')}
-          defaultText={t('recipeDetail.submit')}
-          onClick={() => handleDelete(id)}
-          type="button"
-        />
+        {/* Delete Button - only visible if user can delete */}
+        {canDelete && (
+          <SubmitButton
+            isLoading={loading}
+            pendingText={t('recipeDetail.submitPending')}
+            defaultText={t('recipeDetail.submit')}
+            onClick={() => handleDelete(id)}
+            type="button"
+          />
+        )}
       </div>
     </div>
   );

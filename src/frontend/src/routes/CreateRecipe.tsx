@@ -13,6 +13,7 @@ import {
   getCloudinarySignature,
   uploadImageToCloudinary,
 } from '../api';
+import { useNotification } from '../utils/NotifContext';
 import { getStringValue } from '../utils/utils';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 
@@ -50,7 +51,7 @@ const createRecipeSchema = (t: TFunction) =>
   });
 
 const CreateRecipe = () => {
-  const [error, setError] = useState('');
+  const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState('');
   const navigate = useNavigate();
@@ -66,7 +67,6 @@ const CreateRecipe = () => {
   ) => {
     if (loading) return;
 
-    setError('');
     setLoading(true);
 
     try {
@@ -113,10 +113,14 @@ const CreateRecipe = () => {
         t,
       );
 
+      showNotification(t('notification.createRecipeSuccess'), 'success');
       void navigate(`/recipes/${recipe.id}`);
     } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError(t('error.genericError'));
+      if (err instanceof Error) {
+        showNotification(err.message, 'error');
+      } else {
+        showNotification(t('error.genericError'), 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -267,11 +271,6 @@ const CreateRecipe = () => {
             {fileName || t('createRecipe.noFile')}
           </span>
         </div>
-
-        {/* Errors & Warnings */}
-        <p className="text-md min-h-5 text-center text-red-500">
-          {error || '\u00A0'}
-        </p>
 
         {/* Submit Button */}
         <div className="flex justify-center">

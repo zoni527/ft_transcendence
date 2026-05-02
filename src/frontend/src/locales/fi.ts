@@ -8,6 +8,7 @@ export const fiTranslations = {
   notification: {
     signupSuccess: 'Tili luotu',
     loginSuccess: 'Kirjautuminen onnistui',
+    createRecipeSuccess: 'Resepti luotiin onnistuneesti',
   },
   recipes: {
     header: 'Kaikki reseptit',

@@ -3,34 +3,28 @@ import { useTranslation } from 'react-i18next';
 import RecipeCard from '../components/RecipeCard';
 import StatusBox from '../components/StatusBox';
 import { getRecipes } from '../api';
+import { useNotification } from '../utils/NotifContext';
 import type { Recipe } from '../types/types';
 
 const Recipes = () => {
+  const { showNotification } = useNotification();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
     getRecipes(t)
       .then(setRecipes)
       .catch((err: unknown) => {
-        if (err instanceof Error) setError(err.message);
-        else setError(t('error.genericError'));
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
       })
       .finally(() => setLoading(false));
-  }, [t]);
+  }, [t, showNotification]);
 
-  if (error) {
-    return (
-      <StatusBox
-        message={`${t('error.error')} ${error}`}
-        className="text-red-600"
-      />
-    );
-  }
-
-  if (loading) {
+  if (loading || !recipes) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 

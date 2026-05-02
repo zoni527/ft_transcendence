@@ -47,7 +47,7 @@ export const enTranslations = {
       Cookies: see Section 6 below.`,
 
     section3_title: '3. How we use your information',
-    section3_text: `To operate the service and let you sign in, create and save recipes, and follow users.
+    section3_text: `To operate the service and let you sign in, create and save recipes, post comments and reviews, and follow other users.
       To prevent abuse, fraud, and ensure platform security.
       To communicate with you about your account or important changes.`,
 

@@ -5,6 +5,9 @@ export const fiTranslations = {
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
   },
+  notification: {
+    accCreated: 'Tili luotu',
+  },
   recipes: {
     header: 'Kaikki reseptit',
   },

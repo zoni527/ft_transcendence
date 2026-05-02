@@ -6,7 +6,8 @@ export const fiTranslations = {
     login: 'Kirjaudu sisään',
   },
   notification: {
-    accCreated: 'Tili luotu',
+    signupSuccess: 'Tili luotu',
+    loginSuccess: 'Kirjautuminen onnistui',
   },
   recipes: {
     header: 'Kaikki reseptit',

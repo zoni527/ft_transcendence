@@ -25,7 +25,7 @@ const Notification = ({ message, onClose, variant }: NotificationProps) => {
 
   return (
     <div
-      className={`fixed right-5 bottom-5 z-1000 rounded-md px-5 py-3 text-lg font-semibold text-white shadow-lg ${
+      className={`fixed right-5 bottom-5 z-1000 rounded-md px-4 py-2 text-lg font-semibold text-white shadow-lg ${
         variantStyles[variant]
       }`}
     >

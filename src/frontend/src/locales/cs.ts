@@ -6,7 +6,8 @@ export const csTranslations = {
     login: 'Přihlásit se',
   },
   notification: {
-    accCreated: 'Účet vytvořen',
+    signupSuccess: 'Účet vytvořen',
+    loginSuccess: 'Přihlášení bylo úspěšné',
   },
   recipes: {
     header: 'Všechny recepty',

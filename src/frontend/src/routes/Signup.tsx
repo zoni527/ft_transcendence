@@ -73,7 +73,7 @@ const Signup = () => {
         t,
       )
         .then(() => {
-          showNotification(t('notification.accCreated'), 'success');
+          showNotification(t('notification.signupSuccess'), 'success');
           void navigate('/dashboard');
         })
         .catch((err: unknown) => {

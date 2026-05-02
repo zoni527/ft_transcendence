@@ -6,7 +6,8 @@ export const enTranslations = {
     login: 'Log in',
   },
   notification: {
-    accCreated: 'Account created',
+    signupSuccess: 'Account created',
+    loginSuccess: 'Login successful',
   },
   recipes: {
     header: 'All recipes',

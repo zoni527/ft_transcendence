@@ -7,6 +7,7 @@ import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
 import { postLogin } from '../api';
+import { useNotification } from '../utils/NotifContext';
 import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
@@ -21,7 +22,7 @@ const loginSchema = (t: TFunction) =>
   });
 
 const Login = () => {
-  const [error, setError] = useState('');
+  const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -30,8 +31,6 @@ const Login = () => {
     e.preventDefault();
 
     if (loading) return;
-
-    setError('');
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -45,7 +44,10 @@ const Login = () => {
     });
 
     if (!result.success) {
-      setError(result.error.issues[0]?.message || t('error.input'));
+      showNotification(
+        result.error.issues[0]?.message || t('error.input'),
+        'error',
+      );
     } else {
       setLoading(true);
 
@@ -58,11 +60,15 @@ const Login = () => {
         t,
       )
         .then(() => {
+          showNotification(t('notification.loginSuccess'), 'success');
           void navigate('/dashboard');
         })
         .catch((err: unknown) => {
-          if (err instanceof Error) setError(err.message);
-          else setError(t('error.genericError'));
+          if (err instanceof Error) {
+            showNotification(err.message, 'error');
+          } else {
+            showNotification(t('error.genericError'), 'error');
+          }
         })
         .finally(() => setLoading(false));
     }
@@ -92,11 +98,6 @@ const Login = () => {
           type="password"
           placeholder={t('login.passwordPlace')}
         />
-
-        {/* Errors & Warnings */}
-        <p className="text-md min-h-5 text-center text-red-500">
-          {error || '\u00A0'}
-        </p>
 
         {/* Submit Button */}
         <div className="flex justify-center">

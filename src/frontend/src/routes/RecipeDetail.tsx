@@ -12,7 +12,7 @@ import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { showNotification } = useNotification();
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { state } = useLocation() as { state?: { recipe?: Recipe } };
@@ -69,12 +69,6 @@ const RecipeDetail = () => {
       <StatusBox message={t('error.recipeNotFound')} className="text-red-600" />
     );
   }
-
-  // Check if user has admin, moderator, or chef role, or if they are the recipe owner
-  const canDelete =
-    user &&
-    (user.roles.some((role) => ['admin', 'moderator', 'chef'].includes(role)) ||
-      user.id === recipe.author_id);
 
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
@@ -171,7 +165,7 @@ const RecipeDetail = () => {
         </div>
 
         {/* Delete Button - only visible if user can delete */}
-        {canDelete && (
+        {user && hasRole(['chef', 'moderator', 'admin']) && (
           <SubmitButton
             isLoading={loading}
             pendingText={t('recipeDetail.submitPending')}

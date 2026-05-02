@@ -1,36 +1,33 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
 import NavButton from '../components/NavButton';
 import StatusBox from '../components/StatusBox';
 import { getUser } from '../api';
+import { useNotification } from '../utils/NotifContext';
 import type { User } from '../types/types';
 import { cardBase, buttonBase } from '../styles/styles';
 
 const Dashboard = () => {
+  const { showNotification } = useNotification();
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  const loading = !user && !error;
+  const loading = !user;
 
   useEffect(() => {
     getUser(t)
       .then(setUser)
       .catch((err: unknown) => {
-        if (err instanceof Error) setError(err.message);
-        else setError(t('error.genericError'));
-      });
-  }, [t]);
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
 
-  if (error) {
-    return (
-      <StatusBox
-        message={`${t('error.error')} ${error}`}
-        className="text-red-500"
-      />
-    );
-  }
+        showNotification(message, 'error');
+        void navigate('/login');
+      });
+  }, [t, navigate, showNotification]);
 
   if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
@@ -63,19 +60,15 @@ const Dashboard = () => {
 
           {/* Right */}
           <div className="flex-1 space-y-2">
-            <DataField label="ID" value={user.id} />
+            <DataField
+              label={t('dashboard.roles')}
+              value={user.roles.join(', ')}
+            />
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="w-full space-y-2">
-          <DataField label={t('dashboard.createdAt')} value={user.created_at} />
-          <DataField label={t('dashboard.updatedAt')} value={user.updated_at} />
-          <DataField
-            label={t('dashboard.roles')}
-            value={user.roles.join(', ')}
-          />
-        </div>
+        <div className="w-full space-y-2"></div>
         <NavButton to="/create" className={`${buttonBase}`}>
           {t('dashboard.createRecipe')}
         </NavButton>

@@ -55,7 +55,7 @@ const RecipeDetail = () => {
     return (
       <StatusBox
         message={`${t('error.error')} ${error}`}
-        className="text-red-500"
+        className="text-red-600"
       />
     );
   }

@@ -344,7 +344,7 @@ export const getCloudinarySignature = async (
 };
 
 // POST Cloudinary (uploading an image to Cloudinary)
-export const getCloudinaryUrl = async (
+export const uploadImageToCloudinary = async (
   file: File,
   config: CloudinaryUploadConfig,
   t: TFunction,

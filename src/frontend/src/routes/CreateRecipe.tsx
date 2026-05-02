@@ -11,7 +11,7 @@ import SubmitButton from '../components/SubmitButton';
 import {
   postCreateRecipe,
   getCloudinarySignature,
-  getCloudinaryUrl,
+  uploadImageToCloudinary,
 } from '../api';
 import { getStringValue } from '../utils/utils';
 import { cardBase, uploadButtonBase } from '../styles/styles';
@@ -102,7 +102,7 @@ const CreateRecipe = () => {
       }
 
       const signature = await getCloudinarySignature(t);
-      const image_url = await getCloudinaryUrl(image, signature, t);
+      const image_url = await uploadImageToCloudinary(image, signature, t);
 
       const recipe = await postCreateRecipe(
         {

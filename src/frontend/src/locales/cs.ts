@@ -47,7 +47,7 @@ export const csTranslations = {
       Cookies: viz část 6 níže.`,
 
     section3_title: '3. Jak vaše údaje používáme',
-    section3_text: `K provozu služby a umožnění přihlášení, vytváření a ukládání receptů a sledování uživatelů.
+    section3_text: `K provozu služby a umožnění přihlášení, vytváření a ukládání receptů, zveřejňování komentářů a recenzí a sledování ostatních uživatelů.
       K prevenci zneužití, podvodů a zajištění bezpečnosti platformy.
       Ke komunikaci s vámi ohledně vašeho účtu nebo důležitých změn.`,
 

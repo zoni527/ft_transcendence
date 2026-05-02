@@ -47,7 +47,7 @@ export const fiTranslations = {
       Evästeet: katso kohta 6.`,
 
     section3_title: '3. Miten käytämme tietojasi',
-    section3_text: `Palvelun ylläpitämiseen ja sisäänkirjautumisen, reseptien luomisen ja tallentamisen sekä käyttäjien seuraamisen mahdollistamiseen.
+    section3_text: `Palvelun tarjoamiseksi ja mahdollistaaksemme kirjautumisesi, reseptien luomisen ja tallentamisen, kommenttien ja arvostelujen julkaisemisen sekä muiden käyttäjien seuraamisen.
       Väärinkäytösten, petosten ja tietoturvan estämiseen.
       Yhteydenpitoon tilisi tai tärkeiden muutosten osalta.`,
 

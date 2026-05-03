@@ -77,6 +77,48 @@ func GetMe(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, user)
 }
 
+func GetSession(c *gin.Context) {
+	token, err := c.Cookie("token")
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		return
+	}
+
+	claims, err := ValidateJWTToken(token)
+	if err != nil {
+		c.SetSameSite(http.SameSiteLaxMode)
+		c.SetCookie("token", "", -1, "/", "", false, true)
+		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		return
+	}
+
+	blacklisted, err := isTokenBlacklisted(token)
+	if err != nil {
+		log.Printf("GetSession blacklist check: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if blacklisted {
+		c.SetSameSite(http.SameSiteLaxMode)
+		c.SetCookie("token", "", -1, "/", "", false, true)
+		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		return
+	}
+
+	user, err := repository.GetUserById(claims.Subject)
+	if err == pgx.ErrNoRows {
+		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		return
+	}
+	if err != nil {
+		log.Printf("GetSession error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"authenticated": true, "user": user})
+}
+
 func CreateUser(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

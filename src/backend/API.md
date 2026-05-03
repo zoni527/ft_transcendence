@@ -277,6 +277,35 @@ Get the profile of the currently authenticated user.
 
 ---
 
+### GET /api/session
+
+Check whether the current browser session is authenticated.
+
+**Response** `200 OK` (authenticated):
+```json
+{
+  "authenticated": true,
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "name": "Jane",
+    "display_name": "jane_cooks",
+    "created_at": "2026-04-09T12:00:00Z",
+    "updated_at": "2026-04-09T12:00:00Z",
+    "roles": ["user"]
+  }
+}
+```
+
+**Response** `200 OK` (not authenticated):
+```json
+{
+  "authenticated": false
+}
+```
+
+---
+
 ## Recipes
 
 ### GET /api/recipes
@@ -651,6 +680,7 @@ Get all recipes a user has favourited.
 | POST /api/users/login | done |
 | POST /api/users/logout | done |
 | GET /api/users/me | done |
+| GET /api/users/session | done |
 | GET /api/users/search?q= | TODO |
 | POST /api/users | TODO |
 | PUT /api/users/:id | TODO |

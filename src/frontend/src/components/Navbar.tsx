@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import LangDropdown from './LangDropDown';
 import NavButton from './NavButton';
 import { useAuth } from '../utils/AuthContext';
+import { postLogout } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 import { cardBase, buttonBase, navLeftBase } from '../styles/styles';
 
@@ -13,9 +14,19 @@ const Navbar = () => {
   const { t } = useTranslation();
 
   const handleLogout = () => {
-    showNotification(t('notification.logoutSuccess'), 'success');
-    logout();
-    void navigate('/');
+    postLogout(t)
+      .then(() => {
+        logout();
+
+        showNotification(t('notication.logoutSuccess'), 'success');
+        void navigate('/');
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+      });
   };
 
   return (

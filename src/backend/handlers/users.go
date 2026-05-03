@@ -86,8 +86,7 @@ func GetSession(c *gin.Context) {
 
 	claims, err := ValidateJWTToken(token)
 	if err != nil {
-		c.SetSameSite(http.SameSiteLaxMode)
-		c.SetCookie("token", "", -1, "/", "", false, true)
+		clearAuthCookie(c)
 		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
@@ -99,14 +98,14 @@ func GetSession(c *gin.Context) {
 		return
 	}
 	if blacklisted {
-		c.SetSameSite(http.SameSiteLaxMode)
-		c.SetCookie("token", "", -1, "/", "", false, true)
+		clearAuthCookie(c)
 		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
 
 	user, err := repository.GetUserById(claims.Subject)
 	if err == pgx.ErrNoRows {
+		clearAuthCookie(c)
 		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
@@ -221,8 +220,7 @@ func LogoutUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("token", "", -1, "/", "", false, true)
+	clearAuthCookie(c)
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
@@ -239,6 +237,11 @@ func DeleteUser(c *gin.Context) {
 func SearchUsers(c *gin.Context) {
 	// TODO: call repository.SearchUsers()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+}
+
+func clearAuthCookie(c *gin.Context) {
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", "", -1, "/", "", false, true)
 }
 
 // Function to trim leading and trailing blank spaces, set email to lowercase

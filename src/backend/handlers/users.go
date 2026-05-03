@@ -391,7 +391,7 @@ func isTokenBlacklisted(token string) (bool, error) {
 func addTokenToBlacklist(token string, expirationDate time.Time) error {
 	err := repository.AddTokenToBlacklist(token, expirationDate)
 	if err != nil {
-		return fmt.Errorf("addTokenToBlacklist: %v", err)
+		return fmt.Errorf("addTokenToBlacklist: %w", err)
 	}
 	return nil
 }

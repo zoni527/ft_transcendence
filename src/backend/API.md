@@ -431,7 +431,7 @@ Create a new recipe with steps and ingredients.
 
 Get a pre-signed Cloudinary signature for uploading recipe images. Required for secure client-side image uploads.
 
-**Requires:** `Authorization` header with valid JWT.
+**Requires:** Valid JWT in `token` cookie (set during login).
 
 **Response** `200 OK`
 ```json

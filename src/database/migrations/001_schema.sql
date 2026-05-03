@@ -42,6 +42,11 @@ CREATE TABLE role_permission (
     PRIMARY KEY (role_id, permission_id)
 );
 
+CREATE TABLE token_blacklist (
+    token              VARCHAR PRIMARY KEY,
+    expiration_date    TIMESTAMP NOT NULL
+);
+
 -- =====================
 -- RECIPE
 -- =====================

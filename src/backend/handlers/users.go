@@ -207,15 +207,9 @@ func LoginUser(c *gin.Context) {
 }
 
 func LogoutUser(c *gin.Context) {
-	token, err := c.Cookie("token")
-	if err != nil {
-		log.Printf("LogoutUser: %v", err)
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
+	token := c.GetString("token")
 	expDate := c.GetTime("expDate")
-	err = addTokenToBlacklist(token, expDate)
-	if err != nil {
+	if err := addTokenToBlacklist(token, expDate); err != nil {
 		log.Printf("LogoutUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
@@ -422,6 +416,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
+		c.Set("token", token)
 		c.Set("userID", claims.Subject)
 		c.Set("expDate", claims.ExpiresAt.Time)
 		c.Next()

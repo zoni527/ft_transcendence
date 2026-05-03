@@ -12,7 +12,7 @@ import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { showNotification } = useNotification();
-  const { user, hasRole } = useAuth();
+  const { hasRole } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { state } = useLocation() as { state?: { recipe?: Recipe } };
@@ -164,16 +164,15 @@ const RecipeDetail = () => {
           </button>
         </div>
 
-        {/* Delete Button - only visible if user can delete */}
-        {user && hasRole(['chef', 'moderator', 'admin']) && (
-          <SubmitButton
-            isLoading={loading}
-            pendingText={t('recipeDetail.submitPending')}
-            defaultText={t('recipeDetail.submit')}
-            onClick={() => handleDelete(id)}
-            type="button"
-          />
-        )}
+        {/* Delete Button */}
+        <SubmitButton
+          isLoading={loading}
+          pendingText={t('recipeDetail.submitPending')}
+          defaultText={t('recipeDetail.submit')}
+          onClick={() => handleDelete(id)}
+          type="button"
+          disabled={!hasRole(['chef', 'moderator', 'admin'])}
+        />
       </div>
     </div>
   );

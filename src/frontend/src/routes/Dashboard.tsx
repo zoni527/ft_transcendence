@@ -27,7 +27,7 @@ const Dashboard = () => {
         <img
           src={'/path/to/default/avatar.jpg'}
           alt={`${user.name}'s avatar`}
-          className="h-32 w-32 rounded-full border-2 border-gray-300"
+          className="h-24 w-24 rounded-full border-2 border-gray-300"
         />
       </div>
 
@@ -37,7 +37,7 @@ const Dashboard = () => {
       </h1>
 
       {/* User Info Section */}
-      <div className="mt-6 space-y-6">
+      <div className="mt-26 space-y-6">
         <div className="flex flex-col gap-4">
           {/* Full name */}
           <div className="flex items-center justify-between border-b border-gray-300 pb-4">
@@ -105,11 +105,13 @@ const Dashboard = () => {
 
       {/* Bottom Section */}
       <div className="mt-6">
-        {hasRole(['admin', 'moderator', 'chef']) && (
-          <NavButton path="/create" className={buttonBase}>
-            {t('dashboard.createRecipe')}
-          </NavButton>
-        )}
+        <NavButton
+          path="/create"
+          className={buttonBase}
+          disabled={!hasRole(['admin', 'moderator', 'chef'])}
+        >
+          {t('dashboard.createRecipe')}
+        </NavButton>
       </div>
     </div>
   );

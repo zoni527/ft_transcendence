@@ -7,6 +7,7 @@ interface SubmitButtonProps {
   pendingText: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit';
+  disabled?: boolean;
 }
 
 const SubmitButton = ({
@@ -15,12 +16,13 @@ const SubmitButton = ({
   pendingText,
   onClick,
   type = 'submit',
+  disabled = false,
 }: SubmitButtonProps) => {
   return (
     <button
       type={type}
-      className={`${buttonBase}${isLoading ? 'cursor-not-allowed opacity-50 hover:bg-inherit' : ''}`}
-      disabled={isLoading}
+      className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+      disabled={isLoading || disabled}
       aria-busy={isLoading}
       onClick={onClick}
     >

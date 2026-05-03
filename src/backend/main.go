@@ -19,6 +19,8 @@ func main() {
 	}
 	defer repository.ClosePool()
 
+	go handlers.TokenCleanupLoop()
+
 	handlers.LoadJWTSecret()
 
 	err = handlers.LoadCloudinaryVars()
@@ -42,6 +44,7 @@ func main() {
 	router.DELETE("/api/users/:id", handlers.DeleteUser)  // not implemented yet
 	router.GET("/api/users/search", handlers.SearchUsers) // not implemented yet
 	router.POST("/api/users/login", handlers.LoginUser)
+	router.POST("/api/users/logout", handlers.AuthMiddleware(), handlers.LogoutUser)
 	router.GET("/api/users/me", handlers.AuthMiddleware(), handlers.GetMe)
 
 	// Recipes

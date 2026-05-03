@@ -21,7 +21,16 @@ const Dashboard = () => {
   }
 
   return (
-    <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
+    <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
+      {/* Avatar */}
+      <div className="absolute top-8 right-8">
+        <img
+          src={'/path/to/default/avatar.jpg'}
+          alt={`${user.name}'s avatar`}
+          className="h-32 w-32 rounded-full border-2 border-gray-300"
+        />
+      </div>
+
       {/* Header */}
       <h1 className="mb-8 text-3xl font-bold text-orange-700">
         {t('common.welcome')}, {user.name}!

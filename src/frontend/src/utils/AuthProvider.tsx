@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { AuthContext } from './AuthContext';
-import { getUser } from '../api';
+import { getSession } from '../api';
 import type { User } from '../types/types';
 
 type Props = {
@@ -22,7 +22,7 @@ const AuthProvider = ({ children, t }: Props) => {
 
     const initAuth = async () => {
       try {
-        const me = await getUser(t);
+        const me = await getSession(t);
 
         if (isMounted) {
           setUser(me);

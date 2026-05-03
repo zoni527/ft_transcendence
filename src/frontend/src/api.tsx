@@ -22,6 +22,11 @@ interface CreateRecipeResponse {
   id: string;
 }
 
+interface SessionResponse {
+  authenticated: boolean;
+  user: User;
+}
+
 interface LoginPayload {
   email: string;
   password: string;
@@ -63,6 +68,17 @@ function isCreateRecipeResponse(data: unknown): data is CreateRecipeResponse {
   const obj = data as Record<string, unknown>;
 
   return typeof obj.id === 'string';
+}
+
+// Validation for SessionResponse
+function isSessionResponse(data: unknown): data is SessionResponse {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return typeof obj.authenticated === 'boolean' && isUserResponse(obj.user);
 }
 
 // Validation for UserResponse
@@ -227,6 +243,35 @@ export const postCreateRecipe = async (
   }
 
   return data;
+};
+
+// GET /api/users/session (session authentication)
+export const getSession = async (t: TFunction): Promise<User | null> => {
+  const response = await fetch(`${baseUrl}/users/session`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isSessionResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  if (!data.authenticated) return null;
+
+  return data.user;
 };
 
 // GET /api/users/me (user authentication)

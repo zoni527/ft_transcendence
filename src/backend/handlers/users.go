@@ -176,7 +176,7 @@ func LogoutUser(c *gin.Context) {
 	err = addTokenToBlacklist(token, expDate)
 	if err != nil {
 		log.Printf("LogoutUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)

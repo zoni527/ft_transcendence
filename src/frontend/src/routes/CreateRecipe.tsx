@@ -116,12 +116,10 @@ const CreateRecipe = () => {
       showNotification(t('notification.createRecipeSuccess'), 'success');
       void navigate(`/recipes/${recipe.id}`);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        const message =
-          err instanceof Error ? err.message : t('error.genericError');
+      const message =
+        err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
-      }
+      showNotification(message, 'error');
     } finally {
       setLoading(false);
     }

@@ -18,7 +18,7 @@ const Navbar = () => {
       .then(() => {
         logout();
 
-        showNotification(t('notication.logoutSuccess'), 'success');
+        showNotification(t('notification.logoutSuccess'), 'success');
         void navigate('/');
       })
       .catch((err: unknown) => {

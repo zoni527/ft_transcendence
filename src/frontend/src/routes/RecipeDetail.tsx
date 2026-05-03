@@ -47,10 +47,14 @@ const RecipeDetail = () => {
   };
 
   useEffect(() => {
-    if (!id || cachedRecipe) return;
+    if (!id || cachedRecipe) {
+      return;
+    }
 
     getRecipeById(id, t)
-      .then(setRecipe)
+      .then((fetchedRecipe) => {
+        setRecipe(fetchedRecipe);
+      })
       .catch((err: unknown) => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
@@ -60,7 +64,7 @@ const RecipeDetail = () => {
       });
   }, [id, cachedRecipe, t, navigate, showNotification]);
 
-  if (loading) {
+  if (recipe === null) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 

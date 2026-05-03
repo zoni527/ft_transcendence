@@ -1,4 +1,4 @@
-import { useState, useMemo, type ReactNode } from 'react';
+import { useState, useMemo, useCallback, type ReactNode } from 'react';
 import Notification from '../components/Notification';
 import { NotificationContext } from './NotifContext.ts';
 import type { NotificationVariant } from './NotifContext.ts';
@@ -19,7 +19,7 @@ const NotificationProvider = ({ children }: Props) => {
     setNotification({ message: msg, variant });
   };
 
-  const clear = () => setNotification(null);
+  const clear = useCallback(() => setNotification(null), []);
 
   const value = useMemo(() => ({ showNotification }), []);
 

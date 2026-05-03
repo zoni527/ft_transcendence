@@ -220,7 +220,7 @@ Authenticate a user and receive a JWT token.
 }
 ```
 
-Sets a secure `token` cookie with JWT.
+Sets a `token` cookie with JWT. The cookie can be marked Secure once the API is served over HTTPS.
 
 **Errors:**
 | Status | When |
@@ -234,7 +234,7 @@ Sets a secure `token` cookie with JWT.
 
 Log out the current authenticated user. Clears the authentication cookie.
 
-**Requires:** `Authorization` header with valid JWT.
+**Requires:** Valid JWT in `token` cookie (set during login).
 
 **Response** `200 OK`
 ```json
@@ -254,7 +254,7 @@ Log out the current authenticated user. Clears the authentication cookie.
 
 Get the profile of the currently authenticated user.
 
-**Requires:** `Authorization` header with valid JWT.
+**Requires:** Valid JWT in `token` cookie (set during login).
 
 **Response** `200 OK`
 ```json

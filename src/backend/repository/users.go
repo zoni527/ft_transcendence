@@ -53,7 +53,8 @@ func GetRolesByUserId(userId string) ([]string, error) {
 
 // GetAllUsers returns all users with their roles attached.
 func GetAllUsers() ([]models.User, error) {
-	sql := `SELECT id, email, name, display_name, created_at, updated_at
+	sql := `SELECT id, email, name, display_name, COALESCE(avatar_url, ''),
+				created_at, updated_at
 			FROM "user" `
 
 	rows, err := Pool.Query(context.Background(), sql)
@@ -70,6 +71,7 @@ func GetAllUsers() ([]models.User, error) {
 			&u.Email,
 			&u.Name,
 			&u.Display_name,
+			&u.Avatar_url,
 			&u.Created_at,
 			&u.Updated_at,
 		)
@@ -98,7 +100,8 @@ func GetAllUsers() ([]models.User, error) {
 
 // GetUserById returns a single user by UUID, with roles attached.
 func GetUserById(id string) (models.User, error) {
-	sql := `SELECT id, email, name, display_name, created_at, updated_at
+	sql := `SELECT id, email, name, display_name, COALESCE(avatar_url, ''),
+				created_at, updated_at
 			FROM "user"
 			WHERE id = $1`
 
@@ -108,6 +111,7 @@ func GetUserById(id string) (models.User, error) {
 		&u.Email,
 		&u.Name,
 		&u.Display_name,
+		&u.Avatar_url,
 		&u.Created_at,
 		&u.Updated_at,
 	)

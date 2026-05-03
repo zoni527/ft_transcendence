@@ -392,6 +392,9 @@ func ValidateJWTToken(token string) (*jwt.RegisteredClaims, error) {
 	if claims.Subject == "" {
 		return nil, fmt.Errorf("missing userID")
 	}
+	if claims.ExpiresAt == nil {
+		return nil, fmt.Errorf("missing exp")
+	}
 	return claims, nil
 }
 
@@ -411,7 +414,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		blacklisted, err := isTokenBlacklisted(token)
 		if err != nil {
-			log.Printf("check blacklist failed: %v", err)
+			log.Printf("Check blacklist failed: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}

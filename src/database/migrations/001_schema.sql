@@ -43,9 +43,12 @@ CREATE TABLE role_permission (
 );
 
 CREATE TABLE token_blacklist (
-    token              VARCHAR PRIMARY KEY,
+    token_hash         VARCHAR(64) PRIMARY KEY CHECK (char_length(token_hash) = 64),
     expiration_date    TIMESTAMP NOT NULL
 );
+
+CREATE INDEX idx_token_blacklist_expiration_date
+     ON token_blacklist (expiration_date);
 
 -- =====================
 -- RECIPE

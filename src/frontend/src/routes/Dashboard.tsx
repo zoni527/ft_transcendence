@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
 import NavButton from '../components/NavButton';
+import PencilIcon from '../components/PencilIcon';
 import StatusBox from '../components/StatusBox';
 import { useAuth } from '../utils/AuthContext';
 import { cardBase, buttonBase } from '../styles/styles';
@@ -22,33 +23,79 @@ const Dashboard = () => {
   return (
     <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
       {/* Header */}
-      <h1 className="mb-6 text-2xl font-semibold text-orange-700">
+      <h1 className="mb-8 text-3xl font-bold text-orange-700">
         {t('common.welcome')}, {user.name}!
       </h1>
 
-      {/* User Info Fields */}
-      <div className="mt-6 space-y-16">
-        <div className="flex gap-8">
-          {/* Left */}
-          <div className="flex-1 space-y-2">
-            <DataField
-              label={t('dashboard.username')}
-              value={user.display_name}
-            />
-            <DataField label={t('dashboard.email')} value={user.email} />
+      {/* User Info Section */}
+      <div className="mt-6 space-y-6">
+        <div className="flex flex-col gap-4">
+          {/* Full name */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField label={t('dashboard.name')} value={user.name} />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('common.edit')}
+            >
+              <PencilIcon />
+            </button>
           </div>
 
-          {/* Right */}
-          <div className="flex-1 space-y-2">
-            <DataField
-              label={t('dashboard.roles')}
-              value={user.roles.join(', ')}
-            />
+          {/* Username */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField
+                label={t('dashboard.username')}
+                value={user.display_name}
+              />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('common.edit')}
+            >
+              <PencilIcon />
+            </button>
+          </div>
+
+          {/* Email */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField label={t('dashboard.email')} value={user.email} />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('common.edit')}
+            >
+              <PencilIcon />
+            </button>
+          </div>
+
+          {/* Roles */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField
+                label={t('dashboard.roles')}
+                value={user.roles.join(', ')}
+              />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('common.edit')}
+            >
+              <PencilIcon />
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Bottom */}
-        <div className="w-full space-y-2"></div>
+      {/* Bottom Section */}
+      <div className="mt-6">
         {hasRole(['admin', 'moderator', 'chef']) && (
           <NavButton path="/create" className={buttonBase}>
             {t('dashboard.createRecipe')}

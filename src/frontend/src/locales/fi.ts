@@ -28,135 +28,13 @@ export const fiTranslations = {
     submitPending: 'Poistetaan reseptiä...',
   },
   dashboard: {
+    name: 'Koko nimi',
     username: 'Käyttäjätunnus',
     email: 'Sähköposti',
     createdAt: 'Luotu',
     updatedAt: 'Päivitetty',
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
-  },
-  footer: {
-    privacy: 'Tietosuojakäytäntö',
-    terms: 'Käyttöehdot',
-  },
-  privacyPolicy: {
-    intro: `RISE-palvelussa luottamuksesi on meille tärkeää.
-      Tämä tietosuojakäytäntö selittää, mitä tietoja keräämme käyttäessäsi reseptien jakamisalustaa, miten käytämme niitä ja mitkä oikeudet sinulla on yleisen tietosuoja-asetuksen (GDPR) ja muiden soveltuvien lakien mukaisesti.`,
-
-    section1_title: '1. Keitä olemme',
-    section1_text: `RISE on reseptien jakamisalusta, joka on kehitetty osana ft_transcendence-projektia 42-koulussa.
-      Rekisterinpitäjänä toimii RISE-tiimi.`,
-
-    section2_title: '2. Mitä keräämme',
-    section2_text: `Tilitiedot: nimi, sähköpostiosoite ja suolattu, hajautettu salasana.
-      Luomasi sisältö: reseptit, kuvat, kommentit ja arviot, jotka julkaiset alustalla.
-      Tekniset tiedot: IP-osoite, selain ja laitteen tiedot, jotka kerätään automaattisesti.
-      Evästeet: katso kohta 6.`,
-
-    section3_title: '3. Miten käytämme tietojasi',
-    section3_text: `Palvelun tarjoamiseksi ja mahdollistaaksemme kirjautumisesi, reseptien luomisen ja tallentamisen, kommenttien ja arvostelujen julkaisemisen sekä muiden käyttäjien seuraamisen.
-      Väärinkäytösten, petosten ja tietoturvan estämiseen.
-      Yhteydenpitoon tilisi tai tärkeiden muutosten osalta.`,
-
-    section4_title: '4. Oikeusperuste (GDPR artikla 6)',
-    section4_text: `Sopimuksen täytäntöönpano: tilinhallinta ja sisällön tallennus.
-      Oikeutettu etu: tietoturvan valvonta ja tuotteen analytiikka.
-      Suostumus: ei-välttämättömät evästeet ja valinnainen viestintä.
-      Lakisääteinen velvoite: jos laki sitä edellyttää.`,
-
-    section5_title: '5. Tietojen jakaminen',
-    section5_text: `Emme myy henkilötietojasi. Jaamme niitä vain:
-      - palveluntarjoajien kanssa (hosting, sähköpostipalvelut), joita sitovat tietojenkäsittelysopimukset.
-      - viranomaisten kanssa, jos laki sitä vaatii.`,
-
-    section6_title: '6. Evästeet',
-    section6_text: `Käytämme välttämättömiä evästeitä istunnon hallintaan ja tietoturvaan.`,
-
-    section7_title: '7. Oikeutesi',
-    section7_text: `GDPR:n mukaan sinulla on oikeus:
-      - pääsy omiin henkilötietoihisi.
-      - pyytää virheellisten tietojen korjaamista.
-      - pyytää tietojen poistamista ("oikeus tulla unohdetuksi").
-      - saada tietosi siirrettävässä muodossa.
-      - vastustaa käsittelyä, joka perustuu oikeutettuun etuun.
-      - peruuttaa suostumus suostumukseen perustuvasta käsittelystä.
-      - tehdä valitus valvontaviranomaiselle.`,
-
-    section8_title: '8. Tietojen säilytys',
-    section8_text: `Säilytämme tilitietoja niin kauan kuin tilisi on aktiivinen.`,
-
-    section9_title: '9. Tietoturva',
-    section9_text: `Salasanat on hajautettu ja suolattu.
-      Kaikki liikenne kulkee HTTPS-yhteyden kautta.
-      Noudatamme alan parhaita käytäntöjä tallennuksessa, pääsynhallinnassa ja häiriötilanteiden hallinnassa.`,
-
-    section10_title: '10. Lapset',
-    section10_text: `RISE ei ole tarkoitettu alle 13-vuotiaille käyttäjille.`,
-
-    section11_title: '11. Muutokset tähän käytäntöön',
-    section11_text: `Voimme päivittää tätä käytäntöä ajoittain.`,
-  },
-  termsService: {
-    intro: `Tervetuloa RISE-palveluun.
-      Käyttämällä reseptien jakamiseen tarkoitettua alustaamme hyväksyt nämä käyttöehdot ("ehdot").
-      Lue ehdot huolellisesti.`,
-
-    section1_title: '1. Ehtojen hyväksyminen',
-    section1_text: `Luomalla tilin tai käyttämällä RISE-palvelua hyväksyt nämä ehdot sekä tietosuojakäytäntömme.
-      Jos et hyväksy ehtoja, älä käytä palvelua.`,
-
-    section2_title: '2. Käyttöoikeus',
-    section2_text: `Sinun on oltava vähintään 13-vuotias käyttääksesi RISE-palvelua.
-      Jos olet alle 18-vuotias, vanhempasi tai huoltajasi tulee hyväksyä nämä ehdot puolestasi.`,
-
-    section3_title: '3. Tilisi',
-    section3_text: `Anna rekisteröityessäsi oikeat ja ajantasaiset tiedot.
-      Pidä salasanasi luottamuksellisena ja turvallisena.
-      Olet vastuussa kaikesta tililläsi tapahtuvasta toiminnasta.`,
-
-    section4_title: '4. Sisältösi',
-    section4_text: `Säilytät omistusoikeuden lataamiisi resepteihin, kuviin ja kommentteihin.
-      Antamalla sisältöä myönnät meille maailmanlaajuisen, ei-yksinomaisen ja rojaltivapaan lisenssin näyttää, tallentaa ja jakaa sisältöä palvelussa.
-
-      Et saa julkaista sisältöä, joka:
-      - rikkoo lakia tai kolmansien osapuolten oikeuksia.
-      - sisältää vihapuhetta tai häirintää.
-      - vääristää ainesosia tai jättää ilmoittamatta allergeeneja.
-      - edistää vaarallisia ruoan käsittelytapoja.`,
-
-    section5_title: '5. Sallittu käyttö',
-    section5_text: `Käyttäjät EIVÄT saa:
-      - kerätä tai kopioida sisältöä laajamittaisesti ilman lupaa.
-      - yrittää murtaa palvelun tai muiden käyttäjien turvallisuutta.
-      - tehdä vääriä ilmoituksia tai väärinkäyttää moderointia.
-      - esiintyä toisena henkilönä tai organisaationa.
-      - lähettää roskapostia tai haittaohjelmia.
-      - käänteismallintaa tai häiritä palvelun toimintaa.`,
-
-    section6_title: '6. Immateriaalioikeudet',
-    section6_text: `RISE-nimi, logo, käyttöliittymä ja lähdekoodi kuuluvat RISE-tiimille.
-      Niitä ei saa kopioida tai käyttää ilman kirjallista lupaa.
-      Yhteisön reseptit kuuluvat niiden tekijöille.`,
-
-    section7_title: '7. Tilin päättäminen',
-    section7_text: `Voimme jäädyttää tai sulkea tilejä, jotka rikkovat näitä ehtoja.
-      Voit poistaa tilisi milloin tahansa asetuksista, jolloin tietosi poistetaan tietosuojakäytäntömme mukaisesti.`,
-
-    section8_title: '8. Vastuuvapauslauseke',
-    section8_text: `Reseptit tarjoavat käyttäjät sellaisenaan.
-      RISE ei tarkista ravintoarvoja, allergeeneja tai turvallisuustietoja.
-      Valmista ruokaa vastuullisesti ja tarvittaessa konsultoi asiantuntijaa.`,
-
-    section9_title: '9. Vastuunrajoitus',
-    section9_text: `Sovellettavan lain sallimissa rajoissa RISE ei ole vastuussa epäsuorista tai välillisistä vahingoista.`,
-
-    section10_title: '10. Ehtojen muutokset',
-    section10_text: `Voimme päivittää näitä ehtoja.
-      Palvelun jatkokäyttö tarkoittaa muutosten hyväksymistä.`,
-
-    section11_title: '11. Sovellettava laki',
-    section11_text: `Näihin ehtoihin sovelletaan Suomen lakia.
-      Riidat ratkaistaan Suomen tuomioistuimissa.`,
   },
   login: {
     header: 'Kirjaudu sisään',
@@ -262,7 +140,7 @@ export const fiTranslations = {
     bannerTitle: 'Reseptejä, joita varten kannattaa herätä',
     loading: 'Ladataan...',
     welcome: 'Tervetuloa',
-    rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
+    edit: 'Muokkaa',
   },
   error: {
     error: 'Virhe:',

@@ -277,7 +277,7 @@ Get the profile of the currently authenticated user.
 
 ---
 
-### GET /api/session
+### GET /api/users/session
 
 Check whether the current browser session is authenticated.
 

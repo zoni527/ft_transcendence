@@ -165,6 +165,25 @@ func LoginUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 
+func LogoutUser(c *gin.Context) {
+	token, err := c.Cookie("token")
+	if err != nil {
+		log.Printf("LogoutUser: %v", err)
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	expDate := c.GetTime("expDate")
+	err = addTokenToBlacklist(token, expDate)
+	if err != nil {
+		log.Printf("LogoutUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", "", -1, "/", "", false, true)
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "logged out successfully"})
+}
+
 func UpdateUser(c *gin.Context) {
 	// TODO: call repository.UpdateUser()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
@@ -306,7 +325,7 @@ func generateJWTToken(userID string) (string, error) {
 	now := time.Now()
 	claims := jwt.RegisteredClaims{
 		Subject:   userID,
-		ExpiresAt: jwt.NewNumericDate(now.Add(24 * time.Hour)),
+		ExpiresAt: jwt.NewNumericDate(now.Add(1 * time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(now),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -345,7 +364,44 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
+		blacklisted, err := isTokenBlacklisted(token)
+		if err != nil {
+			log.Printf("check blacklist failed: %v", err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			return
+		}
+		if blacklisted {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			return
+		}
 		c.Set("userID", claims.Subject)
+		c.Set("expDate", claims.ExpiresAt.Time)
 		c.Next()
+	}
+}
+
+func isTokenBlacklisted(token string) (bool, error) {
+	exist, err := repository.GetTokenBlacklisted(token)
+	if err != nil {
+		return false, fmt.Errorf("check token blacklist: %w", err)
+	}
+	return exist, nil
+}
+
+func addTokenToBlacklist(token string, expirationDate time.Time) error {
+	err := repository.AddTokenToBlacklist(token, expirationDate)
+	if err != nil {
+		return fmt.Errorf("addTokenToBlacklist: %v", err)
+	}
+	return nil
+}
+
+func TokenCleanupLoop() {
+	ticker := time.NewTicker(1 * time.Hour)
+	defer ticker.Stop()
+	for range ticker.C {
+		if err := repository.CleanExpiredTokens(time.Now()); err != nil {
+			log.Printf("TokenCleanupLoop: %v", err)
+		}
 	}
 }

@@ -285,6 +285,22 @@ export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   }
 };
 
+// POST /api/users/logout (user logout)
+export const postLogout = async (t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/logout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+};
+
 // POST /api/users (user signup)
 export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   const response = await fetch(`${baseUrl}/users`, {

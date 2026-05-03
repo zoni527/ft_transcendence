@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import type { User } from '../types/types';
-import { AuthContext } from './AuthContext';
-import { getUser } from '../api';
 import type { TFunction } from 'i18next';
+import { AuthContext } from './AuthContext';
+import { getUser, postLogout } from '../api';
+import { useNotification } from '../utils/NotifContext.ts';
+import type { User } from '../types/types';
 
 type Props = {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ type Props = {
 const AuthProvider = ({ children, t }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { showNotification } = useNotification();
 
   const hasRole = (roles: string[]) => {
     return user?.roles.some((r) => roles.includes(r)) ?? false;
@@ -49,14 +51,17 @@ const AuthProvider = ({ children, t }: Props) => {
     setUser(userData);
   };
 
-  // This might need a backend implementation
   const logout = () => {
-    // await fetch('/api/logout', {
-    //   method: 'POST',
-    //   credentials: 'include',
-    // });
-
-    setUser(null);
+    postLogout(t)
+      .then(() => {
+        showNotification(t('notication.logoutSuccess'), 'success');
+        setUser(null);
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+        showNotification(message, 'error');
+      });
   };
 
   return (

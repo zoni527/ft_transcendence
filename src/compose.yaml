@@ -19,7 +19,7 @@ services:
     ports:
       - "127.0.0.1:${NGINX_PORT_EXTERNAL:-8080}:${NGINX_PORT_INTERNAL:-80}"
     environment:
-      - NGINX_PORT_INTERNAL=80
+      - NGINX_PORT_INTERNAL=${NGINX_PORT_INTERNAL:-80}
     networks:
       - transcendence_network
     restart: unless-stopped

@@ -158,26 +158,99 @@ Create a new user.
 
 ---
 
-### PUT /api/users/:id
+### PUT /api/users/me
 
-Replace a user completely. All fields are required.
+Update the current user's profile. Requires authentication.
+
+**Authentication:** JWT token in `token` cookie
 
 **Request body:**
 ```json
 {
-  "email": "user@example.com",
-  "name": "Jane",
-  "display_name": "jane_cooks"
+  "email": "newemail@example.com",
+  "name": "Jane Doe",
+  "display_name": "jane_cooks_new",
+  "avatar_url": "https://example.com/avatar.png"
 }
 ```
 
-**Response** `200 OK` — returns the updated user.
+**Notes:**
+- `email` and `display_name` are required
+- `name` and `avatar_url` are optional
+- Users cannot modify their `roles` via this endpoint
+- Email must be unique; changing to an existing email will fail
+
+**Response** `200 OK`
+```json
+{
+  "id": "uuid",
+  "email": "newemail@example.com",
+  "name": "Jane Doe",
+  "display_name": "jane_cooks_new",
+  "avatar_url": "https://example.com/avatar.png",
+  "created_at": "2026-04-09T12:00:00Z",
+  "updated_at": "2026-04-09T12:00:00Z",
+  "roles": ["user"]
+}
+```
 
 **Errors:**
 | Status | When |
 |---|---|
-| 400 | Missing required fields |
+| 400 | Invalid input data or missing required fields |
+| 401 | Unauthorized — invalid or missing token |
+| 409 | Email already exists (taken by another user) |
+| 500 | Internal server error |
+
+---
+
+### PUT /api/users/:id
+
+Update any user (admin-only). Allows changing profile fields and roles.
+
+**Authentication:** JWT token (admin role required) in `token` cookie
+
+**Request body:**
+```json
+{
+  "email": "newemail@example.com",
+  "name": "Jane Doe",
+  "display_name": "jane_updated",
+  "avatar_url": "https://example.com/avatar.png",
+  "roles": ["user", "admin"]
+}
+```
+
+**Notes:**
+- `email`, `display_name`, and `roles` are required
+- `name` and `avatar_url` are optional
+- Only admins can modify users' roles
+- Entire role list is replaced (not additive)
+- All operations are atomic: if any step fails, the entire transaction rolls back
+
+**Response** `200 OK`
+```json
+{
+  "id": "uuid",
+  "email": "newemail@example.com",
+  "name": "Jane Doe",
+  "display_name": "jane_updated",
+  "avatar_url": "https://example.com/avatar.png",
+  "created_at": "2026-04-09T12:00:00Z",
+  "updated_at": "2026-04-09T12:00:00Z",
+  "roles": ["user", "admin"]
+}
+```
+
+**Errors:**
+| Status | When |
+|---|---|
+| 400 | Invalid input data or missing required fields |
+| 401 | Unauthorized — invalid or missing token |
+| 403 | Forbidden — user lacks admin role |
 | 404 | User not found |
+| 409 | Email already exists (taken by another user) |
+| 500 | Internal server error |
 
 ---
 

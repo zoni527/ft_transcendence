@@ -76,7 +76,7 @@ const Dashboard = () => {
             value={user.roles.join(', ')}
           />
         </div>
-        <NavButton path="/create" className={`${buttonBase}`}>
+        <NavButton to="/create" className={`${buttonBase}`}>
           {t('dashboard.createRecipe')}
         </NavButton>
       </div>

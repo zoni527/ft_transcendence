@@ -12,20 +12,20 @@ const Navbar = () => {
     >
       {/* Left Side */}
       <div className="flex gap-6 text-xl font-semibold">
-        <NavButton path="/" className={`${navLeftBase}`}>
+        <NavButton to="/" className={`${navLeftBase}`}>
           {t('nav.recipes')}
         </NavButton>
-        <NavButton path="/dashboard" className={`${navLeftBase}`}>
+        <NavButton to="/dashboard" className={`${navLeftBase}`}>
           {t('nav.dashboard')}
         </NavButton>
       </div>
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
-        <NavButton path="/signup" className={`${buttonBase}`}>
+        <NavButton to="/signup" className={`${buttonBase}`}>
           {t('nav.signup')}
         </NavButton>
-        <NavButton path="/login" className={`${buttonBase}`}>
+        <NavButton to="/login" className={`${buttonBase}`}>
           {t('nav.login')}
         </NavButton>
         <LangDropdown />

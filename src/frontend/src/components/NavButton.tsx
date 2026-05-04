@@ -1,23 +1,17 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
 interface NavButtonProps {
-  path: string;
+  to: string;
   children: ReactNode;
   className: string;
 }
 
-const NavButton = ({ path, className, children }: NavButtonProps) => {
-  const navigate = useNavigate();
-
-  const handleNavigation = () => {
-    void navigate(path);
-  };
-
+const NavButton = ({ to, className, children }: NavButtonProps) => {
   return (
-    <button onClick={handleNavigation} className={`${className}`}>
+    <Link to={to} className={className}>
       {children}
-    </button>
+    </Link>
   );
 };
 

@@ -238,6 +238,7 @@ func UpdateUser(c *gin.Context) {
 		Email:        req.Email,
 		Name:         req.Name,
 		Display_name: req.Display_name,
+		Avatar_url:   req.Avatar_url,
 		roles:        req.Roles,
 		Updated_at:   Time.Now(),
 	}

@@ -17,6 +17,8 @@ export const buttonBase = `
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   hover:bg-orange-800
   whitespace-nowrap
+  transition-colors
+  duration-300
 `;
 
 export const langButtonBase = `
@@ -32,6 +34,8 @@ export const langButtonBase = `
   hover:bg-orange-800
   hover:text-white
   active:scale-95
+  transition-colors
+  duration-300
 `;
 
 export const uploadButtonBase = `
@@ -56,7 +60,8 @@ export const navLeftBase = `
   text-orange-700
   hover:cursor-pointer
   hover:text-orange-800
-  hover:underline
+  transition-colors
+  duration-300
 `;
 
 export const inputFieldBase = `

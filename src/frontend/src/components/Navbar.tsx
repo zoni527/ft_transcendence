@@ -38,35 +38,21 @@ const Navbar = () => {
         <NavButton to="/" className={`${navLeftBase}`}>
           {t('nav.recipes')}
         </NavButton>
-<<<<<<< HEAD
-        <NavButton to="/dashboard" className={`${navLeftBase}`}>
-          {t('nav.dashboard')}
-        </NavButton>
-=======
->>>>>>> 1e806cb (feature: rework navbar to have conditional UI)
       </div>
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
-<<<<<<< HEAD
-        <NavButton to="/signup" className={`${buttonBase}`}>
-          {t('nav.signup')}
-        </NavButton>
-        <NavButton to="/login" className={`${buttonBase}`}>
-          {t('nav.login')}
-        </NavButton>
-=======
         {!user ? (
-          <NavButton path="/signup" className={`${buttonBase}`}>
+          <NavButton to="/signup" className={`${buttonBase}`}>
             {t('nav.signup')}
           </NavButton>
         ) : (
-          <NavButton path="/dashboard" className={`${buttonBase}`}>
+          <NavButton to="/dashboard" className={`${buttonBase}`}>
             {t('nav.dashboard')}
           </NavButton>
         )}
         {!user ? (
-          <NavButton path="/login" className={buttonBase}>
+          <NavButton to="/login" className={buttonBase}>
             {t('nav.login')}
           </NavButton>
         ) : (
@@ -74,7 +60,6 @@ const Navbar = () => {
             {t('nav.logout')}
           </NavButton>
         )}
->>>>>>> 1e806cb (feature: rework navbar to have conditional UI)
         <LangDropdown />
       </div>
     </nav>

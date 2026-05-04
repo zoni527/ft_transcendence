@@ -4,7 +4,8 @@ package handlers
 // [done] GetUsers      — GET /api/users
 // [done] GetUserById   — GET /api/users/:id
 // [done] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
-// [TODO] UpdateUser    — PUT /api/users/:id
+// [done] UpdateMe     — PUT /api/users/me
+// [done] UpdateUser   — PUT /api/users/:id
 // [TODO] DeleteUser    — DELETE /api/users/:id
 // [TODO] SearchUsers   — GET /api/users/search?q=
 
@@ -59,12 +60,12 @@ func GetUserById(c *gin.Context) {
 }
 
 func GetMe(c *gin.Context) {
-	id := c.GetString("userID")
-	if !isValidUUID(id) {
+	userID := c.GetString("userID")
+	if !isValidUUID(userID) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-	user, err := repository.GetUserById(id)
+	user, err := repository.GetUserById(userID)
 	if err == pgx.ErrNoRows {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -124,13 +125,8 @@ func CreateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	normalizeUserFields(&req)
-	if req.Name != "" && !isValidName(req.Name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
-		return
-	}
-	if !isValidDisplayName(req.Display_name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
+	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if err := validatePassword(req.Password); err != nil {
@@ -218,9 +214,36 @@ func LogoutUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
+func UpdateMe(c *gin.Context) {
+	userID := c.GetString("userID")
+	var req models.UpdateMeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	userParams := models.UpdateMeRequest{
+		Email:        req.Email,
+		Name:         req.Name,
+		Display_name: req.Display_name,
+		Avatar_url:   req.Avatar_url,
+	}
+	user, err := repository.UpdateMe(userID, userParams)
+	if err != nil {
+		log.Printf("UpdateMe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
+}
+
 func UpdateUser(c *gin.Context) {
-	id := c.Param("id")
-	if !isValidUUID(id) {
+	targetUserID := c.Param("id")
+	if !isValidUUID(targetUserID) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
 		return
 	}
@@ -229,13 +252,8 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	normalizeUserFields(&req)
-	if req.Name != "" && !isValidName(req.Name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
-		return
-	}
-	if !isValidDisplayName(req.Display_name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
+	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	userParams := models.UpdateUserRequest{
@@ -243,45 +261,11 @@ func UpdateUser(c *gin.Context) {
 		Name:         req.Name,
 		Display_name: req.Display_name,
 		Avatar_url:   req.Avatar_url,
-	}
-	if user, err := repository.UpdateUser(id, userParams); err != nil {
-		log.Printf("UpdateUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, user)
-}
-
-func AdminUpdateUser(c *gin.Context) {
-	id := c.Param("id")
-	if !isValidUUID(id) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
-		return
-	}
-	var req models.AdminUpdateUserRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
-		return
-	}
-	normalizeUserFields(&req)
-	if req.Name != "" && !isValidName(req.Name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
-		return
-	}
-	if !isValidDisplayName(req.Display_name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
-		return
-	}
-	userParams := models.AdminUpdateUserRequest{
-		Email:        req.Email,
-		Name:         req.Name,
-		Display_name: req.Display_name,
-		Avatar_url:   req.Avatar_url,
 		Roles:        req.Roles,
 	}
-	if user, err := repository.AdminUpdateUser(id, userParams); err != nil {
-		log.Printf("AdminUpdateUser: %v", err)
+	user, err := repository.UpdateUser(targetUserID, userParams)
+	if err != nil {
+		log.Printf("UpdateUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -304,15 +288,20 @@ func clearAuthCookie(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 }
 
-type UserRequest interface {
-	*models.CreateUserRequest | *models.UpdateUserRequest | *models.AdminUpdateUserRequest
-}
-
-// normalizeUserFields trims and normalizes user request fields (email, name, display_name)
-func normalizeUserFields[T UserRequest](req T) {
-	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
-	req.Name = strings.TrimSpace(req.Name)
-	req.Display_name = strings.TrimSpace(req.Display_name)
+// normalizeAndValidateUserFields normalizes and validates common user fields.
+func normalizeAndValidateUserFields(email, name, displayName *string) error {
+	*email = strings.ToLower(strings.TrimSpace(*email))
+	*displayName = strings.TrimSpace(*displayName)
+	if *name != "" {
+		*name = strings.TrimSpace(*name)
+		if !isValidName(*name) {
+			return errors.New("invalid name")
+		}
+	}
+	if !isValidDisplayName(*displayName) {
+		return errors.New("invalid display_name")
+	}
+	return nil
 }
 
 // Create a hashed password to store in Database

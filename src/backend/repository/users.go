@@ -245,6 +245,69 @@ func CleanExpiredTokens(currentTime time.Time) error {
 	return nil
 }
 
-func UpdateUser(params models.User) (models.User, error) {
+func UpdateUser(id string, params models.UpdateUserRequest) (models.User, error) {
+	sql := `UPDATE "user"
+			SET email = $1, name = $2, display_name = $3, avatar_url = $4, updated_at = NOW()
+			WHERE id = $5
+			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
 
+	var u models.User
+	err := Pool.QueryRow(context.Background(), sql,
+		params.Email, params.Name, params.Display_name, params.Avatar_url, id).Scan(
+		&u.Id,
+		&u.Email,
+		&u.Name,
+		&u.Display_name,
+		&u.Avatar_url,
+		&u.Created_at,
+		&u.Updated_at,
+	)
+	if err == pgx.ErrNoRows {
+		return models.User{}, pgx.ErrNoRows
+	}
+	if err != nil {
+		return models.User{}, fmt.Errorf("UpdateUser: %w", err)
+	}
+
+	roles, err := GetRolesByUserId(u.Id)
+	if err != nil {
+		return models.User{}, fmt.Errorf("UpdateUser get roles: %w", err)
+	}
+	u.Roles = roles
+	return u, nil
+}
+
+// AdminUpdateUser updates user fields and replaces roles for the given user id.
+func AdminUpdateUser(id string, params models.AdminUpdateUserRequest) (models.User, error) {
+	u, err := UpdateUser(id, params.UpdateUserRequest)
+	if err != nil {
+		return models.User{}, fmt.Errorf("AdminUpdateUser update user: %w", err)
+	}
+	tx, err := Pool.Begin(context.Background())
+	if err != nil {
+		return models.User{}, fmt.Errorf("start transaction: %w", err)
+	}
+	defer tx.Rollback(context.Background())
+
+	delSQL := `DELETE FROM user_role WHERE user_id = $1`
+	if _, err := tx.Exec(context.Background(), delSQL, id); err != nil {
+		return models.User{}, fmt.Errorf("delete roles: %w", err)
+	}
+	insSQL := `INSERT INTO user_role(user_id, role_id)
+			   VALUES($1, (SELECT id FROM role WHERE name = $2))`
+	for _, r := range params.Roles {
+		if _, err := tx.Exec(context.Background(), insSQL, id, r); err != nil {
+			return models.User{}, fmt.Errorf("insert role %s: %w", r, err)
+		}
+	}
+	if err := tx.Commit(context.Background()); err != nil {
+		return models.User{}, fmt.Errorf("commit roles tx: %w", err)
+	}
+
+	roles, err := GetRolesByUserId(id)
+	if err != nil {
+		return models.User{}, fmt.Errorf("get roles after update: %w", err)
+	}
+	u.Roles = roles
+	return u, nil
 }

@@ -124,7 +124,7 @@ func CreateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	normalizeCreateUserRequest(&req)
+	normalizeUserFields(&req)
 	if req.Name != "" && !isValidName(req.Name) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
 		return
@@ -219,12 +219,17 @@ func LogoutUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
+	id := c.Param("id")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		return
+	}
 	var req models.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	normalizeCreateUserRequest(&req)
+	normalizeUserFields(&req)
 	if req.Name != "" && !isValidName(req.Name) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
 		return
@@ -239,13 +244,49 @@ func UpdateUser(c *gin.Context) {
 		Display_name: req.Display_name,
 		Avatar_url:   req.Avatar_url,
 	}
-	if err := repository.UpdateUser(userParams); err != nil {
+	if user, err := repository.UpdateUser(id, userParams); err != nil {
 		log.Printf("UpdateUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"user updated successfully"})
+	c.IndentedJSON(http.StatusOK, user)
+}
+
+func AdminUpdateUser(c *gin.Context) {
+	id := c.Param("id")
+	if !isValidUUID(id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		return
+	}
+	var req models.AdminUpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+	normalizeUserFields(&req)
+	if req.Name != "" && !isValidName(req.Name) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
+		return
+	}
+	if !isValidDisplayName(req.Display_name) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
+		return
+	}
+	userParams := models.AdminUpdateUserRequest{
+		Email:        req.Email,
+		Name:         req.Name,
+		Display_name: req.Display_name,
+		Avatar_url:   req.Avatar_url,
+		Roles:        req.Roles,
+	}
+	if user, err := repository.AdminUpdateUser(id, userParams); err != nil {
+		log.Printf("AdminUpdateUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
 }
 
 func DeleteUser(c *gin.Context) {
@@ -263,8 +304,12 @@ func clearAuthCookie(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 }
 
-// Function to trim leading and trailing blank spaces, set email to lowercase
-func normalizeCreateUserRequest(req *models.CreateUserRequest) {
+type UserRequest interface {
+	*models.CreateUserRequest | *models.UpdateUserRequest | *models.AdminUpdateUserRequest
+}
+
+// normalizeUserFields trims and normalizes user request fields (email, name, display_name)
+func normalizeUserFields[T UserRequest](req T) {
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	req.Name = strings.TrimSpace(req.Name)
 	req.Display_name = strings.TrimSpace(req.Display_name)

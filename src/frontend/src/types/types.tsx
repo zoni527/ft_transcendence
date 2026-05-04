@@ -24,7 +24,16 @@ export interface User {
   email: string;
   name: string;
   display_name: string;
+  avatar_url: string;
   created_at: string;
   updated_at: string;
   roles: string[];
 }
+
+export type AuthContextType = {
+  user: User | null;
+  login: (user: User) => void;
+  logout: () => void;
+  loading: boolean;
+  hasRole: (roles: string[]) => boolean;
+};

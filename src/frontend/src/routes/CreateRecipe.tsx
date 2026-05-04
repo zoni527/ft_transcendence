@@ -11,8 +11,9 @@ import SubmitButton from '../components/SubmitButton';
 import {
   postCreateRecipe,
   getCloudinarySignature,
-  getCloudinaryUrl,
+  uploadImageToCloudinary,
 } from '../api';
+import { useNotification } from '../utils/NotifContext.ts';
 import { getStringValue } from '../utils/utils';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 
@@ -50,7 +51,7 @@ const createRecipeSchema = (t: TFunction) =>
   });
 
 const CreateRecipe = () => {
-  const [error, setError] = useState('');
+  const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState('');
   const navigate = useNavigate();
@@ -66,7 +67,6 @@ const CreateRecipe = () => {
   ) => {
     if (loading) return;
 
-    setError('');
     setLoading(true);
 
     try {
@@ -102,7 +102,7 @@ const CreateRecipe = () => {
       }
 
       const signature = await getCloudinarySignature(t);
-      const image_url = await getCloudinaryUrl(image, signature, t);
+      const image_url = await uploadImageToCloudinary(image, signature, t);
 
       const recipe = await postCreateRecipe(
         {
@@ -113,10 +113,13 @@ const CreateRecipe = () => {
         t,
       );
 
+      showNotification(t('notification.createRecipeSuccess'), 'success');
       void navigate(`/recipes/${recipe.id}`);
     } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError(t('error.genericError'));
+      const message =
+        err instanceof Error ? err.message : t('error.genericError');
+
+      showNotification(message, 'error');
     } finally {
       setLoading(false);
     }
@@ -268,14 +271,10 @@ const CreateRecipe = () => {
           </span>
         </div>
 
-        {/* Errors & Warnings */}
-        <p className="text-md min-h-5 text-center text-red-500">
-          {error || '\u00A0'}
-        </p>
-
         {/* Submit Button */}
-        <div className="flex justify-center">
+        <div className="mt-12 flex justify-center">
           <SubmitButton
+            className="rounded-full bg-orange-700 hover:bg-orange-800"
             isLoading={loading}
             pendingText={t('createRecipe.submitPending')}
             defaultText={t('createRecipe.submit')}

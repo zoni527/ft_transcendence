@@ -4,9 +4,20 @@ export const enTranslations = {
     dashboard: 'Profile',
     signup: 'Sign up',
     login: 'Log in',
+    logout: 'Log out',
   },
-  recipes: {
-    header: 'All recipes',
+  notification: {
+    signupSuccess: 'Account created',
+    loginSuccess: 'Login successful',
+    logoutSuccess: 'Logout successful',
+    createRecipeSuccess: 'Recipe created successfully',
+    recipeDeleteSuccess: 'Recipe deleted successfully',
+  },
+  info: {
+    name: "Other users can't see your full name",
+    username: 'How others can recognize you on the platform',
+    email: 'Your registration email',
+    roles: 'Advanced roles allow more functionality',
   },
   recipeDetail: {
     author: 'Author',
@@ -19,14 +30,19 @@ export const enTranslations = {
     protein: 'Protein (g)',
     carbs: 'Carbohydrates (g)',
     fat: 'Fat (g)',
+    editRecipe: 'Edit recipe',
+    submit: 'Delete recipe',
+    submitPending: 'Deleting recipe...',
   },
   dashboard: {
+    name: 'Full name',
     username: 'Username',
     email: 'E-mail',
     createdAt: 'Created at',
     updatedAt: 'Updated at',
     roles: 'Roles',
     createRecipe: 'Create recipe',
+    editUser: 'Edit profile',
   },
   footer: {
     privacy: 'Privacy Policy',
@@ -158,7 +174,7 @@ export const enTranslations = {
     password: 'Password',
     passwordPlace: 'Enter your password',
     submit: 'Continue',
-    submitPending: 'Logging in',
+    submitPending: 'Logging in...',
   },
   signup: {
     header: 'Sign up',
@@ -173,7 +189,7 @@ export const enTranslations = {
     rePassword: 'Confirm password',
     rePasswordPlace: 'Re-enter your password',
     submit: 'Continue',
-    submitPending: 'Signing up',
+    submitPending: 'Signing up...',
   },
   createRecipe: {
     header: 'Create recipe',
@@ -203,7 +219,7 @@ export const enTranslations = {
     uploadImage: 'Upload image',
     noFile: 'No file chosen',
     submit: 'Submit',
-    submitPending: 'Submitting recipe',
+    submitPending: 'Submitting recipe...',
   },
   difficulty: {
     type: 'Difficulty',
@@ -262,6 +278,7 @@ export const enTranslations = {
     input: 'Invalid input',
     userNotFound: 'User not found',
     recipeNotFound: 'Recipe not found',
+    recipesNotFound: 'No recipes found',
     genericError: 'An error occurred, please try again later',
     invalidResponse: 'Invalid database response',
     badRequest: 'Invalid request, please check your input',

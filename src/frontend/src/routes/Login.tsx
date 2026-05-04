@@ -6,7 +6,9 @@ import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
-import { postLogin } from '../api';
+import { getUser, postLogin } from '../api';
+import { useAuth } from '../utils/AuthContext';
+import { useNotification } from '../utils/NotifContext.ts';
 import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
@@ -21,17 +23,16 @@ const loginSchema = (t: TFunction) =>
   });
 
 const Login = () => {
-  const [error, setError] = useState('');
+  const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { login } = useAuth();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (loading) return;
-
-    setError('');
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -45,7 +46,10 @@ const Login = () => {
     });
 
     if (!result.success) {
-      setError(result.error.issues[0]?.message || t('error.input'));
+      showNotification(
+        result.error.issues[0]?.message || t('error.input'),
+        'error',
+      );
     } else {
       setLoading(true);
 
@@ -57,12 +61,19 @@ const Login = () => {
         },
         t,
       )
-        .then(() => {
+        .then(async () => {
+          const user = await getUser(t);
+
+          login(user);
+
+          showNotification(t('notification.loginSuccess'), 'success');
           void navigate('/dashboard');
         })
         .catch((err: unknown) => {
-          if (err instanceof Error) setError(err.message);
-          else setError(t('error.genericError'));
+          const message =
+            err instanceof Error ? err.message : t('error.genericError');
+
+          showNotification(message, 'error');
         })
         .finally(() => setLoading(false));
     }
@@ -93,14 +104,10 @@ const Login = () => {
           placeholder={t('login.passwordPlace')}
         />
 
-        {/* Errors & Warnings */}
-        <p className="text-md min-h-5 text-center text-red-500">
-          {error || '\u00A0'}
-        </p>
-
         {/* Submit Button */}
-        <div className="flex justify-center">
+        <div className="mt-12 flex justify-center">
           <SubmitButton
+            className="rounded-full bg-orange-700 hover:bg-orange-800"
             isLoading={loading}
             pendingText={t('login.submitPending')}
             defaultText={t('login.submit')}

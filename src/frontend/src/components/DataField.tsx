@@ -5,7 +5,7 @@ interface DataFieldProps {
 
 const DataField = ({ label, value }: DataFieldProps) => {
   return (
-    <p className={`text-lg`}>
+    <p className={`text-xl text-gray-700`}>
       <strong>{label}:</strong> {value}
     </p>
   );

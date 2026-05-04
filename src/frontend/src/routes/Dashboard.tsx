@@ -1,36 +1,14 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
 import NavButton from '../components/NavButton';
+import InfoIcon from '../components/InfoIcon';
 import StatusBox from '../components/StatusBox';
-import { getUser } from '../api';
-import type { User } from '../types/types';
+import { useAuth } from '../utils/AuthContext';
 import { cardBase, buttonBase } from '../styles/styles';
 
 const Dashboard = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { user, loading, hasRole } = useAuth();
   const { t } = useTranslation();
-
-  const loading = !user && !error;
-
-  useEffect(() => {
-    getUser(t)
-      .then(setUser)
-      .catch((err: unknown) => {
-        if (err instanceof Error) setError(err.message);
-        else setError(t('error.genericError'));
-      });
-  }, [t]);
-
-  if (error) {
-    return (
-      <StatusBox
-        message={`${t('error.error')} ${error}`}
-        className="text-red-500"
-      />
-    );
-  }
 
   if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
@@ -38,45 +16,107 @@ const Dashboard = () => {
 
   if (!user) {
     return (
-      <StatusBox message={t('error.userNotFound')} className="text-black" />
+      <StatusBox message={t('error.userNotFound')} className="text-red-600" />
     );
   }
 
   return (
-    <div className={`${cardBase} mt-8 p-8 wrap-anywhere`}>
+    <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
+      {/* Avatar */}
+      <div className="absolute top-8 right-8">
+        <img
+          src={user.avatar_url}
+          alt={`${user.name}'s avatar`}
+          className="h-28 w-28 rounded-full border-2 border-gray-300"
+        />
+      </div>
+
       {/* Header */}
-      <h1 className="mb-6 text-2xl font-semibold text-orange-700">
+      <h1 className="mb-8 text-3xl font-bold text-[#C04D31]">
         {t('common.welcome')}, {user.name}!
       </h1>
 
-      {/* User Info Fields */}
-      <div className="mt-6 space-y-16">
-        <div className="flex gap-8">
-          {/* Left */}
-          <div className="flex-1 space-y-2">
-            <DataField
-              label={t('dashboard.username')}
-              value={user.display_name}
-            />
-            <DataField label={t('dashboard.email')} value={user.email} />
+      {/* User Info Section */}
+      <div className="mt-28 space-y-6">
+        <div className="flex flex-col gap-4">
+          {/* Full name */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField label={t('dashboard.name')} value={user.name} />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('info.name')}
+            >
+              <InfoIcon />
+            </button>
           </div>
 
-          {/* Right */}
-          <div className="flex-1 space-y-2">
-            <DataField label="ID" value={user.id} />
+          {/* Username */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField
+                label={t('dashboard.username')}
+                value={user.display_name}
+              />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('info.username')}
+            >
+              <InfoIcon />
+            </button>
+          </div>
+
+          {/* Email */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField label={t('dashboard.email')} value={user.email} />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('info.email')}
+            >
+              <InfoIcon />
+            </button>
+          </div>
+
+          {/* Roles */}
+          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+            <div className="flex-1">
+              <DataField
+                label={t('dashboard.roles')}
+                value={user.roles.join(', ')}
+              />
+            </div>
+            <button
+              onClick={() => {}}
+              className="rounded p-2"
+              title={t('info.roles')}
+            >
+              <InfoIcon />
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Bottom */}
-        <div className="w-full space-y-2">
-          <DataField label={t('dashboard.createdAt')} value={user.created_at} />
-          <DataField label={t('dashboard.updatedAt')} value={user.updated_at} />
-          <DataField
-            label={t('dashboard.roles')}
-            value={user.roles.join(', ')}
-          />
-        </div>
-        <NavButton to="/create" className={`${buttonBase}`}>
+      {/* Bottom Section */}
+      <div className="mt-16 flex gap-2">
+        <NavButton
+          path="/editUser"
+          className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
+        >
+          {t('dashboard.editUser')}
+        </NavButton>
+
+        <NavButton
+          path="/create"
+          className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
+          disabled={!hasRole(['admin', 'moderator', 'chef'])}
+        >
           {t('dashboard.createRecipe')}
         </NavButton>
       </div>

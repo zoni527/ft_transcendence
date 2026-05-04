@@ -8,15 +8,11 @@ export const buttonBase = `
   inline-flex
   items-center
   justify-center
-  rounded-full
-  bg-[#C04D31]
   px-4
   py-2
   font-semibold
   text-white
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
-  hover:cursor-pointer
-  hover:bg-orange-900
   whitespace-nowrap
   transition-colors
   duration-300
@@ -30,12 +26,13 @@ export const langButtonBase = `
   py-1
   text-sm
   font-bold
-  text-[#C04D31]
+  text-orange-700
   transition
-  duration-300
-  hover:bg-orange-900
+  hover:bg-orange-800
   hover:text-white
   active:scale-95
+  transition-colors
+  duration-300
 `;
 
 export const uploadButtonBase = `
@@ -57,9 +54,9 @@ export const uploadButtonBase = `
 `;
 
 export const navLeftBase = `
-  text-[#C04D31]
+  text-orange-700
   hover:cursor-pointer
-  hover:text-orange-900
+  hover:text-orange-800
   transition-colors
   duration-300
 `;

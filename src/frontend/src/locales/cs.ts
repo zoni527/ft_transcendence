@@ -4,9 +4,14 @@ export const csTranslations = {
     dashboard: 'Profil',
     signup: 'Registrovat se',
     login: 'Přihlásit se',
+    logout: 'Odhlásit se',
   },
-  recipes: {
-    header: 'Všechny recepty',
+  notification: {
+    signupSuccess: 'Účet vytvořen',
+    loginSuccess: 'Přihlášení bylo úspěšné',
+    logoutSuccess: 'Odhlášení bylo úspěšné',
+    createRecipeSuccess: 'Recept byl úspěšně vytvořen',
+    recipeDeleteSuccess: 'Recept byl úspěšně smazán',
   },
   recipeDetail: {
     author: 'Autor',
@@ -19,14 +24,19 @@ export const csTranslations = {
     protein: 'Bílkoviny (g)',
     carbs: 'Sacharidy (g)',
     fat: 'Tuky (g)',
+    editRecipe: 'Upravit recept',
+    submit: 'Smazat recept',
+    submitPending: 'Mažu recept...',
   },
   dashboard: {
+    name: 'Celé jméno',
     username: 'Uživatelské jméno',
     email: 'E-mail',
     createdAt: 'Vytvořeno',
     updatedAt: 'Aktualizováno',
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
+    editUser: 'Upravit profil',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',
@@ -112,19 +122,19 @@ export const csTranslations = {
       Poskytnutím obsahu nám udělujete celosvětovou, nevýhradní a bezplatnou licenci jej zobrazovat a distribuovat v rámci služby.
 
       Nesmíte zveřejňovat obsah, který:
-      - porušuje zákony nebo práva třetích stran
-      - obsahuje nenávistný nebo obtěžující obsah
-      - uvádí nepravdivé informace o ingrediencích nebo alergenech
-- podporuje nebezpečné postupy při přípravě jídla`,
+      - porušuje zákony nebo práva třetích stran.
+      - obsahuje nenávistný nebo obtěžující obsah.
+      - uvádí nepravdivé informace o ingrediencích nebo alergenech.
+      - podporuje nebezpečné postupy při přípravě jídla.`,
 
     section5_title: '5. Povolené použití',
     section5_text: `Uživatelé NESMÍ:
-      - hromadně kopírovat obsah bez povolení
-      - narušovat bezpečnost služby nebo účtů
-      - zneužívat moderaci nebo podávat falešná hlášení
-      - vydávat se za jinou osobu nebo organizaci
-      - rozesílat spam nebo malware
-      - zpětně analyzovat nebo narušovat službu`,
+      - hromadně kopírovat obsah bez povolení.
+      - narušovat bezpečnost služby nebo účtů.
+      - zneužívat moderaci nebo podávat falešná hlášení.
+      - vydávat se za jinou osobu nebo organizaci.
+      - rozesílat spam nebo malware.
+      - zpětně analyzovat nebo narušovat službu.`,
 
     section6_title: '6. Duševní vlastnictví',
     section6_text: `Název RISE, logo, design a kód patří týmu RISE.
@@ -157,7 +167,7 @@ export const csTranslations = {
     password: 'Heslo',
     passwordPlace: 'Zadejte své heslo',
     submit: 'Pokračovat',
-    submitPending: 'Přihlašování',
+    submitPending: 'Přihlašování...',
   },
   signup: {
     header: 'Registrovat se',
@@ -172,7 +182,7 @@ export const csTranslations = {
     rePassword: 'Potvrďte heslo',
     rePasswordPlace: 'Zadejte své heslo znovu',
     submit: 'Pokračovat',
-    submitPending: 'Vytváření účtu',
+    submitPending: 'Vytváření účtu...',
   },
   createRecipe: {
     header: 'Vytvořit recept',
@@ -202,7 +212,7 @@ export const csTranslations = {
     uploadImage: 'Nahrát obrázek',
     noFile: 'Žádný soubor nebyl vybrán',
     submit: 'Odeslat',
-    submitPending: 'Odesílám recept',
+    submitPending: 'Odesílám recept...',
   },
   difficulty: {
     type: 'Obtížnost',
@@ -261,6 +271,7 @@ export const csTranslations = {
     input: 'Neplatný vstup',
     userNotFound: 'Uživatel nenalezen',
     recipeNotFound: 'Recept nenalezen',
+    recipesNotFound: 'Nebyly nalezeny žádné recepty',
     genericError: 'Došlo k chybě, zkuste to prosím později',
     invalidResponse: 'Neplatná odpověď databáze',
     badRequest:

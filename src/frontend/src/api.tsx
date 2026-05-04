@@ -22,6 +22,11 @@ interface CreateRecipeResponse {
   id: string;
 }
 
+interface SessionResponse {
+  authenticated: boolean;
+  user: User;
+}
+
 interface LoginPayload {
   email: string;
   password: string;
@@ -63,6 +68,17 @@ function isCreateRecipeResponse(data: unknown): data is CreateRecipeResponse {
   const obj = data as Record<string, unknown>;
 
   return typeof obj.id === 'string';
+}
+
+// Validation for SessionResponse
+function isSessionResponse(data: unknown): data is SessionResponse {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return typeof obj.authenticated === 'boolean' && isUserResponse(obj.user);
 }
 
 // Validation for UserResponse
@@ -151,12 +167,16 @@ export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    throw new Error(getTranslatedErrorMessage(response.status, t));
   }
 
-  const data = (await response.json()) as Recipe[];
-  return data;
+  const data: unknown = await response.json();
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data as Recipe[];
 };
 
 // GET /api/recipes/:id (get a single recipe by ID)
@@ -173,6 +193,22 @@ export const getRecipeById = async (
 
   const data = (await response.json()) as Recipe;
   return data;
+};
+
+// DELETE /api/recipes/:id (delete a single recipe by ID)
+export const deleteRecipe = async (id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/recipes/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
 };
 
 // POST /api/recipes (create a new recipe)
@@ -207,6 +243,35 @@ export const postCreateRecipe = async (
   }
 
   return data;
+};
+
+// GET /api/users/session (session authentication)
+export const getSession = async (t: TFunction): Promise<User | null> => {
+  const response = await fetch(`${baseUrl}/users/session`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isSessionResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  if (!data.authenticated) return null;
+
+  return data.user;
 };
 
 // GET /api/users/me (user authentication)
@@ -262,6 +327,22 @@ export const postLogin = async (payload: LoginPayload, t: TFunction) => {
 
   if (!isLoginSignupResponse(data)) {
     throw new Error(t('error.invalidResponse'));
+  }
+};
+
+// POST /api/users/logout (user logout)
+export const postLogout = async (t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/logout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
   }
 };
 
@@ -328,7 +409,7 @@ export const getCloudinarySignature = async (
 };
 
 // POST Cloudinary (uploading an image to Cloudinary)
-export const getCloudinaryUrl = async (
+export const uploadImageToCloudinary = async (
   file: File,
   config: CloudinaryUploadConfig,
   t: TFunction,

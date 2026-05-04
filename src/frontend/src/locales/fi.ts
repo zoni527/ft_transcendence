@@ -4,9 +4,14 @@ export const fiTranslations = {
     dashboard: 'Käyttäjäprofiili',
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
+    logout: 'Kirjaudu ulos',
   },
-  recipes: {
-    header: 'Kaikki reseptit',
+  notification: {
+    signupSuccess: 'Tili luotu',
+    loginSuccess: 'Kirjauduttu sisään',
+    logoutSuccess: 'Kirjauduttu ulos',
+    createRecipeSuccess: 'Resepti luotu',
+    recipeDeleteSuccess: 'Resepti poistettu',
   },
   recipeDetail: {
     author: 'Tekijä',
@@ -19,14 +24,19 @@ export const fiTranslations = {
     protein: 'Proteiini (g)',
     carbs: 'Hiilihydraatit (g)',
     fat: 'Rasva (g)',
+    editRecipe: 'Muokkaa reseptiä',
+    submit: 'Poista resepti',
+    submitPending: 'Reseptiä poistetaan...',
   },
   dashboard: {
+    name: 'Koko nimi',
     username: 'Käyttäjätunnus',
     email: 'Sähköposti',
     createdAt: 'Luotu',
     updatedAt: 'Päivitetty',
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
+    editUser: 'Muokkaa profiilia',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',
@@ -158,7 +168,7 @@ export const fiTranslations = {
     password: 'Salasana',
     passwordPlace: 'Syötä salasana',
     submit: 'Jatka',
-    submitPending: 'Kirjaudutaan sisään',
+    submitPending: 'Kirjaudutaan sisään...',
   },
   signup: {
     header: 'Rekisteröidy',
@@ -173,7 +183,7 @@ export const fiTranslations = {
     rePassword: 'Vahvista salasana',
     rePasswordPlace: 'Syötä salasana uudelleen',
     submit: 'Jatka',
-    submitPending: 'Rekisteröintiä käsitellään',
+    submitPending: 'Rekisteröintiä käsitellään...',
   },
   createRecipe: {
     header: 'Luo resepti',
@@ -203,7 +213,7 @@ export const fiTranslations = {
     uploadImage: 'Lataa kuva',
     noFile: 'Ei tiedostoa valittu',
     submit: 'Lähetä',
-    submitPending: 'Lähetetään reseptiä',
+    submitPending: 'Lähetetään reseptiä...',
   },
   difficulty: {
     type: 'Vaikeusaste',
@@ -262,6 +272,7 @@ export const fiTranslations = {
     input: 'Virheellinen syöte',
     userNotFound: 'Käyttäjää ei löytynyt',
     recipeNotFound: 'Reseptiä ei löytynyt',
+    recipesNotFound: 'Reseptejä ei löytynyt',
     genericError: 'Tapahtui virhe, yritä myöhemmin uudelleen',
     invalidResponse: 'Virheellinen tietokannan vastaus',
     badRequest: 'Virheellinen pyyntö, tarkista syötteesi',

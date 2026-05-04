@@ -5,7 +5,7 @@ package repository
 // [done] GetAllUsers       — GET /api/users
 // [done] GetUserById       — GET /api/users/:id
 
-// [TODO] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
+// [done] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
 // [TODO] UpdateUser        — PUT /api/users/:id (full replace)
 // [TODO] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
@@ -243,4 +243,8 @@ func CleanExpiredTokens(currentTime time.Time) error {
 		return fmt.Errorf("CleanExpiredTokens: %w", err)
 	}
 	return nil
+}
+
+func UpdateUser(params models.User) (models.User, error) {
+
 }

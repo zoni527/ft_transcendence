@@ -412,7 +412,7 @@ func ValidateJWTToken(token string) (*jwt.RegisteredClaims, error) {
 		return nil, fmt.Errorf("missing userID")
 	}
 	if claims.ExpiresAt == nil {
-		return nil, fmt.Errorf("missing exp")
+		return nil, fmt.Errorf("missing expiration date")
 	}
 	return claims, nil
 }

@@ -13,6 +13,12 @@ export const enTranslations = {
     createRecipeSuccess: 'Recipe created successfully',
     recipeDeleteSuccess: 'Recipe deleted successfully',
   },
+  info: {
+    name: "Other users can't see your full name",
+    username: 'How others can recognize you on the platform',
+    email: 'Your registration email',
+    roles: 'Advanced roles allow more functionality',
+  },
   recipeDetail: {
     author: 'Author',
     prep: 'Preparation time (min)',

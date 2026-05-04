@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
 import NavButton from '../components/NavButton';
-import PencilIcon from '../components/PencilIcon';
+import InfoIcon from '../components/InfoIcon';
 import StatusBox from '../components/StatusBox';
 import { useAuth } from '../utils/AuthContext';
 import { cardBase, buttonBase } from '../styles/styles';
@@ -25,14 +25,14 @@ const Dashboard = () => {
       {/* Avatar */}
       <div className="absolute top-8 right-8">
         <img
-          src={'/path/to/default/avatar.jpg'}
+          src={user.avatar_url}
           alt={`${user.name}'s avatar`}
-          className="h-24 w-24 rounded-full border-2 border-gray-300"
+          className="h-28 w-28 rounded-full border-2 border-gray-300"
         />
       </div>
 
       {/* Header */}
-      <h1 className="mb-8 text-3xl font-bold text-orange-700">
+      <h1 className="mb-8 text-3xl font-bold text-[#C04D31]">
         {t('common.welcome')}, {user.name}!
       </h1>
 
@@ -47,9 +47,9 @@ const Dashboard = () => {
             <button
               onClick={() => {}}
               className="rounded p-2"
-              title={t('common.edit')}
+              title={t('info.name')}
             >
-              <PencilIcon />
+              <InfoIcon />
             </button>
           </div>
 
@@ -64,9 +64,9 @@ const Dashboard = () => {
             <button
               onClick={() => {}}
               className="rounded p-2"
-              title={t('common.edit')}
+              title={t('info.username')}
             >
-              <PencilIcon />
+              <InfoIcon />
             </button>
           </div>
 
@@ -78,9 +78,9 @@ const Dashboard = () => {
             <button
               onClick={() => {}}
               className="rounded p-2"
-              title={t('common.edit')}
+              title={t('info.email')}
             >
-              <PencilIcon />
+              <InfoIcon />
             </button>
           </div>
 
@@ -95,16 +95,19 @@ const Dashboard = () => {
             <button
               onClick={() => {}}
               className="rounded p-2"
-              title={t('common.edit')}
+              title={t('info.roles')}
             >
-              <PencilIcon />
+              <InfoIcon />
             </button>
           </div>
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="mt-6">
+      <div className="mt-16">
+        <NavButton path="/editUser" className={buttonBase}>
+          {t('dashboard.createRecipe')}
+        </NavButton>
         <NavButton
           path="/create"
           className={buttonBase}

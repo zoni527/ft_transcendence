@@ -219,8 +219,35 @@ func LogoutUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	// TODO: call repository.UpdateUser()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	userID := c.GetString("userID")
+	var req models.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+	normalizeCreateUserRequest(&req)
+	if req.Name != "" && !isValidName(req.Name) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
+		return
+	}
+	if !isValidDisplayName(req.Display_name) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
+		return
+	}
+	userParams := models.User{
+		Email:        req.Email,
+		Name:         req.Name,
+		Display_name: req.Display_name,
+		roles:        req.Roles,
+		Updated_at:   Time.Now(),
+	}
+	if err := repository.UpdateUser(userParams); err != nil {
+		log.Printf("Update error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"user updated successfully"})
 }
 
 func DeleteUser(c *gin.Context) {

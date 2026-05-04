@@ -67,5 +67,6 @@ type UpdateUserRequest struct {
 	Email        string   `json:"email" binding:"required,email"`
 	Name         string   `json:"name" binding:"omitempty,min=2,max=50"`
 	Display_name string   `json:"display_name" binding:"required,min=3,max=15"`
+	Avatar_url   string   `json:"avatar_url"`
 	Roles        []string `json:"roles" binding:"required"`
 }

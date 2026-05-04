@@ -40,7 +40,10 @@ func main() {
 	router.GET("/api/users", handlers.GetUsers)
 	router.GET("/api/users/:id", handlers.GetUserById)
 	router.POST("/api/users", handlers.CreateUser)
-	router.PUT("/api/users/:id", handlers.UpdateUser)     // not implemented yet
+	router.PUT("/api/users/:id",
+		handlers.AuthMiddleware(),
+		handlers.RequiredRolesMiddleware("user", "admin"),
+		handlers.UpdateUser)
 	router.DELETE("/api/users/:id", handlers.DeleteUser)  // not implemented yet
 	router.GET("/api/users/search", handlers.SearchUsers) // not implemented yet
 	router.POST("/api/users/login", handlers.LoginUser)

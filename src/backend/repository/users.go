@@ -6,7 +6,8 @@ package repository
 // [done] GetUserById       — GET /api/users/:id
 
 // [done] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
-// [TODO] UpdateUser        — PUT /api/users/:id (full replace)
+// [done] UpdateMe          — PUT /api/users/me
+// [done] UpdateUser        — PUT /api/users/:id (admin update)
 // [TODO] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
 // [TODO] Add pagination (?page=1&limit=20) to GetAllUsers
@@ -35,6 +36,33 @@ func GetRolesByUserId(userId string) ([]string, error) {
 			WHERE ur.user_id = $1`
 
 	rows, err := Pool.Query(context.Background(), sql, userId)
+	if err != nil {
+		return nil, fmt.Errorf("error querying roles: %w", err)
+	}
+	defer rows.Close()
+
+	var roles []string
+	for rows.Next() {
+		var role string
+		if err := rows.Scan(&role); err != nil {
+			return nil, fmt.Errorf("error scanning role: %w", err)
+		}
+		roles = append(roles, role)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating roles: %w", err)
+	}
+	return roles, nil
+}
+
+// getRolesByUserIdTx is the transaction version of GetRolesByUserId.
+func getRolesByUserIdTx(tx pgx.Tx, userId string) ([]string, error) {
+	sql := `SELECT r.name
+			FROM user_role ur
+			JOIN role r ON ur.role_id = r.id
+			WHERE ur.user_id = $1`
+
+	rows, err := tx.Query(context.Background(), sql, userId)
 	if err != nil {
 		return nil, fmt.Errorf("error querying roles: %w", err)
 	}
@@ -245,14 +273,20 @@ func CleanExpiredTokens(currentTime time.Time) error {
 	return nil
 }
 
-func UpdateUser(id string, params models.UpdateUserRequest) (models.User, error) {
+func UpdateMe(id string, params models.UpdateMeRequest) (models.User, error) {
+	tx, err := Pool.Begin(context.Background())
+	if err != nil {
+		return models.User{}, fmt.Errorf("start transaction: %w", err)
+	}
+	defer tx.Rollback(context.Background())
+
 	sql := `UPDATE "user"
 			SET email = $1, name = $2, display_name = $3, avatar_url = $4, updated_at = NOW()
 			WHERE id = $5
 			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
 
 	var u models.User
-	err := Pool.QueryRow(context.Background(), sql,
+	err = tx.QueryRow(context.Background(), sql,
 		params.Email, params.Name, params.Display_name, params.Avatar_url, id).Scan(
 		&u.Id,
 		&u.Email,
@@ -266,48 +300,73 @@ func UpdateUser(id string, params models.UpdateUserRequest) (models.User, error)
 		return models.User{}, pgx.ErrNoRows
 	}
 	if err != nil {
-		return models.User{}, fmt.Errorf("UpdateUser: %w", err)
+		return models.User{}, fmt.Errorf("UpdateMe: %w", err)
 	}
 
-	roles, err := GetRolesByUserId(u.Id)
+	roles, err := getRolesByUserIdTx(tx, u.Id)
 	if err != nil {
-		return models.User{}, fmt.Errorf("UpdateUser get roles: %w", err)
+		return models.User{}, fmt.Errorf("UpdateMe get roles: %w", err)
 	}
 	u.Roles = roles
+
+	if err := tx.Commit(context.Background()); err != nil {
+		return models.User{}, fmt.Errorf("UpdateMe commit: %w", err)
+	}
 	return u, nil
 }
 
-// AdminUpdateUser updates user fields and replaces roles for the given user id.
-func AdminUpdateUser(id string, params models.AdminUpdateUserRequest) (models.User, error) {
-	u, err := UpdateUser(id, params.UpdateUserRequest)
-	if err != nil {
-		return models.User{}, fmt.Errorf("AdminUpdateUser update user: %w", err)
-	}
+// UpdateUser updates user fields and replaces roles for the given user id.
+func UpdateUser(id string, params models.UpdateUserRequest) (models.User, error) {
 	tx, err := Pool.Begin(context.Background())
 	if err != nil {
 		return models.User{}, fmt.Errorf("start transaction: %w", err)
 	}
 	defer tx.Rollback(context.Background())
 
+	sql := `UPDATE "user"
+			SET email = $1, name = $2, display_name = $3, avatar_url = $4, updated_at = NOW()
+			WHERE id = $5
+			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
+
+	var u models.User
+	err = tx.QueryRow(context.Background(), sql,
+		params.Email, params.Name, params.Display_name, params.Avatar_url, id).Scan(
+		&u.Id,
+		&u.Email,
+		&u.Name,
+		&u.Display_name,
+		&u.Avatar_url,
+		&u.Created_at,
+		&u.Updated_at,
+	)
+	if err == pgx.ErrNoRows {
+		return models.User{}, pgx.ErrNoRows
+	}
+	if err != nil {
+		return models.User{}, fmt.Errorf("UpdateUser update profile: %w", err)
+	}
+
 	delSQL := `DELETE FROM user_role WHERE user_id = $1`
 	if _, err := tx.Exec(context.Background(), delSQL, id); err != nil {
-		return models.User{}, fmt.Errorf("delete roles: %w", err)
+		return models.User{}, fmt.Errorf("UpdateUser delete roles: %w", err)
 	}
+
 	insSQL := `INSERT INTO user_role(user_id, role_id)
 			   VALUES($1, (SELECT id FROM role WHERE name = $2))`
 	for _, r := range params.Roles {
 		if _, err := tx.Exec(context.Background(), insSQL, id, r); err != nil {
-			return models.User{}, fmt.Errorf("insert role %s: %w", r, err)
+			return models.User{}, fmt.Errorf("UpdateUser insert role %s: %w", r, err)
 		}
 	}
-	if err := tx.Commit(context.Background()); err != nil {
-		return models.User{}, fmt.Errorf("commit roles tx: %w", err)
-	}
 
-	roles, err := GetRolesByUserId(id)
+	roles, err := getRolesByUserIdTx(tx, u.Id)
 	if err != nil {
-		return models.User{}, fmt.Errorf("get roles after update: %w", err)
+		return models.User{}, fmt.Errorf("UpdateUser get roles: %w", err)
 	}
 	u.Roles = roles
+
+	if err := tx.Commit(context.Background()); err != nil {
+		return models.User{}, fmt.Errorf("UpdateUser commit: %w", err)
+	}
 	return u, nil
 }

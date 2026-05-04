@@ -142,7 +142,7 @@ docker exec -it postgres psql -U dbuser -d ft_transcendence
 | -------- | ------------- | --------- |
 | postgres | 5432          | -         |
 | adminer  | 8080          | 8081      |
-| nxinx    | 80            | 8080      |
+| nginx    | 80            | 8080      |
 | backend  | 8080          | -         |
 | frontend | 5173          | -         |
 

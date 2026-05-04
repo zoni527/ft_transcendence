@@ -3,10 +3,17 @@ name: CI
 on:
     pull_request:
         branches: [main]
+    push:
+        branches: [main]
+
+concurrency:
+    group: ci-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
     backend-build:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
 
         steps:
             - uses: actions/checkout@v4
@@ -15,6 +22,8 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version-file: src/backend/go.mod
+                  cache: true
+                  cache-dependency-path: src/backend/go.sum
 
             - name: Build
               run: go build ./...
@@ -22,6 +31,7 @@ jobs:
 
     backend-vet:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
 
         steps:
             - uses: actions/checkout@v4
@@ -30,13 +40,20 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version-file: src/backend/go.mod
+                  cache: true
+                  cache-dependency-path: src/backend/go.sum
 
             - name: Run go vet
               run: go vet ./...
               working-directory: src/backend
 
+            - name: Check gofmt
+              run: test -z "$(gofmt -l .)"
+              working-directory: src/backend
+
     frontend-build:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
 
         steps:
             - uses: actions/checkout@v4
@@ -58,6 +75,7 @@ jobs:
 
     frontend-lint:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
 
         steps:
             - uses: actions/checkout@v4
@@ -79,6 +97,7 @@ jobs:
 
     frontend-format:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
 
         steps:
             - uses: actions/checkout@v4
@@ -95,11 +114,12 @@ jobs:
               working-directory: src/frontend
 
             - name: Check formatting
-              run: npx prettier --check .
+              run: npm run format
               working-directory: src/frontend
 
     backend-test:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
 
         steps:
             - uses: actions/checkout@v4
@@ -108,7 +128,35 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version-file: src/backend/go.mod
+                  cache: true
+                  cache-dependency-path: src/backend/go.sum
 
             - name: Run tests
               run: go test ./...
               working-directory: src/backend
+
+    docker-build:
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build backend image
+              uses: docker/build-push-action@v6
+              with:
+                  context: src/backend
+                  push: false
+                  cache-from: type=gha,scope=backend
+                  cache-to: type=gha,mode=max,scope=backend
+
+            - name: Build frontend image
+              uses: docker/build-push-action@v6
+              with:
+                  context: src/frontend
+                  push: false
+                  cache-from: type=gha,scope=frontend
+                  cache-to: type=gha,mode=max,scope=frontend

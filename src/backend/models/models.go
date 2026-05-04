@@ -63,14 +63,17 @@ type LoginUserRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type UpdateUserRequest struct {
+type UpdateMeRequest struct {
 	Email        string `json:"email" binding:"required,email"`
 	Name         string `json:"name" binding:"omitempty,min=2,max=50"`
 	Display_name string `json:"display_name" binding:"required,min=3,max=15"`
-	Avatar_url   string `json:"avatar_url"`
+	Avatar_url   string `json:"avatar_url" binding:"omitempty"`
 }
 
-type AdminUpdateUserRequest struct {
-	UpdateUserRequest
-	Roles []string `json:"roles" binding:"required"`
+type UpdateUserRequest struct {
+	Email        string   `json:"email" binding:"required,email"`
+	Name         string   `json:"name" binding:"omitempty,min=2,max=50"`
+	Display_name string   `json:"display_name" binding:"required,min=3,max=15"`
+	Avatar_url   string   `json:"avatar_url" binding:"omitempty"`
+	Roles        []string `json:"roles" binding:"required"`
 }

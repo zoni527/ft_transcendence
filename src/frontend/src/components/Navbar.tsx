@@ -35,7 +35,7 @@ const Navbar = () => {
     >
       {/* Left Side */}
       <div className="flex gap-6 text-xl font-semibold">
-        <NavButton to="/" className={`${navLeftBase}`}>
+        <NavButton path="/" className={`${navLeftBase}`}>
           {t('nav.recipes')}
         </NavButton>
       </div>
@@ -43,16 +43,16 @@ const Navbar = () => {
       {/* Right Side */}
       <div className="flex items-center gap-4">
         {!user ? (
-          <NavButton to="/signup" className={`${buttonBase}`}>
+          <NavButton path="/signup" className={`${buttonBase}`}>
             {t('nav.signup')}
           </NavButton>
         ) : (
-          <NavButton to="/dashboard" className={`${buttonBase}`}>
+          <NavButton path="/dashboard" className={`${buttonBase}`}>
             {t('nav.dashboard')}
           </NavButton>
         )}
         {!user ? (
-          <NavButton to="/login" className={buttonBase}>
+          <NavButton path="/login" className={buttonBase}>
             {t('nav.login')}
           </NavButton>
         ) : (

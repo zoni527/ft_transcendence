@@ -120,19 +120,19 @@ export const csTranslations = {
       Poskytnutím obsahu nám udělujete celosvětovou, nevýhradní a bezplatnou licenci jej zobrazovat a distribuovat v rámci služby.
 
       Nesmíte zveřejňovat obsah, který:
-      - porušuje zákony nebo práva třetích stran
-      - obsahuje nenávistný nebo obtěžující obsah
-      - uvádí nepravdivé informace o ingrediencích nebo alergenech
-- podporuje nebezpečné postupy při přípravě jídla`,
+      - porušuje zákony nebo práva třetích stran.
+      - obsahuje nenávistný nebo obtěžující obsah.
+      - uvádí nepravdivé informace o ingrediencích nebo alergenech.
+      - podporuje nebezpečné postupy při přípravě jídla.`,
 
     section5_title: '5. Povolené použití',
     section5_text: `Uživatelé NESMÍ:
-      - hromadně kopírovat obsah bez povolení
-      - narušovat bezpečnost služby nebo účtů
-      - zneužívat moderaci nebo podávat falešná hlášení
-      - vydávat se za jinou osobu nebo organizaci
-      - rozesílat spam nebo malware
-      - zpětně analyzovat nebo narušovat službu`,
+      - hromadně kopírovat obsah bez povolení.
+      - narušovat bezpečnost služby nebo účtů.
+      - zneužívat moderaci nebo podávat falešná hlášení.
+      - vydávat se za jinou osobu nebo organizaci.
+      - rozesílat spam nebo malware.
+      - zpětně analyzovat nebo narušovat službu.`,
 
     section6_title: '6. Duševní vlastnictví',
     section6_text: `Název RISE, logo, design a kód patří týmu RISE.

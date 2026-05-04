@@ -4,9 +4,14 @@ export const fiTranslations = {
     dashboard: 'Käyttäjäprofiili',
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
+    logout: 'Kirjaudu ulos',
   },
-  recipes: {
-    header: 'Kaikki reseptit',
+  notification: {
+    signupSuccess: 'Tili luotu',
+    loginSuccess: 'Kirjauduttu sisään',
+    logoutSuccess: 'Kirjauduttu ulos',
+    createRecipeSuccess: 'Resepti luotu',
+    recipeDeleteSuccess: 'Resepti poistettu',
   },
   recipeDetail: {
     author: 'Tekijä',
@@ -19,8 +24,11 @@ export const fiTranslations = {
     protein: 'Proteiini (g)',
     carbs: 'Hiilihydraatit (g)',
     fat: 'Rasva (g)',
+    submit: 'Poista resepti',
+    submitPending: 'Reseptiä poistetaan...',
   },
   dashboard: {
+    name: 'Koko nimi',
     username: 'Käyttäjätunnus',
     email: 'Sähköposti',
     createdAt: 'Luotu',
@@ -262,6 +270,7 @@ export const fiTranslations = {
     input: 'Virheellinen syöte',
     userNotFound: 'Käyttäjää ei löytynyt',
     recipeNotFound: 'Reseptiä ei löytynyt',
+    recipesNotFound: 'Reseptejä ei löytynyt',
     genericError: 'Tapahtui virhe, yritä myöhemmin uudelleen',
     invalidResponse: 'Virheellinen tietokannan vastaus',
     badRequest: 'Virheellinen pyyntö, tarkista syötteesi',

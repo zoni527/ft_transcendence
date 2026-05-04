@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { ReactNode, MouseEvent } from 'react';
 
 interface NavButtonProps {
-  to?: string;
+  path?: string;
   children: ReactNode;
   className: string;
   onClick?: () => void;
@@ -10,50 +10,53 @@ interface NavButtonProps {
 }
 
 const NavButton = ({
-  to,
+  path,
   className,
   children,
   onClick,
   disabled = false,
 }: NavButtonProps) => {
+  const navigate = useNavigate();
 
   // Handle navigation when the button is clicked
   const handleNavigation = (e: MouseEvent) => {
-    if (disabled) {
-      e.preventDefault();
+    if (e.button === 1 || e.ctrlKey || e.metaKey) {
       return;
     }
 
+    e.preventDefault();
+
     // If `onClick` is provided, use it (for custom actions like logout)
     if (onClick) {
-      e.preventDefault();
       onClick();
+    } else if (path && !disabled) {
+      void navigate(path);
     }
   };
 
-  // If `to` is provided, use an anchor element
-  if (to) {
+  // If `path` is provided, use an anchor element
+  if (path) {
     return (
-      <Link
-        to={to}
+      <a
+        href={path}
         onClick={handleNavigation}
-        className={`${className} ${disabled ? 'pointer-events-none cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+        className={`${className} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         aria-disabled={disabled}
       >
         {children}
-      </Link>
+      </a>
     );
   }
 
   // If no `path` is provided, render as a button and handle `onClick` directly
   return (
-    <Link
+    <button
       onClick={handleNavigation}
       className={`${className} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
       disabled={disabled}
     >
       {children}
-    </Link>
+    </button>
   );
 };
 

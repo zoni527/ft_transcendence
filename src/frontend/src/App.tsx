@@ -37,8 +37,8 @@ const App = () => {
                   <Route path="/terms" element={<TermsService />} />
                 </Routes>
               </div>
-              <Footer className="mt-20" />
             </div>
+            <Footer className="mt-20" />
           </div>
         </Router>
       </NotificationProvider>

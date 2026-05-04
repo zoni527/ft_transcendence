@@ -2,6 +2,9 @@
 all: env_validation
 	docker compose --file ./src/compose.yaml up --detach
 
+backend: env_validation
+	docker compose --file ./src/compose.yaml up --detach --build backend
+
 clean:
 	docker compose --file ./src/compose.yaml down
 
@@ -26,6 +29,22 @@ check_backend:
 
 env_validation:
 	@./scripts/env_validation.sh
+
+help:
+	@printf "Available targets:\n"
+	@printf "  all             Validate the environment and start the stack\n"
+	@printf "  backend         Validate the environment and rebuild/start only backend\n"
+	@printf "  clean           Stop the Docker stack\n"
+	@printf "  fclean          Stop the stack and remove backend/frontend images\n"
+	@printf "  dbclean         Stop the stack and remove volumes\n"
+	@printf "  re              Run fclean, then bring the stack back up\n"
+	@printf "  up              Alias for all\n"
+	@printf "  down            Alias for clean\n"
+	@printf "  nuke            Run fclean and dbclean\n"
+	@printf "  check_backend   Compile the backend without producing an executable\n"
+	@printf "  env_validation  Check local environment prerequisites\n"
+	@printf "  help            Show this help message\n"
+	
 # ---------------------------------------------------------------------------- #
-.PHONY: all clean fclean dbclean re check_backend env_validation up down nuke
+.PHONY: all backend help clean fclean dbclean re check_backend env_validation up down nuke
 # ---------------------------------------------------------------------------- #

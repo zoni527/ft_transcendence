@@ -199,6 +199,113 @@ Delete a user. Cascades: removes their roles and favourites. Recipes they author
 
 ---
 
+### POST /api/users/login
+
+Authenticate a user and receive a JWT token.
+
+**Request body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "plaintext_password"
+}
+```
+
+**Response** `200 OK`
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "authenticated": true
+}
+```
+
+Sets a `token` cookie with JWT. The cookie can be marked Secure once the API is served over HTTPS.
+
+**Errors:**
+| Status | When |
+|---|---|
+| 400 | Missing email or password |
+| 401 | Invalid credentials |
+
+---
+
+### POST /api/users/logout
+
+Log out the current authenticated user. Clears the authentication cookie.
+
+**Requires:** Valid JWT in `token` cookie (set during login).
+
+**Response** `200 OK`
+```json
+{
+  "message": "logged out successfully"
+}
+```
+
+**Errors:**
+| Status | When |
+|---|---|
+| 401 | Unauthorized — missing or invalid JWT |
+
+---
+
+### GET /api/users/me
+
+Get the profile of the currently authenticated user.
+
+**Requires:** Valid JWT in `token` cookie (set during login).
+
+**Response** `200 OK`
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "name": "Jane",
+  "display_name": "jane_cooks",
+  "created_at": "2026-04-09T12:00:00Z",
+  "updated_at": "2026-04-09T12:00:00Z",
+  "roles": ["user"]
+}
+```
+
+**Errors:**
+| Status | When |
+|---|---|
+| 401 | Unauthorized — missing or invalid JWT |
+| 404 | User not found |
+
+---
+
+### GET /api/users/session
+
+Check whether the current browser session is authenticated.
+
+**Response** `200 OK` (authenticated):
+```json
+{
+  "authenticated": true,
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "name": "Jane",
+    "display_name": "jane_cooks",
+    "created_at": "2026-04-09T12:00:00Z",
+    "updated_at": "2026-04-09T12:00:00Z",
+    "roles": ["user"]
+  }
+}
+```
+
+**Response** `200 OK` (not authenticated):
+```json
+{
+  "authenticated": false
+}
+```
+
+---
+
 ## Recipes
 
 ### GET /api/recipes
@@ -347,6 +454,29 @@ Create a new recipe with steps and ingredients.
 | 400 | Missing required fields (title, author_id) |
 | 400 | Invalid difficulty or meal_type value |
 | 400 | Negative or zero numeric fields (servings, prep_time, etc.) |
+
+---
+### GET /api/recipes/image-signature
+
+Get a pre-signed Cloudinary signature for uploading recipe images. Required for secure client-side image uploads.
+
+**Requires:** Valid JWT in `token` cookie (set during login).
+
+**Response** `200 OK`
+```json
+{
+  "signature": "cloudinary_signature_string",
+  "timestamp": 1701234567,
+  "api_key": "cloudinary_api_key",
+  "cloud_name": "your_cloud_name"
+}
+```
+
+**Errors:**
+| Status | When |
+|---|
+| 401 | Unauthorized — missing or invalid JWT |
+| 500 | Failed to generate signature |
 
 ---
 
@@ -547,12 +677,17 @@ Get all recipes a user has favourited.
 |---|---|
 | GET /api/users | done |
 | GET /api/users/:id | done |
+| POST /api/users/login | done |
+| POST /api/users/logout | done |
+| GET /api/users/me | done |
+| GET /api/users/session | done |
 | GET /api/users/search?q= | TODO |
 | POST /api/users | TODO |
 | PUT /api/users/:id | TODO |
 | DELETE /api/users/:id | TODO |
 | GET /api/recipes | done |
 | GET /api/recipes/:id | done |
+| GET /api/recipes/image-signature | done |
 | POST /api/recipes | TODO |
 | POST /api/recipes/:id/image | TODO |
 | PUT /api/recipes/:id | TODO |

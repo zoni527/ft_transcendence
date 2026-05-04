@@ -13,8 +13,11 @@ package repository
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"time"
 
 	"ft_transcendence/backend/models"
 
@@ -194,4 +197,46 @@ func CreateUser(params models.CreateUserParams) (models.User, error) {
 		return models.User{}, fmt.Errorf("commit transaction: %w", err)
 	}
 	return u, nil
+}
+
+func hashToken(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:])
+}
+
+func AddTokenToBlacklist(token string, expirationDate time.Time) error {
+	tokenHash := hashToken(token)
+	sql := `INSERT INTO token_blacklist(token_hash, expiration_date)
+			VALUES ($1, $2)
+			ON CONFLICT (token_hash) DO UPDATE
+			SET expiration_date = EXCLUDED.expiration_date`
+	if _, err := Pool.Exec(context.Background(), sql, tokenHash, expirationDate); err != nil {
+		return fmt.Errorf("AddTokenToBlacklist: %w", err)
+	}
+	return nil
+}
+
+func GetTokenBlacklisted(token string) (bool, error) {
+	tokenHash := hashToken(token)
+	sql := `SELECT EXISTS (
+			SELECT 1 
+			FROM token_blacklist 
+			WHERE token_hash = $1
+	)`
+	var exists bool
+	err := Pool.QueryRow(context.Background(), sql, tokenHash).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("GetTokenBlacklisted: %w", err)
+	}
+	return exists, nil
+}
+
+func CleanExpiredTokens(currentTime time.Time) error {
+	sql := `DELETE FROM token_blacklist
+            WHERE expiration_date < $1`
+	_, err := Pool.Exec(context.Background(), sql, currentTime)
+	if err != nil {
+		return fmt.Errorf("CleanExpiredTokens: %w", err)
+	}
+	return nil
 }

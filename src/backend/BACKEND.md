@@ -136,7 +136,7 @@ func CreateUser(u user) (user, error) {
 - `RETURNING` lets PostgreSQL send back auto-generated fields (id, created_at)
 - Don't insert `id` or `created_at` — the DB generates those
 
-## HTTP Status Codes
+## HTTP Status Codes Examples
 
 | Code | Constant                          | When to use                              |
 |------|-----------------------------------|------------------------------------------|

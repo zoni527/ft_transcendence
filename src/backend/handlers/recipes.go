@@ -139,9 +139,7 @@ func DeleteRecipe(c *gin.Context) {
 	if !isModeratorOrAdmin { // Check if client is the author of the recipe
 		recipe, err := repository.GetRecipeById(recipeId)
 		if err != nil {
-			var ue *repository.UserError
-			if errors.As(err, &ue) {
-				c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+			if identifyAndRespondToUserError(c, err) {
 				return
 			}
 			log.Printf("handlers.DeleteRecipe: %v", err)
@@ -157,9 +155,7 @@ func DeleteRecipe(c *gin.Context) {
 	}
 
 	if err := repository.DeleteRecipe(recipeId); err != nil {
-		var ue *repository.UserError
-		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"error": ue.Error()})
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
 		log.Printf("handlers.DeleteRecipe: %v", err)

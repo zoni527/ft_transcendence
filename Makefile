@@ -44,7 +44,6 @@ help:
 	@printf "  check_backend   Compile the backend without producing an executable\n"
 	@printf "  env_validation  Check local environment prerequisites\n"
 	@printf "  help            Show this help message\n"
-	
 # ---------------------------------------------------------------------------- #
 .PHONY: all backend help clean fclean dbclean re check_backend env_validation up down nuke
 # ---------------------------------------------------------------------------- #

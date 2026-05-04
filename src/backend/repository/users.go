@@ -223,8 +223,8 @@ func AddTokenToBlacklist(token string, expirationDate time.Time) error {
 func GetTokenBlacklisted(token string) (bool, error) {
 	tokenHash := hashToken(token)
 	sql := `SELECT EXISTS (
-			SELECT 1 
-			FROM token_blacklist 
+			SELECT 1
+			FROM token_blacklist
 			WHERE token_hash = $1
 	)`
 	var exists bool

@@ -10,7 +10,7 @@ ft_transcendence uses **PostgreSQL 17** as its relational database, running as a
 
 The database is defined in `src/compose.yaml` with two services:
 
-- **postgres** — the PostgreSQL database server (container port `5432`, host port `5433`)
+- **postgres** — the PostgreSQL database server (access only through backend)
 - **adminer** — a web UI for browsing the database (host port `8081`)
 
 ### Environment Variables
@@ -138,14 +138,13 @@ docker exec -it postgres psql -U dbuser -d ft_transcendence
 
 ## Port Configuration
 
-The postgres container runs on port **5433** on the host machine (mapped from 5432 inside the container). This avoids conflicts if we have PostgreSQL installed locally on machine.
-
 | Service  | Internal Port | Host Port |
 | -------- | ------------- | --------- |
-| postgres | 5432          | 5433      |
+| postgres | 5432          | -         |
 | adminer  | 8080          | 8081      |
-| backend  | 8080          | 8080      |
-| frontend | 5173          | 5173      |
+| nginx    | 80            | 8080      |
+| backend  | 8080          | -         |
+| frontend | 5173          | -         |
 
 ## Changing .env Credentials
 

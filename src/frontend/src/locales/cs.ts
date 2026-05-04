@@ -24,6 +24,7 @@ export const csTranslations = {
     protein: 'Bílkoviny (g)',
     carbs: 'Sacharidy (g)',
     fat: 'Tuky (g)',
+    editRecipe: 'Upravit recept',
     submit: 'Smazat recept',
     submitPending: 'Mažu recept...',
   },
@@ -35,6 +36,7 @@ export const csTranslations = {
     updatedAt: 'Aktualizováno',
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
+    editUser: 'Upravit profil',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',

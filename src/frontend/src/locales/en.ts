@@ -30,6 +30,7 @@ export const enTranslations = {
     protein: 'Protein (g)',
     carbs: 'Carbohydrates (g)',
     fat: 'Fat (g)',
+    editRecipe: 'Edit recipe',
     submit: 'Delete recipe',
     submitPending: 'Deleting recipe...',
   },
@@ -41,6 +42,7 @@ export const enTranslations = {
     updatedAt: 'Updated at',
     roles: 'Roles',
     createRecipe: 'Create recipe',
+    editUser: 'Edit profile',
   },
   footer: {
     privacy: 'Privacy Policy',

@@ -145,8 +145,9 @@ const Signup = () => {
         />
 
         {/* Submit Button */}
-        <div className="flex justify-center">
+        <div className="mt-12 flex justify-center">
           <SubmitButton
+            className="rounded-full bg-orange-700 hover:bg-orange-800"
             isLoading={loading}
             pendingText={t('signup.submitPending')}
             defaultText={t('signup.submit')}

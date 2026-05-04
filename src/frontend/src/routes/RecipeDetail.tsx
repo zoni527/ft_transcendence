@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
+import NavButton from '../components/NavButton.tsx';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import { getRecipeById, deleteRecipe } from '../api';
 import { useNotification } from '../utils/NotifContext.ts';
 import { useAuth } from '../utils/AuthContext';
 import type { Recipe } from '../types/types';
-import { cardBase } from '../styles/styles';
+import { cardBase, buttonBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { showNotification } = useNotification();
@@ -169,14 +170,24 @@ const RecipeDetail = () => {
         </div>
 
         {/* Delete Button */}
-        <SubmitButton
-          isLoading={loading}
-          pendingText={t('recipeDetail.submitPending')}
-          defaultText={t('recipeDetail.submit')}
-          onClick={() => handleDelete(id)}
-          type="button"
-          disabled={!hasRole(['chef', 'moderator', 'admin'])}
-        />
+        <div className="mt-16 flex gap-2">
+          <NavButton
+            path="/editRecipe"
+            className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
+          >
+            {t('recipeDetail.editRecipe')}
+          </NavButton>
+
+          <SubmitButton
+            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+            isLoading={loading}
+            pendingText={t('recipeDetail.submitPending')}
+            defaultText={t('recipeDetail.submit')}
+            onClick={() => handleDelete(id)}
+            type="button"
+            disabled={!hasRole(['chef', 'moderator', 'admin'])}
+          />
+        </div>
       </div>
     </div>
   );

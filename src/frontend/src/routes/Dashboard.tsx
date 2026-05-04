@@ -104,13 +104,17 @@ const Dashboard = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="mt-16">
-        <NavButton path="/editUser" className={buttonBase}>
-          {t('dashboard.createRecipe')}
+      <div className="mt-16 flex gap-2">
+        <NavButton
+          path="/editUser"
+          className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
+        >
+          {t('dashboard.editUser')}
         </NavButton>
+
         <NavButton
           path="/create"
-          className={buttonBase}
+          className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
           disabled={!hasRole(['admin', 'moderator', 'chef'])}
         >
           {t('dashboard.createRecipe')}

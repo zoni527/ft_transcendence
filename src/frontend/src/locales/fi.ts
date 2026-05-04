@@ -24,6 +24,7 @@ export const fiTranslations = {
     protein: 'Proteiini (g)',
     carbs: 'Hiilihydraatit (g)',
     fat: 'Rasva (g)',
+    editRecipe: 'Muokkaa reseptiä',
     submit: 'Poista resepti',
     submitPending: 'Reseptiä poistetaan...',
   },
@@ -35,6 +36,7 @@ export const fiTranslations = {
     updatedAt: 'Päivitetty',
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
+    editUser: 'Muokkaa profiilia',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',

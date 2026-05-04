@@ -43,20 +43,32 @@ const Navbar = () => {
       {/* Right Side */}
       <div className="flex items-center gap-4">
         {!user ? (
-          <NavButton path="/signup" className={`${buttonBase}`}>
+          <NavButton
+            path="/signup"
+            className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
+          >
             {t('nav.signup')}
           </NavButton>
         ) : (
-          <NavButton path="/dashboard" className={`${buttonBase}`}>
+          <NavButton
+            path="/dashboard"
+            className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
+          >
             {t('nav.dashboard')}
           </NavButton>
         )}
         {!user ? (
-          <NavButton path="/login" className={buttonBase}>
+          <NavButton
+            path="/login"
+            className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
+          >
             {t('nav.login')}
           </NavButton>
         ) : (
-          <NavButton className={buttonBase} onClick={handleLogout}>
+          <NavButton
+            className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
+            onClick={handleLogout}
+          >
             {t('nav.logout')}
           </NavButton>
         )}

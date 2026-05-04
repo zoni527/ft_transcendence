@@ -219,7 +219,6 @@ func LogoutUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	userID := c.GetString("userID")
 	var req models.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
@@ -234,16 +233,14 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
 		return
 	}
-	userParams := models.User{
+	userParams := models.UpdateUserRequest{
 		Email:        req.Email,
 		Name:         req.Name,
 		Display_name: req.Display_name,
 		Avatar_url:   req.Avatar_url,
-		roles:        req.Roles,
-		Updated_at:   Time.Now(),
 	}
 	if err := repository.UpdateUser(userParams); err != nil {
-		log.Printf("Update error: %v", err)
+		log.Printf("UpdateUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

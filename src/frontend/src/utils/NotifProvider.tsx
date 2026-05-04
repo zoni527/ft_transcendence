@@ -15,13 +15,16 @@ type Props = {
 const NotificationProvider = ({ children }: Props) => {
   const [notification, setNotification] = useState<NotificationState>(null);
 
-  const showNotification = (msg: string, variant: NotificationVariant) => {
-    setNotification({ message: msg, variant });
-  };
+  const showNotification = useCallback(
+    (msg: string, variant: NotificationVariant) => {
+      setNotification({ message: msg, variant });
+    },
+    [],
+  );
 
   const clear = useCallback(() => setNotification(null), []);
 
-  const value = useMemo(() => ({ showNotification }), []);
+  const value = useMemo(() => ({ showNotification }), [showNotification]);
 
   return (
     <NotificationContext.Provider value={value}>

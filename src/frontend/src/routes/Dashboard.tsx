@@ -37,7 +37,7 @@ const Dashboard = () => {
       </h1>
 
       {/* User Info Section */}
-      <div className="mt-26 space-y-6">
+      <div className="mt-28 space-y-6">
         <div className="flex flex-col gap-4">
           {/* Full name */}
           <div className="flex items-center justify-between border-b border-gray-300 pb-4">

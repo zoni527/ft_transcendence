@@ -8,4 +8,4 @@
 
 ALTER TABLE "user"
     ADD COLUMN avatar_url VARCHAR NOT NULL
-    DEFAULT 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777876738/j4n3sxf5c2qo8h3zam9l.jpg';
+    DEFAULT 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777887730/f06qpjbotv8rahtc287u.png';

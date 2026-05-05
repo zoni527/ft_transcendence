@@ -153,7 +153,7 @@ func CreateUser(c *gin.Context) {
 	data, err := repository.CreateUser(userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user already exists"})
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user/email already exists"})
 			return
 		}
 		log.Printf("CreateUser error: %v", err)
@@ -253,6 +253,10 @@ func UpdateMe(c *gin.Context) {
 	}
 	user, err := repository.UpdateMe(userID, userParams)
 	if err != nil {
+		if errors.Is(err, repository.ErrUserAlreadyExists) {
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user/email already exists"})
+			return
+		}
 		log.Printf("UpdateMe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
@@ -285,6 +289,10 @@ func UpdateUser(c *gin.Context) {
 	}
 	user, err := repository.UpdateUser(targetUserID, userParams)
 	if err != nil {
+		if errors.Is(err, repository.ErrUserAlreadyExists) {
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user/email already exists"})
+			return
+		}
 		log.Printf("UpdateUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return

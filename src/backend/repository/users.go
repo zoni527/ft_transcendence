@@ -301,6 +301,10 @@ func UpdateMe(id string, params models.UpdateMeRequest) (models.User, error) {
 		return models.User{}, pgx.ErrNoRows
 	}
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
+			return models.User{}, ErrUserAlreadyExists
+		}
 		return models.User{}, fmt.Errorf("UpdateMe: %w", err)
 	}
 
@@ -344,6 +348,10 @@ func UpdateUser(id string, params models.UpdateUserRequest) (models.User, error)
 		return models.User{}, pgx.ErrNoRows
 	}
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
+			return models.User{}, ErrUserAlreadyExists
+		}
 		return models.User{}, fmt.Errorf("UpdateUser update profile: %w", err)
 	}
 

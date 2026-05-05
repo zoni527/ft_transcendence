@@ -281,13 +281,14 @@ func UpdateMe(id string, params models.UpdateMeRequest) (models.User, error) {
 	defer tx.Rollback(context.Background())
 
 	sql := `UPDATE "user"
-			SET email = $1, name = $2, display_name = $3, avatar_url = $4, updated_at = NOW()
-			WHERE id = $5
+			SET email = $1, name = $2, password_hash = $3 display_name = $4,
+						avatar_url = $5, updated_at = NOW()
+			WHERE id = $6
 			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
 
 	var u models.User
 	err = tx.QueryRow(context.Background(), sql,
-		params.Email, params.Name, params.Display_name, params.Avatar_url, id).Scan(
+		params.Email, params.Name, params.Password, params.Display_name, params.Avatar_url, id).Scan(
 		&u.Id,
 		&u.Email,
 		&u.Name,

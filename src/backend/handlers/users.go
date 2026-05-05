@@ -226,9 +226,24 @@ func UpdateMe(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if err := validatePassword(req.Password); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if !isPasswordStrong(req.Password) {
+		c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+		return
+	}
+	hashedPassword, err := hashPassword(req.Password)
+	if err != nil {
+		log.Printf("CreateUser hashPassword error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
 	userParams := models.UpdateMeRequest{
 		Email:        req.Email,
 		Name:         req.Name,
+		Password:     hashedPassword,
 		Display_name: req.Display_name,
 		Avatar_url:   req.Avatar_url,
 	}

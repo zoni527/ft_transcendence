@@ -226,6 +226,11 @@ export const csTranslations = {
     submit: 'Odeslat',
     submitPending: 'Úprava profilu...',
   },
+  editRecipe: {
+    header: 'Upravit recept',
+    submit: 'Odeslat',
+    submitPending: 'Úprava receptu...',
+  },
   difficulty: {
     type: 'Obtížnost',
     type_easy: 'Snadné',

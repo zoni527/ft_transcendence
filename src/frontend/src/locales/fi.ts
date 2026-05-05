@@ -226,6 +226,11 @@ export const fiTranslations = {
     submit: 'Lähetä',
     submitPending: 'Profiilia muokataan...',
   },
+  editRecipe: {
+    header: 'Muokkaa reseptiä',
+    submit: 'Lähetä',
+    submitPending: 'Muokataan reseptiä...',
+  },
   difficulty: {
     type: 'Vaikeusaste',
     type_easy: 'Helppo',

@@ -3,21 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { z } from 'zod';
-import FormHeader from '../components/FormHeader';
-import InputField from '../components/InputField';
-import InputTextArea from '../components/InputTextArea';
-import SelectField from '../components/SelectField';
-import SubmitButton from '../components/SubmitButton';
+import FormHeader from '../components/FormHeader.tsx';
+import InputField from '../components/InputField.tsx';
+import InputTextArea from '../components/InputTextArea.tsx';
+import SelectField from '../components/SelectField.tsx';
+import SubmitButton from '../components/SubmitButton.tsx';
 import {
-  postCreateRecipe,
+  putUpdateRecipe,
   getCloudinarySignature,
   uploadImageToCloudinary,
-} from '../api';
+} from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue } from '../utils/utils';
-import { cardBase, uploadButtonBase } from '../styles/styles';
+import { getStringValue } from '../utils/utils.tsx';
+import { cardBase, uploadButtonBase } from '../styles/styles.tsx';
 
-type CreateRecipeModalProps = {
+type EditRecipeModalProps = {
+  id: string;
   onClose: () => void;
 };
 
@@ -53,7 +54,7 @@ const createRecipeSchema = (t: TFunction) =>
     }),
   });
 
-const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
+const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState('');
@@ -125,12 +126,14 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
       const signature = await getCloudinarySignature(t);
       const image_url = await uploadImageToCloudinary(image, signature, t);
 
-      const recipe = await postCreateRecipe(
+      const recipe = await putUpdateRecipe(
         {
           ...result.data,
+          id,
           image_url,
           is_published: result.data.is_published === 'yes',
         },
+        id,
         t,
       );
 
@@ -169,7 +172,7 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
 
         {/* Information fields */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <InputField id="title" name="title" label={t('createRecipe.title')} />
+          <InputField id="title" name="title" label={t('editRecipe.title')} />
 
           <InputTextArea
             id="description"
@@ -285,4 +288,4 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
   );
 };
 
-export default CreateRecipeModal;
+export default EditRecipeModal;

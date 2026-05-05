@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CreateRecipeModal from '../components/CreateRecipeModal';
+import CreateRecipeModal from '../modals/CreateRecipe';
 import DataField from '../components/DataField';
-import EditUserModal from '../components/EditUserModal';
+import EditUserModal from '../modals/EditUser';
 import InfoIcon from '../components/InfoIcon';
 import StatusBox from '../components/StatusBox';
 import { useAuth } from '../utils/AuthContext';

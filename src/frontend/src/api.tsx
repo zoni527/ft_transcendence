@@ -18,6 +18,24 @@ interface CreateRecipePayload {
   is_published: boolean;
 }
 
+interface UpdateRecipePayload {
+  id: string;
+  title: string;
+  description: string;
+  prep_time_min: number;
+  cook_time_min: number;
+  servings: number;
+  difficulty: string;
+  cuisine: string;
+  meal_type: string;
+  image_url: string;
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  is_published: boolean;
+}
+
 interface CreateRecipeResponse {
   id: string;
 }
@@ -413,6 +431,41 @@ export const putUpdateMe = async (payload: UpdateMePayload, t: TFunction) => {
   }
 
   if (!isUserResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// PUT /api/recipes/:id (edit a recipe)
+export const putUpdateRecipe = async (
+  payload: UpdateRecipePayload,
+  id: string,
+  t: TFunction,
+): Promise<CreateRecipeResponse> => {
+  const response = await fetch(`${baseUrl}/recipes/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isCreateRecipeResponse(data)) {
     throw new Error(t('error.invalidResponse'));
   }
 

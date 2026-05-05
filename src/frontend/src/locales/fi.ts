@@ -12,6 +12,13 @@ export const fiTranslations = {
     logoutSuccess: 'Kirjauduttu ulos',
     createRecipeSuccess: 'Resepti luotu',
     recipeDeleteSuccess: 'Resepti poistettu',
+    updateUserSuccess: 'Käyttäjäprofiili päivitetty',
+  },
+  info: {
+    name: 'Muut käyttäjät eivät näe koko nimeäsi',
+    username: 'Miten muut voivat tunnistaa sinut alustalla',
+    email: 'Rekisteröintisähköpostisi',
+    roles: 'Laajennetut roolit mahdollistavat enemmän toimintoja',
   },
   recipeDetail: {
     author: 'Tekijä',

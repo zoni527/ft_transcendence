@@ -12,6 +12,7 @@ export const enTranslations = {
     logoutSuccess: 'Logout successful',
     createRecipeSuccess: 'Recipe created successfully',
     recipeDeleteSuccess: 'Recipe deleted successfully',
+    updateUserSuccess: 'User profile updated',
   },
   info: {
     name: "Other users can't see your full name",

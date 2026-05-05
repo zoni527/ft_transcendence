@@ -5,7 +5,13 @@ import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
+import {
+  putUpdateMe,
+  getCloudinarySignature,
+  uploadImageToCloudinary,
+} from '../api';
 import { useNotification } from '../utils/NotifContext';
+import { getStringValue } from '../utils/utils';
 import type { User } from '../types/types';
 import { cardBase } from '../styles/styles';
 
@@ -57,36 +63,64 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    void handleSubmitAsync(e);
+  };
 
+  const handleSubmitAsync = async (
+    e: React.SyntheticEvent<HTMLFormElement>,
+  ) => {
     if (loading) return;
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-
-    const schema = editUserSchema(t);
-
-    const result = schema.safeParse({
-      fullName: formData.get('fullName'),
-      username: formData.get('username'),
-      email: formData.get('email'),
-    });
-
-    if (!result.success) {
-      showNotification(
-        result.error.issues[0]?.message || t('error.input'),
-        'error',
-      );
-      return;
-    }
 
     setLoading(true);
 
-    // TODO: replace with real API call
-    setTimeout(() => {
+    try {
+      const form = e.currentTarget;
+      const formData = new FormData(form);
+
+      const schema = editUserSchema(t);
+
+      const result = schema.safeParse({
+        fullName: getStringValue(formData, 'fullName'),
+        username: getStringValue(formData, 'username'),
+        email: getStringValue(formData, 'email'),
+        password: getStringValue(formData, 'password'),
+        confirmPassword: getStringValue(formData, 'confirmPassword'),
+      });
+
+      if (!result.success) {
+        throw new Error(result.error.issues[0]?.message || t('error.input'));
+      }
+
+      const image = formData.get('image');
+
+      let image_url = '';
+
+      if (image instanceof File && image.size > 0) {
+        const signature = await getCloudinarySignature(t);
+        image_url = await uploadImageToCloudinary(image, signature, t);
+      } else {
+        image_url = '';
+      }
+
+      const updatedUser = await putUpdateMe(
+        {
+          ...result.data,
+          image_url,
+        },
+        t,
+      );
+
       showNotification(t('notification.updateUserSuccess'), 'success');
-      setLoading(false);
+
       onClose();
-    }, 600);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : t('error.genericError');
+
+      showNotification(message, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

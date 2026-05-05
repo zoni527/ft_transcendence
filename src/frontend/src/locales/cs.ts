@@ -12,6 +12,13 @@ export const csTranslations = {
     logoutSuccess: 'Odhlášení bylo úspěšné',
     createRecipeSuccess: 'Recept byl úspěšně vytvořen',
     recipeDeleteSuccess: 'Recept byl úspěšně smazán',
+    updateUserSuccess: 'Profil uživatele byl aktualizován',
+  },
+  info: {
+    name: 'Ostatní uživatelé nevidí vaše celé jméno',
+    username: 'Jak vás ostatní mohou na platformě rozpoznat',
+    email: 'Váš registrační e-mail',
+    roles: 'Pokročilé role umožňují více funkcí',
   },
   recipeDetail: {
     author: 'Autor',

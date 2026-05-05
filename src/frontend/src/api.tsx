@@ -39,6 +39,14 @@ interface SignupPayload {
   display_name: string;
 }
 
+interface UpdateMePayload {
+  email: string;
+  password: string;
+  name: string;
+  display_name: string;
+  avatar_url: string;
+}
+
 interface LoginSignupResponse {
   id: string;
   email: string;
@@ -378,6 +386,37 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   if (!data.authenticated) {
     throw new Error(t('error.authError'));
   }
+};
+
+// PUT /api/users/me (user update)
+export const putUpdateMe = async (payload: UpdateMePayload, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isUserResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
 };
 
 // GET /api/recipes/image-signature (gets an UploadConfig for Cloudinary)

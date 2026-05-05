@@ -10,6 +10,7 @@ import {
   getCloudinarySignature,
   uploadImageToCloudinary,
 } from '../api';
+import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
 import { getStringValue } from '../utils/utils';
 import type { User } from '../types/types';
@@ -42,6 +43,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   // Disable background scroll
   useEffect(() => {
@@ -93,22 +95,27 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
 
       const image = formData.get('image');
 
-      let image_url = '';
+      let avatar_url = '';
 
       if (image instanceof File && image.size > 0) {
         const signature = await getCloudinarySignature(t);
-        image_url = await uploadImageToCloudinary(image, signature, t);
+        avatar_url = await uploadImageToCloudinary(image, signature, t);
       } else {
-        image_url = '';
+        avatar_url = '';
       }
 
       const updatedUser = await putUpdateMe(
         {
-          ...result.data,
-          image_url,
+          email: result.data.email,
+          password: result.data.password,
+          name: result.data.fullName,
+          display_name: result.data.username,
+          avatar_url,
         },
         t,
       );
+
+      login(updatedUser);
 
       showNotification(t('notification.updateUserSuccess'), 'success');
 

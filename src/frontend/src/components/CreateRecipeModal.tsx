@@ -160,13 +160,14 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-black"
+          className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer hover:text-black"
         >
           ✕
         </button>
 
         <FormHeader title={t('createRecipe.header')} />
 
+        {/* Information fields */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <InputField id="title" name="title" label={t('createRecipe.title')} />
 

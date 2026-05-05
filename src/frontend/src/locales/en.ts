@@ -221,6 +221,11 @@ export const enTranslations = {
     submit: 'Submit',
     submitPending: 'Submitting recipe...',
   },
+  editUser: {
+    header: 'Edit profile',
+    submit: 'Submit',
+    submitPending: 'Editing profile...',
+  },
   difficulty: {
     type: 'Difficulty',
     type_easy: 'Easy',

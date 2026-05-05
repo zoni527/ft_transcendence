@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
@@ -12,14 +14,28 @@ type EditUserModalProps = {
   onClose: () => void;
 };
 
+// Validation schema
+const editUserSchema = (t: TFunction) =>
+  z
+    .object({
+      fullName: z.string().min(1, t('signupValidation.nameRequired')),
+      username: z.string().min(1, t('signupValidation.usernameRequired')),
+      email: z
+        .string()
+        .min(1, t('signupValidation.emailRequired'))
+        .email(t('signupValidation.invalidEmail')),
+      password: z.string().min(8, t('signupValidation.passwordLen')),
+      confirmPassword: z.string().min(8, t('signupValidation.passwordConfirm')),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t('signupValidation.passwordMatch'),
+      path: ['confirmPassword'],
+    });
+
 const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
-
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(user.name);
-  const [displayName, setDisplayName] = useState(user.display_name);
-  const [email, setEmail] = useState(user.email);
 
   // Disable background scroll
   useEffect(() => {
@@ -39,23 +55,38 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (loading) return;
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const schema = editUserSchema(t);
+
+    const result = schema.safeParse({
+      fullName: formData.get('fullName'),
+      username: formData.get('username'),
+      email: formData.get('email'),
+    });
+
+    if (!result.success) {
+      showNotification(
+        result.error.issues[0]?.message || t('error.input'),
+        'error',
+      );
+      return;
+    }
 
     setLoading(true);
 
-    try {
-      // TODO: replace with your real API call
-      await new Promise((res) => setTimeout(res, 800));
-
+    // TODO: replace with real API call
+    setTimeout(() => {
       showNotification(t('notification.updateUserSuccess'), 'success');
-      onClose();
-    } catch (err) {
-      showNotification(t('error.genericError'), 'error');
-    } finally {
       setLoading(false);
-    }
+      onClose();
+    }, 600);
   };
 
   return (
@@ -70,47 +101,62 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-black"
+          className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer hover:text-black"
         >
           ✕
         </button>
 
-        {/* Sticky header (nice UX) */}
-        <div className="sticky top-0 z-10 bg-white pb-4">
-          <FormHeader title={t('dashboard.editUser')} />
-        </div>
+        <FormHeader title={t('editUser.header')} />
 
+        {/* Information fields */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <InputField
-            id="name"
-            name="name"
-            label={t('dashboard.name')}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            id="fullName"
+            name="fullName"
+            label={t('signup.name')}
+            type="text"
+            placeholder={user.name}
           />
 
           <InputField
-            id="display_name"
-            name="display_name"
-            label={t('dashboard.username')}
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            id="username"
+            name="username"
+            label={t('signup.username')}
+            type="text"
+            placeholder={user.display_name}
           />
 
           <InputField
             id="email"
             name="email"
-            label={t('dashboard.email')}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            label={t('signup.email')}
+            type="email"
+            placeholder={user.email}
           />
 
+          <InputField
+            id="password"
+            name="password"
+            label={t('signup.password')}
+            type="password"
+            placeholder={t('signup.passwordPlace')}
+          />
+
+          <InputField
+            id="confirmPassword"
+            name="confirmPassword"
+            label={t('signup.rePassword')}
+            type="password"
+            placeholder={t('signup.rePasswordPlace')}
+          />
+
+          {/* Submit */}
           <div className="mt-12 flex justify-center">
             <SubmitButton
               className="rounded-full bg-orange-700 hover:bg-orange-800"
               isLoading={loading}
-              pendingText={t('editUser.saving')}
-              defaultText={t('editUser.save')}
+              pendingText={t('editUser.submitPending')}
+              defaultText={t('editUser.submit')}
             />
           </div>
         </form>

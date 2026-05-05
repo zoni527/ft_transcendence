@@ -410,17 +410,22 @@ func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
 	}
 	return func(c *gin.Context) {
 		userID := c.GetString("userID")
+		targetID := c.Param("id")
 		if !isValidUUID(userID) {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		roles, err := repository.GetRolesByUserId(userID)
+		if targetID != "" && userID == targetID {
+			c.Next()
+			return
+		}
+		userRoles, err := repository.GetRolesByUserId(userID)
 		if err != nil {
 			log.Printf("GetRolesByUserId: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}
-		for _, r := range roles {
+		for _, r := range userRoles {
 			if allowedRoles[r] {
 				c.Next()
 				return

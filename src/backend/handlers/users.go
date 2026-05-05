@@ -217,7 +217,7 @@ func LogoutUser(c *gin.Context) {
 
 func UpdateMe(c *gin.Context) {
 	userID := c.GetString("userID")
-	if !isValidUUID(targetUserID) {
+	if !isValidUUID(userID) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
 		return
 	}

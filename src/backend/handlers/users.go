@@ -217,6 +217,10 @@ func LogoutUser(c *gin.Context) {
 
 func UpdateMe(c *gin.Context) {
 	userID := c.GetString("userID")
+	if !isValidUUID(targetUserID) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		return
+	}
 	var req models.UpdateMeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
@@ -236,7 +240,7 @@ func UpdateMe(c *gin.Context) {
 	}
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
-		log.Printf("CreateUser hashPassword error: %v", err)
+		log.Printf("UpdateMe hashPassword error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

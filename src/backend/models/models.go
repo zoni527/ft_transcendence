@@ -71,6 +71,14 @@ type UpdateMeRequest struct {
 	Avatar_url   string `json:"avatar_url" binding:"omitempty"`
 }
 
+type UpdateMeParams struct {
+	Email           string `json:"email"`
+	Name            string `json:"name"`
+	Password_hashed string `json:"-"`
+	Display_name    string `json:"display_name"`
+	Avatar_url      string `json:"avatar_url"`
+}
+
 type UpdateUserRequest struct {
 	Email        string   `json:"email" binding:"required,email"`
 	Name         string   `json:"name" binding:"omitempty,min=2,max=50"`

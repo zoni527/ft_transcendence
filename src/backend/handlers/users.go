@@ -244,12 +244,12 @@ func UpdateMe(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	userParams := models.UpdateMeRequest{
-		Email:        req.Email,
-		Name:         req.Name,
-		Password:     hashedPassword,
-		Display_name: req.Display_name,
-		Avatar_url:   req.Avatar_url,
+	userParams := models.UpdateMeParams{
+		Email:           req.Email,
+		Name:            req.Name,
+		Password_hashed: hashedPassword,
+		Display_name:    req.Display_name,
+		Avatar_url:      req.Avatar_url,
 	}
 	user, err := repository.UpdateMe(userID, userParams)
 	if err != nil {

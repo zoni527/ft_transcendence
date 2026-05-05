@@ -4,7 +4,7 @@ package handlers
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
 // [done] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
-// [....] UpdateRecipe      — PUT /api/recipes/:id
+// [done] UpdateRecipe      — PUT /api/recipes/:id
 // [done] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 

@@ -58,7 +58,7 @@ CREATE TABLE recipe (
     id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     -- TODO: GDPR — TOS should state that published recipes remain after account
     --       deletion with authorship anonymized (author_id set to NULL)
-    author_id               UUID REFERENCES "user"(id) ON DELETE SET NULL,
+    author_id               UUID CONSTRAINT fk_author_id REFERENCES "user"(id) ON DELETE SET NULL,
     title                   VARCHAR NOT NULL,
     description             TEXT,
     prep_time_min           INT,

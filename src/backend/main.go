@@ -59,7 +59,9 @@ func main() {
 		handlers.AuthMiddleware(),
 		handlers.RequiredRolesMiddleware("chef", "moderator", "admin"),
 		handlers.RecipeImageSignature)
-	router.PUT("/api/recipes/:id", handlers.UpdateRecipe) // not implemented yet
+	router.PUT("/api/recipes/:id",
+		handlers.AuthMiddleware(),
+		handlers.UpdateRecipe)
 	router.DELETE("/api/recipes/:id",
 		handlers.AuthMiddleware(),
 		handlers.DeleteRecipe)

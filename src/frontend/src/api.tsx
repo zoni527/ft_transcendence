@@ -94,6 +94,7 @@ function isUserResponse(data: unknown): data is User {
     typeof obj.email === 'string' &&
     typeof obj.name === 'string' &&
     typeof obj.display_name === 'string' &&
+    typeof obj.avatar_url === 'string' &&
     typeof obj.created_at === 'string' &&
     typeof obj.updated_at === 'string' &&
     Array.isArray(obj.roles) &&

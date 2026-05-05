@@ -21,6 +21,7 @@ import { cardBase, uploadButtonBase } from '../styles/styles.tsx';
 type EditRecipeModalProps = {
   onClose: () => void;
   passedRecipe: Recipe;
+  onSuccess?: () => void;
 };
 
 // Helper function for validation
@@ -55,7 +56,11 @@ const createRecipeSchema = (t: TFunction) =>
     }),
   });
 
-const EditRecipeModal = ({ onClose, passedRecipe }: EditRecipeModalProps) => {
+const EditRecipeModal = ({
+  onSuccess,
+  onClose,
+  passedRecipe,
+}: EditRecipeModalProps) => {
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -156,6 +161,7 @@ const EditRecipeModal = ({ onClose, passedRecipe }: EditRecipeModalProps) => {
 
       showNotification(t('notification.editRecipeSuccess'), 'success');
 
+      onSuccess?.();
       onClose();
       void navigate(`/recipes/${recipe.id}`);
     } catch (err: unknown) {

@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -506,4 +507,20 @@ func TokenCleanupLoop() {
 			log.Printf("TokenCleanupLoop: %v", err)
 		}
 	}
+}
+
+func UserAvatarSignature(c *gin.Context) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	params := map[string]string{
+		"timestamp": timestamp,
+		"folder":    "avatar",
+	}
+	signature := GenerateCloudinarySignature(params)
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"signature":  signature,
+		"api_key":    string(cloudinaryKey),
+		"cloud_name": string(cloudinaryCloudName),
+		"timestamp":  timestamp,
+		"folder":     "avatar",
+	})
 }

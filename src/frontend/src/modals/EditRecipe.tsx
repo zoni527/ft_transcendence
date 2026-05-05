@@ -75,6 +75,8 @@ const EditRecipeModal = ({ onClose, passedRecipe }: EditRecipeModalProps) => {
   const [carbs, setCarbs] = useState(passedRecipe.carbs_g);
   const [fat, setFat] = useState(passedRecipe.fat_g);
   const [is_published, setIsPublished] = useState(passedRecipe.is_published);
+  const [fileName, setFileName] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   // Disable background scroll
   useEffect(() => {
@@ -132,14 +134,13 @@ const EditRecipeModal = ({ onClose, passedRecipe }: EditRecipeModalProps) => {
         throw new Error(result.error.issues[0]?.message || t('error.input'));
       }
 
-      const image = formData.get('image');
+      let image_url = passedRecipe.image_url;
 
-      if (!(image instanceof File) || image.size === 0) {
-        throw new Error(t('recValidation.imageRequired'));
+      if (imageFile) {
+        const signature = await getCloudinarySignature(t);
+        image_url = await uploadImageToCloudinary(imageFile, signature, t);
       }
 
-      const signature = await getCloudinarySignature(t);
-      const image_url = await uploadImageToCloudinary(image, signature, t);
       const id = passedRecipe.id;
 
       const recipe = await putUpdateRecipe(
@@ -324,8 +325,9 @@ const EditRecipeModal = ({ onClose, passedRecipe }: EditRecipeModalProps) => {
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
+                  const file = e.target.files?.[0] || null;
                   setFileName(file ? file.name : '');
+                  setImageFile(file);
                 }}
               />
             </label>

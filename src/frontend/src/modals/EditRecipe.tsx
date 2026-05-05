@@ -15,11 +15,12 @@ import {
 } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 import { getStringValue } from '../utils/utils.tsx';
+import type { Recipe } from '../types/types.tsx';
 import { cardBase, uploadButtonBase } from '../styles/styles.tsx';
 
 type EditRecipeModalProps = {
-  id: string;
   onClose: () => void;
+  passedRecipe: Recipe;
 };
 
 // Helper function for validation
@@ -54,12 +55,26 @@ const createRecipeSchema = (t: TFunction) =>
     }),
   });
 
-const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
+const EditRecipeModal = ({ onClose, passedRecipe }: EditRecipeModalProps) => {
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const [fileName, setFileName] = useState('');
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // Controlled input states
+  const [title, setTitle] = useState(passedRecipe.title);
+  const [description, setDescription] = useState(passedRecipe.description);
+  const [prep_time_min, setPrepTimeMin] = useState(passedRecipe.prep_time_min);
+  const [cook_time_min, setCookTimeMin] = useState(passedRecipe.cook_time_min);
+  const [servings, setServings] = useState(passedRecipe.servings);
+  const [difficulty, setDifficulty] = useState(passedRecipe.difficulty);
+  const [cuisine, setCuisine] = useState(passedRecipe.cuisine);
+  const [meal_type, setMealType] = useState(passedRecipe.meal_type);
+  const [calories, setCalories] = useState(passedRecipe.calories);
+  const [protein, setProtein] = useState(passedRecipe.protein_g);
+  const [carbs, setCarbs] = useState(passedRecipe.carbs_g);
+  const [fat, setFat] = useState(passedRecipe.fat_g);
+  const [is_published, setIsPublished] = useState(passedRecipe.is_published);
 
   // Disable background scroll
   useEffect(() => {
@@ -125,6 +140,7 @@ const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
 
       const signature = await getCloudinarySignature(t);
       const image_url = await uploadImageToCloudinary(image, signature, t);
+      const id = passedRecipe.id;
 
       const recipe = await putUpdateRecipe(
         {
@@ -168,32 +184,50 @@ const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
           ✕
         </button>
 
-        <FormHeader title={t('createRecipe.header')} />
+        <FormHeader title={t('editRecipe.header')} />
 
         {/* Information fields */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <InputField id="title" name="title" label={t('editRecipe.title')} />
+          <InputField
+            id="title"
+            name="title"
+            label={t('createRecipe.title')}
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
           <InputTextArea
             id="description"
             name="description"
             label={t('createRecipe.description')}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
 
           <InputField
             id="prep_time_min"
             name="prep_time_min"
             label={t('createRecipe.prep')}
+            type="text"
+            value={prep_time_min.toString()}
+            onChange={(e) => setPrepTimeMin(Number(e.target.value))}
           />
           <InputField
             id="cook_time_min"
             name="cook_time_min"
             label={t('createRecipe.cook')}
+            type="text"
+            value={cook_time_min.toString()}
+            onChange={(e) => setCookTimeMin(Number(e.target.value))}
           />
           <InputField
             id="servings"
             name="servings"
             label={t('createRecipe.servings')}
+            type="text"
+            value={servings.toString()}
+            onChange={(e) => setServings(Number(e.target.value))}
           />
 
           <SelectField
@@ -205,12 +239,17 @@ const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
               { value: 'medium', label: t('difficulty.type_medium') },
               { value: 'hard', label: t('difficulty.type_hard') },
             ]}
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
           />
 
           <InputField
             id="cuisine"
             name="cuisine"
             label={t('createRecipe.cuisine')}
+            type="text"
+            value={cuisine}
+            onChange={(e) => setCuisine(e.target.value)}
           />
 
           <SelectField
@@ -223,33 +262,56 @@ const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
               { value: 'dinner', label: t('meal.type_dinner') },
               { value: 'snack', label: t('meal.type_snack') },
             ]}
+            value={meal_type}
+            onChange={(e) => setMealType(e.target.value)}
           />
 
           <InputField
             id="calories"
             name="calories"
             label={t('createRecipe.calories')}
+            type="text"
+            value={calories.toString()}
+            onChange={(e) => setCalories(Number(e.target.value))}
           />
+
           <InputField
             id="protein_g"
             name="protein_g"
             label={t('createRecipe.protein')}
+            type="text"
+            value={protein.toString()}
+            onChange={(e) => setProtein(Number(e.target.value))}
           />
+
           <InputField
             id="carbs_g"
             name="carbs_g"
             label={t('createRecipe.carbs')}
+            type="text"
+            value={carbs.toString()}
+            onChange={(e) => setCarbs(Number(e.target.value))}
           />
-          <InputField id="fat_g" name="fat_g" label={t('createRecipe.fat')} />
+
+          <InputField
+            id="fat_g"
+            name="fat_g"
+            label={t('createRecipe.fat')}
+            type="text"
+            value={fat.toString()}
+            onChange={(e) => setFat(Number(e.target.value))}
+          />
 
           <SelectField
             id="is_published"
             name="is_published"
             label={t('createRecipe.publish')}
             options={[
-              { value: 'yes', label: t('createRecipe.yes') },
-              { value: 'no', label: t('createRecipe.no') },
+              { value: 'true', label: t('createRecipe.yes') },
+              { value: 'false', label: t('createRecipe.no') },
             ]}
+            value={is_published.toString()}
+            onChange={(e) => setIsPublished(e.target.value === 'true')}
           />
 
           {/* Image Upload */}

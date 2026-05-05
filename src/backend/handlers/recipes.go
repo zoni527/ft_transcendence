@@ -410,13 +410,8 @@ func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
 	}
 	return func(c *gin.Context) {
 		userID := c.GetString("userID")
-		targetID := c.Param("id")
 		if !isValidUUID(userID) {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-			return
-		}
-		if targetID != "" && userID == targetID {
-			c.Next()
 			return
 		}
 		userRoles, err := repository.GetRolesByUserId(userID)

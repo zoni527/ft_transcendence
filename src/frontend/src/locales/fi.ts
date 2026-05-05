@@ -12,6 +12,7 @@ export const fiTranslations = {
     logoutSuccess: 'Kirjauduttu ulos',
     createRecipeSuccess: 'Resepti luotu',
     recipeDeleteSuccess: 'Resepti poistettu',
+    editRecipeSuccess: 'Resepti on muokattu onnistuneesti',
     updateUserSuccess: 'Käyttäjäprofiili päivitetty',
   },
   info: {

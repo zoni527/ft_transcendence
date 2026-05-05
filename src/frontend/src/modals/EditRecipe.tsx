@@ -137,7 +137,7 @@ const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
         t,
       );
 
-      showNotification(t('notification.createRecipeSuccess'), 'success');
+      showNotification(t('notification.editRecipeSuccess'), 'success');
 
       onClose();
       void navigate(`/recipes/${recipe.id}`);
@@ -278,8 +278,8 @@ const EditRecipeModal = ({ id, onClose }: EditRecipeModalProps) => {
             <SubmitButton
               className="rounded-full bg-orange-700 hover:bg-orange-800"
               isLoading={loading}
-              pendingText={t('createRecipe.submitPending')}
-              defaultText={t('createRecipe.submit')}
+              pendingText={t('editRecipe.submitPending')}
+              defaultText={t('editRecipe.submit')}
             />
           </div>
         </form>

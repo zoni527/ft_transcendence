@@ -12,6 +12,7 @@ export const csTranslations = {
     logoutSuccess: 'Odhlášení bylo úspěšné',
     createRecipeSuccess: 'Recept byl úspěšně vytvořen',
     recipeDeleteSuccess: 'Recept byl úspěšně smazán',
+    editRecipeSuccess: 'Recept byl úspěšně upraven',
     updateUserSuccess: 'Profil uživatele byl aktualizován',
   },
   info: {

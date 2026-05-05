@@ -280,6 +280,10 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if err := validateRoles(req.Roles); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	userParams := models.UpdateUserRequest{
 		Email:        req.Email,
 		Name:         req.Name,
@@ -358,6 +362,32 @@ func validatePassword(password string) error {
 func isPasswordStrong(password string) bool {
 	result := zxcvbn.PasswordStrength(password, nil)
 	return result.Score >= 0
+}
+
+// Validate roles: must not be empty, no duplicates, and only valid role names
+func validateRoles(roles []string) error {
+	if len(roles) == 0 {
+		return errors.New("roles cannot be empty")
+	}
+
+	validRoles := map[string]bool{
+		"user":      true,
+		"chef":      true,
+		"moderator": true,
+		"admin":     true,
+	}
+
+	seen := make(map[string]bool)
+	for _, role := range roles {
+		if !validRoles[role] {
+			return fmt.Errorf("invalid role: %s", role)
+		}
+		if seen[role] {
+			return fmt.Errorf("duplicate role: %s", role)
+		}
+		seen[role] = true
+	}
+	return nil
 }
 
 // Custom name validator: Allows letters + separators (space, apostrophe, hyphen),

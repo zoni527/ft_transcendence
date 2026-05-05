@@ -80,7 +80,7 @@ const RecipeDetail = () => {
     <>
       {isEditRecipeOpen && (
         <EditRecipeModal
-          id={recipe.id}
+          passedRecipe={recipe}
           onClose={() => setIsEditRecipeOpen(false)}
         />
       )}

@@ -96,13 +96,11 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
 
       const image = formData.get('image');
 
-      let avatar_url = '';
+      let avatar_url = user.avatar_url;
 
       if (image instanceof File && image.size > 0) {
         const signature = await getCloudinarySignatureAvatar(t);
         avatar_url = await uploadImageToCloudinary(image, signature, t);
-      } else {
-        avatar_url = '';
       }
 
       const updatedUser = await putUpdateMe(

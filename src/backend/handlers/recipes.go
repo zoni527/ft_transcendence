@@ -98,12 +98,29 @@ func UpdateRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
+
+	if modOrAdmin, err := isModOrAdmin(c, id); err != nil {
+		return
+	} else if !modOrAdmin {
+		if author, err := isAuthor(c, id, r.Author_id); err != nil {
+			return
+		} else if !author {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "action forbidden"})
+			return
+		}
+	}
+
+	if err := validateRecipeFields(&r); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
+		return
+	}
+
 	r.Id = id
 	if err := repository.UpdateRecipe(&r); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
-		log.Printf("handlers.CreateRecipe: %v", err)
+		log.Printf("handlers.UpdateRecipe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -123,33 +140,14 @@ func DeleteRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
-	roles, err := repository.GetRolesByUserId(userId)
-	if err != nil {
-		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+
+	if modOrAdmin, err := isModOrAdmin(c, userId); err != nil {
 		return
-	}
-	isModeratorOrAdmin := false
-	for _, r := range roles {
-		if r == "moderator" || r == "admin" {
-			isModeratorOrAdmin = true
-			break
-		}
-	}
-	if !isModeratorOrAdmin { // Check if client is the author of the recipe
-		recipe, err := repository.GetRecipeById(recipeId)
-		if err != nil {
-			if identifyAndRespondToUserError(c, err) {
-				return
-			}
-			log.Printf("handlers.DeleteRecipe: %v", err)
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{
-				"error": "internal server error",
-			})
+	} else if !modOrAdmin {
+		if author, err := isAuthor(c, userId, recipeId); err != nil {
 			return
-		}
-		if userId != recipe.Author_id {
-			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "can't delete this recipe"})
+		} else if !author {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "action forbidden"})
 			return
 		}
 	}
@@ -454,4 +452,44 @@ func identifyAndRespondToUserError(c *gin.Context, err error) bool {
 	}
 
 	return false
+}
+
+func isModOrAdmin(c *gin.Context, id string) (bool, error) {
+	roles, err := repository.GetRolesByUserId(id)
+	if err != nil {
+		log.Printf("isModOrAdmin: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return false, err
+	}
+	isOrAint := false
+	for _, r := range roles {
+		if r == "moderator" || r == "admin" {
+			isOrAint = true
+			break
+		}
+	}
+
+	return isOrAint, nil
+}
+
+func isAuthor(c *gin.Context, userId, recipeId string) (bool, error) {
+	recipe, err := repository.GetRecipeById(recipeId)
+	if err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return false, err
+		}
+		log.Printf("handlers.DeleteRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
+		})
+		return false, err
+	}
+
+	if userId != recipe.Author_id {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "action forbidden"})
+		return false, err
+
+	}
+
+	return true, nil
 }

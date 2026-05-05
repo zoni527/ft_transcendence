@@ -273,7 +273,7 @@ func CleanExpiredTokens(currentTime time.Time) error {
 	return nil
 }
 
-func UpdateMe(id string, params models.UpdateMeRequest) (models.User, error) {
+func UpdateMe(id string, params models.UpdateMeParams) (models.User, error) {
 	tx, err := Pool.Begin(context.Background())
 	if err != nil {
 		return models.User{}, fmt.Errorf("start transaction: %w", err)
@@ -288,7 +288,7 @@ func UpdateMe(id string, params models.UpdateMeRequest) (models.User, error) {
 
 	var u models.User
 	err = tx.QueryRow(context.Background(), sql,
-		params.Email, params.Name, params.Password, params.Display_name, params.Avatar_url, id).Scan(
+		params.Email, params.Name, params.Password_hashed, params.Display_name, params.Avatar_url, id).Scan(
 		&u.Id,
 		&u.Email,
 		&u.Name,

@@ -308,8 +308,8 @@ const EditRecipeModal = ({ onClose, passedRecipe }: EditRecipeModalProps) => {
             name="is_published"
             label={t('createRecipe.publish')}
             options={[
-              { value: 'true', label: t('createRecipe.yes') },
-              { value: 'false', label: t('createRecipe.no') },
+              { value: 'yes', label: t('createRecipe.yes') },
+              { value: 'no', label: t('createRecipe.no') },
             ]}
             value={is_published.toString()}
             onChange={(e) => setIsPublished(e.target.value === 'true')}

@@ -19,6 +19,8 @@ In particular:
 - **repository/** — pgx query functions (`GetAllUsers`, `CreateUser`, etc.). Only talks to the database.
 - Each layer only talks to the one below it.
 
+For user updates, the handler decides whether the caller is editing their own profile or acting as an admin, then allows only the fields that fit that role.
+
 ## Connection Pool (pgxpool)
 
 The pool is like a **circle** with multiple **straws** sticking into it — each straw is a connection to PostgreSQL, and the items rolling through those straws are queries (requests).

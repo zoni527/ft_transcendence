@@ -6,8 +6,7 @@ package repository
 // [done] GetUserById       — GET /api/users/:id
 
 // [done] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
-// [done] UpdateMe          — PUT /api/users/me
-// [done] UpdateUser        — PUT /api/users/:id (admin update)
+// [done] UpdateUser        — PUT /api/users/:id (self-update + admin update)
 // [TODO] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
 // [TODO] Add pagination (?page=1&limit=20) to GetAllUsers
@@ -273,7 +272,7 @@ func CleanExpiredTokens(currentTime time.Time) error {
 	return nil
 }
 
-func UpdateMe(id string, params models.UpdateMeParams) (models.User, error) {
+func UpdateUser(id string, params models.UpdateUserParams) (models.User, error) {
 	tx, err := Pool.Begin(context.Background())
 	if err != nil {
 		return models.User{}, fmt.Errorf("start transaction: %w", err)
@@ -281,14 +280,24 @@ func UpdateMe(id string, params models.UpdateMeParams) (models.User, error) {
 	defer tx.Rollback(context.Background())
 
 	sql := `UPDATE "user"
-			SET email = $1, name = $2, password_hash = $3, display_name = $4,
-						avatar_url = $5, updated_at = NOW()
+			SET email = COALESCE($1, email),
+				name = COALESCE($2, name),
+				password_hash = COALESCE($3, password_hash),
+				display_name = COALESCE($4, display_name),
+				avatar_url = COALESCE($5, avatar_url),
+				updated_at = NOW()
 			WHERE id = $6
 			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
 
 	var u models.User
 	err = tx.QueryRow(context.Background(), sql,
-		params.Email, params.Name, params.Password_hashed, params.Display_name, params.Avatar_url, id).Scan(
+		nullableString(params.Email),
+		nullableString(params.Name),
+		nullableString(params.Password_hashed),
+		nullableString(params.Display_name),
+		nullableString(params.Avatar_url),
+		id,
+	).Scan(
 		&u.Id,
 		&u.Email,
 		&u.Name,
@@ -305,66 +314,21 @@ func UpdateMe(id string, params models.UpdateMeParams) (models.User, error) {
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 			return models.User{}, ErrUserAlreadyExists
 		}
-		return models.User{}, fmt.Errorf("UpdateMe: %w", err)
+		return models.User{}, fmt.Errorf("UpdateUser profile: %w", err)
 	}
 
-	roles, err := getRolesByUserIdTx(tx, u.Id)
-	if err != nil {
-		return models.User{}, fmt.Errorf("UpdateMe get roles: %w", err)
-	}
-	u.Roles = roles
-
-	if err := tx.Commit(context.Background()); err != nil {
-		return models.User{}, fmt.Errorf("UpdateMe commit: %w", err)
-	}
-	return u, nil
-}
-
-// UpdateUser updates user fields and replaces roles for the given user id.
-func UpdateUser(id string, params models.UpdateUserRequest) (models.User, error) {
-	tx, err := Pool.Begin(context.Background())
-	if err != nil {
-		return models.User{}, fmt.Errorf("start transaction: %w", err)
-	}
-	defer tx.Rollback(context.Background())
-
-	sql := `UPDATE "user"
-			SET email = $1, name = $2, display_name = $3, avatar_url = $4, updated_at = NOW()
-			WHERE id = $5
-			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
-
-	var u models.User
-	err = tx.QueryRow(context.Background(), sql,
-		params.Email, params.Name, params.Display_name, params.Avatar_url, id).Scan(
-		&u.Id,
-		&u.Email,
-		&u.Name,
-		&u.Display_name,
-		&u.Avatar_url,
-		&u.Created_at,
-		&u.Updated_at,
-	)
-	if err == pgx.ErrNoRows {
-		return models.User{}, pgx.ErrNoRows
-	}
-	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-			return models.User{}, ErrUserAlreadyExists
+	if params.Roles != nil {
+		delSQL := `DELETE FROM user_role WHERE user_id = $1`
+		if _, err := tx.Exec(context.Background(), delSQL, id); err != nil {
+			return models.User{}, fmt.Errorf("UpdateUser delete roles: %w", err)
 		}
-		return models.User{}, fmt.Errorf("UpdateUser update profile: %w", err)
-	}
 
-	delSQL := `DELETE FROM user_role WHERE user_id = $1`
-	if _, err := tx.Exec(context.Background(), delSQL, id); err != nil {
-		return models.User{}, fmt.Errorf("UpdateUser delete roles: %w", err)
-	}
-
-	insSQL := `INSERT INTO user_role(user_id, role_id)
-			   VALUES($1, (SELECT id FROM role WHERE name = $2))`
-	for _, r := range params.Roles {
-		if _, err := tx.Exec(context.Background(), insSQL, id, r); err != nil {
-			return models.User{}, fmt.Errorf("UpdateUser insert role %s: %w", r, err)
+		insSQL := `INSERT INTO user_role(user_id, role_id)
+				   VALUES($1, (SELECT id FROM role WHERE name = $2))`
+		for _, r := range params.Roles {
+			if _, err := tx.Exec(context.Background(), insSQL, id, r); err != nil {
+				return models.User{}, fmt.Errorf("UpdateUser insert role %s: %w", r, err)
+			}
 		}
 	}
 
@@ -378,4 +342,11 @@ func UpdateUser(id string, params models.UpdateUserRequest) (models.User, error)
 		return models.User{}, fmt.Errorf("UpdateUser commit: %w", err)
 	}
 	return u, nil
+}
+
+func nullableString(value *string) any {
+	if value == nil {
+		return nil
+	}
+	return *value
 }

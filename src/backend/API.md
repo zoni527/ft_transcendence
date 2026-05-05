@@ -158,11 +158,18 @@ Create a new user.
 
 ---
 
-### PUT /api/users/me
+### PUT /api/users/:id
 
-Update the current user's profile. Requires authentication.
+Update a user profile. Requires authentication.
 
 **Authentication:** JWT token in `token` cookie
+
+**Permissions:**
+- A user can update their own profile
+- A user can change their own password
+- An admin can update any user's profile fields
+- An admin can update roles
+- An admin cannot change another user's password
 
 **Request body:**
 ```json
@@ -170,65 +177,19 @@ Update the current user's profile. Requires authentication.
   "email": "newemail@example.com",
   "name": "Jane Doe",
   "password": "newPassword123",
-  "display_name": "jane_cooks_new",
-  "avatar_url": "https://example.com/avatar.png"
+  "display_name": "jane_updated",
+  "avatar_url": "https://example.com/avatar.png",
+  "roles": ["user", "admin"]
 }
 ```
 
 **Notes:**
-- `email`, `password`, and `display_name` are required
-- `name` and `avatar_url` are optional
-- Password must be 8-20 characters and sufficiently strong
-- Users cannot modify their `roles` via this endpoint
+- All fields are optional
+- `password` is only accepted when the caller is updating their own profile
+- `roles` is only accepted for admins
+- If a field is omitted, it is left unchanged
 - Email must be unique; changing to an existing email will fail
-
-**Response** `200 OK`
-```json
-{
-  "id": "uuid",
-  "email": "newemail@example.com",
-  "name": "Jane Doe",
-  "display_name": "jane_cooks_new",
-  "avatar_url": "https://example.com/avatar.png",
-  "created_at": "2026-04-09T12:00:00Z",
-  "updated_at": "2026-04-09T12:00:00Z",
-  "roles": ["user"]
-}
-```
-
-**Errors:**
-| Status | When |
-|---|---|
-| 400 | Invalid input data or missing required fields |
-| 401 | Unauthorized — invalid or missing token |
-| 409 | Email already exists (taken by another user) |
-| 500 | Internal server error |
-
----
-
-### PUT /api/users/:id
-
-Update any user (admin-only). Allows changing profile fields and roles.
-
-**Authentication:** JWT token (admin role required) in `token` cookie
-
-**Request body:**
-```json
-{
-  "email": "newemail@example.com",
-  "name": "Jane Doe",
-  "display_name": "jane_updated",
-  "avatar_url": "https://example.com/avatar.png",
-  "roles": ["user", "admin"]
-}
-```
-
-**Notes:**
-- `email`, `display_name`, and `roles` are required
-- `name` and `avatar_url` are optional
-- Only admins can modify users' roles
-- Entire role list is replaced (not additive)
-- All operations are atomic: if any step fails, the entire transaction rolls back
+- Role updates replace the full role list when provided
 
 **Response** `200 OK`
 ```json
@@ -247,10 +208,9 @@ Update any user (admin-only). Allows changing profile fields and roles.
 **Errors:**
 | Status | When |
 |---|---|
-| 400 | Invalid input data or missing required fields |
+| 400 | Invalid input data, missing payload fields, or invalid values |
 | 401 | Unauthorized — invalid or missing token |
-| 403 | Forbidden — user lacks admin role |
-| 404 | User not found |
+| 403 | Forbidden — caller is not allowed to change the requested fields |
 | 409 | Email already exists (taken by another user) |
 | 500 | Internal server error |
 

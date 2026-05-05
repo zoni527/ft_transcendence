@@ -4,8 +4,7 @@ package handlers
 // [done] GetUsers      — GET /api/users
 // [done] GetUserById   — GET /api/users/:id
 // [done] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
-// [done] UpdateMe     — PUT /api/users/me
-// [done] UpdateUser   — PUT /api/users/:id
+// [done] UpdateUser   — PUT /api/users/:id (self-update + admin update)
 // [TODO] DeleteUser    — DELETE /api/users/:id
 // [TODO] SearchUsers   — GET /api/users/search?q=
 
@@ -215,81 +214,88 @@ func LogoutUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
-func UpdateMe(c *gin.Context) {
-	userID := c.GetString("userID")
-	if !isValidUUID(userID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
-		return
-	}
-	var req models.UpdateMeRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
-		return
-	}
-	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if err := validatePassword(req.Password); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if !isPasswordStrong(req.Password) {
-		c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
-		return
-	}
-	hashedPassword, err := hashPassword(req.Password)
-	if err != nil {
-		log.Printf("UpdateMe hashPassword error: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
-	userParams := models.UpdateMeParams{
-		Email:           req.Email,
-		Name:            req.Name,
-		Password_hashed: hashedPassword,
-		Display_name:    req.Display_name,
-		Avatar_url:      req.Avatar_url,
-	}
-	user, err := repository.UpdateMe(userID, userParams)
-	if err != nil {
-		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user/email already exists"})
-			return
-		}
-		log.Printf("UpdateMe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, user)
-}
-
 func UpdateUser(c *gin.Context) {
 	targetUserID := c.Param("id")
 	if !isValidUUID(targetUserID) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
+
+	callerUserID := c.GetString("userID")
+	if !isValidUUID(callerUserID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+
+	callerRoles, err := repository.GetRolesByUserId(callerUserID)
+	if err != nil {
+		log.Printf("UpdateUser GetRolesByUserId: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	callerIsAdmin := hasRole(callerRoles, "admin")
+	callerIsOwner := callerUserID == targetUserID
+	if !callerIsOwner && !callerIsAdmin {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		return
+	}
+
 	var req models.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
+	if err := normalizeAndValidateUpdateUserRequest(&req); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := validateRoles(req.Roles); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if req.Password != nil && !callerIsOwner {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "password can only be changed by the account owner"})
 		return
 	}
-	userParams := models.UpdateUserRequest{
-		Email:        req.Email,
-		Name:         req.Name,
-		Display_name: req.Display_name,
-		Avatar_url:   req.Avatar_url,
-		Roles:        req.Roles,
+	if req.Password != nil {
+		if err := validatePassword(*req.Password); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if !isPasswordStrong(*req.Password) {
+			c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+			return
+		}
+	}
+	if req.Roles != nil && !callerIsAdmin {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "roles can only be changed by an admin"})
+		return
+	}
+	if req.Roles != nil {
+		if err := validateRoles(req.Roles); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
+	if !hasAnyUpdateField(&req) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "no fields to update"})
+		return
+	}
+
+	var hashedPassword *string
+	if req.Password != nil {
+		hash, err := hashPassword(*req.Password)
+		if err != nil {
+			log.Printf("UpdateUser hashPassword error: %v", err)
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			return
+		}
+		hashedPassword = &hash
+	}
+
+	userParams := models.UpdateUserParams{
+		Email:           req.Email,
+		Name:            req.Name,
+		Password_hashed: hashedPassword,
+		Display_name:    req.Display_name,
+		Avatar_url:      req.Avatar_url,
+		Roles:           req.Roles,
 	}
 	user, err := repository.UpdateUser(targetUserID, userParams)
 	if err != nil {
@@ -320,9 +326,36 @@ func clearAuthCookie(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 }
 
-// normalizeAndValidateUserFields normalizes and validates common user fields.
+// normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.
+func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error {
+	if req.Email != nil {
+		lowered := strings.ToLower(*req.Email)
+		req.Email = &lowered
+	}
+	if req.Name != nil {
+		trimmed := strings.TrimSpace(*req.Name)
+		if !isValidName(trimmed) {
+			return errors.New("invalid name")
+		}
+		req.Name = &trimmed
+	}
+	if req.Display_name != nil {
+		trimmed := strings.TrimSpace(*req.Display_name)
+		if !isValidDisplayName(trimmed) {
+			return errors.New("invalid display_name")
+		}
+		req.Display_name = &trimmed
+	}
+	if req.Avatar_url != nil {
+		trimmed := strings.TrimSpace(*req.Avatar_url)
+		req.Avatar_url = &trimmed
+	}
+	return nil
+}
+
+// normalizeAndValidateUserFields normalizes and validates the required create-user fields.
 func normalizeAndValidateUserFields(email, name, displayName *string) error {
-	*email = strings.ToLower(strings.TrimSpace(*email))
+	*email = strings.ToLower(*email)
 	*displayName = strings.TrimSpace(*displayName)
 	if *name != "" {
 		*name = strings.TrimSpace(*name)
@@ -462,6 +495,19 @@ func isValidDisplayName(displayName string) bool {
 	}
 
 	return hasAlphaNum
+}
+
+func hasRole(roles []string, role string) bool {
+	for _, currentRole := range roles {
+		if currentRole == role {
+			return true
+		}
+	}
+	return false
+}
+
+func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
+	return req.Email != nil || req.Name != nil || req.Password != nil || req.Display_name != nil || req.Avatar_url != nil || req.Roles != nil
 }
 
 // Secret key used to sign every generated JWT

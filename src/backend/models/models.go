@@ -63,26 +63,20 @@ type LoginUserRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type UpdateMeRequest struct {
-	Email        string `json:"email"        binding:"required,email"`
-	Name         string `json:"name"         binding:"omitempty,min=2,max=50"`
-	Password     string `json:"password"     binding:"required,min=8,max=20"`
-	Display_name string `json:"display_name" binding:"required,min=3,max=15"`
-	Avatar_url   string `json:"avatar_url"   binding:"omitempty"`
-}
-
-type UpdateMeParams struct {
-	Email           string `json:"email"`
-	Name            string `json:"name"`
-	Password_hashed string `json:"-"`
-	Display_name    string `json:"display_name"`
-	Avatar_url      string `json:"avatar_url"`
-}
-
 type UpdateUserRequest struct {
-	Email        string   `json:"email"        binding:"required,email"`
-	Name         string   `json:"name"         binding:"omitempty,min=2,max=50"`
-	Display_name string   `json:"display_name" binding:"required,min=3,max=15"`
-	Avatar_url   string   `json:"avatar_url"   binding:"omitempty"`
-	Roles        []string `json:"roles"        binding:"required"`
+	Email        *string  `json:"email,omitempty"        binding:"omitempty,email"`
+	Name         *string  `json:"name,omitempty"         binding:"omitempty,min=2,max=50"`
+	Password     *string  `json:"password,omitempty"     binding:"omitempty,min=8,max=20"`
+	Display_name *string  `json:"display_name,omitempty" binding:"omitempty,min=3,max=15"`
+	Avatar_url   *string  `json:"avatar_url,omitempty"`
+	Roles        []string `json:"roles,omitempty"        binding:"omitempty,dive,required"`
+}
+
+type UpdateUserParams struct {
+	Email           *string  `json:"email,omitempty"`
+	Name            *string  `json:"name,omitempty"`
+	Password_hashed *string  `json:"-"`
+	Display_name    *string  `json:"display_name,omitempty"`
+	Avatar_url      *string  `json:"avatar_url,omitempty"`
+	Roles           []string `json:"roles,omitempty"`
 }

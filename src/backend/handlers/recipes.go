@@ -219,7 +219,7 @@ func RecipeImageSignature(c *gin.Context) {
 		"timestamp": timestamp,
 		"folder":    "recipes",
 	}
-	signature := generateCloudinarySignature(params)
+	signature := GenerateCloudinarySignature(params)
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"signature":  signature,
 		"api_key":    string(cloudinaryKey),
@@ -417,7 +417,7 @@ func onlyGraphicChars(s string) error {
 	return nil
 }
 
-func generateCloudinarySignature(params map[string]string) string {
+func GenerateCloudinarySignature(params map[string]string) string {
 	keys := make([]string, 0, len(params))
 	for k := range params {
 		keys = append(keys, k)

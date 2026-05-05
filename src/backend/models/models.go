@@ -66,6 +66,7 @@ type LoginUserRequest struct {
 type UpdateMeRequest struct {
 	Email        string `json:"email" binding:"required,email"`
 	Name         string `json:"name" binding:"omitempty,min=2,max=50"`
+	Password     string `json:"password" binding:"required,min=8,max=20"`
 	Display_name string `json:"display_name" binding:"required,min=3,max=15"`
 	Avatar_url   string `json:"avatar_url" binding:"omitempty"`
 }

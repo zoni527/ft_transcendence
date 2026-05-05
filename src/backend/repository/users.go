@@ -281,7 +281,7 @@ func UpdateMe(id string, params models.UpdateMeRequest) (models.User, error) {
 	defer tx.Rollback(context.Background())
 
 	sql := `UPDATE "user"
-			SET email = $1, name = $2, password_hash = $3 display_name = $4,
+			SET email = $1, name = $2, password_hash = $3, display_name = $4,
 						avatar_url = $5, updated_at = NOW()
 			WHERE id = $6
 			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`

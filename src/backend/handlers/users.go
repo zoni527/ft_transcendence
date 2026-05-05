@@ -268,7 +268,7 @@ func UpdateMe(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	targetUserID := c.Param("id")
 	if !isValidUUID(targetUserID) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 	var req models.UpdateUserRequest

@@ -390,8 +390,8 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
 
 // PUT /api/users/me (user update)
 export const putUpdateMe = async (payload: UpdateMePayload, t: TFunction) => {
-  const response = await fetch(`${baseUrl}/users`, {
-    method: 'POST',
+  const response = await fetch(`${baseUrl}/users/me`, {
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -424,6 +424,35 @@ export const getCloudinarySignature = async (
   t: TFunction,
 ): Promise<CloudinaryUploadConfig> => {
   const response = await fetch(`${baseUrl}/recipes/image-signature`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isCloudinaryBackendResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// GET /api/users/avatar (gets an UploadConfig for Cloudinary)
+export const getCloudinarySignatureAvatar = async (
+  t: TFunction,
+): Promise<CloudinaryUploadConfig> => {
+  const response = await fetch(`${baseUrl}/users/avatar`, {
     method: 'GET',
     credentials: 'include',
   });

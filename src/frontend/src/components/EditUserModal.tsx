@@ -7,7 +7,7 @@ import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
 import {
   putUpdateMe,
-  getCloudinarySignature,
+  getCloudinarySignatureAvatar,
   uploadImageToCloudinary,
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
@@ -99,7 +99,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
       let avatar_url = '';
 
       if (image instanceof File && image.size > 0) {
-        const signature = await getCloudinarySignature(t);
+        const signature = await getCloudinarySignatureAvatar(t);
         avatar_url = await uploadImageToCloudinary(image, signature, t);
       } else {
         avatar_url = '';

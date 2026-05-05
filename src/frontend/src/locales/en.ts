@@ -154,8 +154,7 @@ export const enTranslations = {
 
     section8_title: '8. Disclaimers',
     section8_text: `Recipes are provided "as is" by community members.
-      RISE does not verify the accuracy of nutritional information, allergens, or food-safety claims.
-      Cook responsibly and consult a qualified professional for dietary, medical, or allergy concerns.`,
+      RISE does not verify the accuracy of nutritional information, allergens, or food-safety claims.`,
 
     section9_title: '9. Limitation of liability',
     section9_text: `To the fullest extent permitted by law, RISE and its contributors are not liable for indirect, incidental, special, or consequential damages arising from your use of the service.`,
@@ -218,12 +217,12 @@ export const enTranslations = {
     yes: 'Yes',
     no: 'No',
     uploadImage: 'Upload image',
-    noFile: 'No file chosen',
     submit: 'Submit',
     submitPending: 'Submitting recipe...',
   },
   editUser: {
     header: 'Edit profile',
+    uploadAvatar: 'Upload avatar',
     submit: 'Submit',
     submitPending: 'Editing profile...',
   },
@@ -278,6 +277,7 @@ export const enTranslations = {
     loading: 'Loading...',
     welcome: 'Welcome',
     rightsReserved: 'RISE. All Rights Reserved.',
+    noFile: 'No file chosen',
   },
   error: {
     error: 'Error:',

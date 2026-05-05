@@ -45,11 +45,11 @@ export const uploadButtonBase = `
   py-1
   text-gray-700
   text-sm
-  shadow-[0px_0px_10px_0px_rgba(0,0,0,0.4)]
+  shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   hover:cursor-pointer
   whitespace-nowrap
   border-2
-  border-transparent
+  border-gray-300
   hover:border-orange-800
 `;
 
@@ -69,7 +69,7 @@ export const inputFieldBase = `
   px-4
   py-2
   focus:ring-2
-  focus:ring-orange-500
+  focus:ring-orange-800
   focus:outline-none
 `;
 

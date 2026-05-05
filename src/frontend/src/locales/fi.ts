@@ -154,8 +154,7 @@ export const fiTranslations = {
 
     section8_title: '8. Vastuuvapauslauseke',
     section8_text: `Reseptit tarjoavat käyttäjät sellaisenaan.
-      RISE ei tarkista ravintoarvoja, allergeeneja tai turvallisuustietoja.
-      Valmista ruokaa vastuullisesti ja tarvittaessa konsultoi asiantuntijaa.`,
+      RISE ei tarkista ravintoarvoja, allergeeneja tai turvallisuustietoja.`,
 
     section9_title: '9. Vastuunrajoitus',
     section9_text: `Sovellettavan lain sallimissa rajoissa RISE ei ole vastuussa epäsuorista tai välillisistä vahingoista.`,
@@ -218,9 +217,14 @@ export const fiTranslations = {
     yes: 'Kyllä',
     no: 'Ei',
     uploadImage: 'Lataa kuva',
-    noFile: 'Ei tiedostoa valittu',
     submit: 'Lähetä',
     submitPending: 'Lähetetään reseptiä...',
+  },
+  editUser: {
+    header: 'Muokkaa profiilia',
+    uploadAvatar: 'Lataa avatar',
+    submit: 'Lähetä',
+    submitPending: 'Profiilia muokataan...',
   },
   difficulty: {
     type: 'Vaikeusaste',
@@ -273,6 +277,7 @@ export const fiTranslations = {
     loading: 'Ladataan...',
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
+    noFile: 'Ei tiedostoa valittu',
   },
   error: {
     error: 'Virhe:',

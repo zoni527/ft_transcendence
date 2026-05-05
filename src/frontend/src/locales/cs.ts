@@ -217,9 +217,14 @@ export const csTranslations = {
     yes: 'Ano',
     no: 'Ne',
     uploadImage: 'Nahrát obrázek',
-    noFile: 'Žádný soubor nebyl vybrán',
     submit: 'Odeslat',
     submitPending: 'Odesílám recept...',
+  },
+  editUser: {
+    header: 'Upravit profil',
+    uploadAvatar: 'Nahrát avatar',
+    submit: 'Odeslat',
+    submitPending: 'Úprava profilu...',
   },
   difficulty: {
     type: 'Obtížnost',
@@ -272,6 +277,7 @@ export const csTranslations = {
     loading: 'Načítání...',
     welcome: 'Vítejte',
     rightsReserved: 'RISE. Všechna práva vyhrazena.',
+    noFile: 'Žádný soubor nebyl vybrán',
   },
   error: {
     error: 'Chyba:',

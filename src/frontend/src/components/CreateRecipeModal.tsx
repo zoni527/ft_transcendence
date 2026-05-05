@@ -266,7 +266,7 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
             </label>
 
             <span className="text-sm text-gray-600">
-              {fileName || t('createRecipe.noFile')}
+              {fileName || t('common.noFile')}
             </span>
           </div>
 

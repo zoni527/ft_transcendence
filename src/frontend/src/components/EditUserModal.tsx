@@ -14,7 +14,7 @@ import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
 import { getStringValue } from '../utils/utils';
 import type { User } from '../types/types';
-import { cardBase } from '../styles/styles';
+import { cardBase, uploadButtonBase } from '../styles/styles';
 
 type EditUserModalProps = {
   user: User;
@@ -44,6 +44,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const [fileName, setFileName] = useState('');
 
   // Disable background scroll
   useEffect(() => {
@@ -190,6 +191,27 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             type="password"
             placeholder={t('signup.rePasswordPlace')}
           />
+
+          {/* Image Upload */}
+          <div className="mt-12 flex items-center gap-3">
+            <label className={uploadButtonBase}>
+              📁 {t('editUser.uploadAvatar')}
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  setFileName(file ? file.name : '');
+                }}
+              />
+            </label>
+
+            <span className="text-sm text-gray-600">
+              {fileName || t('common.noFile')}
+            </span>
+          </div>
 
           {/* Submit */}
           <div className="mt-12 flex justify-center">

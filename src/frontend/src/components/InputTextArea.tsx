@@ -6,6 +6,8 @@ interface InputTextAreaProps {
   label: string;
   rows?: number;
   placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 const InputTextArea = ({
@@ -14,6 +16,8 @@ const InputTextArea = ({
   label,
   rows = 4,
   placeholder = '...',
+  value,
+  onChange,
 }: InputTextAreaProps) => {
   return (
     <div>
@@ -27,6 +31,8 @@ const InputTextArea = ({
         rows={rows}
         placeholder={placeholder}
         className={`${cardBase} ${inputFieldBase} resize-none`}
+        value={value}
+        onChange={onChange}
       />
     </div>
   );

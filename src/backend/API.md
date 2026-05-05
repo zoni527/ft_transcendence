@@ -169,14 +169,16 @@ Update the current user's profile. Requires authentication.
 {
   "email": "newemail@example.com",
   "name": "Jane Doe",
+  "password": "newPassword123",
   "display_name": "jane_cooks_new",
   "avatar_url": "https://example.com/avatar.png"
 }
 ```
 
 **Notes:**
-- `email` and `display_name` are required
+- `email`, `password`, and `display_name` are required
 - `name` and `avatar_url` are optional
+- Password must be 8-20 characters and sufficiently strong
 - Users cannot modify their `roles` via this endpoint
 - Email must be unique; changing to an existing email will fail
 
@@ -376,6 +378,34 @@ Check whether the current browser session is authenticated.
   "authenticated": false
 }
 ```
+
+---
+
+### GET /api/users/avatar
+
+Get a Cloudinary upload signature for uploading user avatars. This endpoint provides the authentication credentials needed to upload files directly to Cloudinary.
+
+**Requires:** Valid JWT in `token` cookie (set during login).
+
+**Response** `200 OK`
+```json
+{
+  "signature": "cloudinary_signature_string",
+  "api_key": "your_cloudinary_api_key",
+  "cloud_name": "your_cloudinary_cloud_name",
+  "timestamp": "1712700000",
+  "folder": "avatar"
+}
+```
+
+**Notes:**
+- This endpoint is used by the frontend before uploading an avatar to Cloudinary
+- The returned signature, API key, and other parameters should be used with Cloudinary's upload widget or API
+
+**Errors:**
+| Status | When |
+|---|---|
+| 401 | Unauthorized — missing or invalid JWT |
 
 ---
 

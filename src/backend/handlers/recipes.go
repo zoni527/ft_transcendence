@@ -87,8 +87,14 @@ func CreateRecipe(c *gin.Context) {
 }
 
 func UpdateRecipe(c *gin.Context) {
-	id := c.Param("id")
-	if !isValidUUID(id) {
+	userId := c.GetString("userID")
+	if !isValidUUID(userId) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	recipeId := c.Param("id")
+	if !isValidUUID(recipeId) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
@@ -99,15 +105,25 @@ func UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	if modOrAdmin, err := isModOrAdmin(c, id); err != nil {
-		return
-	} else if !modOrAdmin {
-		if author, err := isAuthor(c, id, r.Author_id); err != nil {
-			return
-		} else if !author {
-			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "action forbidden"})
+	original, err := repository.GetRecipeById(recipeId)
+	if err != nil {
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
+		log.Printf("handlers.UpdateRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	modOrAdmin, err := isModOrAdmin(userId)
+	if err != nil {
+		log.Printf("isModOrAdmin: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if !(modOrAdmin || userId == original.Author_id) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
 	}
 
 	if err := validateRecipeFields(&r); err != nil {
@@ -115,7 +131,8 @@ func UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	r.Id = id
+	r.Id = recipeId
+	r.Author_id = original.Author_id
 	if err := repository.UpdateRecipe(&r); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -125,31 +142,40 @@ func UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"id": id})
+	c.IndentedJSON(http.StatusOK, gin.H{"id": recipeId})
 }
 
 func DeleteRecipe(c *gin.Context) {
-	recipeId := c.Param("id")
-	if !isValidUUID(recipeId) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
-		return
-	}
-
 	userId := c.GetString("userID")
 	if !isValidUUID(userId) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	if modOrAdmin, err := isModOrAdmin(c, userId); err != nil {
+	recipeId := c.Param("id")
+	if !isValidUUID(recipeId) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
-	} else if !modOrAdmin {
-		if author, err := isAuthor(c, userId, recipeId); err != nil {
-			return
-		} else if !author {
-			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "action forbidden"})
+	}
+
+	original, err := repository.GetRecipeById(recipeId)
+	if err != nil {
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
+		log.Printf("handlers.DeleteRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	modOrAdmin, err := isModOrAdmin(userId)
+	if err != nil {
+		log.Printf("isModOrAdmin: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if !(modOrAdmin || userId == original.Author_id) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
 	}
 
 	if err := repository.DeleteRecipe(recipeId); err != nil {
@@ -454,42 +480,17 @@ func identifyAndRespondToUserError(c *gin.Context, err error) bool {
 	return false
 }
 
-func isModOrAdmin(c *gin.Context, id string) (bool, error) {
+func isModOrAdmin(id string) (bool, error) {
 	roles, err := repository.GetRolesByUserId(id)
 	if err != nil {
-		log.Printf("isModOrAdmin: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return false, err
 	}
-	isOrAint := false
+
 	for _, r := range roles {
 		if r == "moderator" || r == "admin" {
-			isOrAint = true
-			break
+			return true, nil
 		}
 	}
 
-	return isOrAint, nil
-}
-
-func isAuthor(c *gin.Context, userId, recipeId string) (bool, error) {
-	recipe, err := repository.GetRecipeById(recipeId)
-	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return false, err
-		}
-		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
-		})
-		return false, err
-	}
-
-	if userId != recipe.Author_id {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "action forbidden"})
-		return false, err
-
-	}
-
-	return true, nil
+	return false, nil
 }

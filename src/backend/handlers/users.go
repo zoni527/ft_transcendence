@@ -218,7 +218,7 @@ func LogoutUser(c *gin.Context) {
 func UpdateMe(c *gin.Context) {
 	userID := c.GetString("userID")
 	if !isValidUUID(userID) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 	var req models.UpdateMeRequest
@@ -264,7 +264,7 @@ func UpdateMe(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	targetUserID := c.Param("id")
 	if !isValidUUID(targetUserID) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 	var req models.UpdateUserRequest

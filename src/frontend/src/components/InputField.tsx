@@ -6,6 +6,8 @@ interface InputFieldProps {
   label: string;
   type?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const InputField = ({
@@ -14,6 +16,8 @@ const InputField = ({
   label,
   type = 'text',
   placeholder = '...',
+  value,
+  onChange,
 }: InputFieldProps) => {
   return (
     <div>
@@ -27,6 +31,8 @@ const InputField = ({
         type={type}
         placeholder={placeholder}
         className={`${cardBase} ${inputFieldBase}`}
+        value={value}
+        onChange={onChange}
       />
     </div>
   );

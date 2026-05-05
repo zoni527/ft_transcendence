@@ -12,7 +12,6 @@ import {
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
-import { getStringValue } from '../utils/utils';
 import type { User } from '../types/types';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 
@@ -44,7 +43,15 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+
+  // Controlled input states
+  const [fullName, setFullName] = useState(user.name);
+  const [username, setUsername] = useState(user.display_name);
+  const [email, setEmail] = useState(user.email);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fileName, setFileName] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   // Disable background scroll
   useEffect(() => {
@@ -66,41 +73,33 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    void handleSubmitAsync(e);
+    void handleSubmitAsync();
   };
 
-  const handleSubmitAsync = async (
-    e: React.SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmitAsync = async () => {
     if (loading) return;
-
     setLoading(true);
 
     try {
-      const form = e.currentTarget;
-      const formData = new FormData(form);
-
       const schema = editUserSchema(t);
 
       const result = schema.safeParse({
-        fullName: getStringValue(formData, 'fullName'),
-        username: getStringValue(formData, 'username'),
-        email: getStringValue(formData, 'email'),
-        password: getStringValue(formData, 'password'),
-        confirmPassword: getStringValue(formData, 'confirmPassword'),
+        fullName,
+        username,
+        email,
+        password,
+        confirmPassword,
       });
 
       if (!result.success) {
         throw new Error(result.error.issues[0]?.message || t('error.input'));
       }
 
-      const image = formData.get('image');
-
       let avatar_url = user.avatar_url;
 
-      if (image instanceof File && image.size > 0) {
+      if (imageFile) {
         const signature = await getCloudinarySignatureAvatar(t);
-        avatar_url = await uploadImageToCloudinary(image, signature, t);
+        avatar_url = await uploadImageToCloudinary(imageFile, signature, t);
       }
 
       const updatedUser = await putUpdateMe(
@@ -115,14 +114,11 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
       );
 
       login(updatedUser);
-
       showNotification(t('notification.updateUserSuccess'), 'success');
-
       onClose();
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : t('error.genericError');
-
       showNotification(message, 'error');
     } finally {
       setLoading(false);
@@ -155,7 +151,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="fullName"
             label={t('signup.name')}
             type="text"
-            placeholder={user.name}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
           />
 
           <InputField
@@ -163,7 +160,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="username"
             label={t('signup.username')}
             type="text"
-            placeholder={user.display_name}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
 
           <InputField
@@ -171,7 +169,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="email"
             label={t('signup.email')}
             type="email"
-            placeholder={user.email}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           <InputField
@@ -179,7 +178,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="password"
             label={t('signup.password')}
             type="password"
-            placeholder={t('signup.passwordPlace')}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           <InputField
@@ -187,7 +187,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="confirmPassword"
             label={t('signup.rePassword')}
             type="password"
-            placeholder={t('signup.rePasswordPlace')}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
           {/* Image Upload */}
@@ -200,8 +201,9 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
+                  const file = e.target.files?.[0] || null;
                   setFileName(file ? file.name : '');
+                  setImageFile(file);
                 }}
               />
             </label>

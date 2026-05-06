@@ -12,12 +12,12 @@ export const fiTranslations = {
     logoutSuccess: 'Kirjauduttu ulos',
     createRecipeSuccess: 'Resepti luotu',
     recipeDeleteSuccess: 'Resepti poistettu',
-    editRecipeSuccess: 'Resepti on muokattu onnistuneesti',
+    editRecipeSuccess: 'Resepti päivitetty',
     updateUserSuccess: 'Käyttäjäprofiili päivitetty',
   },
   info: {
-    name: 'Muut käyttäjät eivät näe koko nimeäsi',
-    username: 'Miten muut voivat tunnistaa sinut alustalla',
+    name: 'Ei näy muille käyttäjille',
+    username: 'Muille näkyvä tunnisteesi alustalla',
     email: 'Rekisteröintisähköpostisi',
     roles: 'Laajennetut roolit mahdollistavat enemmän toimintoja',
   },
@@ -223,14 +223,14 @@ export const fiTranslations = {
   },
   editUser: {
     header: 'Muokkaa profiilia',
-    uploadAvatar: 'Lataa avatar',
+    uploadAvatar: 'Lataa profiilikuva',
     submit: 'Lähetä',
-    submitPending: 'Profiilia muokataan...',
+    submitPending: 'Profiilia päivitetään...',
   },
   editRecipe: {
     header: 'Muokkaa reseptiä',
     submit: 'Lähetä',
-    submitPending: 'Muokataan reseptiä...',
+    submitPending: 'Reseptiä päivitetään...',
   },
   difficulty: {
     type: 'Vaikeusaste',
@@ -283,7 +283,7 @@ export const fiTranslations = {
     loading: 'Ladataan...',
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
-    noFile: 'Ei tiedostoa valittu',
+    noFile: 'Tiedostoa ei valittu',
   },
   error: {
     error: 'Virhe:',

@@ -225,7 +225,7 @@ export const enTranslations = {
     header: 'Edit profile',
     uploadAvatar: 'Upload avatar',
     submit: 'Submit',
-    submitPending: 'Editing profile...',
+    submitPending: 'Updating profile...',
   },
   editRecipe: {
     header: 'Edit recipe',

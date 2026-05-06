@@ -152,17 +152,9 @@ Used by `PUT /api/recipes/:id` and `DELETE /api/recipes/:id`.
 
 ## Endpoints
 
-### GET /api/users/:id/roles
-
-Returns the role names for a user. Public read so the frontend can render
-role badges on profile pages without an extra auth dance.
-
-**Response** `200 OK`
-```json
-{ "roles": ["chef", "moderator"] }
-```
-
-`404` if the user does not exist.
+> Note: there is no dedicated `GET /api/users/:id/roles` endpoint. Roles
+> are already part of the User JSON returned by `GET /api/users/:id` and
+> `GET /api/users/me`. Frontend reads `user.roles` from those calls.
 
 ### POST /api/users/:id/roles
 
@@ -264,10 +256,9 @@ Role-based view tips:
 Schema and middleware are already in place. Remaining work:
 
 - [ ] `GET /api/roles` handler + repository query
-- [ ] `GET /api/users/:id/roles` handler
 - [ ] `POST /api/users/:id/roles` handler (with 409 on duplicate)
 - [ ] `DELETE /api/users/:id/roles/:role` handler (with self-revoke admin guard)
 - [ ] `repository.GrantRole(userID, roleName)`
 - [ ] `repository.RevokeRole(userID, roleName)`
-- [ ] Wire all four routes in [main.go](main.go)
+- [ ] Wire the three routes in [main.go](main.go)
 - [ ] Add the new endpoints to [API.md](API.md)

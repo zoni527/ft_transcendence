@@ -178,7 +178,7 @@ Update a user profile. Requires authentication.
   "name": "Jane Doe",
   "password": "newPassword123",
   "display_name": "jane_updated",
-  "avatar_url": "https://example.com/avatar.png",
+  "avatar_url": "https://res.cloudinary.com/dhuk7trpf/image/upload/image.png",
   "roles": ["user", "admin"]
 }
 ```

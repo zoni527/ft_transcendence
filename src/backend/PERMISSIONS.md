@@ -244,17 +244,21 @@ Role-based view tips:
   the role check on the client too, so the button is hidden when it would 403.
   Server still enforces, client only hides.
 
-## Open questions
+## Deferred (post-MVP)
 
-- Should `user` ever be revocable? Today it is the default role and can be
-  removed via the same DELETE endpoint, but doing so leaves an account in
-  an odd state (logged in, no permissions). Leaning toward "no, treat it
-  as a permanent baseline."
-- Do we need an audit log on role grants/revokes? Not required by the
-  subject, but would be cheap to add (`role_change` table with actor,
-  target, role, action, timestamp).
-- Permission-level middleware vs role-level: defer until a real use case
-  shows up.
+None of the below blocks the permission module's subject requirements.
+They are tracked here so we don't lose them if we have time at the end.
+
+- **`user` role is permanent.** The default role can't be revoked.
+  `DELETE /api/users/:id/roles/user` returns `400`. Removing it would
+  leave an account logged in with no permissions, which is an odd state
+  with no use case.
+- **Audit log on role grants/revokes.** Cheap to add (`role_change`
+  table: actor, target, role, action, timestamp). Not required by the
+  subject. Defer.
+- **Permission-level middleware.** Schema supports it; add
+  `RequiredPermissionsMiddleware` only when a route genuinely needs
+  finer control than role names. Defer.
 
 ## Implementation checklist
 

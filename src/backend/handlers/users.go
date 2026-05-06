@@ -340,29 +340,43 @@ func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error 
 			if err := validateEmail(lowered); err != nil {
 				return err
 			}
+			req.Email = &lowered
+		} else {
+			req.Email = nil
 		}
-		req.Email = &lowered
 	}
 	if req.Name != nil {
 		trimmed := strings.TrimSpace(*req.Name)
-		if !isValidName(trimmed) {
-			return errors.New("invalid name")
+		if trimmed != "" {
+			if !isValidName(trimmed) {
+				return errors.New("invalid name")
+			}
+			req.Name = &trimmed
+		} else {
+			req.Name = nil
 		}
-		req.Name = &trimmed
 	}
 	if req.Display_name != nil {
 		trimmed := strings.TrimSpace(*req.Display_name)
-		if !isValidDisplayName(trimmed) {
-			return errors.New("invalid display_name")
+		if trimmed != "" {
+			if !isValidDisplayName(trimmed) {
+				return errors.New("invalid display_name")
+			}
+			req.Display_name = &trimmed
+		} else {
+			req.Display_name = nil
 		}
-		req.Display_name = &trimmed
 	}
 	if req.Avatar_url != nil {
 		trimmed := strings.TrimSpace(*req.Avatar_url)
-		if err := validateCloudinaryAvatarURL(trimmed); err != nil {
-			return err
+		if trimmed != "" {
+			if err := validateCloudinaryAvatarURL(trimmed); err != nil {
+				return err
+			}
+			req.Avatar_url = &trimmed
+		} else {
+			req.Avatar_url = nil
 		}
-		req.Avatar_url = &trimmed
 	}
 	return nil
 }

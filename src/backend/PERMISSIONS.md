@@ -14,8 +14,8 @@ of permissions, and the backend gates routes by role.
 Permissions exist in the schema for future granularity but are not yet
 checked individually. Today, route middleware only looks at role names. If
 we ever need finer control (e.g. "this moderator can `edit_recipe` but not
-`ban_user`"), we add a `RequiredPermissionsMiddleware` without breaking the
-existing wiring.
+`delete_recipe`"), we add a `RequiredPermissionsMiddleware` without breaking
+the existing wiring.
 
 ## Roles
 
@@ -36,16 +36,15 @@ signup flow assigns `user` only ([repository/users.go:192](repository/users.go#L
 Defined in [001_schema.sql](../database/migrations/001_schema.sql) and seeded
 with role mappings in [002_seed.sql](../database/migrations/002_seed.sql).
 
-| Permission         | admin | moderator | chef | user |
-|--------------------|:-----:|:---------:|:----:|:----:|
-| `create_recipe`    | yes   |           | yes  |      |
-| `edit_recipe`      | yes   | yes       |      |      |
-| `delete_recipe`    | yes   | yes       |      |      |
-| `publish_recipe`   | yes   | yes       | yes  |      |
-| `manage_users`     | yes   |           |      |      |
-| `manage_roles`     | yes   |           |      |      |
-| `ban_user`         | yes   |           |      |      |
-| `moderate_content` | yes   | yes       |      |      |
+| Permission | admin | moderator | chef | user |
+|---|:-:|:-:|:-:|:-:|
+| `create_recipe` | yes | | yes | |
+| `edit_recipe` | yes | yes | | |
+| `delete_recipe` | yes | yes | | |
+| `publish_recipe` | yes | yes | yes | |
+| `manage_users` | yes | | | |
+| `manage_roles` | yes | | | |
+| `moderate_content` | yes | yes | | |
 
 Two patterns the table doesn't show:
 

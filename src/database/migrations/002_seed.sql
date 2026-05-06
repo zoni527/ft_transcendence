@@ -30,7 +30,6 @@ INSERT INTO permission (name, description) VALUES
     ('publish_recipe', 'Publish/unpublish recipes'),
     ('manage_users',   'View, edit, and delete user accounts'),
     ('manage_roles',   'Assign and remove roles'),
-    ('ban_user',       'Ban a user from the platform'),
     ('moderate_content', 'Review and moderate user content');
 
 -- admin gets all permissions

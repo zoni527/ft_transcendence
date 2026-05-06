@@ -21,12 +21,12 @@ existing wiring.
 
 Four roles, seeded in [002_seed.sql](../database/migrations/002_seed.sql).
 
-| Role | Description |
-|---|---|
-| `user` | Default. Browse, favourite, comment. Every signed-up user gets this. |
-| `chef` | Can create and publish recipes. |
-| `moderator` | Can edit, delete, and unpublish any recipe. Reviews user content. |
-| `admin` | Everything. Manages users, roles, and site settings. |
+| Role          | Description                                                               |
+|---------------|---------------------------------------------------------------------------|
+| `user`        | Default. Browse, favourite, comment. Every signed-up user gets this.      |
+| `chef`        | Can create and publish recipes.                                           |
+| `moderator`   | Can edit, delete, and unpublish any recipe. Reviews user content.         |
+| `admin`       | Everything. Manages users, roles, and site settings.                      |
 
 Roles are additive: a chef who is also a moderator holds both. The default
 signup flow assigns `user` only ([repository/users.go:192](repository/users.go#L192)).
@@ -36,16 +36,16 @@ signup flow assigns `user` only ([repository/users.go:192](repository/users.go#L
 Defined in [001_schema.sql](../database/migrations/001_schema.sql) and seeded
 with role mappings in [002_seed.sql](../database/migrations/002_seed.sql).
 
-| Permission | admin | moderator | chef | user |
-|---|:-:|:-:|:-:|:-:|
-| `create_recipe` | yes | | yes | |
-| `edit_recipe` | yes | yes | | |
-| `delete_recipe` | yes | yes | | |
-| `publish_recipe` | yes | yes | yes | |
-| `manage_users` | yes | | | |
-| `manage_roles` | yes | | | |
-| `ban_user` | yes | | | |
-| `moderate_content` | yes | yes | | |
+| Permission         | admin | moderator | chef | user |
+|--------------------|:-----:|:---------:|:----:|:----:|
+| `create_recipe`    | yes   |           | yes  |      |
+| `edit_recipe`      | yes   | yes       |      |      |
+| `delete_recipe`    | yes   | yes       |      |      |
+| `publish_recipe`   | yes   | yes       | yes  |      |
+| `manage_users`     | yes   |           |      |      |
+| `manage_roles`     | yes   |           |      |      |
+| `ban_user`         | yes   |           |      |      |
+| `moderate_content` | yes   | yes       |      |      |
 
 Two patterns the table doesn't show:
 
@@ -131,13 +131,13 @@ Grant a role to a user. Admin only.
 { "roles": ["user", "chef"] }
 ```
 
-| Status | Meaning |
-|---|---|
-| 400 | Missing or unknown role name |
-| 401 | Not signed in |
-| 403 | Caller is not admin |
-| 404 | Target user not found |
-| 409 | User already has that role |
+| Status    | Meaning                       |
+|-----------|-------------------------------|
+| 400       | Missing or unknown role name  |
+| 401       | Not signed in                 |
+| 403       | Caller is not admin           |
+| 404       | Target user not found         |
+| 409       | User already has that role    |
 
 Idempotent-by-PK in the DB (`user_role` PRIMARY KEY (user_id, role_id)),
 but we surface `409` rather than silently no-op so the UI can show feedback.
@@ -150,12 +150,12 @@ Revoke a role from a user. Admin only.
 
 **Response** `204 No Content`
 
-| Status | Meaning |
-|---|---|
-| 400 | Trying to revoke `user` (the default role cannot be removed) |
-| 401 | Not signed in |
-| 403 | Caller is not admin, OR caller is trying to revoke their own `admin` |
-| 404 | User has no such role |
+| Status    | Meaning                                                               |
+|-----------|-----------------------------------------------------------------------|
+| 400       | Trying to revoke `user` (the default role cannot be removed)          |
+| 401       | Not signed in                                                         |
+| 403       | Caller is not admin, OR caller is trying to revoke their own `admin`  |
+| 404       | User has no such role                                                 |
 
 The self-revoke admin rule is a lockout guard: if every admin removed their
 own admin role we would have nobody who can grant it back.

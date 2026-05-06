@@ -206,13 +206,13 @@ Update a user profile. Requires authentication.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | Invalid input data, missing payload fields, or invalid values |
-| 401 | Unauthorized — invalid or missing token |
-| 403 | Forbidden — caller is not allowed to change the requested fields |
-| 409 | Email already exists (taken by another user) |
-| 500 | Internal server error |
+| Status    | When                                                              |
+|-----------|-------------------------------------------------------------------|
+| 400       | Invalid input data, missing payload fields, or invalid values     |
+| 401       | Unauthorized — invalid or missing token                           |
+| 403       | Forbidden — caller is not allowed to change the requested fields  |
+| 409       | Email already exists (taken by another user)                      |
+| 500       | Internal server error                                             |
 
 ---
 
@@ -363,9 +363,9 @@ Get a Cloudinary upload signature for uploading user avatars. This endpoint prov
 - The returned signature, API key, and other parameters should be used with Cloudinary's upload widget or API
 
 **Errors:**
-| Status | When |
-|---|---|
-| 401 | Unauthorized — missing or invalid JWT |
+| Status    | When                                  |
+|-----------|---------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT |
 
 ---
 

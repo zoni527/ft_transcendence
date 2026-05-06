@@ -1,50 +1,85 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CreateRecipeModal from '../modals/CreateRecipe';
 import DataField from '../components/DataField';
 import EditUserModal from '../modals/EditUser';
 import InfoIcon from '../components/InfoIcon';
+import ModalButton from '../components/ModalButton';
 import StatusBox from '../components/StatusBox';
+import { getUserbyId } from '../api';
 import { useAuth } from '../utils/AuthContext';
-import { cardBase, buttonBase } from '../styles/styles';
+import type { User } from '../types/types';
+import { cardBase } from '../styles/styles';
 
 const Dashboard = () => {
+  const { id } = useParams<{ id: string }>();
+  const [userData, setUserData] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
-  const { user, loading, hasRole } = useAuth();
+  const { user: authUser, hasRole } = useAuth();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (!authUser && !id) return;
+    const fetchUser = async () => {
+      setLoading(true);
+      try {
+        if (!id) {
+          setUserData(authUser);
+        } else {
+          const data = await getUserbyId(id, t);
+          setUserData(data);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchUser().catch((err) => {
+      console.error(err);
+      setUserData(null);
+    });
+  }, [id, authUser, t]);
 
   if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
-  if (!user) {
+  if (!userData) {
     return (
       <StatusBox message={t('error.userNotFound')} className="text-red-600" />
     );
   }
 
+  const isSelf = !id || authUser?.id === userData.id;
+
   return (
     <>
-      {isUserEditOpen && (
-        <EditUserModal onClose={() => setIsUserEditOpen(false)} user={user} />
+      {isUserEditOpen && isSelf && (
+        <EditUserModal
+          onClose={() => setIsUserEditOpen(false)}
+          user={userData}
+        />
       )}
       {isCreateRecipeOpen && (
         <CreateRecipeModal onClose={() => setIsCreateRecipeOpen(false)} />
       )}
+
       <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
         {/* Avatar */}
         <div className="absolute top-8 right-8">
           <img
-            src={user.avatar_url}
-            alt={`${user.name}'s avatar`}
+            src={userData.avatar_url}
+            alt={`${userData.name}'s avatar`}
             className="h-28 w-28 rounded-full border-2 border-gray-300"
           />
         </div>
 
         {/* Header */}
         <h1 className="mb-8 text-3xl font-bold text-[#C04D31]">
-          {t('common.welcome')}, {user.name}!
+          {t('common.welcome')}, {userData.name}!
         </h1>
 
         {/* User Info Section */}
@@ -53,7 +88,7 @@ const Dashboard = () => {
             {/* Full name */}
             <div className="flex items-center justify-between border-b border-gray-300 pb-4">
               <div className="flex-1">
-                <DataField label={t('dashboard.name')} value={user.name} />
+                <DataField label={t('dashboard.name')} value={userData.name} />
               </div>
               <button
                 onClick={() => {}}
@@ -69,7 +104,7 @@ const Dashboard = () => {
               <div className="flex-1">
                 <DataField
                   label={t('dashboard.username')}
-                  value={user.display_name}
+                  value={userData.display_name}
                 />
               </div>
               <button
@@ -84,7 +119,10 @@ const Dashboard = () => {
             {/* Email */}
             <div className="flex items-center justify-between border-b border-gray-300 pb-4">
               <div className="flex-1">
-                <DataField label={t('dashboard.email')} value={user.email} />
+                <DataField
+                  label={t('dashboard.email')}
+                  value={userData.email}
+                />
               </div>
               <button
                 onClick={() => {}}
@@ -100,7 +138,7 @@ const Dashboard = () => {
               <div className="flex-1">
                 <DataField
                   label={t('dashboard.roles')}
-                  value={user.roles.join(', ')}
+                  value={userData.roles.join(', ')}
                 />
               </div>
               <button
@@ -117,21 +155,20 @@ const Dashboard = () => {
         {/* Bottom Section */}
         <div className="mt-16 flex gap-2">
           {/* Edit user */}
-          <button
+          <ModalButton
+            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
             onClick={() => setIsUserEditOpen(true)}
-            className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
-          >
-            {t('dashboard.editUser')}
-          </button>
+            text={t('dashboard.editUser')}
+            disabled={!isSelf}
+          />
 
           {/* Create recipe */}
-          <button
+          <ModalButton
+            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
             onClick={() => setIsCreateRecipeOpen(true)}
-            className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
-            disabled={!hasRole(['admin', 'moderator', 'chef'])}
-          >
-            {t('dashboard.createRecipe')}
-          </button>
+            text={t('dashboard.createRecipe')}
+            disabled={!hasRole(['moderator', 'admin', 'chef']) || !isSelf}
+          />
         </div>
       </div>
     </>

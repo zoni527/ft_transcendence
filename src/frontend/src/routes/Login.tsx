@@ -67,7 +67,7 @@ const Login = () => {
           login(user);
 
           showNotification(t('notification.loginSuccess'), 'success');
-          void navigate('/dashboard');
+          void navigate('/me');
         })
         .catch((err: unknown) => {
           const message =

@@ -80,7 +80,7 @@ const Signup = () => {
           login(user);
 
           showNotification(t('notification.signupSuccess'), 'success');
-          void navigate('/dashboard');
+          void navigate('/me');
         })
         .catch((err: unknown) => {
           const message =

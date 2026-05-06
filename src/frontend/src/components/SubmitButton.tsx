@@ -8,7 +8,7 @@ interface SubmitButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit';
   disabled?: boolean;
-  className?: string; // 👈 add this
+  className?: string;
 }
 
 const SubmitButton = ({
@@ -18,12 +18,12 @@ const SubmitButton = ({
   onClick,
   type = 'submit',
   disabled = false,
-  className = '', // 👈 default empty
+  className = '',
 }: SubmitButtonProps) => {
   return (
     <button
       type={type}
-      className={` ${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className} `}
+      className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}
       disabled={isLoading || disabled}
       aria-busy={isLoading}
       onClick={onClick}

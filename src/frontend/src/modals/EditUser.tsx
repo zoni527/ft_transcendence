@@ -6,7 +6,7 @@ import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
 import {
-  putUpdateMe,
+  putUpdateUser,
   getCloudinarySignatureAvatar,
   uploadImageToCloudinary,
 } from '../api';
@@ -102,7 +102,9 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
         avatar_url = await uploadImageToCloudinary(imageFile, signature, t);
       }
 
-      const updatedUser = await putUpdateMe(
+      const id = user.id;
+
+      const updatedUser = await putUpdateUser(
         {
           email: result.data.email,
           password: result.data.password,
@@ -110,6 +112,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
           display_name: result.data.username,
           avatar_url,
         },
+        id,
         t,
       );
 

@@ -3,17 +3,18 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
 import EditRecipeModal from '../modals/EditRecipe.tsx';
+import ModalButton from '../components/ModalButton.tsx';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import { getRecipeById, deleteRecipe } from '../api';
 import { useNotification } from '../utils/NotifContext';
 import { useAuth } from '../utils/AuthContext';
 import type { Recipe } from '../types/types';
-import { cardBase, buttonBase } from '../styles/styles';
+import { cardBase } from '../styles/styles';
 
 const RecipeDetail = () => {
   const { showNotification } = useNotification();
-  const { hasRole } = useAuth();
+  const { user, hasRole } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { state } = useLocation() as { state?: { recipe?: Recipe } };
@@ -74,6 +75,8 @@ const RecipeDetail = () => {
       <StatusBox message={t('error.recipeNotFound')} className="text-red-600" />
     );
   }
+
+  const isSelf = recipe.author_id == user?.id;
 
   return (
     <>
@@ -185,13 +188,12 @@ const RecipeDetail = () => {
           {/* Bottom Section */}
           <div className="mt-16 flex gap-2">
             {/* Edit recipe */}
-            <button
+            <ModalButton
+              className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
               onClick={() => setIsEditRecipeOpen(true)}
-              className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
-              disabled={!hasRole(['admin', 'moderator', 'chef'])}
-            >
-              {t('recipeDetail.editRecipe')}
-            </button>
+              text={t('recipeDetail.editRecipe')}
+              disabled={!hasRole(['chef', 'moderator', 'admin']) || !isSelf}
+            />
 
             {/* Delete recipe */}
             <SubmitButton
@@ -201,7 +203,7 @@ const RecipeDetail = () => {
               defaultText={t('recipeDetail.submit')}
               onClick={() => handleDelete(id)}
               type="button"
-              disabled={!hasRole(['chef', 'moderator', 'admin'])}
+              disabled={!hasRole(['chef', 'moderator', 'admin']) || !isSelf}
             />
           </div>
         </div>

@@ -14,8 +14,22 @@ of permissions, and the backend gates routes by role.
 Permissions exist in the schema for future granularity but are not yet
 checked individually. Today, route middleware only looks at role names. If
 we ever need finer control (e.g. "this moderator can `edit_recipe` but not
-`delete_recipe`"), we add a `RequiredPermissionsMiddleware` without breaking
-the existing wiring.
+`delete_recipe`"), we **replace** `RequiredRolesMiddleware` with a
+`RequiredPermissionsMiddleware` on the affected routes, we do not stack
+both layers.
+
+**No per-user overrides.** A user's effective permissions are the union of
+permissions across their assigned roles, period. There is no
+`user_permission` table, and we will not glue an extra permission onto one
+specific user as a one-off. If someone needs a capability their role
+doesn't grant, the answer is either an authorship check (for "edit your
+own thing" cases) or a different role — never a direct grant.
+
+Concretely: a chef can edit her *own* recipes via authorship check. She
+*cannot* edit another user's recipes. We do not promote her to moderator
+just to let her touch one other recipe, and we do not bolt `edit_recipe`
+onto her chef role for one user. The two paths are: own → allowed,
+not own → forbidden unless you hold a role that grants it for everyone.
 
 ## Roles
 
@@ -51,7 +65,7 @@ Two patterns the table doesn't show:
 - **Authorship overrides.** A chef can edit and delete their *own* recipes
   even though `edit_recipe` and `delete_recipe` are not in their role. The
   handler checks `recipe.author_id == current_user.id` and short-circuits
-  the role check. See the TODO note in [002_seed.sql:46](../database/migrations/002_seed.sql#L46).
+  the role check. See the TODO note in [002_seed.sql:45](../database/migrations/002_seed.sql#L45).
 - **Public reads.** Browsing published recipes needs no permission. Auth
   middleware is not attached to public GET routes.
 
@@ -61,13 +75,19 @@ Two middlewares, applied in order on protected routes.
 
 ### AuthMiddleware
 
-[handlers/users.go:335](handlers/users.go#L335). Reads the `token` cookie,
-validates the JWT, and stores `userID` on the Gin context. Returns
-`401 Unauthorized` on failure.
+[handlers/users.go:396](handlers/users.go#L396). Reads the `token` cookie,
+validates the JWT, checks the token blacklist, and stores `userID` on the
+Gin context.
+
+| Status | When |
+|---|---|
+| 401 `{"error":"unauthorized"}`   | Missing `token` cookie |
+| 401 `{"error":"invalid token"}`  | JWT validation failed, or token is blacklisted |
+| 500                              | Blacklist lookup itself errored |
 
 ### RequiredRolesMiddleware
 
-[handlers/recipes.go:406](handlers/recipes.go#L406). Looks up the user's
+[handlers/recipes.go:441](handlers/recipes.go#L441). Looks up the user's
 roles via `GetRolesByUserId` and allows the request if *any* of the user's
 roles match the allowed list. Returns `403 Forbidden` on failure.
 

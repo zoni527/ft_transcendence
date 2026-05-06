@@ -76,7 +76,23 @@ Two patterns the table doesn't show:
 
 ## How enforcement works
 
-Two middlewares, applied in order on protected routes.
+Two middlewares run before any protected route:
+
+- `AuthMiddleware` — "are you logged in?" (identity)
+- `RequiredRolesMiddleware` — "do you have one of these roles?" (authorization)
+
+These stack because they answer **different** questions: one identifies
+the user, the other checks what they can do. You always need both.
+
+If both pass, the handler runs. Some handlers do an extra check of their
+own (e.g. authorship — see below). That's the only handler-level pattern
+in the code today.
+
+> **Rule of thumb for adding new middleware:** stack middlewares that ask
+> different questions, replace middlewares that ask the same question. So
+> a future `RequiredPermissionsMiddleware` would *replace*
+> `RequiredRolesMiddleware` on the affected routes (same question, finer
+> grain), not run alongside it.
 
 ### AuthMiddleware
 

@@ -302,7 +302,7 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
 };
 
 // GET /api/users/me (user authentication)
-export const getUser = async (t: TFunction): Promise<User> => {
+export const getMe = async (t: TFunction): Promise<User> => {
   const response = await fetch(`${baseUrl}/users/me`, {
     method: 'GET',
     credentials: 'include',

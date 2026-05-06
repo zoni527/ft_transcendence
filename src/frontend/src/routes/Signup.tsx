@@ -6,7 +6,7 @@ import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
-import { getUser, postSignup } from '../api';
+import { getMe, postSignup } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
 import { getStringValue } from '../utils/utils';
@@ -75,7 +75,7 @@ const Signup = () => {
         t,
       )
         .then(async () => {
-          const user = await getUser(t);
+          const user = await getMe(t);
 
           login(user);
 

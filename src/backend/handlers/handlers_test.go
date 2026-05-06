@@ -313,3 +313,31 @@ func TestTitles(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateCloudinaryAvatarURL(t *testing.T) {
+	goodURLs := []string{
+		"",
+		"https://res.cloudinary.com/demo/image/upload/v123/avatar.png",
+		"https://res.cloudinary.com/my-cloud/avatar/user-1.webp",
+	}
+
+	badURLs := []string{
+		"http://res.cloudinary.com/demo/image/upload/v123/avatar.png",
+		"https://example.com/demo/image/upload/v123/avatar.png",
+		"https://res.cloudinary.com",
+		"https://res.cloudinary.com/demo",
+		"not-a-url",
+	}
+
+	for _, u := range goodURLs {
+		if err := validateCloudinaryAvatarURL(u); err != nil {
+			t.Errorf("validateCloudinaryAvatarURL(%q) returned unexpected error: %v", u, err)
+		}
+	}
+
+	for _, u := range badURLs {
+		if err := validateCloudinaryAvatarURL(u); err == nil {
+			t.Errorf("validateCloudinaryAvatarURL(%q) expected error, got nil", u)
+		}
+	}
+}

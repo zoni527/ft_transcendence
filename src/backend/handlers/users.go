@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -152,7 +153,7 @@ func CreateUser(c *gin.Context) {
 	data, err := repository.CreateUser(userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user/email already exists"})
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
 		log.Printf("CreateUser error: %v", err)
@@ -300,7 +301,11 @@ func UpdateUser(c *gin.Context) {
 	user, err := repository.UpdateUser(targetUserID, userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user/email already exists"})
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
+			return
+		}
+		if err == pgx.ErrNoRows {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 			return
 		}
 		log.Printf("UpdateUser: %v", err)
@@ -348,8 +353,32 @@ func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error 
 	}
 	if req.Avatar_url != nil {
 		trimmed := strings.TrimSpace(*req.Avatar_url)
+		if err := validateCloudinaryAvatarURL(trimmed); err != nil {
+			return err
+		}
 		req.Avatar_url = &trimmed
 	}
+	return nil
+}
+
+func validateCloudinaryAvatarURL(avatarURL string) error {
+	if avatarURL == "" {
+		return nil
+	}
+
+	parsed, err := url.Parse(avatarURL)
+	if err != nil {
+		return errors.New("invalid avatar_url")
+	}
+
+	if parsed.Scheme != "https" || parsed.Host != "res.cloudinary.com" {
+		return errors.New("avatar_url must be a Cloudinary URL")
+	}
+
+	if !strings.HasPrefix(parsed.Path, "/") || len(strings.Split(strings.Trim(parsed.Path, "/"), "/")) < 2 {
+		return errors.New("avatar_url must include cloud name and asset path")
+	}
+
 	return nil
 }
 

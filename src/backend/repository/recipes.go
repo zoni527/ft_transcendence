@@ -4,7 +4,7 @@ package repository
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
 // [done] CreateRecipe      — POST /api/recipes (currently inserts the recipe row only)
-// [TODO] UpdateRecipe      — PUT /api/recipes/:id
+// [done] UpdateRecipe      — PUT /api/recipes/:id
 // [done] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] GetAllRecipes should support ?include_drafts=true for admins (once auth is implemented)
 // [TODO] Add GET /api/users/:id/recipes so authors can see their own unpublished recipes
@@ -15,6 +15,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"ft_transcendence/backend/models"
 
@@ -97,11 +98,11 @@ func GetRecipeById(id string) (models.Recipe, error) {
 	)
 
 	if err == pgx.ErrNoRows {
-		return models.Recipe{}, &UserError{"recipe not found"}
+		return models.Recipe{}, &NotFoundError{"recipe not found"}
 	}
 
 	if err != nil {
-		return models.Recipe{}, fmt.Errorf("error getting recipe by id: %w", err)
+		return models.Recipe{}, fmt.Errorf("repository.GetRecipeById: %w", err)
 	}
 
 	return r, nil
@@ -125,21 +126,39 @@ func CreateRecipe(r *models.Recipe) (string, error) {
 		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
 	).Scan(&newId)
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if !errors.As(err, &pgErr) {
-			return "", fmt.Errorf("repository.CreateRecipe: %w", err)
-		}
-		switch pgErr.Code {
-		case pgerrcode.ForeignKeyViolation:
-			return "", &UserError{"invalid author_id"}
-		case pgerrcode.CheckViolation:
-			return "", &UserError{"invalid recipe data"}
-		default:
-			return "", fmt.Errorf("repository.CreateRecipe: %w", err)
-		}
+		return "", recipePostgresErrorClassification("repository.CreateRecipe", err)
 	}
 
 	return newId, nil
+}
+
+func UpdateRecipe(r *models.Recipe) error {
+	sql := `
+		UPDATE recipe
+		SET (
+			title, description, prep_time_min, cook_time_min, servings,
+			difficulty, cuisine, meal_type, image_url, calories,
+			protein_g, carbs_g, fat_g, is_published
+		) = (
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+		),
+			updated_at = now()
+		WHERE id = $15`
+
+	res, err := Pool.Exec(context.Background(), sql,
+		r.Title, r.Description, r.Prep_time_min, r.Cook_time_min, r.Servings,
+		r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url, r.Calories,
+		r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
+		r.Id,
+	)
+	if err != nil {
+		return recipePostgresErrorClassification("repository.UpdateRecipe", err)
+	}
+	if res.RowsAffected() == 0 {
+		return &NotFoundError{"recipe not found"}
+	}
+
+	return nil
 }
 
 func DeleteRecipe(id string) error {
@@ -149,16 +168,60 @@ func DeleteRecipe(id string) error {
 		return fmt.Errorf("repository.DeleteRecipe: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return &UserError{"recipe not found"}
+		return &NotFoundError{"recipe not found"}
 	}
 
 	return nil
 }
 
-type UserError struct {
+// -----------------------------------------------------------------------------
+// helper functions
+
+type BadRequestError struct {
 	msg string
 }
 
-func (e *UserError) Error() string {
+func (e *BadRequestError) Error() string {
 	return e.msg
+}
+
+type NotFoundError struct {
+	msg string
+}
+
+func (e *NotFoundError) Error() string {
+	return e.msg
+}
+
+func recipePostgresErrorClassification(functionName string, err error) error {
+	var pgErr *pgconn.PgError
+	// Not a Postgres error -> internal server error
+	if !errors.As(err, &pgErr) {
+		return fmt.Errorf("%v: %w", functionName, err)
+	}
+	switch pgErr.Code {
+	case pgerrcode.ForeignKeyViolation:
+		if pgErr.ConstraintName == "fk_author_id" {
+			return &BadRequestError{"invalid author id"}
+		}
+		log.Printf("%v: foreign key violation: %v", functionName, pgErr.ConstraintName)
+		return &BadRequestError{"invalid recipe data"}
+
+	case pgerrcode.CheckViolation:
+		switch pgErr.ConstraintName {
+		case "recipe_difficulty_allowed_values":
+			return &BadRequestError{"invalid difficulty value"}
+		case "recipe_meal_type_allowed_values":
+			return &BadRequestError{"invalid meal type value"}
+		default:
+			log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
+			return &BadRequestError{"invalid recipe data"}
+		}
+
+	case pgerrcode.InvalidTextRepresentation:
+		return &NotFoundError{"recipe not found"}
+
+	default:
+		return fmt.Errorf("%v: %w", functionName, err)
+	}
 }

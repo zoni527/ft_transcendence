@@ -15,3 +15,6 @@ src/frontend/node_modules
 
 # Backend, name of executable might change in future
 src/backend/backend
+
+# Local folder
+local

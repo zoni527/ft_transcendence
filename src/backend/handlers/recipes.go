@@ -4,7 +4,7 @@ package handlers
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
 // [done] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
-// [TODO] UpdateRecipe      — PUT /api/recipes/:id
+// [done] UpdateRecipe      — PUT /api/recipes/:id
 // [done] DeleteRecipe      — DELETE /api/recipes/:id
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
@@ -47,9 +47,7 @@ func GetRecipeById(c *gin.Context) {
 
 	recipe, err := repository.GetRecipeById(id)
 	if err != nil {
-		var ue *repository.UserError
-		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"error": ue.Error()})
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
 		log.Printf("handlers.GetRecipeById: %v", err)
@@ -61,7 +59,6 @@ func GetRecipeById(c *gin.Context) {
 
 func CreateRecipe(c *gin.Context) {
 	var r models.Recipe
-
 	if err := c.ShouldBindJSON(&r); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
@@ -78,9 +75,7 @@ func CreateRecipe(c *gin.Context) {
 
 	newRecipeId, err := repository.CreateRecipe(&r)
 	if err != nil {
-		var ue *repository.UserError
-		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": ue.Error()})
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
 		log.Printf("handlers.CreateRecipe: %v", err)
@@ -92,59 +87,99 @@ func CreateRecipe(c *gin.Context) {
 }
 
 func UpdateRecipe(c *gin.Context) {
-	// TODO: call repository.UpdateRecipe()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
-}
+	userId := c.GetString("userID")
+	if !isValidUUID(userId) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 
-func DeleteRecipe(c *gin.Context) {
 	recipeId := c.Param("id")
 	if !isValidUUID(recipeId) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
+	var r models.Recipe
+	if err := c.ShouldBindJSON(&r); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+
+	original, err := repository.GetRecipeById(recipeId)
+	if err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return
+		}
+		log.Printf("handlers.UpdateRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	modOrAdmin, err := isModOrAdmin(userId)
+	if err != nil {
+		log.Printf("isModOrAdmin: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if !(modOrAdmin || userId == original.Author_id) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
+	}
+
+	if err := validateRecipeFields(&r); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
+		return
+	}
+
+	r.Id = recipeId
+	r.Author_id = original.Author_id
+	if err := repository.UpdateRecipe(&r); err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return
+		}
+		log.Printf("handlers.UpdateRecipe: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"id": recipeId})
+}
+
+func DeleteRecipe(c *gin.Context) {
 	userId := c.GetString("userID")
 	if !isValidUUID(userId) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
-	roles, err := repository.GetRolesByUserId(userId)
+
+	recipeId := c.Param("id")
+	if !isValidUUID(recipeId) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		return
+	}
+
+	original, err := repository.GetRecipeById(recipeId)
 	if err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return
+		}
 		log.Printf("handlers.DeleteRecipe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	isModeratorOrAdmin := false
-	for _, r := range roles {
-		if r == "moderator" || r == "admin" {
-			isModeratorOrAdmin = true
-			break
-		}
+	modOrAdmin, err := isModOrAdmin(userId)
+	if err != nil {
+		log.Printf("isModOrAdmin: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
 	}
-	if !isModeratorOrAdmin { // Check if client is the author of the recipe
-		recipe, err := repository.GetRecipeById(recipeId)
-		if err != nil {
-			var ue *repository.UserError
-			if errors.As(err, &ue) {
-				c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
-				return
-			}
-			log.Printf("handlers.DeleteRecipe: %v", err)
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{
-				"error": "internal server error",
-			})
-			return
-		}
-		if userId != recipe.Author_id {
-			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "can't delete this recipe"})
-			return
-		}
+	if !(modOrAdmin || userId == original.Author_id) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
 	}
 
 	if err := repository.DeleteRecipe(recipeId); err != nil {
-		var ue *repository.UserError
-		if errors.As(err, &ue) {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"error": ue.Error()})
+		if identifyAndRespondToUserError(c, err) {
 			return
 		}
 		log.Printf("handlers.DeleteRecipe: %v", err)
@@ -428,4 +463,34 @@ func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
 		}
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 	}
+}
+
+func identifyAndRespondToUserError(c *gin.Context, err error) bool {
+	var br *repository.BadRequestError
+	var nf *repository.NotFoundError
+	switch {
+	case errors.As(err, &br):
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": br.Error()})
+		return true
+	case errors.As(err, &nf):
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
+		return true
+	}
+
+	return false
+}
+
+func isModOrAdmin(id string) (bool, error) {
+	roles, err := repository.GetRolesByUserId(id)
+	if err != nil {
+		return false, err
+	}
+
+	for _, r := range roles {
+		if r == "moderator" || r == "admin" {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

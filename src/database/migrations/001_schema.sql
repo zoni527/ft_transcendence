@@ -58,15 +58,17 @@ CREATE TABLE recipe (
     id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     -- TODO: GDPR — TOS should state that published recipes remain after account
     --       deletion with authorship anonymized (author_id set to NULL)
-    author_id               UUID REFERENCES "user"(id) ON DELETE SET NULL,
+    author_id               UUID CONSTRAINT fk_author_id REFERENCES "user"(id) ON DELETE SET NULL,
     title                   VARCHAR NOT NULL,
     description             TEXT,
     prep_time_min           INT,
     cook_time_min           INT,
     servings                INT DEFAULT 4,
-    difficulty              VARCHAR NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard')),
+    difficulty              VARCHAR NOT NULL CONSTRAINT recipe_difficulty_allowed_values
+                                CHECK (difficulty IN ('easy', 'medium', 'hard')),
     cuisine                 VARCHAR,
-    meal_type               VARCHAR NOT NULL CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
+    meal_type               VARCHAR NOT NULL CONSTRAINT recipe_meal_type_allowed_values
+                                CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
     image_url               VARCHAR,
     calories                INT,
     protein_g               DECIMAL,

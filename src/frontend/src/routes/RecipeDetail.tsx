@@ -192,7 +192,10 @@ const RecipeDetail = () => {
               className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
               onClick={() => setIsEditRecipeOpen(true)}
               text={t('recipeDetail.editRecipe')}
-              disabled={!hasRole(['chef', 'moderator', 'admin']) || !isSelf}
+              disabled={
+                !hasRole(['moderator', 'admin']) &&
+                !(hasRole(['chef']) && isSelf)
+              }
             />
 
             {/* Delete recipe */}
@@ -203,7 +206,10 @@ const RecipeDetail = () => {
               defaultText={t('recipeDetail.submit')}
               onClick={() => handleDelete(id)}
               type="button"
-              disabled={!hasRole(['chef', 'moderator', 'admin']) || !isSelf}
+              disabled={
+                !hasRole(['moderator', 'admin']) &&
+                !(hasRole(['chef']) && isSelf)
+              }
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../utils/NotifContext';
 import CreateRecipeModal from '../modals/CreateRecipe';
 import DataField from '../components/DataField';
 import EditUserModal from '../modals/EditUser';
@@ -15,14 +16,17 @@ import { cardBase } from '../styles/styles';
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
   const [userData, setUserData] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
   const { user: authUser, hasRole } = useAuth();
+  const { showNotification } = useNotification();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   useEffect(() => {
     if (!authUser && !id) return;
+
     const fetchUser = async () => {
       setLoading(true);
       try {
@@ -37,11 +41,15 @@ const Dashboard = () => {
       }
     };
 
-    void fetchUser().catch((err) => {
-      console.error(err);
+    void fetchUser().catch((err: unknown) => {
+      const message =
+        err instanceof Error ? err.message : t('error.genericError');
+
+      showNotification(message, 'error');
       setUserData(null);
+      void navigate('/');
     });
-  }, [id, authUser, t]);
+  }, [id, authUser, t, showNotification, navigate]);
 
   if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
@@ -57,7 +65,7 @@ const Dashboard = () => {
 
   return (
     <>
-      {isUserEditOpen && isSelf && (
+      {isUserEditOpen && (
         <EditUserModal
           onClose={() => setIsUserEditOpen(false)}
           user={userData}
@@ -159,7 +167,7 @@ const Dashboard = () => {
             className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
             onClick={() => setIsUserEditOpen(true)}
             text={t('dashboard.editUser')}
-            disabled={!isSelf}
+            disabled={!(hasRole(['admin']) || isSelf)}
           />
 
           {/* Create recipe */}
@@ -167,7 +175,7 @@ const Dashboard = () => {
             className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
             onClick={() => setIsCreateRecipeOpen(true)}
             text={t('dashboard.createRecipe')}
-            disabled={!hasRole(['moderator', 'admin', 'chef']) || !isSelf}
+            disabled={!(hasRole(['chef', 'moderator', 'admin']) && isSelf)}
           />
         </div>
       </div>

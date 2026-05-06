@@ -33,6 +33,7 @@ const SelectField = ({
       <select
         id={id}
         name={name}
+        defaultValue=""
         value={value}
         onChange={onChange}
         className={`${cardBase} ${inputFieldBase}`}

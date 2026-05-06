@@ -328,6 +328,33 @@ export const getMe = async (t: TFunction): Promise<User> => {
   return data;
 };
 
+// GET /api/users/:id (get a user by ID)
+export const getUserbyId = async (id: string, t: TFunction): Promise<User> => {
+  const response = await fetch(`${baseUrl}/users/${id}`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isUserResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
 // POST /api/users/login (user login)
 export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   const response = await fetch(`${baseUrl}/users/login`, {
@@ -407,8 +434,12 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
 };
 
 // PUT /api/users/me (user update)
-export const putUpdateMe = async (payload: UpdateMePayload, t: TFunction) => {
-  const response = await fetch(`${baseUrl}/users/me`, {
+export const putUpdateUser = async (
+  payload: UpdateMePayload,
+  id: string,
+  t: TFunction,
+) => {
+  const response = await fetch(`${baseUrl}/users/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

@@ -304,7 +304,7 @@ func UpdateUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 			return
 		}

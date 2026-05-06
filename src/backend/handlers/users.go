@@ -536,7 +536,12 @@ func hasRole(roles []string, role string) bool {
 }
 
 func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
-	return req.Email != nil || req.Name != nil || req.Password != nil || req.Display_name != nil || req.Avatar_url != nil || req.Roles != nil
+	return req.Email != nil ||
+		req.Name != nil ||
+		req.Password != nil ||
+		req.Display_name != nil ||
+		req.Avatar_url != nil ||
+		req.Roles != nil
 }
 
 // Secret key used to sign every generated JWT

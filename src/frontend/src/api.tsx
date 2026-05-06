@@ -182,6 +182,8 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
       return t('error.unauthorized');
     case 404:
       return t('error.notFound');
+    case 429:
+      return t('error.rateLimit');
     case 500:
       return t('error.serverError');
     default:

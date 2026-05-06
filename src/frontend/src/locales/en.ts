@@ -296,6 +296,7 @@ export const enTranslations = {
     badRequest: 'Invalid request, please check your input',
     unauthorized: 'You are not authorized to perform this action',
     notFound: 'The requested resource could not be found',
+    rateLimit: 'Too many requests — rate limit exceeded',
     serverError: 'An internal server error occurred, please try again later',
     authError: 'Signup succeeded but automatic login failed, please log in',
   },

@@ -296,6 +296,7 @@ export const fiTranslations = {
     badRequest: 'Virheellinen pyyntö, tarkista syötteesi',
     unauthorized: 'Sinulla ei ole oikeuksia suorittaa tätä toimintoa',
     notFound: 'Haettua resurssia ei löydy',
+    rateLimit: 'Liian monta pyyntöä — nopeusrajoitus ylitetty',
     serverError: 'Sisäinen palvelinvirhe, yritä myöhemmin uudelleen',
     authError:
       'Rekisteröinti onnistui, mutta automaattinen kirjautuminen epäonnistui, kirjaudu sisään manuaalisesti',

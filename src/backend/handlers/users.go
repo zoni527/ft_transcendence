@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/mail"
 	"net/url"
 	"os"
 	"strconv"
@@ -334,7 +335,12 @@ func clearAuthCookie(c *gin.Context) {
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.
 func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error {
 	if req.Email != nil {
-		lowered := strings.ToLower(*req.Email)
+		lowered := strings.ToLower(strings.TrimSpace(*req.Email))
+		if lowered != "" {
+			if err := validateEmail(lowered); err != nil {
+				return err
+			}
+		}
 		req.Email = &lowered
 	}
 	if req.Name != nil {
@@ -361,6 +367,27 @@ func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error 
 	return nil
 }
 
+// normalizeAndValidateUserFields normalizes and validates the required create-user fields.
+func normalizeAndValidateUserFields(email, name, displayName *string) error {
+	*email = strings.ToLower(strings.TrimSpace(*email))
+	if *email != "" {
+		if err := validateEmail(*email); err != nil {
+			return err
+		}
+	}
+	*displayName = strings.TrimSpace(*displayName)
+	if *name != "" {
+		*name = strings.TrimSpace(*name)
+		if !isValidName(*name) {
+			return errors.New("invalid name")
+		}
+	}
+	if !isValidDisplayName(*displayName) {
+		return errors.New("invalid display_name")
+	}
+	return nil
+}
+
 func validateCloudinaryAvatarURL(avatarURL string) error {
 	if avatarURL == "" {
 		return nil
@@ -382,19 +409,30 @@ func validateCloudinaryAvatarURL(avatarURL string) error {
 	return nil
 }
 
-// normalizeAndValidateUserFields normalizes and validates the required create-user fields.
-func normalizeAndValidateUserFields(email, name, displayName *string) error {
-	*email = strings.ToLower(*email)
-	*displayName = strings.TrimSpace(*displayName)
-	if *name != "" {
-		*name = strings.TrimSpace(*name)
-		if !isValidName(*name) {
-			return errors.New("invalid name")
+func validateEmail(email string) error {
+	if email == "" {
+		return nil
+	}
+
+	for _, r := range email {
+		if unicode.IsControl(r) {
+			return errors.New("email contains control characters")
 		}
 	}
-	if !isValidDisplayName(*displayName) {
-		return errors.New("invalid display_name")
+
+	addr, err := mail.ParseAddress(email)
+	if err != nil {
+		return err
 	}
+
+	parts := strings.Split(addr.Address, "@")
+	allowed := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-+"
+	for _, r := range parts[0] {
+		if !strings.ContainsRune(allowed, r) {
+			return fmt.Errorf("invalid character in email local part: %c", r)
+		}
+	}
+
 	return nil
 }
 

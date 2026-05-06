@@ -23,13 +23,13 @@ Four roles, seeded in [002_seed.sql](../database/migrations/002_seed.sql).
 
 | Role          | Description                                                               |
 |---------------|---------------------------------------------------------------------------|
-| `user`        | Default. Browse, favourite, comment. Every signed-up user gets this.      |
+| `user`        | Default. Browse and favourite. Every signed-up user gets this.            |
 | `chef`        | Can create and publish recipes.                                           |
 | `moderator`   | Can edit, delete, and unpublish any recipe. Reviews user content.         |
 | `admin`       | Everything. Manages users, roles, and site settings.                      |
 
 Roles are additive: a chef who is also a moderator holds both. The default
-signup flow assigns `user` only ([repository/users.go:192](repository/users.go#L192)).
+signup flow assigns `user` only ([repository/users.go:193](repository/users.go#L193)).
 
 ## Permissions
 
@@ -167,7 +167,7 @@ panel to populate a "grant role" dropdown.
 **Response** `200 OK`
 ```json
 [
-  { "name": "user",      "description": "Default. Browse, favourite, comment." },
+  { "name": "user",      "description": "Default. Browse and favourite." },
   { "name": "chef",      "description": "Can create and publish recipes." },
   { "name": "moderator", "description": "Review and moderate content." },
   { "name": "admin",     "description": "Full access." }

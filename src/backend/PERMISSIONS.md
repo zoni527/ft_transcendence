@@ -183,6 +183,11 @@ Grant a role to a user. Admin only.
 Idempotent-by-PK in the DB (`user_role` PRIMARY KEY (user_id, role_id)),
 but we surface `409` rather than silently no-op so the UI can show feedback.
 
+**One role per call.** Bulk grants are intentionally not supported — the
+frontend can fire parallel requests if it needs to grant multiple. This
+keeps per-role status codes (especially `409`) clean and avoids
+partial-success ambiguity.
+
 ### DELETE /api/users/:id/roles/:role
 
 Revoke a role from a user. Admin only.

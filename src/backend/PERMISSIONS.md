@@ -127,9 +127,18 @@ For "edit your own thing" routes, the handler runs the authorship check
 ```go
 // inside handler
 recipe, err := repository.GetRecipeById(recipeID)
-// ...
+if err != nil {
+    // ... 404 if not found, 500 otherwise
+    return
+}
+
 userID := c.GetString("userID")
-roles, _ := repository.GetRolesByUserId(userID)
+roles, err := repository.GetRolesByUserId(userID)
+if err != nil {
+    log.Printf("GetRolesByUserId: %v", err)
+    c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+    return
+}
 
 isOwner := recipe.Author_id == userID
 isPrivileged := contains(roles, "moderator") || contains(roles, "admin")

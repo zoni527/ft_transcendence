@@ -5,6 +5,7 @@ export const enTranslations = {
     signup: 'Sign up',
     login: 'Log in',
     logout: 'Log out',
+    admin: 'Admin',
   },
   notification: {
     signupSuccess: 'Account created',
@@ -46,6 +47,9 @@ export const enTranslations = {
     roles: 'Roles',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
+  },
+  adminPanel: {
+    header: 'Admin panel',
   },
   footer: {
     privacy: 'Privacy Policy',
@@ -290,6 +294,7 @@ export const enTranslations = {
     error: 'Error:',
     input: 'Invalid input',
     userNotFound: 'User not found',
+    accessDenied: 'Access denied',
     recipeNotFound: 'Recipe not found',
     recipesNotFound: 'No recipes found',
     genericError: 'An error occurred, please try again later',

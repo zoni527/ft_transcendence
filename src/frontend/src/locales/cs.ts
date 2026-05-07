@@ -5,6 +5,7 @@ export const csTranslations = {
     signup: 'Registrovat se',
     login: 'Přihlásit se',
     logout: 'Odhlásit se',
+    admin: 'Admin',
   },
   notification: {
     signupSuccess: 'Účet vytvořen',
@@ -46,6 +47,9 @@ export const csTranslations = {
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
+  },
+  adminPanel: {
+    header: 'Administrátorský panel',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',
@@ -290,6 +294,7 @@ export const csTranslations = {
     error: 'Chyba:',
     input: 'Neplatný vstup',
     userNotFound: 'Uživatel nenalezen',
+    accessDenied: 'Přístup odepřen',
     recipeNotFound: 'Recept nenalezen',
     recipesNotFound: 'Nebyly nalezeny žádné recepty',
     genericError: 'Došlo k chybě, zkuste to prosím později',

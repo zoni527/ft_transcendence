@@ -5,6 +5,7 @@ export const fiTranslations = {
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
     logout: 'Kirjaudu ulos',
+    admin: 'Admin',
   },
   notification: {
     signupSuccess: 'Tili luotu',
@@ -46,6 +47,9 @@ export const fiTranslations = {
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
+  },
+  adminPanel: {
+    header: 'Ylläpitäjän paneeli',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',
@@ -290,6 +294,7 @@ export const fiTranslations = {
     error: 'Virhe:',
     input: 'Virheellinen syöte',
     userNotFound: 'Käyttäjää ei löytynyt',
+    accessDenied: 'Pääsy estetty',
     recipeNotFound: 'Reseptiä ei löytynyt',
     recipesNotFound: 'Reseptejä ei löytynyt',
     genericError: 'Tapahtui virhe, yritä myöhemmin uudelleen',

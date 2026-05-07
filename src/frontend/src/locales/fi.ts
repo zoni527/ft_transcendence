@@ -294,6 +294,7 @@ export const fiTranslations = {
     error: 'Virhe:',
     input: 'Virheellinen syöte',
     userNotFound: 'Käyttäjää ei löytynyt',
+    usersNotFound: 'Käyttäjiä ei löytynyt',
     accessDenied: 'Pääsy estetty',
     recipeNotFound: 'Reseptiä ei löytynyt',
     recipesNotFound: 'Reseptejä ei löytynyt',

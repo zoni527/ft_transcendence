@@ -294,6 +294,7 @@ export const csTranslations = {
     error: 'Chyba:',
     input: 'Neplatný vstup',
     userNotFound: 'Uživatel nenalezen',
+    usersNotFound: 'Uživatelé nenalezeni',
     accessDenied: 'Přístup odepřen',
     recipeNotFound: 'Recept nenalezen',
     recipesNotFound: 'Nebyly nalezeny žádné recepty',

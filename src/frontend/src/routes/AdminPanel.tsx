@@ -1,14 +1,31 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import DataField from '../components/DataField';
-import NavButton from '../components/NavButton';
-import InfoIcon from '../components/InfoIcon';
+import AdminUserField from '../components/AdminUserField.tsx';
 import StatusBox from '../components/StatusBox';
 import { useAuth } from '../utils/AuthContext';
-import { cardBase, buttonBase } from '../styles/styles';
+import { getUsers } from '../api';
+import { useNotification } from '../utils/NotifContext.ts';
+import type { User } from '../types/types';
+import { cardBase } from '../styles/styles';
 
 const AdminPanel = () => {
-  const { user, loading, hasRole } = useAuth();
+  const { user, hasRole } = useAuth();
+  const { showNotification } = useNotification();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    getUsers(t)
+      .then(setUsers)
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+      })
+      .finally(() => setLoading(false));
+  }, [t, showNotification]);
 
   if (loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
@@ -23,6 +40,12 @@ const AdminPanel = () => {
   if (!hasRole(['admin'])) {
     return (
       <StatusBox message={t('error.accessDenied')} className="text-red-600" />
+    );
+  }
+
+  if (users.length === 0) {
+    return (
+      <StatusBox message={t('error.usersNotFound')} className="text-red-600" />
     );
   }
 
@@ -42,89 +65,14 @@ const AdminPanel = () => {
         {t('adminPanel.header')}
       </h1>
 
-      {/* User Info Section */}
+      {/* List of Users */}
       <div className="mt-28 space-y-6">
         <div className="flex flex-col gap-4">
-          {/* Full name */}
-          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-            <div className="flex-1">
-              <DataField label={t('dashboard.name')} value={user.name} />
-            </div>
-            <button
-              onClick={() => {}}
-              className="rounded p-2"
-              title={t('info.name')}
-            >
-              <InfoIcon />
-            </button>
-          </div>
-
-          {/* Username */}
-          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-            <div className="flex-1">
-              <DataField
-                label={t('dashboard.username')}
-                value={user.display_name}
-              />
-            </div>
-            <button
-              onClick={() => {}}
-              className="rounded p-2"
-              title={t('info.username')}
-            >
-              <InfoIcon />
-            </button>
-          </div>
-
-          {/* Email */}
-          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-            <div className="flex-1">
-              <DataField label={t('dashboard.email')} value={user.email} />
-            </div>
-            <button
-              onClick={() => {}}
-              className="rounded p-2"
-              title={t('info.email')}
-            >
-              <InfoIcon />
-            </button>
-          </div>
-
-          {/* Roles */}
-          <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-            <div className="flex-1">
-              <DataField
-                label={t('dashboard.roles')}
-                value={user.roles.join(', ')}
-              />
-            </div>
-            <button
-              onClick={() => {}}
-              className="rounded p-2"
-              title={t('info.roles')}
-            >
-              <InfoIcon />
-            </button>
-          </div>
+          {' '}
+          {users.map((user) => (
+            <AdminUserField user={user} />
+          ))}
         </div>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="mt-16 flex gap-2">
-        <NavButton
-          path="/editUser"
-          className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
-        >
-          {t('dashboard.editUser')}
-        </NavButton>
-
-        <NavButton
-          path="/create"
-          className={`${buttonBase} rounded-xl bg-slate-600 hover:bg-[#C04D31]`}
-          disabled={!hasRole(['admin', 'moderator', 'chef'])}
-        >
-          {t('dashboard.createRecipe')}
-        </NavButton>
       </div>
     </div>
   );

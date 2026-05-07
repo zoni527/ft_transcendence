@@ -305,6 +305,23 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
   return data.user;
 };
 
+// GET /api/users (get all users)
+export const getUsers = async (t: TFunction): Promise<User[]> => {
+  const response = await fetch(`${baseUrl}/users`);
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  const data: unknown = await response.json();
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data as User[];
+};
+
 // GET /api/users/me (user authentication)
 export const getMe = async (t: TFunction): Promise<User> => {
   const response = await fetch(`${baseUrl}/users/me`, {

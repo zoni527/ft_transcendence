@@ -294,6 +294,7 @@ export const enTranslations = {
     error: 'Error:',
     input: 'Invalid input',
     userNotFound: 'User not found',
+    usersNotFound: 'Users not found',
     accessDenied: 'Access denied',
     recipeNotFound: 'Recipe not found',
     recipesNotFound: 'No recipes found',

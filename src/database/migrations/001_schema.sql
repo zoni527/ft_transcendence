@@ -122,8 +122,8 @@ CREATE TABLE recipe_ingredient (
 -- =====================
 
 CREATE TABLE recipe_favourite (
-    user_id         UUID REFERENCES "user"(id) ON DELETE CASCADE,
-    recipe_id       UUID REFERENCES recipe(id) ON DELETE CASCADE,
+    user_id         UUID CONSTRAINT fk_user_id REFERENCES "user"(id) ON DELETE CASCADE,
+    recipe_id       UUID CONSTRAINT fk_recipe_id REFERENCES recipe(id) ON DELETE CASCADE,
     created_at      TIMESTAMP DEFAULT now(),
     PRIMARY KEY (user_id, recipe_id)
 );

@@ -70,6 +70,10 @@ func main() {
 		handlers.DeleteRecipe)
 	router.POST("/api/recipes/:id/image", handlers.UploadRecipeImage) // not implemented yet
 
+	// Favourites
+	router.POST("/api/recipes/:id/favourite",
+		handlers.AddFavourite)
+
 	if err := router.Run("0.0.0.0:8080"); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}

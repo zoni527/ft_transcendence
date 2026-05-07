@@ -197,6 +197,7 @@ func recipePostgresErrorClassification(functionName string, err error) error {
 	if !errors.As(err, &pgErr) {
 		return fmt.Errorf("%v: %w", functionName, err)
 	}
+
 	switch pgErr.Code {
 	case pgerrcode.ForeignKeyViolation:
 		if pgErr.ConstraintName == "fk_author_id" {

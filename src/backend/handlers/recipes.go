@@ -63,11 +63,13 @@ func CreateRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
+
 	r.Author_id = c.GetString("userID")
 	if !isValidUUID(r.Author_id) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
+
 	if err := validateRecipeFields(&r); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
 		return

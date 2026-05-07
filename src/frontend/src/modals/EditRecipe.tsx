@@ -37,8 +37,7 @@ const createRecipeSchema = (t: TFunction) =>
   z.object({
     title: z.string().min(1, t('recValidation.recipeNameRequired')),
     description: z.string().min(1, t('recValidation.descriptionRequired')),
-    prep_time_min: requiredNumber(t('recValidation.prepTime'), 0, t),
-    cook_time_min: requiredNumber(t('recValidation.cookTime'), 0, t),
+    preparation_time_min: requiredNumber(t('recValidation.prepTime'), 0, t),
     servings: requiredNumber(t('recValidation.servings'), 1, t),
     difficulty: z.enum(['easy', 'medium', 'hard'], {
       errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
@@ -51,9 +50,6 @@ const createRecipeSchema = (t: TFunction) =>
     protein_g: requiredNumber(t('recValidation.protein'), 0, t),
     carbs_g: requiredNumber(t('recValidation.carbs'), 0, t),
     fat_g: requiredNumber(t('recValidation.fat'), 0, t),
-    is_published: z.enum(['yes', 'no'], {
-      errorMap: () => ({ message: t('recValidation.selectPublishOption') }),
-    }),
   });
 
 const EditRecipeModal = ({
@@ -69,8 +65,9 @@ const EditRecipeModal = ({
   // Controlled input states
   const [title, setTitle] = useState(passedRecipe.title);
   const [description, setDescription] = useState(passedRecipe.description);
-  const [prep_time_min, setPrepTimeMin] = useState(passedRecipe.prep_time_min);
-  const [cook_time_min, setCookTimeMin] = useState(passedRecipe.cook_time_min);
+  const [preparation_time_min, setPrepTimeMin] = useState(
+    passedRecipe.preparation_time_min,
+  );
   const [servings, setServings] = useState(passedRecipe.servings);
   const [difficulty, setDifficulty] = useState(passedRecipe.difficulty);
   const [cuisine, setCuisine] = useState(passedRecipe.cuisine);
@@ -79,7 +76,6 @@ const EditRecipeModal = ({
   const [protein, setProtein] = useState(passedRecipe.protein_g);
   const [carbs, setCarbs] = useState(passedRecipe.carbs_g);
   const [fat, setFat] = useState(passedRecipe.fat_g);
-  const [is_published, setIsPublished] = useState(passedRecipe.is_published);
   const [fileName, setFileName] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -122,8 +118,7 @@ const EditRecipeModal = ({
       const result = schema.safeParse({
         title: getStringValue(formData, 'title'),
         description: getStringValue(formData, 'description'),
-        prep_time_min: getStringValue(formData, 'prep_time_min'),
-        cook_time_min: getStringValue(formData, 'cook_time_min'),
+        preparation_time_min: getStringValue(formData, 'preparation_time_min'),
         servings: getStringValue(formData, 'servings'),
         difficulty: getStringValue(formData, 'difficulty'),
         cuisine: getStringValue(formData, 'cuisine'),
@@ -132,7 +127,6 @@ const EditRecipeModal = ({
         protein_g: getStringValue(formData, 'protein_g'),
         carbs_g: getStringValue(formData, 'carbs_g'),
         fat_g: getStringValue(formData, 'fat_g'),
-        is_published: getStringValue(formData, 'is_published'),
       });
 
       if (!result.success) {
@@ -153,7 +147,6 @@ const EditRecipeModal = ({
           ...result.data,
           id,
           image_url,
-          is_published: result.data.is_published === 'yes',
         },
         id,
         t,
@@ -213,21 +206,14 @@ const EditRecipeModal = ({
           />
 
           <InputField
-            id="prep_time_min"
-            name="prep_time_min"
+            id="preparation_time_min"
+            name="preparation_time_min"
             label={t('createRecipe.prep')}
             type="text"
-            value={prep_time_min.toString()}
+            value={preparation_time_min.toString()}
             onChange={(e) => setPrepTimeMin(Number(e.target.value))}
           />
-          <InputField
-            id="cook_time_min"
-            name="cook_time_min"
-            label={t('createRecipe.cook')}
-            type="text"
-            value={cook_time_min.toString()}
-            onChange={(e) => setCookTimeMin(Number(e.target.value))}
-          />
+
           <InputField
             id="servings"
             name="servings"
@@ -307,18 +293,6 @@ const EditRecipeModal = ({
             type="text"
             value={fat.toString()}
             onChange={(e) => setFat(Number(e.target.value))}
-          />
-
-          <SelectField
-            id="is_published"
-            name="is_published"
-            label={t('createRecipe.publish')}
-            options={[
-              { value: 'yes', label: t('createRecipe.yes') },
-              { value: 'no', label: t('createRecipe.no') },
-            ]}
-            value={is_published.toString()}
-            onChange={(e) => setIsPublished(e.target.value === 'yes')}
           />
 
           {/* Image Upload */}

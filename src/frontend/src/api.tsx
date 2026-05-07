@@ -4,8 +4,7 @@ import type { Recipe, User } from './types/types';
 interface CreateRecipePayload {
   title: string;
   description: string;
-  prep_time_min: number;
-  cook_time_min: number;
+  preparation_time_min: number;
   servings: number;
   difficulty: string;
   cuisine: string;
@@ -15,15 +14,13 @@ interface CreateRecipePayload {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
-  is_published: boolean;
 }
 
 interface UpdateRecipePayload {
   id: string;
   title: string;
   description: string;
-  prep_time_min: number;
-  cook_time_min: number;
+  preparation_time_min: number;
   servings: number;
   difficulty: string;
   cuisine: string;
@@ -33,7 +30,6 @@ interface UpdateRecipePayload {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
-  is_published: boolean;
 }
 
 interface CreateRecipeResponse {
@@ -193,7 +189,7 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
   }
 }
 
-// GET /api/recipes (get all published recipes)
+// GET /api/recipes (get all recipes)
 export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
 

@@ -154,6 +154,7 @@ Create a new user.
 | Status | When |
 |---|---|
 | 400 | Missing required fields or invalid data |
+| 422 | Password is too weak |
 | 409 | Email already exists |
 
 ---
@@ -211,6 +212,7 @@ Update a user profile. Requires authentication.
 | 400       | Invalid input data, missing payload fields, or invalid values     |
 | 401       | Unauthorized — invalid or missing token                           |
 | 403       | Forbidden — caller is not allowed to change the requested fields  |
+| 422       | Password is too weak                                              |
 | 409       | Email already exists (taken by another user)                      |
 | 500       | Internal server error                                             |
 
@@ -366,6 +368,8 @@ Get a Cloudinary upload signature for uploading user avatars. This endpoint prov
 | Status    | When                                  |
 |-----------|---------------------------------------|
 | 401       | Unauthorized — missing or invalid JWT |
+| 500       | Failed to generate signature          |
+
 
 ---
 

@@ -48,6 +48,9 @@ func favouritePostgresErrorClassification(functionName string, err error) error 
 			return &BadRequestError{"invalid data"}
 		}
 
+	case pgerrcode.UniqueViolation:
+		return &ConflictError{"recipe already favourited"}
+
 	case pgerrcode.InvalidTextRepresentation:
 		return &NotFoundError{"bad format"}
 

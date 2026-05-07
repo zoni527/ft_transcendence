@@ -73,6 +73,8 @@ func main() {
 	// Favourites
 	router.POST("/api/recipes/:id/favourite",
 		handlers.AddFavourite)
+	router.POST("/api/favourite",
+		handlers.AddFavouriteAdmin)
 
 	if err := router.Run("0.0.0.0:8080"); err != nil {
 		log.Fatal("Server failed to start:", err)

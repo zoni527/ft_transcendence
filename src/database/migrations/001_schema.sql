@@ -26,7 +26,7 @@ CREATE TABLE role (
 
 CREATE TABLE permission (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name            VARCHAR UNIQUE NOT NULL, -- create_recipe, delete_recipe, ban_user, etc.
+    name            VARCHAR UNIQUE NOT NULL, -- create_recipe, delete_recipe, manage_roles, etc.
     description     TEXT
 );
 

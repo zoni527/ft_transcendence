@@ -22,11 +22,11 @@ Requests without a valid API key will receive `401 Unauthorized`.
 
 Requests are rate-limited per API key. If you exceed the limit, the server responds with `429 Too Many Requests`.
 
-| Header | Description |
-|---|---|
-| `X-RateLimit-Limit` | Max requests per window |
-| `X-RateLimit-Remaining` | Requests left in current window |
-| `X-RateLimit-Reset` | Seconds until the window resets |
+| Header                    | Description                                   |
+|---------------------------|-----------------------------------------------|
+| `X-RateLimit-Limit`       | Max requests per window                       |
+| `X-RateLimit-Remaining`   | Requests left in current window               |
+| `X-RateLimit-Reset`       | Seconds until the window resets               |
 
 ## Common Error Responses
 
@@ -38,13 +38,13 @@ All errors return JSON in this format:
 }
 ```
 
-| Status | Meaning |
-|---|---|
-| 400 | Bad request — invalid or missing data |
-| 401 | Unauthorized — missing or invalid API key |
-| 404 | Not found — resource does not exist |
-| 429 | Too many requests — rate limit exceeded |
-| 500 | Internal server error |
+| Status    | Meaning                                   |
+|-----------|-------------------------------------------|
+| 400       | Bad request — invalid or missing data     |
+| 401       | Unauthorized — missing or invalid API key |
+| 404       | Not found — resource does not exist       |
+| 429       | Too many requests — rate limit exceeded   |
+| 500       | Internal server error                     |
 
 ---
 
@@ -55,10 +55,10 @@ All errors return JSON in this format:
 Get all users.
 
 **Query parameters (optional):**
-| Param | Type | Description |
-|---|---|---|
-| page | int | Page number for pagination (default: 1) — TODO |
-| limit | int | Results per page (default: 20) — TODO |
+| Param | Type  | Description                                       |
+|-------|-------|---------------------------------------------------|
+| page  | int   | Page number for pagination (default: 1) — TODO    |
+| limit | int   | Results per page (default: 20) — TODO             |
 
 **Response** `200 OK`
 ```json
@@ -82,9 +82,9 @@ Get all users.
 Search users by name or display name. Useful for the "Add Friend" feature.
 
 **Query parameters:**
-| Param | Type | Description |
-|---|---|---|
-| q | string | Search term (matches name or display_name) |
+| Param | Type      | Description                                   |
+|-------|-----------|-----------------------------------------------|
+| q     | string    | Search term (matches name or display_name)    |
 
 **Response** `200 OK`
 ```json
@@ -117,9 +117,9 @@ Get a single user by ID.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 404 | User not found |
+| Status    | When              |
+|-----------|-------------------|
+| 404       | User not found    |
 
 ---
 
@@ -151,11 +151,11 @@ Create a new user.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | Missing required fields or invalid data |
-| 422 | Password is too weak |
-| 409 | Email already exists |
+| Status    | When                                      |
+|-----------|-------------------------------------------|
+| 400       | Missing required fields or invalid data   |
+| 422       | Password is too weak                      |
+| 409       | Email already exists                      |
 
 ---
 
@@ -230,9 +230,9 @@ Delete a user. Cascades: removes their roles and favourites. Recipes they author
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 404 | User not found |
+| Status    | When                      |
+|-----------|---------------------------|
+| 404       | User not found            |
 
 ---
 
@@ -260,10 +260,10 @@ Authenticate a user and receive a JWT token.
 Sets a `token` cookie with JWT. The cookie can be marked Secure once the API is served over HTTPS.
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | Missing email or password |
-| 401 | Invalid credentials |
+| Status    | When                      |
+|-----------|---------------------------|
+| 400       | Missing email or password |
+| 401       | Invalid credentials       |
 
 ---
 
@@ -281,9 +281,9 @@ Log out the current authenticated user. Clears the authentication cookie.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 401 | Unauthorized — missing or invalid JWT |
+| Status    | When                                  |
+|-----------|---------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT |
 
 ---
 
@@ -307,10 +307,10 @@ Get the profile of the currently authenticated user.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 401 | Unauthorized — missing or invalid JWT |
-| 404 | User not found |
+| Status    | When                                  |
+|-----------|---------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT |
+| 404       | User not found                        |
 
 ---
 
@@ -382,15 +382,15 @@ Get all published recipes.
 > **Future:** Once auth + roles are implemented, admins can use `?include_drafts=true` to see unpublished recipes. Authors will be able to see their own drafts via `GET /api/users/:id/recipes`.
 
 **Query parameters (optional):**
-| Param | Type | Description |
-|---|---|---|
-| cuisine | string | Filter by cuisine (e.g. "italian") |
-| meal_type | string | Filter by meal type (breakfast/lunch/dinner/snack) |
-| difficulty | string | Filter by difficulty (easy/medium/hard) |
-| sort | string | Sort by field (e.g. "created_at", "title", "calories") — TODO |
-| order | string | Sort order: "asc" or "desc" (default: "desc") — TODO |
-| page | int | Page number for pagination (default: 1) — TODO |
-| limit | int | Results per page (default: 20) — TODO |
+| Param         | Type      | Description                                                   |
+|---------------|-----------|---------------------------------------------------------------|
+| cuisine       | string    | Filter by cuisine (e.g. "italian")                            |
+| meal_type     | string    | Filter by meal type (breakfast/lunch/dinner/snack)            |
+| difficulty    | string    | Filter by difficulty (easy/medium/hard)                       |
+| sort          | string    | Sort by field (e.g. "created_at", "title", "calories") — TODO |
+| order         | string    | Sort order: "asc" or "desc" (default: "desc") — TODO          |
+| page          | int       | Page number for pagination (default: 1) — TODO                |
+| limit         | int       | Results per page (default: 20) — TODO                         |
 
 **Response** `200 OK`
 ```json
@@ -467,9 +467,9 @@ Get a single recipe by ID, including its steps and ingredients.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 404 | Recipe not found |
+| Status    | When              |
+|-----------|-------------------|
+| 404       | Recipe not found  |
 
 ---
 
@@ -516,13 +516,14 @@ Create a new recipe with steps and ingredients.
 **Response** `201 Created` — returns the created recipe (same format as GET /api/recipes/:id).
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | Missing required fields (title, author_id) |
-| 400 | Invalid difficulty or meal_type value |
-| 400 | Negative or zero numeric fields (servings, prep_time, etc.) |
+| Status    | When                                                          |
+|-----------|---------------------------------------------------------------|
+| 400       | Missing required fields (title, author_id)                    |
+| 400       | Invalid difficulty or meal_type value                         |
+| 400       | Negative or zero numeric fields (servings, prep_time, etc.)   |
 
 ---
+
 ### GET /api/recipes/image-signature
 
 Get a pre-signed Cloudinary signature for uploading recipe images. Required for secure client-side image uploads.
@@ -540,10 +541,10 @@ Get a pre-signed Cloudinary signature for uploading recipe images. Required for 
 ```
 
 **Errors:**
-| Status | When |
-|---|
-| 401 | Unauthorized — missing or invalid JWT |
-| 500 | Failed to generate signature |
+| Status    | When                                  |
+|-----------|---------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT |
+| 500       | Failed to generate signature          |
 
 ---
 
@@ -561,10 +562,10 @@ Upload an image for a recipe. Uses multipart form data.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | No file, wrong format, or exceeds size limit |
-| 404 | Recipe not found |
+| Status    | When                                          |
+|-----------|-----------------------------------------------|
+| 400       | No file, wrong format, or exceeds size limit  |
+| 404       | Recipe not found                              |
 
 ---
 
@@ -577,10 +578,10 @@ Replace a recipe completely. All fields are required.
 **Response** `200 OK` — returns the updated recipe.
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | Missing required fields or invalid values |
-| 404 | Recipe not found |
+| Status    | When                                      |
+|-----------|-------------------------------------------|
+| 400       | Missing required fields or invalid values |
+| 404       | Recipe not found                          |
 
 ---
 
@@ -591,9 +592,9 @@ Delete a recipe. Cascades: removes its steps, ingredients, and favourites.
 **Response** `204 No Content`
 
 **Errors:**
-| Status | When |
-|---|---|
-| 404 | Recipe not found |
+| Status    | When              |
+|-----------|-------------------|
+| 404       | Recipe not found  |
 
 ---
 
@@ -633,10 +634,10 @@ Create a new ingredient.
 **Response** `201 Created` — returns the created ingredient.
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | Missing name |
-| 409 | Ingredient name already exists |
+| Status    | When                              |
+|-----------|-----------------------------------|
+| 400       | Missing name                      |
+| 409       | Ingredient name already exists    |
 
 ---
 
@@ -698,10 +699,10 @@ Favourite a recipe for the current user.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 400 | Already favourited |
-| 404 | Recipe not found |
+| Status    | When                  |
+|-----------|-----------------------|
+| 400       | Already favourited    |
+| 404       | Recipe not found      |
 
 ---
 
@@ -724,9 +725,9 @@ Unfavourite a recipe.
 ```
 
 **Errors:**
-| Status | When |
-|---|---|
-| 404 | Recipe or favourite not found |
+| Status    | When                          |
+|-----------|-------------------------------|
+| 404       | Recipe or favourite not found |
 
 ---
 
@@ -740,29 +741,29 @@ Get all recipes a user has favourited.
 
 ## Implementation Status
 
-| Endpoint | Status |
-|---|---|
-| GET /api/users | done |
-| GET /api/users/:id | done |
-| POST /api/users/login | done |
-| POST /api/users/logout | done |
-| GET /api/users/me | done |
-| GET /api/users/session | done |
-| GET /api/users/search?q= | TODO |
-| POST /api/users | TODO |
-| PUT /api/users/:id | TODO |
-| DELETE /api/users/:id | TODO |
-| GET /api/recipes | done |
-| GET /api/recipes/:id | done |
-| GET /api/recipes/image-signature | done |
-| POST /api/recipes | TODO |
-| POST /api/recipes/:id/image | TODO |
-| PUT /api/recipes/:id | TODO |
-| DELETE /api/recipes/:id | done |
-| GET /api/ingredients | TODO |
-| POST /api/ingredients | TODO |
-| GET /api/ingredient-categories | TODO |
-| POST /api/ingredient-categories | TODO |
-| POST /api/recipes/:id/favourite | TODO |
-| DELETE /api/recipes/:id/favourite | TODO |
-| GET /api/users/:id/favourites | TODO |
+| Endpoint                          | Status    |
+|-----------------------------------|-----------|
+| GET /api/users                    | done      |
+| GET /api/users/:id                | done      |
+| POST /api/users/login             | done      |
+| POST /api/users/logout            | done      |
+| GET /api/users/me                 | done      |
+| GET /api/users/session            | done      |
+| GET /api/users/search?q=          | TODO      |
+| POST /api/users                   | TODO      |
+| PUT /api/users/:id                | TODO      |
+| DELETE /api/users/:id             | TODO      |
+| GET /api/recipes                  | done      |
+| GET /api/recipes/:id              | done      |
+| GET /api/recipes/image-signature  | done      |
+| POST /api/recipes                 | TODO      |
+| POST /api/recipes/:id/image       | TODO      |
+| PUT /api/recipes/:id              | TODO      |
+| DELETE /api/recipes/:id           | done      |
+| GET /api/ingredients              | TODO      |
+| POST /api/ingredients             | TODO      |
+| GET /api/ingredient-categories    | TODO      |
+| POST /api/ingredient-categories   | TODO      |
+| POST /api/recipes/:id/favourite   | TODO      |
+| DELETE /api/recipes/:id/favourite | TODO      |
+| GET /api/users/:id/favourites     | TODO      |

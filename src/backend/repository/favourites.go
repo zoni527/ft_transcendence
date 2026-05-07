@@ -51,7 +51,7 @@ func favouritePostgresErrorClassification(functionName string, err error) error 
 		return &ConflictError{"recipe already favourited"}
 
 	case pgerrcode.InvalidTextRepresentation:
-		return &NotFoundError{"bad format"}
+		return &NotFoundError{"recipe not found"}
 
 	default:
 		return fmt.Errorf("%v: %w", functionName, err)

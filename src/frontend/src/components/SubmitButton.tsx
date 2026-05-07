@@ -9,6 +9,7 @@ interface SubmitButtonProps {
   type?: 'button' | 'submit';
   disabled?: boolean;
   className?: string;
+  title?: string;
 }
 
 const SubmitButton = ({
@@ -18,10 +19,12 @@ const SubmitButton = ({
   onClick,
   type = 'submit',
   disabled = false,
+  title = disabled ? 'Insufficient permissions' : '',
   className = '',
 }: SubmitButtonProps) => {
   return (
     <button
+      title={title}
       type={type}
       className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}
       disabled={isLoading || disabled}

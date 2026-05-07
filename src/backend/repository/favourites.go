@@ -43,7 +43,7 @@ func favouritePostgresErrorClassification(functionName string, err error) error 
 		case "fk_recipe_id":
 			return &NotFoundError{"recipe not found"}
 		default:
-			log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
+			log.Printf("%v: foreign key violation: %v", functionName, pgErr.ConstraintName)
 			return &BadRequestError{"invalid data"}
 		}
 

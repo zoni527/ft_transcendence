@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { buttonBase } from '../styles/styles';
 
 interface SubmitButtonProps {
@@ -19,12 +20,17 @@ const SubmitButton = ({
   onClick,
   type = 'submit',
   disabled = false,
-  title = disabled ? 'Insufficient permissions' : '',
+  title,
   className = '',
 }: SubmitButtonProps) => {
+  const { t } = useTranslation();
+
+  const resolvedTitle =
+    title ?? (disabled ? t('info.insufficientPermissions') : '');
+
   return (
     <button
-      title={title}
+      title={resolvedTitle}
       type={type}
       className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}
       disabled={isLoading || disabled}

@@ -318,7 +318,7 @@ const EditRecipeModal = ({
               { value: 'no', label: t('createRecipe.no') },
             ]}
             value={is_published.toString()}
-            onChange={(e) => setIsPublished(e.target.value === 'true')}
+            onChange={(e) => setIsPublished(e.target.value === 'yes')}
           />
 
           {/* Image Upload */}

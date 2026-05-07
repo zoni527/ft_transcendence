@@ -20,6 +20,7 @@ export const fiTranslations = {
     username: 'Muille näkyvä tunnisteesi alustalla',
     email: 'Rekisteröintisähköpostisi',
     roles: 'Laajennetut roolit mahdollistavat enemmän toimintoja',
+    insufficientPermissions: 'Riittämättömät käyttöoikeudet',
   },
   recipeDetail: {
     author: 'Tekijä',

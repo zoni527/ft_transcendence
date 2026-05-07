@@ -20,6 +20,7 @@ export const csTranslations = {
     username: 'Jak vás ostatní mohou na platformě rozpoznat',
     email: 'Váš registrační e-mail',
     roles: 'Pokročilé role umožňují více funkcí',
+    insufficientPermissions: 'Nedostatečná oprávnění',
   },
   recipeDetail: {
     author: 'Autor',

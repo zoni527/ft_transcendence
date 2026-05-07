@@ -20,6 +20,7 @@ export const enTranslations = {
     username: 'How others can recognize you on the platform',
     email: 'Your registration email',
     roles: 'Advanced roles allow more functionality',
+    insufficientPermissions: 'Insufficient permissions',
   },
   recipeDetail: {
     author: 'Author',

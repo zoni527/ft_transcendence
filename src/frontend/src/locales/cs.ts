@@ -51,6 +51,7 @@ export const csTranslations = {
   adminPanel: {
     header: 'Administrátorský panel',
     users: 'Databáze uživatelů',
+    recipes: 'Databáze receptů',
     edit: 'Upravit',
     delete: 'Smazat',
   },

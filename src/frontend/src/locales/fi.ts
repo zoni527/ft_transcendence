@@ -51,6 +51,7 @@ export const fiTranslations = {
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
     users: 'Käyttäjätietokanta',
+    recipes: 'Reseptitietokanta',
     edit: 'Muokkaa',
     delete: 'Poista',
   },

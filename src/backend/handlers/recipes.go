@@ -234,8 +234,7 @@ func RecipeImageSignature(c *gin.Context) {
 // ----------------
 
 // I know these values are ridiculous, but with this you could feed 100 sumo wrestlers
-const prepTimeMax = 60 * 1000 // 1000 hours max
-const cookTimeMax = 60 * 100  // 100 hours max
+const preparationTimeMax = 60 * 1000 // 1000 hours max
 const servingsMax = 100
 const caloriesMax = 1000000
 
@@ -260,8 +259,7 @@ func validateRecipeFields(r *models.Recipe) error {
 
 	// Minimum food: 1 serving of ice water
 	intFields := []intValidation{
-		{r.Prep_time_min, "prep_time_min", 0, prepTimeMax},
-		{r.Cook_time_min, "cook_time_min", 0, cookTimeMax},
+		{r.Preparation_time_min, "preparation_time_min", 0, preparationTimeMax},
 		{r.Servings, "servings", 1, servingsMax},
 		{r.Calories, "calories", 0, caloriesMax},
 	}

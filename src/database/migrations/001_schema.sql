@@ -56,13 +56,12 @@ CREATE INDEX idx_token_blacklist_expiration_date
 
 CREATE TABLE recipe (
     id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    -- TODO: GDPR — TOS should state that published recipes remain after account
+    -- TODO: GDPR — TOS should state that recipes remain after account
     --       deletion with authorship anonymized (author_id set to NULL)
     author_id               UUID CONSTRAINT fk_author_id REFERENCES "user"(id) ON DELETE SET NULL,
     title                   VARCHAR NOT NULL,
     description             TEXT,
-    prep_time_min           INT,
-    cook_time_min           INT,
+    preparation_time_min    INT,
     servings                INT DEFAULT 4,
     difficulty              VARCHAR NOT NULL CONSTRAINT recipe_difficulty_allowed_values
                                 CHECK (difficulty IN ('easy', 'medium', 'hard')),
@@ -74,7 +73,6 @@ CREATE TABLE recipe (
     protein_g               DECIMAL,
     carbs_g                 DECIMAL,
     fat_g                   DECIMAL,
-    is_published            BOOLEAN DEFAULT false,
     created_at              TIMESTAMP DEFAULT now(),
     updated_at              TIMESTAMP DEFAULT now()
 );

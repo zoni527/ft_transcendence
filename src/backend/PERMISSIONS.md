@@ -66,12 +66,7 @@ Two patterns the table doesn't show:
   even though `edit_recipe` and `delete_recipe` are not in their role. The
   handler checks `recipe.author_id == current_user.id` and short-circuits
   the role check. See the TODO note in [002_seed.sql:45](../database/migrations/002_seed.sql#L45).
-  *Known gap:* today this only works for **published** recipes. The handler
-  fetches via [repository.GetRecipeById](repository/recipes.go#L89), which
-  filters `is_published = true`, so an author hitting `PUT`/`DELETE` on
-  their own draft gets `404`. Fix is a separate follow-up PR (add an
-  unfiltered lookup for owner-scoped routes).
-- **Public reads.** Browsing published recipes needs no permission. Auth
+- **Public reads.** Browsing recipes needs no permission. Auth
   middleware is not attached to public GET routes.
 
 ## How enforcement works

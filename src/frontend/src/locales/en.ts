@@ -230,7 +230,7 @@ export const enTranslations = {
   editRecipe: {
     header: 'Edit recipe',
     submit: 'Submit',
-    submitPending: 'Editing recipe...',
+    submitPending: 'Updating recipe...',
   },
   difficulty: {
     type: 'Difficulty',

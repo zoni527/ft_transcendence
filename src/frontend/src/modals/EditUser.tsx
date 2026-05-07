@@ -30,13 +30,27 @@ const editUserSchema = (t: TFunction) =>
         .string()
         .min(1, t('signupValidation.emailRequired'))
         .email(t('signupValidation.invalidEmail')),
-      password: z.string().min(8, t('signupValidation.passwordLen')),
-      confirmPassword: z.string().min(8, t('signupValidation.passwordConfirm')),
+      password: z
+        .string()
+        .refine(
+          (val) => val === '' || val.length >= 8,
+          t('signupValidation.passwordLen'),
+        ),
+
+      confirmPassword: z.string(),
     })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: t('signupValidation.passwordMatch'),
-      path: ['confirmPassword'],
-    });
+    .refine(
+      (data) => {
+        // no password change
+        if (data.password === '') return true;
+
+        return data.password === data.confirmPassword;
+      },
+      {
+        message: t('signupValidation.passwordMatch'),
+        path: ['confirmPassword'],
+      },
+    );
 
 const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
   const { t } = useTranslation();

@@ -42,7 +42,7 @@ func favouritePostgresErrorClassification(functionName string, err error) error 
 		case "fk_user_id":
 			return &BadRequestError{"invalid user id"}
 		case "fk_recipe_id":
-			return &BadRequestError{"invalid recipe id"}
+			return &NotFoundError{"recipe not found"}
 		default:
 			log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
 			return &BadRequestError{"invalid data"}

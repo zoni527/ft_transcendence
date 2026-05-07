@@ -47,11 +47,7 @@ func GetRecipeById(c *gin.Context) {
 
 	recipe, err := repository.GetRecipeById(id)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.GetRecipeById: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		identifyAndRespondToError(c, "handlers.GetRecipeById", err)
 		return
 	}
 	c.IndentedJSON(http.StatusOK, recipe)
@@ -77,11 +73,7 @@ func CreateRecipe(c *gin.Context) {
 
 	newRecipeId, err := repository.CreateRecipe(&r)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.CreateRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		identifyAndRespondToError(c, "handlers.CreateRecipe", err)
 		return
 	}
 
@@ -109,11 +101,7 @@ func UpdateRecipe(c *gin.Context) {
 
 	original, err := repository.GetRecipeById(recipeId)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.UpdateRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		identifyAndRespondToError(c, "handlers.UpdateRecipe", err)
 		return
 	}
 
@@ -136,11 +124,7 @@ func UpdateRecipe(c *gin.Context) {
 	r.Id = recipeId
 	r.Author_id = original.Author_id
 	if err := repository.UpdateRecipe(&r); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.UpdateRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		identifyAndRespondToError(c, "handlers.UpdateRecipe", err)
 		return
 	}
 
@@ -162,11 +146,7 @@ func DeleteRecipe(c *gin.Context) {
 
 	original, err := repository.GetRecipeById(recipeId)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		identifyAndRespondToError(c, "handlers.DeleteRecipe", err)
 		return
 	}
 	modOrAdmin, err := isModOrAdmin(userId)
@@ -181,11 +161,7 @@ func DeleteRecipe(c *gin.Context) {
 	}
 
 	if err := repository.DeleteRecipe(recipeId); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		identifyAndRespondToError(c, "handlers.DeleteRecipe", err)
 		return
 	}
 
@@ -465,19 +441,22 @@ func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
 	}
 }
 
-func identifyAndRespondToUserError(c *gin.Context, err error) bool {
+func identifyAndRespondToError(c *gin.Context, functionName string, err error) {
 	var br *repository.BadRequestError
 	var nf *repository.NotFoundError
+	var cf *repository.ConflictError
+
 	switch {
 	case errors.As(err, &br):
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": br.Error()})
-		return true
 	case errors.As(err, &nf):
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
-		return true
+	case errors.As(err, &cf):
+		c.IndentedJSON(http.StatusConflict, gin.H{"error": cf.Error()})
+	default:
+		log.Printf("%v: %v", functionName, err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 	}
-
-	return false
 }
 
 func isModOrAdmin(id string) (bool, error) {

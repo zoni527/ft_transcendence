@@ -19,9 +19,9 @@ INSERT INTO "user" (email, password_hash, name, display_name) VALUES
 
 INSERT INTO role (name, description) VALUES
     ('admin',     'Full access — manage users, recipes, roles, and site settings'),
-    ('moderator', 'Can review, edit, and delete recipes and comments'),
+    ('moderator', 'Can review, edit, and delete recipes'),
     ('chef',      'Can create and publish recipes'),
-    ('user',      'Default role — can browse, favourite, and comment');
+    ('user',      'Default role — can browse and favourite');
 
 INSERT INTO permission (name, description) VALUES
     ('create_recipe',  'Create new recipes'),
@@ -30,7 +30,6 @@ INSERT INTO permission (name, description) VALUES
     ('publish_recipe', 'Publish/unpublish recipes'),
     ('manage_users',   'View, edit, and delete user accounts'),
     ('manage_roles',   'Assign and remove roles'),
-    ('ban_user',       'Ban a user from the platform'),
     ('moderate_content', 'Review and moderate user content');
 
 -- admin gets all permissions
@@ -50,7 +49,7 @@ INSERT INTO role_permission (role_id, permission_id)
     WHERE r.name = 'chef' AND p.name IN ('create_recipe', 'publish_recipe');
 
 -- user permissions
--- TODO: add favourite and comment permissions once those features are implemented
+-- TODO: add favourite permission once that feature is implemented
 --       browsing is implicit (no permission needed for public recipes)
 
 -- Assign roles to seed users

@@ -191,6 +191,14 @@ func (e *NotFoundError) Error() string {
 	return e.msg
 }
 
+type ConflictError struct {
+	msg string
+}
+
+func (e *ConflictError) Error() string {
+	return e.msg
+}
+
 func recipePostgresErrorClassification(functionName string, err error) error {
 	var pgErr *pgconn.PgError
 	// Not a Postgres error -> internal server error
@@ -219,6 +227,9 @@ func recipePostgresErrorClassification(functionName string, err error) error {
 
 	case pgerrcode.InvalidTextRepresentation:
 		return &NotFoundError{"recipe not found"}
+
+	case pgerrcode.UniqueViolation:
+		return &ConflictError{"recipe already exists"}
 
 	default:
 		return fmt.Errorf("%v: %w", functionName, err)

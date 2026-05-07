@@ -219,7 +219,7 @@ func RecipeImageSignature(c *gin.Context) {
 		"timestamp": timestamp,
 		"folder":    "recipes",
 	}
-	signature := generateCloudinarySignature(params)
+	signature := GenerateCloudinarySignature(params)
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"signature":  signature,
 		"api_key":    string(cloudinaryKey),
@@ -417,7 +417,7 @@ func onlyGraphicChars(s string) error {
 	return nil
 }
 
-func generateCloudinarySignature(params map[string]string) string {
+func GenerateCloudinarySignature(params map[string]string) string {
 	keys := make([]string, 0, len(params))
 	for k := range params {
 		keys = append(keys, k)
@@ -449,13 +449,13 @@ func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		roles, err := repository.GetRolesByUserId(userID)
+		userRoles, err := repository.GetRolesByUserId(userID)
 		if err != nil {
 			log.Printf("GetRolesByUserId: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}
-		for _, r := range roles {
+		for _, r := range userRoles {
 			if allowedRoles[r] {
 				c.Next()
 				return

@@ -5,8 +5,8 @@ package repository
 // [done] GetAllUsers       — GET /api/users
 // [done] GetUserById       — GET /api/users/:id
 
-// [TODO] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
-// [TODO] UpdateUser        — PUT /api/users/:id (full replace)
+// [done] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
+// [done] UpdateUser        — PUT /api/users/:id (self-update + admin update)
 // [TODO] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
 // [TODO] Add pagination (?page=1&limit=20) to GetAllUsers
@@ -35,6 +35,33 @@ func GetRolesByUserId(userId string) ([]string, error) {
 			WHERE ur.user_id = $1`
 
 	rows, err := Pool.Query(context.Background(), sql, userId)
+	if err != nil {
+		return nil, fmt.Errorf("error querying roles: %w", err)
+	}
+	defer rows.Close()
+
+	var roles []string
+	for rows.Next() {
+		var role string
+		if err := rows.Scan(&role); err != nil {
+			return nil, fmt.Errorf("error scanning role: %w", err)
+		}
+		roles = append(roles, role)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating roles: %w", err)
+	}
+	return roles, nil
+}
+
+// getRolesByUserIdTx is the transaction version of GetRolesByUserId.
+func getRolesByUserIdTx(tx pgx.Tx, userId string) ([]string, error) {
+	sql := `SELECT r.name
+			FROM user_role ur
+			JOIN role r ON ur.role_id = r.id
+			WHERE ur.user_id = $1`
+
+	rows, err := tx.Query(context.Background(), sql, userId)
 	if err != nil {
 		return nil, fmt.Errorf("error querying roles: %w", err)
 	}
@@ -243,4 +270,83 @@ func CleanExpiredTokens(currentTime time.Time) error {
 		return fmt.Errorf("CleanExpiredTokens: %w", err)
 	}
 	return nil
+}
+
+func UpdateUser(id string, params models.UpdateUserParams) (models.User, error) {
+	tx, err := Pool.Begin(context.Background())
+	if err != nil {
+		return models.User{}, fmt.Errorf("start transaction: %w", err)
+	}
+	defer tx.Rollback(context.Background())
+
+	sql := `UPDATE "user"
+			SET email = COALESCE($1, email),
+				name = COALESCE($2, name),
+				password_hash = COALESCE($3, password_hash),
+				display_name = COALESCE($4, display_name),
+				avatar_url = COALESCE($5, avatar_url),
+				updated_at = NOW()
+			WHERE id = $6
+			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
+
+	var u models.User
+	err = tx.QueryRow(context.Background(), sql,
+		nullableString(params.Email),
+		nullableString(params.Name),
+		nullableString(params.Password_hashed),
+		nullableString(params.Display_name),
+		nullableString(params.Avatar_url),
+		id,
+	).Scan(
+		&u.Id,
+		&u.Email,
+		&u.Name,
+		&u.Display_name,
+		&u.Avatar_url,
+		&u.Created_at,
+		&u.Updated_at,
+	)
+	if err == pgx.ErrNoRows {
+		return models.User{}, pgx.ErrNoRows
+	}
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
+			return models.User{}, ErrUserAlreadyExists
+		}
+		return models.User{}, fmt.Errorf("UpdateUser profile: %w", err)
+	}
+
+	if params.Roles != nil {
+		delSQL := `DELETE FROM user_role WHERE user_id = $1`
+		if _, err := tx.Exec(context.Background(), delSQL, id); err != nil {
+			return models.User{}, fmt.Errorf("UpdateUser delete roles: %w", err)
+		}
+
+		insSQL := `INSERT INTO user_role(user_id, role_id)
+				   VALUES($1, (SELECT id FROM role WHERE name = $2))`
+		for _, r := range params.Roles {
+			if _, err := tx.Exec(context.Background(), insSQL, id, r); err != nil {
+				return models.User{}, fmt.Errorf("UpdateUser insert role %s: %w", r, err)
+			}
+		}
+	}
+
+	roles, err := getRolesByUserIdTx(tx, u.Id)
+	if err != nil {
+		return models.User{}, fmt.Errorf("UpdateUser get roles: %w", err)
+	}
+	u.Roles = roles
+
+	if err := tx.Commit(context.Background()); err != nil {
+		return models.User{}, fmt.Errorf("UpdateUser commit: %w", err)
+	}
+	return u, nil
+}
+
+func nullableString(value *string) any {
+	if value == nil {
+		return nil
+	}
+	return *value
 }

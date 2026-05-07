@@ -154,30 +154,67 @@ Create a new user.
 | Status    | When                                      |
 |-----------|-------------------------------------------|
 | 400       | Missing required fields or invalid data   |
+| 422       | Password is too weak                      |
 | 409       | Email already exists                      |
 
 ---
 
 ### PUT /api/users/:id
 
-Replace a user completely. All fields are required.
+Update a user profile. Requires authentication.
+
+**Authentication:** JWT token in `token` cookie
+
+**Permissions:**
+- A user can update their own profile
+- A user can change their own password
+- An admin can update any user's profile fields
+- An admin can update roles
+- An admin cannot change another user's password
 
 **Request body:**
 ```json
 {
-  "email": "user@example.com",
-  "name": "Jane",
-  "display_name": "jane_cooks"
+  "email": "newemail@example.com",
+  "name": "Jane Doe",
+  "password": "newPassword123",
+  "display_name": "jane_updated",
+  "avatar_url": "https://res.cloudinary.com/dhuk7trpf/image/upload/image.png",
+  "roles": ["user", "admin"]
 }
 ```
 
-**Response** `200 OK` — returns the updated user.
+**Notes:**
+- All fields are optional
+- `password` is only accepted when the caller is updating their own profile
+- `roles` is only accepted for admins
+- If a field is omitted, it is left unchanged
+- Email must be unique; changing to an existing email will fail
+- Role updates replace the full role list when provided
+
+**Response** `200 OK`
+```json
+{
+  "id": "uuid",
+  "email": "newemail@example.com",
+  "name": "Jane Doe",
+  "display_name": "jane_updated",
+  "avatar_url": "https://example.com/avatar.png",
+  "created_at": "2026-04-09T12:00:00Z",
+  "updated_at": "2026-04-09T12:00:00Z",
+  "roles": ["user", "admin"]
+}
+```
 
 **Errors:**
-| Status    | When                      |
-|-----------|---------------------------|
-| 400       | Missing required fields   |
-| 404       | User not found            |
+| Status    | When                                                              |
+|-----------|-------------------------------------------------------------------|
+| 400       | Invalid input data, missing payload fields, or invalid values     |
+| 401       | Unauthorized — invalid or missing token                           |
+| 403       | Forbidden — caller is not allowed to change the requested fields  |
+| 422       | Password is too weak                                              |
+| 409       | Email already exists (taken by another user)                      |
+| 500       | Internal server error                                             |
 
 ---
 
@@ -303,6 +340,36 @@ Check whether the current browser session is authenticated.
   "authenticated": false
 }
 ```
+
+---
+
+### GET /api/users/avatar
+
+Get a Cloudinary upload signature for uploading user avatars. This endpoint provides the authentication credentials needed to upload files directly to Cloudinary.
+
+**Requires:** Valid JWT in `token` cookie (set during login).
+
+**Response** `200 OK`
+```json
+{
+  "signature": "cloudinary_signature_string",
+  "api_key": "your_cloudinary_api_key",
+  "cloud_name": "your_cloudinary_cloud_name",
+  "timestamp": "1712700000",
+  "folder": "avatar"
+}
+```
+
+**Notes:**
+- This endpoint is used by the frontend before uploading an avatar to Cloudinary
+- The returned signature, API key, and other parameters should be used with Cloudinary's upload widget or API
+
+**Errors:**
+| Status    | When                                  |
+|-----------|---------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT |
+| 500       | Failed to generate signature          |
+
 
 ---
 

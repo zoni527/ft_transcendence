@@ -4,7 +4,7 @@ package handlers
 // [done] GetUsers      — GET /api/users
 // [done] GetUserById   — GET /api/users/:id
 // [done] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
-// [TODO] UpdateUser    — PUT /api/users/:id
+// [done] UpdateUser   — PUT /api/users/:id (self-update + admin update)
 // [TODO] DeleteUser    — DELETE /api/users/:id
 // [TODO] SearchUsers   — GET /api/users/search?q=
 
@@ -13,7 +13,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/mail"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -59,12 +62,12 @@ func GetUserById(c *gin.Context) {
 }
 
 func GetMe(c *gin.Context) {
-	id := c.GetString("userID")
-	if !isValidUUID(id) {
+	userID := c.GetString("userID")
+	if !isValidUUID(userID) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-	user, err := repository.GetUserById(id)
+	user, err := repository.GetUserById(userID)
 	if err == pgx.ErrNoRows {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -124,13 +127,8 @@ func CreateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	normalizeCreateUserRequest(&req)
-	if req.Name != "" && !isValidName(req.Name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
-		return
-	}
-	if !isValidDisplayName(req.Display_name) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid display_name"})
+	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if err := validatePassword(req.Password); err != nil {
@@ -156,7 +154,7 @@ func CreateUser(c *gin.Context) {
 	data, err := repository.CreateUser(userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.IndentedJSON(http.StatusConflict, gin.H{"error": "user already exists"})
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
 		log.Printf("CreateUser error: %v", err)
@@ -219,8 +217,104 @@ func LogoutUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	// TODO: call repository.UpdateUser()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	targetUserID := c.Param("id")
+	if !isValidUUID(targetUserID) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	callerUserID := c.GetString("userID")
+	if !isValidUUID(callerUserID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+
+	callerRoles, err := repository.GetRolesByUserId(callerUserID)
+	if err != nil {
+		log.Printf("UpdateUser GetRolesByUserId: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	callerIsAdmin := hasRole(callerRoles, "admin")
+	callerIsOwner := callerUserID == targetUserID
+	if !callerIsOwner && !callerIsAdmin {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		return
+	}
+
+	var req models.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		return
+	}
+	if err := normalizeAndValidateUpdateUserRequest(&req); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if req.Password != nil && !callerIsOwner {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "password can only be changed by the account owner"})
+		return
+	}
+	if req.Password != nil {
+		if err := validatePassword(*req.Password); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if !isPasswordStrong(*req.Password) {
+			c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+			return
+		}
+	}
+	if req.Roles != nil && !callerIsAdmin {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "roles can only be changed by an admin"})
+		return
+	}
+	if req.Roles != nil {
+		if err := validateRoles(req.Roles); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
+	if !hasAnyUpdateField(&req) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "no fields to update"})
+		return
+	}
+
+	var hashedPassword *string
+	if req.Password != nil {
+		hash, err := hashPassword(*req.Password)
+		if err != nil {
+			log.Printf("UpdateUser hashPassword error: %v", err)
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			return
+		}
+		hashedPassword = &hash
+	}
+
+	userParams := models.UpdateUserParams{
+		Email:           req.Email,
+		Name:            req.Name,
+		Password_hashed: hashedPassword,
+		Display_name:    req.Display_name,
+		Avatar_url:      req.Avatar_url,
+		Roles:           req.Roles,
+	}
+	user, err := repository.UpdateUser(targetUserID, userParams)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserAlreadyExists) {
+			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
+			return
+		}
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			return
+		}
+		log.Printf("UpdateUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, user)
 }
 
 func DeleteUser(c *gin.Context) {
@@ -238,11 +332,122 @@ func clearAuthCookie(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 }
 
-// Function to trim leading and trailing blank spaces, set email to lowercase
-func normalizeCreateUserRequest(req *models.CreateUserRequest) {
-	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
-	req.Name = strings.TrimSpace(req.Name)
-	req.Display_name = strings.TrimSpace(req.Display_name)
+// normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.
+func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error {
+	if req.Email != nil {
+		lowered := strings.ToLower(strings.TrimSpace(*req.Email))
+		if lowered != "" {
+			if err := validateEmail(lowered); err != nil {
+				return err
+			}
+			req.Email = &lowered
+		} else {
+			req.Email = nil
+		}
+	}
+	if req.Name != nil {
+		trimmed := strings.TrimSpace(*req.Name)
+		if trimmed != "" {
+			if !isValidName(trimmed) {
+				return errors.New("invalid name")
+			}
+			req.Name = &trimmed
+		} else {
+			req.Name = nil
+		}
+	}
+	if req.Display_name != nil {
+		trimmed := strings.TrimSpace(*req.Display_name)
+		if trimmed != "" {
+			if !isValidDisplayName(trimmed) {
+				return errors.New("invalid display_name")
+			}
+			req.Display_name = &trimmed
+		} else {
+			req.Display_name = nil
+		}
+	}
+	if req.Avatar_url != nil {
+		trimmed := strings.TrimSpace(*req.Avatar_url)
+		if trimmed != "" {
+			if err := validateCloudinaryAvatarURL(trimmed); err != nil {
+				return err
+			}
+			req.Avatar_url = &trimmed
+		} else {
+			req.Avatar_url = nil
+		}
+	}
+	return nil
+}
+
+// normalizeAndValidateUserFields normalizes and validates the required create-user fields.
+func normalizeAndValidateUserFields(email, name, displayName *string) error {
+	*email = strings.ToLower(strings.TrimSpace(*email))
+	if *email != "" {
+		if err := validateEmail(*email); err != nil {
+			return err
+		}
+	}
+	*displayName = strings.TrimSpace(*displayName)
+	if *name != "" {
+		*name = strings.TrimSpace(*name)
+		if !isValidName(*name) {
+			return errors.New("invalid name")
+		}
+	}
+	if !isValidDisplayName(*displayName) {
+		return errors.New("invalid display_name")
+	}
+	return nil
+}
+
+func validateCloudinaryAvatarURL(avatarURL string) error {
+	if avatarURL == "" {
+		return nil
+	}
+
+	parsed, err := url.Parse(avatarURL)
+	if err != nil {
+		return errors.New("invalid avatar_url")
+	}
+
+	if parsed.Scheme != "https" || parsed.Host != "res.cloudinary.com" {
+		return errors.New("avatar_url must be a Cloudinary URL")
+	}
+
+	if !strings.HasPrefix(parsed.Path, "/") || len(strings.Split(strings.Trim(parsed.Path, "/"), "/")) < 2 {
+		return errors.New("avatar_url must include cloud name and asset path")
+	}
+
+	return nil
+}
+
+func validateEmail(email string) error {
+	if email == "" {
+		return nil
+	}
+
+	for _, r := range email {
+		if unicode.IsControl(r) {
+			return errors.New("email contains control characters")
+		}
+	}
+
+	addr, err := mail.ParseAddress(email)
+	if err != nil {
+		return err
+	}
+
+	parts := strings.Split(addr.Address, "@")
+	allowed := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-+"
+	for _, r := range parts[0] {
+		if !strings.ContainsRune(allowed, r) {
+			return fmt.Errorf("invalid character in email local part: %c", r)
+		}
+	}
+
+	return nil
 }
 
 // Create a hashed password to store in Database
@@ -271,6 +476,32 @@ func validatePassword(password string) error {
 func isPasswordStrong(password string) bool {
 	result := zxcvbn.PasswordStrength(password, nil)
 	return result.Score >= 0
+}
+
+// Validate roles: must not be empty, no duplicates, and only valid role names
+func validateRoles(roles []string) error {
+	if len(roles) == 0 {
+		return errors.New("roles cannot be empty")
+	}
+
+	validRoles := map[string]bool{
+		"user":      true,
+		"chef":      true,
+		"moderator": true,
+		"admin":     true,
+	}
+
+	seen := make(map[string]bool)
+	for _, role := range roles {
+		if !validRoles[role] {
+			return fmt.Errorf("invalid role: %s", role)
+		}
+		if seen[role] {
+			return fmt.Errorf("duplicate role: %s", role)
+		}
+		seen[role] = true
+	}
+	return nil
 }
 
 // Custom name validator: Allows letters + separators (space, apostrophe, hyphen),
@@ -347,6 +578,24 @@ func isValidDisplayName(displayName string) bool {
 	return hasAlphaNum
 }
 
+func hasRole(roles []string, role string) bool {
+	for _, currentRole := range roles {
+		if currentRole == role {
+			return true
+		}
+	}
+	return false
+}
+
+func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
+	return req.Email != nil ||
+		req.Name != nil ||
+		req.Password != nil ||
+		req.Display_name != nil ||
+		req.Avatar_url != nil ||
+		req.Roles != nil
+}
+
 // Secret key used to sign every generated JWT
 var jwtSecret []byte
 
@@ -387,7 +636,7 @@ func ValidateJWTToken(token string) (*jwt.RegisteredClaims, error) {
 		return nil, fmt.Errorf("missing userID")
 	}
 	if claims.ExpiresAt == nil {
-		return nil, fmt.Errorf("missing exp")
+		return nil, fmt.Errorf("missing expiration date")
 	}
 	return claims, nil
 }
@@ -447,4 +696,20 @@ func TokenCleanupLoop() {
 			log.Printf("TokenCleanupLoop: %v", err)
 		}
 	}
+}
+
+func UserAvatarSignature(c *gin.Context) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	params := map[string]string{
+		"timestamp": timestamp,
+		"folder":    "avatar",
+	}
+	signature := GenerateCloudinarySignature(params)
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"signature":  signature,
+		"api_key":    string(cloudinaryKey),
+		"cloud_name": string(cloudinaryCloudName),
+		"timestamp":  timestamp,
+		"folder":     "avatar",
+	})
 }

@@ -45,9 +45,9 @@ type Recipe struct {
 }
 
 type CreateUserRequest struct {
-	Email        string `json:"email" binding:"required,email"`
-	Password     string `json:"password" binding:"required,min=8,max=20"`
-	Name         string `json:"name" binding:"omitempty,min=2,max=50"`
+	Email        string `json:"email"        binding:"required"`
+	Password     string `json:"password"     binding:"required,min=8,max=20"`
+	Name         string `json:"name"         binding:"omitempty,min=2,max=50"`
 	Display_name string `json:"display_name" binding:"required,min=3,max=15"`
 }
 
@@ -59,6 +59,24 @@ type CreateUserParams struct {
 }
 
 type LoginUserRequest struct {
-	Email    string `json:"email" binding:"required,email"`
+	Email    string `json:"email"    binding:"required"`
 	Password string `json:"password" binding:"required"`
+}
+
+type UpdateUserRequest struct {
+	Email        *string  `json:"email,omitempty"        binding:"omitempty"`
+	Name         *string  `json:"name,omitempty"         binding:"omitempty,min=2,max=50"`
+	Password     *string  `json:"password,omitempty"     binding:"omitempty,min=8,max=20"`
+	Display_name *string  `json:"display_name,omitempty" binding:"omitempty,min=3,max=15"`
+	Avatar_url   *string  `json:"avatar_url,omitempty"   binding:"omitempty,url,max=255"`
+	Roles        []string `json:"roles,omitempty"        binding:"omitempty,dive,required"`
+}
+
+type UpdateUserParams struct {
+	Email           *string  `json:"email,omitempty"`
+	Name            *string  `json:"name,omitempty"`
+	Password_hashed *string  `json:"-"`
+	Display_name    *string  `json:"display_name,omitempty"`
+	Avatar_url      *string  `json:"avatar_url,omitempty"`
+	Roles           []string `json:"roles,omitempty"`
 }

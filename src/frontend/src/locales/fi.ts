@@ -50,7 +50,9 @@ export const fiTranslations = {
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
-    users: 'Käyttäjät',
+    users: 'Käyttäjätietokanta',
+    edit: 'Muokkaa',
+    delete: 'Poista',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',

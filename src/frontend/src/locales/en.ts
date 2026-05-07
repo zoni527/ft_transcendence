@@ -50,7 +50,9 @@ export const enTranslations = {
   },
   adminPanel: {
     header: 'Admin panel',
-    users: 'Users',
+    users: 'User database',
+    edit: 'Edit',
+    delete: 'Delete',
   },
   footer: {
     privacy: 'Privacy Policy',

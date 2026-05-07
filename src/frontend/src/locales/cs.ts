@@ -50,7 +50,9 @@ export const csTranslations = {
   },
   adminPanel: {
     header: 'Administrátorský panel',
-    users: 'Uživatelé',
+    users: 'Databáze uživatelů',
+    edit: 'Upravit',
+    delete: 'Smazat',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',

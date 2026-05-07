@@ -19,18 +19,20 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
-  const { user: authUser, hasRole } = useAuth();
+  const { user: authUser, hasRole, loading: authLoading } = useAuth();
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (!authUser && !id) return;
+    if (!id && authLoading) return;
 
     const fetchUser = async () => {
       setLoading(true);
+
       try {
         if (!id) {
+          if (!authUser) return;
           setUserData(authUser);
         } else {
           const data = await getUserbyId(id, t);
@@ -49,9 +51,9 @@ const Dashboard = () => {
       setUserData(null);
       void navigate('/');
     });
-  }, [id, authUser, t, showNotification, navigate]);
+  }, [id, authUser, authLoading, t, showNotification, navigate]);
 
-  if (loading) {
+  if ((!id && authLoading) || loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 

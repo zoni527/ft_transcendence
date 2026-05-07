@@ -298,6 +298,7 @@ export const csTranslations = {
       'Chybný požadavek, zkontrolujte, zda jsou všechna data správně vyplněná',
     unauthorized: 'Nemáte oprávnění k provedení této akce',
     notFound: 'Požadovaný zdroj nebyl nalezen',
+    conflict: 'Duplicitní uživatelské jméno nebo e-mail',
     rateLimit: 'Příliš mnoho požadavků — překročen limit rychlosti',
     serverError: 'Došlo k interní chybě serveru, zkuste to prosím později',
     authError:

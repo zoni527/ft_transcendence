@@ -56,7 +56,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user: authUser } = useAuth();
 
   // Controlled input states
   const [fullName, setFullName] = useState(user.name);
@@ -130,7 +130,10 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
         t,
       );
 
-      login(updatedUser);
+      if (authUser?.id === updatedUser.id) {
+        login(updatedUser);
+      }
+
       showNotification(t('notification.updateUserSuccess'), 'success');
       onClose();
     } catch (err: unknown) {

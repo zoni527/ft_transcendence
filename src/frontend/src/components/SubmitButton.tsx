@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { buttonBase } from '../styles/styles';
 
 interface SubmitButtonProps {
@@ -8,7 +9,8 @@ interface SubmitButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit';
   disabled?: boolean;
-  className?: string; // 👈 add this
+  className?: string;
+  title?: string;
 }
 
 const SubmitButton = ({
@@ -18,12 +20,19 @@ const SubmitButton = ({
   onClick,
   type = 'submit',
   disabled = false,
-  className = '', // 👈 default empty
+  title,
+  className = '',
 }: SubmitButtonProps) => {
+  const { t } = useTranslation();
+
+  const resolvedTitle =
+    title ?? (disabled ? t('info.insufficientPermissions') : '');
+
   return (
     <button
+      title={resolvedTitle}
       type={type}
-      className={` ${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className} `}
+      className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}
       disabled={isLoading || disabled}
       aria-busy={isLoading}
       onClick={onClick}

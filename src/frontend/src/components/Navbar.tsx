@@ -51,7 +51,7 @@ const Navbar = () => {
           </NavButton>
         ) : (
           <NavButton
-            path="/dashboard"
+            path="/me"
             className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
           >
             {t('nav.dashboard')}

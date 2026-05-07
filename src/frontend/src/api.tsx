@@ -18,6 +18,24 @@ interface CreateRecipePayload {
   is_published: boolean;
 }
 
+interface UpdateRecipePayload {
+  id: string;
+  title: string;
+  description: string;
+  prep_time_min: number;
+  cook_time_min: number;
+  servings: number;
+  difficulty: string;
+  cuisine: string;
+  meal_type: string;
+  image_url: string;
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  is_published: boolean;
+}
+
 interface CreateRecipeResponse {
   id: string;
 }
@@ -37,6 +55,14 @@ interface SignupPayload {
   password: string;
   name: string;
   display_name: string;
+}
+
+interface UpdateUserPayload {
+  email: string | null;
+  password: string | null;
+  name: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
 }
 
 interface LoginSignupResponse {
@@ -94,6 +120,7 @@ function isUserResponse(data: unknown): data is User {
     typeof obj.email === 'string' &&
     typeof obj.name === 'string' &&
     typeof obj.display_name === 'string' &&
+    typeof obj.avatar_url === 'string' &&
     typeof obj.created_at === 'string' &&
     typeof obj.updated_at === 'string' &&
     Array.isArray(obj.roles) &&
@@ -155,6 +182,10 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
       return t('error.unauthorized');
     case 404:
       return t('error.notFound');
+    case 409:
+      return t('error.conflict');
+    case 429:
+      return t('error.rateLimit');
     case 500:
       return t('error.serverError');
     default:
@@ -275,8 +306,35 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
 };
 
 // GET /api/users/me (user authentication)
-export const getUser = async (t: TFunction): Promise<User> => {
+export const getMe = async (t: TFunction): Promise<User> => {
   const response = await fetch(`${baseUrl}/users/me`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isUserResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// GET /api/users/:id (get a user by ID)
+export const getUserbyId = async (id: string, t: TFunction): Promise<User> => {
+  const response = await fetch(`${baseUrl}/users/${id}`, {
     method: 'GET',
     credentials: 'include',
   });
@@ -379,11 +437,110 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   }
 };
 
+// PUT /api/users/:id (user update)
+export const putUpdateUser = async (
+  payload: UpdateUserPayload,
+  id: string,
+  t: TFunction,
+) => {
+  const response = await fetch(`${baseUrl}/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isUserResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// PUT /api/recipes/:id (edit a recipe)
+export const putUpdateRecipe = async (
+  payload: UpdateRecipePayload,
+  id: string,
+  t: TFunction,
+): Promise<CreateRecipeResponse> => {
+  const response = await fetch(`${baseUrl}/recipes/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isCreateRecipeResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
 // GET /api/recipes/image-signature (gets an UploadConfig for Cloudinary)
 export const getCloudinarySignature = async (
   t: TFunction,
 ): Promise<CloudinaryUploadConfig> => {
   const response = await fetch(`${baseUrl}/recipes/image-signature`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isCloudinaryBackendResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// GET /api/users/avatar (gets an UploadConfig for Cloudinary)
+export const getCloudinarySignatureAvatar = async (
+  t: TFunction,
+): Promise<CloudinaryUploadConfig> => {
+  const response = await fetch(`${baseUrl}/users/avatar`, {
     method: 'GET',
     credentials: 'include',
   });

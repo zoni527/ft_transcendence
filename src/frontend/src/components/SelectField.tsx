@@ -11,6 +11,8 @@ interface SelectFieldProps {
   label: string;
   options: SelectOption[];
   placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
 const SelectField = ({
@@ -19,17 +21,20 @@ const SelectField = ({
   label,
   options,
   placeholder = '...',
+  value,
+  onChange,
 }: SelectFieldProps) => {
   return (
     <div>
-      <label htmlFor={id} className={`${inputLabelText}`}>
+      <label htmlFor={id} className={inputLabelText}>
         {label}
       </label>
 
       <select
         id={id}
         name={name}
-        defaultValue=""
+        value={value ?? ''}
+        onChange={onChange}
         className={`${cardBase} ${inputFieldBase}`}
       >
         <option value="" disabled>

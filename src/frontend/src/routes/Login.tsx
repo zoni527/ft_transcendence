@@ -6,7 +6,7 @@ import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
 import SubmitButton from '../components/SubmitButton';
-import { getUser, postLogin } from '../api';
+import { getMe, postLogin } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
 import { getStringValue } from '../utils/utils';
@@ -62,12 +62,12 @@ const Login = () => {
         t,
       )
         .then(async () => {
-          const user = await getUser(t);
+          const user = await getMe(t);
 
           login(user);
 
           showNotification(t('notification.loginSuccess'), 'success');
-          void navigate('/dashboard');
+          void navigate('/me');
         })
         .catch((err: unknown) => {
           const message =

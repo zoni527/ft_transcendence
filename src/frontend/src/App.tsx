@@ -4,7 +4,6 @@ import AuthProvider from './utils/AuthProvider';
 import Banner from './components/Banner';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
-import CreateRecipe from './routes/CreateRecipe';
 import Dashboard from './routes/Dashboard';
 import Login from './routes/Login';
 import PrivacyPolicy from './routes/PrivacyPolicy';
@@ -29,8 +28,8 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<Recipes />} />
                   <Route path="/recipes/:id" element={<RecipeDetail />} />
-                  <Route path="/create" element={<CreateRecipe />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/me" element={<Dashboard />} />
+                  <Route path="/users/:id" element={<Dashboard />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />

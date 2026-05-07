@@ -12,6 +12,15 @@ export const csTranslations = {
     logoutSuccess: 'Odhlášení bylo úspěšné',
     createRecipeSuccess: 'Recept byl úspěšně vytvořen',
     recipeDeleteSuccess: 'Recept byl úspěšně smazán',
+    editRecipeSuccess: 'Recept byl úspěšně upraven',
+    updateUserSuccess: 'Profil uživatele byl aktualizován',
+  },
+  info: {
+    name: 'Ostatní uživatelé nevidí vaše celé jméno',
+    username: 'Jak vás ostatní mohou na platformě rozpoznat',
+    email: 'Váš registrační e-mail',
+    roles: 'Pokročilé role umožňují více funkcí',
+    insufficientPermissions: 'Nedostatečná oprávnění',
   },
   recipeDetail: {
     author: 'Autor',
@@ -210,9 +219,19 @@ export const csTranslations = {
     yes: 'Ano',
     no: 'Ne',
     uploadImage: 'Nahrát obrázek',
-    noFile: 'Žádný soubor nebyl vybrán',
     submit: 'Odeslat',
     submitPending: 'Odesílám recept...',
+  },
+  editUser: {
+    header: 'Upravit profil',
+    uploadAvatar: 'Nahrát avatar',
+    submit: 'Odeslat',
+    submitPending: 'Úprava profilu...',
+  },
+  editRecipe: {
+    header: 'Upravit recept',
+    submit: 'Odeslat',
+    submitPending: 'Úprava receptu...',
   },
   difficulty: {
     type: 'Obtížnost',
@@ -265,6 +284,7 @@ export const csTranslations = {
     loading: 'Načítání...',
     welcome: 'Vítejte',
     rightsReserved: 'RISE. Všechna práva vyhrazena.',
+    noFile: 'Žádný soubor nebyl vybrán',
   },
   error: {
     error: 'Chyba:',
@@ -278,6 +298,8 @@ export const csTranslations = {
       'Chybný požadavek, zkontrolujte, zda jsou všechna data správně vyplněná',
     unauthorized: 'Nemáte oprávnění k provedení této akce',
     notFound: 'Požadovaný zdroj nebyl nalezen',
+    conflict: 'Duplicitní uživatelské jméno nebo e-mail',
+    rateLimit: 'Příliš mnoho požadavků — překročen limit rychlosti',
     serverError: 'Došlo k interní chybě serveru, zkuste to prosím později',
     authError:
       'Registrace byla úspěšná, ale automatické přihlášení selhalo, přihlaste se prosím ručně',

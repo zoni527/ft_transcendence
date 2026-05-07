@@ -12,6 +12,15 @@ export const fiTranslations = {
     logoutSuccess: 'Kirjauduttu ulos',
     createRecipeSuccess: 'Resepti luotu',
     recipeDeleteSuccess: 'Resepti poistettu',
+    editRecipeSuccess: 'Resepti päivitetty',
+    updateUserSuccess: 'Käyttäjäprofiili päivitetty',
+  },
+  info: {
+    name: 'Ei näy muille käyttäjille',
+    username: 'Muille näkyvä tunnisteesi alustalla',
+    email: 'Rekisteröintisähköpostisi',
+    roles: 'Laajennetut roolit mahdollistavat enemmän toimintoja',
+    insufficientPermissions: 'Riittämättömät käyttöoikeudet',
   },
   recipeDetail: {
     author: 'Tekijä',
@@ -147,8 +156,7 @@ export const fiTranslations = {
 
     section8_title: '8. Vastuuvapauslauseke',
     section8_text: `Reseptit tarjoavat käyttäjät sellaisenaan.
-      RISE ei tarkista ravintoarvoja, allergeeneja tai turvallisuustietoja.
-      Valmista ruokaa vastuullisesti ja tarvittaessa konsultoi asiantuntijaa.`,
+      RISE ei tarkista ravintoarvoja, allergeeneja tai turvallisuustietoja.`,
 
     section9_title: '9. Vastuunrajoitus',
     section9_text: `Sovellettavan lain sallimissa rajoissa RISE ei ole vastuussa epäsuorista tai välillisistä vahingoista.`,
@@ -211,9 +219,19 @@ export const fiTranslations = {
     yes: 'Kyllä',
     no: 'Ei',
     uploadImage: 'Lataa kuva',
-    noFile: 'Ei tiedostoa valittu',
     submit: 'Lähetä',
     submitPending: 'Lähetetään reseptiä...',
+  },
+  editUser: {
+    header: 'Muokkaa profiilia',
+    uploadAvatar: 'Lataa profiilikuva',
+    submit: 'Lähetä',
+    submitPending: 'Profiilia päivitetään...',
+  },
+  editRecipe: {
+    header: 'Muokkaa reseptiä',
+    submit: 'Lähetä',
+    submitPending: 'Reseptiä päivitetään...',
   },
   difficulty: {
     type: 'Vaikeusaste',
@@ -266,6 +284,7 @@ export const fiTranslations = {
     loading: 'Ladataan...',
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
+    noFile: 'Tiedostoa ei valittu',
   },
   error: {
     error: 'Virhe:',
@@ -278,6 +297,8 @@ export const fiTranslations = {
     badRequest: 'Virheellinen pyyntö, tarkista syötteesi',
     unauthorized: 'Sinulla ei ole oikeuksia suorittaa tätä toimintoa',
     notFound: 'Haettua resurssia ei löydy',
+    conflict: 'Käyttäjänimi tai sähköpostiosoite on jo käytössä',
+    rateLimit: 'Liian monta pyyntöä — nopeusrajoitus ylitetty',
     serverError: 'Sisäinen palvelinvirhe, yritä myöhemmin uudelleen',
     authError:
       'Rekisteröinti onnistui, mutta automaattinen kirjautuminen epäonnistui, kirjaudu sisään manuaalisesti',

@@ -9,19 +9,17 @@ package handlers
 // [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
 
+	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/integrations"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
@@ -40,7 +38,7 @@ func GetAllRecipes(c *gin.Context) {
 
 func GetRecipeById(c *gin.Context) {
 	id := c.Param("id")
-	if !isValidUUID(id) {
+	if !authorization.IsValidUUID(id) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
@@ -64,7 +62,7 @@ func CreateRecipe(c *gin.Context) {
 		return
 	}
 	r.Author_id = c.GetString("userID")
-	if !isValidUUID(r.Author_id) {
+	if !authorization.IsValidUUID(r.Author_id) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -88,13 +86,13 @@ func CreateRecipe(c *gin.Context) {
 
 func UpdateRecipe(c *gin.Context) {
 	userId := c.GetString("userID")
-	if !isValidUUID(userId) {
+	if !authorization.IsValidUUID(userId) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	recipeId := c.Param("id")
-	if !isValidUUID(recipeId) {
+	if !authorization.IsValidUUID(recipeId) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
@@ -115,13 +113,13 @@ func UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	modOrAdmin, err := isModOrAdmin(userId)
+	allowed, err := authorization.CanEditRecipe(userId, &original)
 	if err != nil {
-		log.Printf("isModOrAdmin: %v", err)
+		log.Printf("CanEditRecipe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	if !(modOrAdmin || userId == original.Author_id) {
+	if !allowed {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
@@ -147,13 +145,13 @@ func UpdateRecipe(c *gin.Context) {
 
 func DeleteRecipe(c *gin.Context) {
 	userId := c.GetString("userID")
-	if !isValidUUID(userId) {
+	if !authorization.IsValidUUID(userId) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	recipeId := c.Param("id")
-	if !isValidUUID(recipeId) {
+	if !authorization.IsValidUUID(recipeId) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
@@ -167,13 +165,14 @@ func DeleteRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	modOrAdmin, err := isModOrAdmin(userId)
+
+	allowed, err := authorization.CanDeleteRecipe(userId, &original)
 	if err != nil {
-		log.Printf("isModOrAdmin: %v", err)
+		log.Printf("CanDeleteRecipe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	if !(modOrAdmin || userId == original.Author_id) {
+	if !allowed {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
@@ -195,35 +194,17 @@ func UploadRecipeImage(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
-// Cloudinary API details to generate signature
-var cloudinarySecret []byte
-var cloudinaryCloudName []byte
-var cloudinaryKey []byte
-
-func LoadCloudinaryVars() error {
-	secret := strings.TrimSpace(os.Getenv("CLOUDINARY_SECRET"))
-	cloudName := strings.TrimSpace(os.Getenv("CLOUDINARY_CLOUD_NAME"))
-	key := strings.TrimSpace(os.Getenv("CLOUDINARY_KEY"))
-	if secret == "" || cloudName == "" || key == "" {
-		return errors.New("missing or empty Cloudinary env variables")
-	}
-	cloudinarySecret = []byte(secret)
-	cloudinaryCloudName = []byte(cloudName)
-	cloudinaryKey = []byte(key)
-	return nil
-}
-
 func RecipeImageSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	params := map[string]string{
 		"timestamp": timestamp,
 		"folder":    "recipes",
 	}
-	signature := GenerateCloudinarySignature(params)
+	signature := integrations.GenerateCloudinarySignature(params)
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"signature":  signature,
-		"api_key":    string(cloudinaryKey),
-		"cloud_name": string(cloudinaryCloudName),
+		"api_key":    integrations.APIKey(),
+		"cloud_name": integrations.CloudName(),
 		"timestamp":  timestamp,
 		"folder":     "recipes",
 	})
@@ -415,54 +396,6 @@ func onlyGraphicChars(s string) error {
 	return nil
 }
 
-func GenerateCloudinarySignature(params map[string]string) string {
-	keys := make([]string, 0, len(params))
-	for k := range params {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	var strToSign []string
-	for _, k := range keys {
-		strToSign = append(strToSign, fmt.Sprintf("%s=%s", k, params[k]))
-	}
-
-	queryString := strings.Join(strToSign, "&")
-	fullString := queryString + string(cloudinarySecret)
-
-	h := sha1.New()
-	h.Write([]byte(fullString))
-
-	return hex.EncodeToString(h.Sum(nil))
-}
-
-func RequiredRolesMiddleware(allowed ...string) gin.HandlerFunc {
-	allowedRoles := map[string]bool{}
-	for _, r := range allowed {
-		allowedRoles[r] = true
-	}
-	return func(c *gin.Context) {
-		userID := c.GetString("userID")
-		if !isValidUUID(userID) {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-			return
-		}
-		userRoles, err := repository.GetRolesByUserId(userID)
-		if err != nil {
-			log.Printf("GetRolesByUserId: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-			return
-		}
-		for _, r := range userRoles {
-			if allowedRoles[r] {
-				c.Next()
-				return
-			}
-		}
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
-	}
-}
-
 func identifyAndRespondToUserError(c *gin.Context, err error) bool {
 	var br *repository.BadRequestError
 	var nf *repository.NotFoundError
@@ -476,19 +409,4 @@ func identifyAndRespondToUserError(c *gin.Context, err error) bool {
 	}
 
 	return false
-}
-
-func isModOrAdmin(id string) (bool, error) {
-	roles, err := repository.GetRolesByUserId(id)
-	if err != nil {
-		return false, err
-	}
-
-	for _, r := range roles {
-		if r == "moderator" || r == "admin" {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }

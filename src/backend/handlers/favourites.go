@@ -26,7 +26,7 @@ func AddFavourite(c *gin.Context) {
 		return
 	}
 
-	if err := repository.AddFavourite(c, userId, recipeId); err != nil {
+	if err := repository.AddFavourite(userId, recipeId); err != nil {
 		identifyAndRespondToError(c, "handlers.AddFavourite", err)
 		return
 	}

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -16,7 +15,7 @@ import (
 // [TODO] RemoveFavourite     — DELETE /api/recipes/:id/favourite
 // [TODO] GetUserFavourites   — GET /api/users/:id/favourites
 
-func AddFavourite(c *gin.Context, userId, recipeId string) error {
+func AddFavourite(userId, recipeId string) error {
 	sql := `
 		INSERT INTO recipe_favourite(user_id, recipe_id)
 		VALUES ($1, $2)

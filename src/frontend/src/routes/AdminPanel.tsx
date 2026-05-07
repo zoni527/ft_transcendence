@@ -67,8 +67,11 @@ const AdminPanel = () => {
 
       {/* List of Users */}
       <div className="mt-28 space-y-6">
+        {/* Header */}
+        <h2 className="mb-8 text-2xl font-bold text-gray-700">
+          {t('adminPanel.users')}
+        </h2>
         <div className="flex flex-col gap-4">
-          {' '}
           {users.map((user) => (
             <AdminUserField user={user} />
           ))}

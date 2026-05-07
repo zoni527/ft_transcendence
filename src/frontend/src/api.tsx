@@ -57,12 +57,12 @@ interface SignupPayload {
   display_name: string;
 }
 
-interface UpdateMePayload {
-  email: string;
-  password: string;
-  name: string;
-  display_name: string;
-  avatar_url: string;
+interface UpdateUserPayload {
+  email: string | null;
+  password: string | null;
+  name: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
 }
 
 interface LoginSignupResponse {
@@ -435,9 +435,9 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   }
 };
 
-// PUT /api/users/me (user update)
+// PUT /api/users/:id (user update)
 export const putUpdateUser = async (
-  payload: UpdateMePayload,
+  payload: UpdateUserPayload,
   id: string,
   t: TFunction,
 ) => {

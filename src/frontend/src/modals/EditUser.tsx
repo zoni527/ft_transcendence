@@ -121,7 +121,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
       const updatedUser = await putUpdateUser(
         {
           email: result.data.email,
-          password: result.data.password,
+          password: result.data.password == '' ? null : result.data.password,
           name: result.data.fullName,
           display_name: result.data.username,
           avatar_url,

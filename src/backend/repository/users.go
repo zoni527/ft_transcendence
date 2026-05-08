@@ -54,6 +54,33 @@ func GetRolesByUserId(userId string) ([]string, error) {
 	return roles, nil
 }
 
+// WIP
+func GetPermissionsByRole(role string) ([]string, error) {
+	sql := `SELECT p.name
+			FROM role_permission rp
+			JOIN permission p ON rp.permission_id = p.id
+			WHERE rp.role_name = $1`
+
+	rows, err := Pool.Query(context.Background(), sql, role)
+	if err != nil {
+		return nil, fmt.Errorf("error querying permissions: %w", err)
+	}
+	defer rows.Close()
+
+	var permissions []string
+	for rows.Next() {
+		var permission string
+		if err := rows.Scan(&permission); err != nil {
+			return nil, fmt.Errorf("error scanning permission: %w", err)
+		}
+		permissions = append(permissions, permission)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating permissions: %w", err)
+	}
+	return permissions, nil
+}
+
 // getRolesByUserIdTx is the transaction version of GetRolesByUserId.
 func getRolesByUserIdTx(tx pgx.Tx, userId string) ([]string, error) {
 	sql := `SELECT r.name

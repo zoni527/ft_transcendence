@@ -66,3 +66,7 @@ func hasPermission(roles []string, permission string) bool {
 func getUserRoles(userID string) ([]string, error) {
 	return repository.GetRolesByUserId(userID)
 }
+
+func getRolePermissions(role string)([]string, error){
+	return repository.GetPermissionsByRole(role)
+}

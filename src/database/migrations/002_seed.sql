@@ -20,14 +20,13 @@ INSERT INTO "user" (email, password_hash, name, display_name) VALUES
 INSERT INTO role (name, description) VALUES
     ('admin',     'Full access — manage users, recipes, roles, and site settings'),
     ('moderator', 'Can review, edit, and delete recipes'),
-    ('chef',      'Can create and publish recipes'),
+    ('chef',      'Can create recipes'),
     ('user',      'Default role — can browse and favourite');
 
 INSERT INTO permission (name, description) VALUES
     ('create_recipe',  'Create new recipes'),
     ('edit_recipe',    'Edit any recipe'),
     ('delete_recipe',  'Delete any recipe'),
-    ('publish_recipe', 'Publish/unpublish recipes'),
     ('manage_users',   'View, edit, and delete user accounts'),
     ('manage_roles',   'Assign and remove roles'),
     ('moderate_content', 'Review and moderate user content');
@@ -39,14 +38,14 @@ INSERT INTO role_permission (role_id, permission_id)
 -- moderator permissions
 INSERT INTO role_permission (role_id, permission_id)
     SELECT r.id, p.id FROM role r, permission p
-    WHERE r.name = 'moderator' AND p.name IN ('edit_recipe', 'delete_recipe', 'publish_recipe', 'moderate_content');
+    WHERE r.name = 'moderator' AND p.name IN ('edit_recipe', 'delete_recipe', 'moderate_content');
 
 -- chef permissions
 -- TODO: chefs can edit their own recipes via authorship check in handler
 --       (recipe.author_id == current_user.id), no edit_recipe permission needed
 INSERT INTO role_permission (role_id, permission_id)
     SELECT r.id, p.id FROM role r, permission p
-    WHERE r.name = 'chef' AND p.name IN ('create_recipe', 'publish_recipe');
+    WHERE r.name = 'chef' AND p.name IN ('create_recipe');
 
 -- user permissions
 -- TODO: add favourite permission once that feature is implemented

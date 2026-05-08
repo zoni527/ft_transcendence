@@ -27,7 +27,7 @@ const ModalButton: React.FC<ModalButtonProps> = ({
       title={resolvedTitle}
       onClick={onClick}
       className={`${buttonBase} ${
-        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+        disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'
       } ${className}`}
       disabled={disabled}
     >

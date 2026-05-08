@@ -1,5 +1,18 @@
 services:
 
+  cert_generator:
+    container_name: cert_generator
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM alpine:3.22
+        RUN apk update && apk add --no-cache openssl
+    volumes:
+      - cert_data:/certs
+      - ./cert_generator/certs_entrypoint.sh:/usr/local/bin/certs_entrypoint.sh:ro
+    entrypoint: ["/usr/local/bin/certs_entrypoint.sh"]
+    user: root
+
   frontend:
     container_name: frontend
     build: ./frontend
@@ -38,6 +51,8 @@ services:
       CLOUDINARY_SECRET: ${CLOUDINARY_SECRET}
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_KEY: ${CLOUDINARY_KEY}
+    volumes:
+      - cert_data
     networks:
       - transcendence_network
     restart: unless-stopped
@@ -55,6 +70,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d
+      - cert_data:/certs:ro
     networks:
       - transcendence_network
     expose:
@@ -65,6 +81,9 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
+    depends_on:
+      cert_generator:
+        condition: service_completed_successfully
 
   adminer:
     container_name: adminer
@@ -79,6 +98,7 @@ services:
 
 volumes:
   postgres_data:
+  cert_data:
 
 networks:
   transcendence_network:

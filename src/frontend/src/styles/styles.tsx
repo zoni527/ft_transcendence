@@ -11,7 +11,8 @@ export const buttonBase = `
   px-4
   py-2
   font-semibold
-  text-white
+  text-orange-700
+  hover:text-orange-800
   shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]
   whitespace-nowrap
   transition-colors
@@ -54,6 +55,8 @@ export const uploadButtonBase = `
 `;
 
 export const navLeftBase = `
+  px-4
+  py-2
   text-orange-700
   hover:cursor-pointer
   hover:text-orange-800

@@ -26,10 +26,11 @@ const NavButton = ({
 
     e.preventDefault();
 
-    // If `onClick` is provided, use it (for custom actions like logout)
-    if (onClick) {
-      onClick();
-    } else if (path && !disabled) {
+    if (disabled) return;
+
+    onClick?.();
+
+    if (path) {
       void navigate(path);
     }
   };
@@ -40,7 +41,7 @@ const NavButton = ({
       <a
         href={path}
         onClick={handleNavigation}
-        className={`${className} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+        className={`${className} ${disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'}`}
         aria-disabled={disabled}
       >
         {children}
@@ -52,7 +53,7 @@ const NavButton = ({
   return (
     <button
       onClick={handleNavigation}
-      className={`${className} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+      className={`${className} ${disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'}`}
       disabled={disabled}
     >
       {children}

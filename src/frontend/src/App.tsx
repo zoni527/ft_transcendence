@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import AdminPanel from './routes/AdminPanel';
 import AuthProvider from './utils/AuthProvider';
 import Banner from './components/Banner';
 import Footer from './components/Footer';
@@ -27,6 +28,7 @@ const App = () => {
                 <Navbar />
                 <Routes>
                   <Route path="/" element={<Recipes />} />
+                  <Route path="/admin" element={<AdminPanel />} />
                   <Route path="/recipes/:id" element={<RecipeDetail />} />
                   <Route path="/me" element={<Dashboard />} />
                   <Route path="/users/:id" element={<Dashboard />} />

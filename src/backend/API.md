@@ -6,15 +6,20 @@ Base URL: `http://localhost:8080`
 
 ## Authentication
 
-> **TODO:** API key middleware not implemented yet. Spec below describes target behavior.
+The API uses **JWT tokens** stored in an HttpOnly cookie. When you call `/api/users/login` successfully, the server sets a `token` cookie containing the JWT. All subsequent authenticated requests automatically include this cookie.
 
-All API requests require an API key in the header:
+**Token lifespan:** 1 hour. After expiration, login again.
 
-```
-X-API-Key: your_api_key_here
-```
+**Behind the scenes:**
+- Authenticated endpoints require `middleware.Authentication()` which validates the JWT and blocks requests without a valid token.
+- Permission/role checks use `middleware.RequirePermission()` or `middleware.RequireRoles()` after authentication.
 
-Requests without a valid API key will receive `401 Unauthorized`.
+| Status    | When                                               |
+|-----------|----------------------------------------------------|
+| 401       | Missing `token` cookie or JWT validation failed    |
+| 403       | Authenticated but lacks required permissions/roles |
+
+---
 
 ## Rate Limiting
 
@@ -28,6 +33,8 @@ Requests are rate-limited per API key. If you exceed the limit, the server respo
 | `X-RateLimit-Remaining`   | Requests left in current window               |
 | `X-RateLimit-Reset`       | Seconds until the window resets               |
 
+---
+
 ## Common Error Responses
 
 All errors return JSON in this format:
@@ -38,13 +45,13 @@ All errors return JSON in this format:
 }
 ```
 
-| Status    | Meaning                                   |
-|-----------|-------------------------------------------|
-| 400       | Bad request — invalid or missing data     |
-| 401       | Unauthorized — missing or invalid API key |
-| 404       | Not found — resource does not exist       |
-| 429       | Too many requests — rate limit exceeded   |
-| 500       | Internal server error                     |
+| Status    | Meaning                                                  |
+|-----------|----------------------------------------------------------|
+| 400       | Bad request — invalid or missing data                    |
+| 401       | Unauthorized — missing or invalid JWT token              |
+| 403       | Forbidden — lacks required permissions/roles             |
+| 404       | Not found — resource does not exist                      |
+| 500       | Internal server error                                    |
 
 ---
 
@@ -68,6 +75,8 @@ Get all users.
     "email": "user@example.com",
     "name": "Jane",
     "display_name": "jane_cooks",
+    "last_seen": "2026-05-11T14:30:00Z",
+    "is_online": true,
     "created_at": "2026-04-09T12:00:00Z",
     "updated_at": "2026-04-09T12:00:00Z",
     "roles": ["user"]
@@ -79,19 +88,18 @@ Get all users.
 
 ### GET /api/users/search?q=
 
-Search users by name or display name. Useful for the "Add Friend" feature.
+Search users by display name. Useful for the "Add Friend" feature.
 
 **Query parameters:**
 | Param | Type      | Description                                   |
 |-------|-----------|-----------------------------------------------|
-| q     | string    | Search term (matches name or display_name)    |
+| q     | string    | Search term (matches display_name)            |
 
 **Response** `200 OK`
 ```json
 [
   {
     "id": "uuid",
-    "name": "Jane",
     "display_name": "jane_cooks"
   }
 ]
@@ -110,6 +118,8 @@ Get a single user by ID.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
   "roles": ["user"]
@@ -144,6 +154,8 @@ Create a new user.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
   "roles": ["user"]
@@ -163,13 +175,13 @@ Create a new user.
 
 Update a user profile. Requires authentication.
 
-**Authentication:** JWT token in `token` cookie
+**Authentication:** JWT token in `token` cookie (via `middleware.Authentication()`)
 
 **Permissions:**
-- A user can update their own profile
+- A user can update their own profile (all fields except roles)
 - A user can change their own password
 - An admin can update any user's profile fields
-- An admin can update roles
+- An admin can update roles (only)
 - An admin cannot change another user's password
 
 **Request body:**
@@ -199,6 +211,8 @@ Update a user profile. Requires authentication.
   "email": "newemail@example.com",
   "name": "Jane Doe",
   "display_name": "jane_updated",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "avatar_url": "https://example.com/avatar.png",
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
@@ -300,6 +314,8 @@ Get the profile of the currently authenticated user.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
   "roles": ["user"]
@@ -311,6 +327,29 @@ Get the profile of the currently authenticated user.
 |-----------|---------------------------------------|
 | 401       | Unauthorized — missing or invalid JWT |
 | 404       | User not found                        |
+
+---
+
+### PUT /api/users/me/heartbeat
+
+Update the current user's `last_seen` timestamp. Used by the frontend to drive the green/red online dot.
+
+**Requires:** Valid JWT in `token` cookie (set during login).
+
+**Body:** none
+
+**Response** `204 No Content`
+
+**Notes:**
+- Frontend should call this every 30 seconds while the user is logged in.
+- Other endpoints returning a User now include `last_seen` and `is_online`.
+- A user is considered online if their `last_seen` is within the last 60 seconds.
+
+**Errors:**
+| Status    | When                                  |
+|-----------|---------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT |
+| 500       | Internal server error                 |
 
 ---
 
@@ -327,6 +366,8 @@ Check whether the current browser session is authenticated.
     "email": "user@example.com",
     "name": "Jane",
     "display_name": "jane_cooks",
+    "last_seen": "2026-05-11T14:30:00Z",
+    "is_online": true,
     "created_at": "2026-04-09T12:00:00Z",
     "updated_at": "2026-04-09T12:00:00Z",
     "roles": ["user"]
@@ -377,9 +418,7 @@ Get a Cloudinary upload signature for uploading user avatars. This endpoint prov
 
 ### GET /api/recipes
 
-Get all published recipes.
-
-> **Future:** Once auth + roles are implemented, admins can use `?include_drafts=true` to see unpublished recipes. Authors will be able to see their own drafts via `GET /api/users/:id/recipes`.
+Get all recipes.
 
 **Query parameters (optional):**
 | Param         | Type      | Description                                                   |
@@ -397,11 +436,14 @@ Get all published recipes.
 [
   {
     "id": "uuid",
-    "author_id": "uuid",
+    "author": {
+      "id": "uuid",
+      "display_name": "jane_cooks",
+      "avatar_url": "https://res.cloudinary.com/.../jane.png"
+    },
     "title": "Pasta Carbonara",
     "description": "Classic Italian pasta",
-    "prep_time_min": 10,
-    "cook_time_min": 20,
+    "preparation_time_min": 20,
     "servings": 4,
     "difficulty": "medium",
     "cuisine": "italian",
@@ -411,30 +453,34 @@ Get all published recipes.
     "protein_g": 25.0,
     "carbs_g": 60.0,
     "fat_g": 22.0,
-    "is_published": true,
     "created_at": "2026-04-09T12:00:00Z",
     "updated_at": "2026-04-09T12:00:00Z"
   }
 ]
 ```
 
+If the original author has been deleted (`author_id` is NULL on the row), the
+`author` object is returned with empty string fields rather than `null`, so the
+shape stays stable on the frontend.
+
 ---
 
 ### GET /api/recipes/:id
 
-Get a single recipe by ID, including its steps and ingredients.
-
-> **TODO:** Currently returns only the base recipe fields. Steps and ingredients are not yet included in the response.
+Get a single recipe by ID.
 
 **Response** `200 OK`
 ```json
 {
   "id": "uuid",
-  "author_id": "uuid",
+  "author": {
+    "id": "uuid",
+    "display_name": "jane_cooks",
+    "avatar_url": "https://res.cloudinary.com/.../jane.png"
+  },
   "title": "Pasta Carbonara",
   "description": "Classic Italian pasta",
-  "prep_time_min": 10,
-  "cook_time_min": 20,
+  "preparation_time_min": 20,
   "servings": 4,
   "difficulty": "medium",
   "cuisine": "italian",
@@ -444,25 +490,8 @@ Get a single recipe by ID, including its steps and ingredients.
   "protein_g": 25.0,
   "carbs_g": 60.0,
   "fat_g": 22.0,
-  "is_published": true,
   "created_at": "2026-04-09T12:00:00Z",
-  "updated_at": "2026-04-09T12:00:00Z",
-  "steps": [
-    {
-      "step_number": 1,
-      "instruction": "Boil water and cook pasta",
-      "media_url": null,
-      "timer_seconds": 600
-    }
-  ],
-  "ingredients": [
-    {
-      "name": "Spaghetti",
-      "quantity": 400,
-      "unit": "g",
-      "sort_order": 1
-    }
-  ]
+  "updated_at": "2026-04-09T12:00:00Z"
 }
 ```
 
@@ -475,16 +504,19 @@ Get a single recipe by ID, including its steps and ingredients.
 
 ### POST /api/recipes
 
-Create a new recipe with steps and ingredients.
+Create a new recipe.
+
+**Authentication/Authorization:**
+- Requires: `middleware.Authentication()` + `middleware.RequirePermission("create_recipe")`
+- Returns `401 Unauthorized` if the JWT cookie is missing or invalid
+- Returns `403 Forbidden` if the authenticated user does not have `create_recipe` permission
 
 **Request body:**
 ```json
 {
-  "author_id": "uuid",
   "title": "Pasta Carbonara",
   "description": "Classic Italian pasta",
-  "prep_time_min": 10,
-  "cook_time_min": 20,
+  "preparation_time_min": 20,
   "servings": 4,
   "difficulty": "medium",
   "cuisine": "italian",
@@ -493,34 +525,23 @@ Create a new recipe with steps and ingredients.
   "calories": 550,
   "protein_g": 25.0,
   "carbs_g": 60.0,
-  "fat_g": 22.0,
-  "steps": [
-    {
-      "step_number": 1,
-      "instruction": "Boil water and cook pasta",
-      "media_url": null,
-      "timer_seconds": 600
-    }
-  ],
-  "ingredients": [
-    {
-      "ingredient_id": "uuid",
-      "quantity": 400,
-      "unit": "g",
-      "sort_order": 1
-    }
-  ]
+  "fat_g": 22.0
 }
 ```
 
-**Response** `201 Created` — returns the created recipe (same format as GET /api/recipes/:id).
+**Notes:**
+- `author_id` is automatically derived from the authenticated user and cannot be specified in the request body.
+
+**Response** `201 Created` — returns the created recipe's id.
 
 **Errors:**
-| Status    | When                                                          |
-|-----------|---------------------------------------------------------------|
-| 400       | Missing required fields (title, author_id)                    |
-| 400       | Invalid difficulty or meal_type value                         |
-| 400       | Negative or zero numeric fields (servings, prep_time, etc.)   |
+| Status    | When                                                                  |
+|-----------|-----------------------------------------------------------------------|
+| 400       | Missing required fields (title, description, etc) or invalid values   |
+| 400       | Invalid difficulty or meal_type value                                 |
+| 400       | Negative or zero numeric fields (servings, preparation_time, etc.)    |
+| 401       | Unauthorized — missing or invalid JWT                                 |
+| 403       | Forbidden — user lacks create_recipe permission                       |
 
 ---
 
@@ -528,7 +549,7 @@ Create a new recipe with steps and ingredients.
 
 Get a pre-signed Cloudinary signature for uploading recipe images. Required for secure client-side image uploads.
 
-**Requires:** Valid JWT in `token` cookie (set during login).
+**Authentication:** `middleware.Authentication()` + `middleware.RequirePermission("create_recipe")`
 
 **Response** `200 OK`
 ```json
@@ -541,10 +562,11 @@ Get a pre-signed Cloudinary signature for uploading recipe images. Required for 
 ```
 
 **Errors:**
-| Status    | When                                  |
-|-----------|---------------------------------------|
-| 401       | Unauthorized — missing or invalid JWT |
-| 500       | Failed to generate signature          |
+| Status    | When                                         |
+|-----------|----------------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT        |
+| 403       | Forbidden — lacks `create_recipe` permission |
+| 500       | Failed to generate signature                 |
 
 ---
 
@@ -571,110 +593,62 @@ Upload an image for a recipe. Uses multipart form data.
 
 ### PUT /api/recipes/:id
 
-Replace a recipe completely. All fields are required.
+Update a recipe.
 
-**Request body:** same as POST /api/recipes (without author_id, which cannot be changed).
+**Authentication:** `middleware.Authentication()`
 
-**Response** `200 OK` — returns the updated recipe.
+**Authorization:**
+- Owner (author) can edit their own recipe
+- Users with `edit_recipe` permission can edit any recipe
+
+**Request body:**
+```json
+{
+  "title": "Pasta Carbonara",
+  "description": "Classic Italian pasta",
+  "preparation_time_min": 20,
+  "servings": 4,
+  "difficulty": "medium",
+  "cuisine": "italian",
+  "meal_type": "dinner",
+  "image_url": "/images/carbonara.jpg",
+  "calories": 550,
+  "protein_g": 25.0,
+  "carbs_g": 60.0,
+  "fat_g": 22.0
+}
+```
+
+**Response** `200 OK` — returns the updated recipe's id.
 
 **Errors:**
-| Status    | When                                      |
-|-----------|-------------------------------------------|
-| 400       | Missing required fields or invalid values |
-| 404       | Recipe not found                          |
+| Status    | When                                            |
+|-----------|-------------------------------------------------|
+| 400       | Missing required fields or invalid values       |
+| 401       | Unauthorized — missing or invalid JWT           |
+| 403       | Forbidden — not the author and lacks permission |
+| 404       | Recipe not found                                |
 
 ---
 
 ### DELETE /api/recipes/:id
 
-Delete a recipe. Cascades: removes its steps, ingredients, and favourites.
+Delete a recipe. Cascades: removes its favourites.
+
+**Authentication:** `middleware.Authentication()`
+
+**Authorization:**
+- Owner (author) can delete their own recipe
+- Users with `delete_recipe` permission can delete any recipe
 
 **Response** `204 No Content`
 
 **Errors:**
-| Status    | When              |
-|-----------|-------------------|
-| 404       | Recipe not found  |
-
----
-
-## Ingredients
-
-### GET /api/ingredients
-
-Get all ingredients.
-
-**Response** `200 OK`
-```json
-[
-  {
-    "id": "uuid",
-    "name": "Spaghetti",
-    "category": "grains",
-    "default_unit": "g"
-  }
-]
-```
-
----
-
-### POST /api/ingredients
-
-Create a new ingredient.
-
-**Request body:**
-```json
-{
-  "name": "Spaghetti",
-  "category_id": "uuid",
-  "default_unit": "g"
-}
-```
-
-**Response** `201 Created` — returns the created ingredient.
-
-**Errors:**
-| Status    | When                              |
-|-----------|-----------------------------------|
-| 400       | Missing name                      |
-| 409       | Ingredient name already exists    |
-
----
-
-## Ingredient Categories
-
-### GET /api/ingredient-categories
-
-Get all ingredient categories.
-
-**Response** `200 OK`
-```json
-[
-  {
-    "id": "uuid",
-    "name": "Dairy",
-    "description": "Milk, cheese, butter, etc.",
-    "icon_url": "/icons/dairy.png"
-  }
-]
-```
-
----
-
-### POST /api/ingredient-categories
-
-Create a new ingredient category.
-
-**Request body:**
-```json
-{
-  "name": "Dairy",
-  "description": "Milk, cheese, butter, etc.",
-  "icon_url": "/icons/dairy.png"
-}
-```
-
-**Response** `201 Created`
+| Status    | When                                            | 
+|-----------|-------------------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT           |
+| 403       | Forbidden — not the author and lacks permission |
+| 404       | Recipe not found                                |
 
 ---
 
@@ -749,10 +723,11 @@ Get all recipes a user has favourited.
 | POST /api/users/logout            | done      |
 | GET /api/users/me                 | done      |
 | GET /api/users/session            | done      |
-| GET /api/users/search?q=          | TODO      |
-| POST /api/users                   | TODO      |
-| PUT /api/users/:id                | TODO      |
+| PUT /api/users/me/heartbeat       | done      |
+| POST /api/users                   | done      |
+| PUT /api/users/:id                | done      |
 | DELETE /api/users/:id             | TODO      |
+| GET /api/users/search?q=          | done      |
 | GET /api/recipes                  | done      |
 | GET /api/recipes/:id              | done      |
 | GET /api/recipes/image-signature  | done      |
@@ -760,10 +735,6 @@ Get all recipes a user has favourited.
 | POST /api/recipes/:id/image       | TODO      |
 | PUT /api/recipes/:id              | TODO      |
 | DELETE /api/recipes/:id           | done      |
-| GET /api/ingredients              | TODO      |
-| POST /api/ingredients             | TODO      |
-| GET /api/ingredient-categories    | TODO      |
-| POST /api/ingredient-categories   | TODO      |
 | POST /api/recipes/:id/favourite   | TODO      |
 | DELETE /api/recipes/:id/favourite | TODO      |
 | GET /api/users/:id/favourites     | TODO      |

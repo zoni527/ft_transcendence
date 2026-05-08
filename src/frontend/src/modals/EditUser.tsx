@@ -12,12 +12,14 @@ import {
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
+import { validateImageFile } from '../utils/utils';
 import type { User } from '../types/types';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 
 type EditUserModalProps = {
   user: User;
   onClose: () => void;
+  onSave: (updatedUser: User) => void;
 };
 
 // Validation schema
@@ -52,7 +54,7 @@ const editUserSchema = (t: TFunction) =>
       },
     );
 
-const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
+const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
@@ -134,7 +136,10 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
         login(updatedUser);
       }
 
+      onSave(updatedUser);
+
       showNotification(t('notification.updateUserSuccess'), 'success');
+
       onClose();
     } catch (err: unknown) {
       const message =
@@ -171,6 +176,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="fullName"
             label={t('signup.name')}
             type="text"
+            placeholder={t('signup.namePlace')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
@@ -180,6 +186,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="username"
             label={t('signup.username')}
             type="text"
+            placeholder={t('signup.usernamePlace')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -189,6 +196,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="email"
             label={t('signup.email')}
             type="email"
+            placeholder={t('signup.emailPlace')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -198,6 +206,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="password"
             label={t('signup.password')}
             type="password"
+            placeholder={t('signup.passwordPlace')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -207,6 +216,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="confirmPassword"
             label={t('signup.rePassword')}
             type="password"
+            placeholder={t('signup.rePasswordPlace')}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
@@ -221,9 +231,23 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  setFileName(file ? file.name : '');
-                  setImageFile(file);
+                  const file = e.target.files?.[0] ?? null;
+
+                  try {
+                    const validFile = validateImageFile(file, t, {
+                      maxSizeMB: 5,
+                    });
+                    setFileName(validFile?.name ?? '');
+                    setImageFile(validFile);
+                  } catch (err: unknown) {
+                    const message =
+                      err instanceof Error
+                        ? err.message
+                        : t('error.genericError');
+                    showNotification(message, 'error');
+                    setFileName('');
+                    setImageFile(null);
+                  }
                 }}
               />
             </label>
@@ -236,9 +260,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
           {/* Submit */}
           <div className="mt-12 flex justify-center">
             <SubmitButton
-              className="rounded-full bg-orange-700 hover:bg-orange-800"
+              className="rounded-full border-3 border-orange-700 hover:border-orange-800"
               isLoading={loading}
-              pendingText={t('editUser.submitPending')}
               defaultText={t('editUser.submit')}
             />
           </div>

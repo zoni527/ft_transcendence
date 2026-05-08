@@ -12,6 +12,7 @@ interface SelectFieldProps {
   options: SelectOption[];
   placeholder?: string;
   value?: string;
+  defaultValue?: string; // for uncontrolled
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
@@ -22,8 +23,11 @@ const SelectField = ({
   options,
   placeholder = '...',
   value,
+  defaultValue,
   onChange,
 }: SelectFieldProps) => {
+  const isControlled = value !== undefined;
+
   return (
     <div>
       <label htmlFor={id} className={inputLabelText}>
@@ -33,9 +37,8 @@ const SelectField = ({
       <select
         id={id}
         name={name}
-        value={value ?? ''}
-        onChange={onChange}
         className={`${cardBase} ${inputFieldBase}`}
+        {...(isControlled ? { value, onChange } : { defaultValue })}
       >
         <option value="" disabled>
           {placeholder}

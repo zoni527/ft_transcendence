@@ -29,7 +29,3 @@ func CanDeleteRecipe(userID string, recipe *models.Recipe) (bool, error) {
 	}
 	return HasPermission(userID, PermDeleteRecipe)
 }
-
-func CanPublishRecipe(userID string) (bool, error) {
-	return HasPermission(userID, PermPublishRecipe)
-}

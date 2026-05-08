@@ -31,7 +31,7 @@ const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
 
     deleteUser(id, t)
       .then(() => {
-        onDelete(user.id);
+        onDelete(id);
         showNotification(t('notification.userDeleteSuccess'), 'success');
       })
       .catch((err: unknown) => {

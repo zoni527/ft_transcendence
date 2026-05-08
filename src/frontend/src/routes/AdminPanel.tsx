@@ -22,19 +22,34 @@ const AdminPanel = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) return;
+    if (!hasRole(['admin'])) return;
+
+    let cancelled = false;
+
     Promise.all([getUsers(t), getRecipes(t)])
       .then(([usersData, recipesData]) => {
+        if (cancelled) return;
         setUsers(usersData);
         setRecipes(recipesData);
       })
       .catch((err: unknown) => {
+        if (cancelled) return;
+
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
         showNotification(message, 'error');
       })
-      .finally(() => setLoading(false));
-  }, [t, showNotification]);
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, user, hasRole, t, showNotification]);
 
   if (loading || authLoading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
@@ -96,10 +111,10 @@ const AdminPanel = () => {
       {/* Content */}
       <div className="mt-8 flex flex-col gap-4">
         {activeSection === 'users' &&
-          users.map((user) => (
+          users.map((listedUser) => (
             <AdminUserField
-              key={user.id}
-              user={user}
+              key={listedUser.id}
+              user={listedUser}
               onDelete={(id) =>
                 setUsers((prev) => prev.filter((u) => u.id !== id))
               }

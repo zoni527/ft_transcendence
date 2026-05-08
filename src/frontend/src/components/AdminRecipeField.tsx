@@ -31,7 +31,7 @@ const AdminRecipeField = ({ recipe, onDelete }: AdminRecipeFieldProps) => {
 
     deleteRecipe(id, t)
       .then(() => {
-        onDelete(recipe.id);
+        onDelete(id);
         showNotification(t('notification.recipeDeleteSuccess'), 'success');
       })
       .catch((err: unknown) => {

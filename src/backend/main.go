@@ -7,6 +7,7 @@ import (
 	"ft_transcendence/backend/config"
 	"ft_transcendence/backend/handlers"
 	"ft_transcendence/backend/integrations"
+	"ft_transcendence/backend/middleware"
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-contrib/cors"
@@ -43,33 +44,33 @@ func main() {
 	router.GET("/api/users", handlers.GetUsers)
 	router.GET("/api/users/:id", handlers.GetUserById)
 	router.POST("/api/users", handlers.CreateUser)
-	router.PUT("/api/users/:id", authorization.AuthMiddleware(), handlers.UpdateUser)
+	router.PUT("/api/users/:id", middleware.Authentication(), handlers.UpdateUser)
 	router.GET("/api/users/avatar",
-		authorization.AuthMiddleware(),
+		middleware.Authentication(),
 		handlers.UserAvatarSignature)
 	router.DELETE("/api/users/:id", handlers.DeleteUser)  // not implemented yet
 	router.GET("/api/users/search", handlers.SearchUsers) // not implemented yet
 	router.POST("/api/users/login", handlers.LoginUser)
 	router.GET("/api/users/session", handlers.GetSession)
-	router.POST("/api/users/logout", authorization.AuthMiddleware(), handlers.LogoutUser)
-	router.GET("/api/users/me", authorization.AuthMiddleware(), handlers.GetMe)
+	router.POST("/api/users/logout", middleware.Authentication(), handlers.LogoutUser)
+	router.GET("/api/users/me", middleware.Authentication(), handlers.GetMe)
 
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)
 	router.GET("/api/recipes/:id", handlers.GetRecipeById)
 	router.POST("/api/recipes",
-		authorization.AuthMiddleware(),
-		authorization.RequirePermission(authorization.PermCreateRecipe),
+		middleware.Authentication(),
+		middleware.RequirePermission(authorization.PermCreateRecipe),
 		handlers.CreateRecipe)
 	router.GET("/api/recipes/image-signature",
-		authorization.AuthMiddleware(),
-		authorization.RequirePermission(authorization.PermCreateRecipe),
+		middleware.Authentication(),
+		middleware.RequirePermission(authorization.PermCreateRecipe),
 		handlers.RecipeImageSignature)
 	router.PUT("/api/recipes/:id",
-		authorization.AuthMiddleware(),
+		middleware.Authentication(),
 		handlers.UpdateRecipe)
 	router.DELETE("/api/recipes/:id",
-		authorization.AuthMiddleware(),
+		middleware.Authentication(),
 		handlers.DeleteRecipe)
 	router.POST("/api/recipes/:id/image", handlers.UploadRecipeImage) // not implemented yet
 

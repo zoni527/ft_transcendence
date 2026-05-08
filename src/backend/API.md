@@ -377,9 +377,7 @@ Get a Cloudinary upload signature for uploading user avatars. This endpoint prov
 
 ### GET /api/recipes
 
-Get all published recipes.
-
-> **Future:** Once auth + roles are implemented, admins can use `?include_drafts=true` to see unpublished recipes. Authors will be able to see their own drafts via `GET /api/users/:id/recipes`.
+Get all recipes.
 
 **Query parameters (optional):**
 | Param         | Type      | Description                                                   |
@@ -400,8 +398,7 @@ Get all published recipes.
     "author_id": "uuid",
     "title": "Pasta Carbonara",
     "description": "Classic Italian pasta",
-    "prep_time_min": 10,
-    "cook_time_min": 20,
+    "preparation_time_min": 20,
     "servings": 4,
     "difficulty": "medium",
     "cuisine": "italian",
@@ -411,7 +408,6 @@ Get all published recipes.
     "protein_g": 25.0,
     "carbs_g": 60.0,
     "fat_g": 22.0,
-    "is_published": true,
     "created_at": "2026-04-09T12:00:00Z",
     "updated_at": "2026-04-09T12:00:00Z"
   }
@@ -433,8 +429,7 @@ Get a single recipe by ID, including its steps and ingredients.
   "author_id": "uuid",
   "title": "Pasta Carbonara",
   "description": "Classic Italian pasta",
-  "prep_time_min": 10,
-  "cook_time_min": 20,
+  "preparation_time_min": 20,
   "servings": 4,
   "difficulty": "medium",
   "cuisine": "italian",
@@ -444,7 +439,6 @@ Get a single recipe by ID, including its steps and ingredients.
   "protein_g": 25.0,
   "carbs_g": 60.0,
   "fat_g": 22.0,
-  "is_published": true,
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
   "steps": [
@@ -483,8 +477,7 @@ Create a new recipe with steps and ingredients.
   "author_id": "uuid",
   "title": "Pasta Carbonara",
   "description": "Classic Italian pasta",
-  "prep_time_min": 10,
-  "cook_time_min": 20,
+  "preparation_time_min": 20,
   "servings": 4,
   "difficulty": "medium",
   "cuisine": "italian",
@@ -516,11 +509,11 @@ Create a new recipe with steps and ingredients.
 **Response** `201 Created` — returns the created recipe (same format as GET /api/recipes/:id).
 
 **Errors:**
-| Status    | When                                                          |
-|-----------|---------------------------------------------------------------|
-| 400       | Missing required fields (title, author_id)                    |
-| 400       | Invalid difficulty or meal_type value                         |
-| 400       | Negative or zero numeric fields (servings, prep_time, etc.)   |
+| Status    | When                                                                  |
+|-----------|-----------------------------------------------------------------------|
+| 400       | Missing required fields (title, author_id)                            |
+| 400       | Invalid difficulty or meal_type value                                 |
+| 400       | Negative or zero numeric fields (servings, preparation_time, etc.)    |
 
 ---
 

@@ -24,24 +24,22 @@ type User struct {
 }
 
 type Recipe struct {
-	Id            string    `json:"id"            db:"id"`
-	Author_id     string    `json:"author_id"     db:"author_id"`
-	Title         string    `json:"title"         db:"title"`
-	Description   string    `json:"description"   db:"description"`
-	Prep_time_min int       `json:"prep_time_min" db:"prep_time_min"`
-	Cook_time_min int       `json:"cook_time_min" db:"cook_time_min"`
-	Servings      int       `json:"servings"      db:"servings"`
-	Difficulty    string    `json:"difficulty"    db:"difficulty"`
-	Cuisine       string    `json:"cuisine"       db:"cuisine"`
-	Meal_type     string    `json:"meal_type"     db:"meal_type"`
-	Image_url     string    `json:"image_url"     db:"image_url"`
-	Calories      int       `json:"calories"      db:"calories"`
-	Protein_g     float64   `json:"protein_g"     db:"protein_g"`
-	Carbs_g       float64   `json:"carbs_g"       db:"carbs_g"`
-	Fat_g         float64   `json:"fat_g"         db:"fat_g"`
-	Is_published  bool      `json:"is_published"  db:"is_published"`
-	Created_at    time.Time `json:"created_at"    db:"created_at"`
-	Updated_at    time.Time `json:"updated_at"    db:"updated_at"`
+	Id                   string    `json:"id"                   db:"id"`
+	Author_id            string    `json:"author_id"            db:"author_id"`
+	Title                string    `json:"title"                db:"title"`
+	Description          string    `json:"description"          db:"description"`
+	Preparation_time_min int       `json:"preparation_time_min" db:"preparation_time_min"`
+	Servings             int       `json:"servings"             db:"servings"`
+	Difficulty           string    `json:"difficulty"           db:"difficulty"`
+	Cuisine              string    `json:"cuisine"              db:"cuisine"`
+	Meal_type            string    `json:"meal_type"            db:"meal_type"`
+	Image_url            string    `json:"image_url"            db:"image_url"`
+	Calories             int       `json:"calories"             db:"calories"`
+	Protein_g            float64   `json:"protein_g"            db:"protein_g"`
+	Carbs_g              float64   `json:"carbs_g"              db:"carbs_g"`
+	Fat_g                float64   `json:"fat_g"                db:"fat_g"`
+	Created_at           time.Time `json:"created_at"           db:"created_at"`
+	Updated_at           time.Time `json:"updated_at"           db:"updated_at"`
 }
 
 type CreateUserRequest struct {

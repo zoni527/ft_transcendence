@@ -20,14 +20,13 @@ INSERT INTO "user" (email, password_hash, name, display_name) VALUES
 INSERT INTO role (name, description) VALUES
     ('admin',     'Full access — manage users, recipes, roles, and site settings'),
     ('moderator', 'Can review, edit, and delete recipes'),
-    ('chef',      'Can create and publish recipes'),
+    ('chef',      'Can create recipes'),
     ('user',      'Default role — can browse and favourite');
 
 INSERT INTO permission (name, description) VALUES
     ('create_recipe',  'Create new recipes'),
     ('edit_recipe',    'Edit any recipe'),
     ('delete_recipe',  'Delete any recipe'),
-    ('publish_recipe', 'Publish/unpublish recipes'),
     ('manage_users',   'View, edit, and delete user accounts'),
     ('manage_roles',   'Assign and remove roles'),
     ('moderate_content', 'Review and moderate user content');
@@ -39,14 +38,14 @@ INSERT INTO role_permission (role_id, permission_id)
 -- moderator permissions
 INSERT INTO role_permission (role_id, permission_id)
     SELECT r.id, p.id FROM role r, permission p
-    WHERE r.name = 'moderator' AND p.name IN ('edit_recipe', 'delete_recipe', 'publish_recipe', 'moderate_content');
+    WHERE r.name = 'moderator' AND p.name IN ('edit_recipe', 'delete_recipe', 'moderate_content');
 
 -- chef permissions
 -- TODO: chefs can edit their own recipes via authorship check in handler
 --       (recipe.author_id == current_user.id), no edit_recipe permission needed
 INSERT INTO role_permission (role_id, permission_id)
     SELECT r.id, p.id FROM role r, permission p
-    WHERE r.name = 'chef' AND p.name IN ('create_recipe', 'publish_recipe');
+    WHERE r.name = 'chef' AND p.name IN ('create_recipe');
 
 -- user permissions
 -- TODO: add favourite permission once that feature is implemented
@@ -93,15 +92,15 @@ INSERT INTO ingredient (name, category_id, default_unit) VALUES
 -- RECIPES
 -- =====================
 
-INSERT INTO recipe (author_id, title, description, prep_time_min, cook_time_min, servings, difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g, is_published) VALUES
+INSERT INTO recipe (author_id, title, description, preparation_time_min, servings, difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g) VALUES
     ((SELECT id FROM "user" WHERE email = 'alice@test.com'),
-     'Pasta Carbonara', 'Classic Roman pasta with eggs, cheese, and pancetta', 10, 20, 4, 'medium', 'Italian', 'dinner', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539163/ko9mymntptndrupaw8ib.jpg', 550, 25.0, 60.0, 22.0, true),
+     'Pasta Carbonara', 'Classic Roman pasta with eggs, cheese, and pancetta', 20, 4, 'medium', 'Italian', 'dinner', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539163/ko9mymntptndrupaw8ib.jpg', 550, 25.0, 60.0, 22.0),
     ((SELECT id FROM "user" WHERE email = 'bob@test.com'),
-     'Chicken Fried Rice', 'Quick and easy weeknight fried rice', 15, 15, 2, 'easy', 'Asian', 'dinner', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539232/pkxfz0nto6t4kzfgys4q.jpg', 450, 30.0, 55.0, 12.0, true),
+     'Chicken Fried Rice', 'Quick and easy weeknight fried rice', 15, 2, 'easy', 'Asian', 'dinner', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539232/pkxfz0nto6t4kzfgys4q.jpg', 450, 30.0, 55.0, 12.0),
     ((SELECT id FROM "user" WHERE email = 'charlie@test.com'),
-     'Garlic Tomato Bruschetta', 'Simple Italian appetizer with fresh tomatoes', 15, 5, 4, 'easy', 'Italian', 'snack', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539266/dxssmqprpxhsgyxjupql.jpg', 180, 4.0, 22.0, 8.0, true),
+     'Garlic Tomato Bruschetta', 'Simple Italian appetizer with fresh tomatoes', 5, 4, 'easy', 'Italian', 'snack', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539266/dxssmqprpxhsgyxjupql.jpg', 180, 4.0, 22.0, 8.0),
     ((SELECT id FROM "user" WHERE email = 'alice@test.com'),
-     'Draft Pasta Salad', 'Work in progress recipe', 20, 10, 6, 'easy', 'Italian', 'lunch', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539308/uof4c0bvl1kb6csvchdn.jpg', 300, 10.0, 40.0, 12.0, false);
+     'Pasta Salad', 'Refreshing summer pasta salad', 10, 6, 'easy', 'Italian', 'lunch', 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539308/uof4c0bvl1kb6csvchdn.jpg', 300, 10.0, 40.0, 12.0);
 
 -- =====================
 -- RECIPE STEPS

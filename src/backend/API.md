@@ -377,9 +377,7 @@ Get a Cloudinary upload signature for uploading user avatars. This endpoint prov
 
 ### GET /api/recipes
 
-Get all published recipes.
-
-> **Future:** Once auth + roles are implemented, admins can use `?include_drafts=true` to see unpublished recipes. Authors will be able to see their own drafts via `GET /api/users/:id/recipes`.
+Get all recipes.
 
 **Query parameters (optional):**
 | Param         | Type      | Description                                                   |

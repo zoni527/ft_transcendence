@@ -14,7 +14,7 @@ CREATE TABLE "user" (
     password_hash   VARCHAR NOT NULL,
     name            VARCHAR,
     display_name    VARCHAR UNIQUE NOT NULL,
-    avatar_url      VARCHAR,
+    avatar_url      VARCHAR NOT NULL DEFAULT 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777887730/f06qpjbotv8rahtc287u.png',
     created_at      TIMESTAMP DEFAULT now(),
     updated_at      TIMESTAMP DEFAULT now()
 );
@@ -68,7 +68,7 @@ CREATE TABLE recipe (
                                 CHECK (difficulty IN ('easy', 'medium', 'hard')),
     cuisine                 VARCHAR,
     meal_type               VARCHAR NOT NULL CONSTRAINT recipe_meal_type_allowed_values
-                                CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
+                                CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack', 'dessert')),
     image_url               VARCHAR,
     calories                INT,
     protein_g               DECIMAL,
@@ -106,3 +106,4 @@ CREATE TABLE friendship (
     PRIMARY KEY (requester_id, receiver_id),
     CONSTRAINT friendship_no_self CHECK (requester_id <> receiver_id)
 );
+

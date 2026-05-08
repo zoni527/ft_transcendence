@@ -38,8 +38,8 @@ Four roles, seeded in [002_seed.sql](../database/migrations/002_seed.sql).
 | Role          | Description                                                               |
 |---------------|---------------------------------------------------------------------------|
 | `user`        | Default. Browse and favourite. Every signed-up user gets this.            |
-| `chef`        | Can create and publish recipes.                                           |
-| `moderator`   | Can edit, delete, and unpublish any recipe. Reviews user content.         |
+| `chef`        | Can create recipes.                                                       |
+| `moderator`   | Can edit and delete any recipe. Reviews user content.                     |
 | `admin`       | Everything. Manages users, roles, and site settings.                      |
 
 Roles are additive: a chef who is also a moderator holds both. The default
@@ -50,15 +50,14 @@ signup flow assigns `user` only ([repository/users.go:193](repository/users.go#L
 Defined in [001_schema.sql](../database/migrations/001_schema.sql) and seeded
 with role mappings in [002_seed.sql](../database/migrations/002_seed.sql).
 
-| Permission | admin | moderator | chef | user |
-|---|:-:|:-:|:-:|:-:|
-| `create_recipe` | yes | | yes | |
-| `edit_recipe` | yes | yes | | |
-| `delete_recipe` | yes | yes | | |
-| `publish_recipe` | yes | yes | yes | |
-| `manage_users` | yes | | | |
-| `manage_roles` | yes | | | |
-| `moderate_content` | yes | yes | | |
+| Permission            | admin | moderator | chef              | user  |
+|-----------------------|:-----:|:---------:|:-----------------:|:-----:|
+| `create_recipe`       | yes   | yes       | yes               |       |
+| `edit_recipe`         | yes   | yes       | yes (only own)    |       |
+| `delete_recipe`       | yes   | yes       | yes (only own)    |       |
+| `moderate_content`    | yes   | yes       |                   |       |
+| `manage_users`        | yes   |           |                   |       |
+| `manage_roles`        | yes   |           |                   |       |
 
 Two patterns the table doesn't show:
 
@@ -210,7 +209,7 @@ panel to populate a "grant role" dropdown.
 ```json
 [
   { "name": "user",      "description": "Default. Browse and favourite." },
-  { "name": "chef",      "description": "Can create and publish recipes." },
+  { "name": "chef",      "description": "Can create recipes." },
   { "name": "moderator", "description": "Review and moderate content." },
   { "name": "admin",     "description": "Full access." }
 ]

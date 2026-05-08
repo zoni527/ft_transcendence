@@ -76,37 +76,37 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 ### Tables
 
 **User Management:**
-| Table | Purpose |
-|---|---|
-| `user` | User accounts (email, password hash, name, display name, timestamps) |
-| `role` | Role definitions (admin, moderator, chef, user) |
-| `permission` | Permission definitions (create_recipe, ban_user, etc.) |
-| `user_role` | Links users to roles (many-to-many) |
-| `role_permission` | Links roles to permissions (many-to-many) |
+| Table             | Purpose                                                               |
+|-------------------|-----------------------------------------------------------------------|
+| `user`            | User accounts (email, password hash, name, display name, timestamps)  |
+| `role`            | Role definitions (admin, moderator, chef, user)                       |
+| `permission`      | Permission definitions (create_recipe, ban_user, etc.)                |
+| `user_role`       | Links users to roles (many-to-many)                                   |
+| `role_permission` | Links roles to permissions (many-to-many)                             |
 
 **Role → Permission Breakdown:**
-| Role | Permissions |
-|---|---|
-| `admin` | All permissions |
-| `moderator` | `edit_recipe`, `delete_recipe`, `publish_recipe`, `moderate_content` |
-| `chef` | `create_recipe`, `publish_recipe` |
-| `user` | None (browsing is implicit; `favourite`/`comment` permissions TBD) |
+| Role          | Permissions                                                           |
+|---------------|-----------------------------------------------------------------------|
+| `admin`       | All permissions                                                       |
+| `moderator`   | `edit_recipe`, `delete_recipe`, `moderate_content`                    |
+| `chef`        | `create_recipe`                                                       |
+| `user`        | None (browsing is implicit; `favourite`/`comment` permissions TBD)    |
 
 > **Note:** Users can have multiple roles. Chefs can edit their own recipes via authorship check in handler logic (no `edit_recipe` permission needed).
 
 **Recipes:**
-| Table | Purpose |
-|---|---|
-| `recipe` | Recipe details (title, description, nutrition, etc.) |
-| `recipe_step` | Ordered cooking steps for each recipe |
-| `ingredient_category` | Categories for ingredients (e.g. poultry, dairy) |
-| `ingredient` | Ingredient definitions with default units |
-| `recipe_ingredient` | Links recipes to ingredients with quantities (many-to-many) |
+| Table                     | Purpose                                                       |
+|---------------------------|---------------------------------------------------------------|
+| `recipe`                  | Recipe details (title, description, nutrition, etc.)          |
+| `recipe_step`             | Ordered cooking steps for each recipe                         |
+| `ingredient_category`     | Categories for ingredients (e.g. poultry, dairy)              |
+| `ingredient`              | Ingredient definitions with default units                     |
+| `recipe_ingredient`       | Links recipes to ingredients with quantities (many-to-many)   |
 
 **Engagement:**
-| Table | Purpose |
-|---|---|
-| `recipe_favourite` | Tracks which users favourited which recipes |
+| Table                 | Purpose                                       |
+|-----------------------|-----------------------------------------------|
+| `recipe_favourite`    | Tracks which users favourited which recipes   |
 
 ### Key Design Decisions
 
@@ -114,7 +114,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 - **Serving-based ingredient scaling** — `recipe.servings` stores the base serving count. `recipe_ingredient.quantity` stores the amount for that base. Scaling (e.g. 4 servings → 2 servings) is done in app logic: `adjusted = quantity * (desired / base)`.
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
 - **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its steps, ingredients, and favourites.
-- **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship). TOS should state that published recipes remain after account deletion with authorship anonymized.
+- **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship). TOS should state that created recipes remain after account deletion with authorship anonymized.
 
 ## Accessing the Database
 

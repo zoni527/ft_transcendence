@@ -52,7 +52,7 @@ with role mappings in [002_seed.sql](../database/migrations/002_seed.sql).
 
 | Permission            | admin | moderator | chef              | user  |
 |-----------------------|:-----:|:---------:|:-----------------:|:-----:|
-| `create_recipe`       | yes   | yes       | yes               |       |
+| `create_recipe`       | yes   |           | yes               |       |
 | `edit_recipe`         | yes   | yes       | yes (only own)    |       |
 | `delete_recipe`       | yes   | yes       | yes (only own)    |       |
 | `moderate_content`    | yes   | yes       |                   |       |

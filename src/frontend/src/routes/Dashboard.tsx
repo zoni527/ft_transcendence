@@ -8,7 +8,8 @@ import EditUserModal from '../modals/EditUser';
 import InfoIcon from '../components/InfoIcon';
 import ModalButton from '../components/ModalButton';
 import StatusBox from '../components/StatusBox';
-import { getUserbyId } from '../api';
+import SubmitButton from '../components/SubmitButton';
+import { getUserbyId, deleteUser } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -23,6 +24,28 @@ const Dashboard = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const handleDelete = (id?: string) => {
+    if (loading) return;
+    if (!id) {
+      showNotification(t('error.genericError'), 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    deleteUser(id, t)
+      .then(() => {
+        void navigate('/');
+        showNotification(t('notification.userDeleteSuccess'), 'success');
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+        showNotification(message, 'error');
+      })
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
     if (!id && authLoading) return;
@@ -163,15 +186,7 @@ const Dashboard = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-16 flex gap-2">
-          {/* Edit user */}
-          <ModalButton
-            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
-            onClick={() => setIsUserEditOpen(true)}
-            text={t('dashboard.editUser')}
-            disabled={!(hasRole(['admin']) || isSelf)}
-          />
-
+        <div className="mt-16 flex w-full items-center justify-between">
           {/* Create recipe */}
           <ModalButton
             className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
@@ -179,6 +194,27 @@ const Dashboard = () => {
             text={t('dashboard.createRecipe')}
             disabled={!(hasRole(['chef', 'moderator', 'admin']) && isSelf)}
           />
+
+          <div className="flex gap-2">
+            {/* Edit user */}
+            <ModalButton
+              className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+              onClick={() => setIsUserEditOpen(true)}
+              text={t('dashboard.editUser')}
+              disabled={!(hasRole(['admin']) || isSelf)}
+            />
+
+            {/* Delete user */}
+            <SubmitButton
+              className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+              isLoading={loading}
+              pendingText={t('dashboard.submitPending')}
+              defaultText={t('dashboard.submit')}
+              onClick={() => handleDelete(userData.id)}
+              type="button"
+              disabled={!(hasRole(['admin']) || isSelf)}
+            />
+          </div>
         </div>
       </div>
     </>

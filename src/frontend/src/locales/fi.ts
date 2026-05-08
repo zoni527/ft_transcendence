@@ -47,8 +47,8 @@ export const fiTranslations = {
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
-    submit: 'Poista käyttäjä',
-    submitPending: 'Poistetaan käyttäjää...',
+    submit: 'Poista profiilia',
+    submitPending: 'Poistetaan profiilia...',
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',

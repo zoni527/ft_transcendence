@@ -47,8 +47,8 @@ export const enTranslations = {
     roles: 'Roles',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
-    submit: 'Delete user',
-    submitPending: 'Deleting user...',
+    submit: 'Delete profile',
+    submitPending: 'Deleting profile...',
   },
   adminPanel: {
     header: 'Admin panel',

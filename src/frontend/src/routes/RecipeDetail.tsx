@@ -184,7 +184,7 @@ const RecipeDetail = () => {
           </div>
 
           {/* Bottom Section */}
-          <div className="mt-16 flex gap-2">
+          <div className="mt-16 flex w-full justify-end gap-2">
             {/* Edit recipe */}
             <ModalButton
               className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"

@@ -47,8 +47,8 @@ export const csTranslations = {
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
-    submit: 'Smazat uživatele',
-    submitPending: 'Mazání uživatele...',
+    submit: 'Smazat profil',
+    submitPending: 'Mazání profilu...',
   },
   adminPanel: {
     header: 'Administrátorský panel',

@@ -34,23 +34,19 @@ const createRecipeSchema = (t: TFunction) =>
   z.object({
     title: z.string().min(1, t('recValidation.recipeNameRequired')),
     description: z.string().min(1, t('recValidation.descriptionRequired')),
-    prep_time_min: requiredNumber(t('recValidation.prepTime'), 0, t),
-    cook_time_min: requiredNumber(t('recValidation.cookTime'), 0, t),
+    preparation_time_min: requiredNumber(t('recValidation.prepTime'), 0, t),
     servings: requiredNumber(t('recValidation.servings'), 1, t),
     difficulty: z.enum(['easy', 'medium', 'hard'], {
       errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
     }),
     cuisine: z.string().min(1, t('recValidation.cuisineRequired')),
-    meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
+    meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack', 'dessert'], {
       errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),
     calories: requiredNumber(t('recValidation.calories'), 0, t),
     protein_g: requiredNumber(t('recValidation.protein'), 0, t),
     carbs_g: requiredNumber(t('recValidation.carbs'), 0, t),
     fat_g: requiredNumber(t('recValidation.fat'), 0, t),
-    is_published: z.enum(['yes', 'no'], {
-      errorMap: () => ({ message: t('recValidation.selectPublishOption') }),
-    }),
   });
 
 const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
@@ -99,8 +95,7 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
       const result = schema.safeParse({
         title: getStringValue(formData, 'title'),
         description: getStringValue(formData, 'description'),
-        prep_time_min: getStringValue(formData, 'prep_time_min'),
-        cook_time_min: getStringValue(formData, 'cook_time_min'),
+        preparation_time_min: getStringValue(formData, 'preparation_time_min'),
         servings: getStringValue(formData, 'servings'),
         difficulty: getStringValue(formData, 'difficulty'),
         cuisine: getStringValue(formData, 'cuisine'),
@@ -109,7 +104,6 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
         protein_g: getStringValue(formData, 'protein_g'),
         carbs_g: getStringValue(formData, 'carbs_g'),
         fat_g: getStringValue(formData, 'fat_g'),
-        is_published: getStringValue(formData, 'is_published'),
       });
 
       if (!result.success) {
@@ -129,7 +123,6 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
         {
           ...result.data,
           image_url,
-          is_published: result.data.is_published === 'yes',
         },
         t,
       );
@@ -169,34 +162,40 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
 
         {/* Information fields */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <InputField id="title" name="title" label={t('createRecipe.title')} />
+          <InputField
+            id="title"
+            name="title"
+            label={t('createRecipe.title')}
+            placeholder={t('createRecipe.titlePlace')}
+          />
 
           <InputTextArea
             id="description"
             name="description"
             label={t('createRecipe.description')}
+            placeholder={t('createRecipe.descriptionPlace')}
           />
 
           <InputField
-            id="prep_time_min"
-            name="prep_time_min"
+            id="preparation_time_min"
+            name="preparation_time_min"
             label={t('createRecipe.prep')}
+            placeholder={t('createRecipe.prepPlace')}
           />
-          <InputField
-            id="cook_time_min"
-            name="cook_time_min"
-            label={t('createRecipe.cook')}
-          />
+
           <InputField
             id="servings"
             name="servings"
             label={t('createRecipe.servings')}
+            placeholder={t('createRecipe.servingsPlace')}
           />
 
           <SelectField
             id="difficulty"
             name="difficulty"
             label={t('difficulty.type')}
+            defaultValue=""
+            placeholder={t('createRecipe.difficultyPlace')}
             options={[
               { value: 'easy', label: t('difficulty.type_easy') },
               { value: 'medium', label: t('difficulty.type_medium') },
@@ -208,17 +207,21 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
             id="cuisine"
             name="cuisine"
             label={t('createRecipe.cuisine')}
+            placeholder={t('createRecipe.cuisinePlace')}
           />
 
           <SelectField
             id="meal_type"
             name="meal_type"
             label={t('meal.type')}
+            defaultValue=""
+            placeholder={t('createRecipe.mealTypePlace')}
             options={[
               { value: 'breakfast', label: t('meal.type_breakfast') },
               { value: 'lunch', label: t('meal.type_lunch') },
               { value: 'dinner', label: t('meal.type_dinner') },
               { value: 'snack', label: t('meal.type_snack') },
+              { value: 'dessert', label: t('meal.type_dessert') },
             ]}
           />
 
@@ -226,27 +229,26 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
             id="calories"
             name="calories"
             label={t('createRecipe.calories')}
+            placeholder={t('createRecipe.caloriesPlace')}
           />
           <InputField
             id="protein_g"
             name="protein_g"
             label={t('createRecipe.protein')}
+            placeholder={t('createRecipe.proteinPlace')}
           />
           <InputField
             id="carbs_g"
             name="carbs_g"
             label={t('createRecipe.carbs')}
+            placeholder={t('createRecipe.carbsPlace')}
           />
-          <InputField id="fat_g" name="fat_g" label={t('createRecipe.fat')} />
 
-          <SelectField
-            id="is_published"
-            name="is_published"
-            label={t('createRecipe.publish')}
-            options={[
-              { value: 'yes', label: t('createRecipe.yes') },
-              { value: 'no', label: t('createRecipe.no') },
-            ]}
+          <InputField
+            id="fat_g"
+            name="fat_g"
+            label={t('createRecipe.fat')}
+            placeholder={t('createRecipe.fatPlace')}
           />
 
           {/* Image Upload */}
@@ -273,9 +275,8 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
           {/* Submit */}
           <div className="mt-12 flex justify-center">
             <SubmitButton
-              className="rounded-full bg-orange-700 hover:bg-orange-800"
+              className="rounded-full border-3 border-orange-700 hover:border-orange-800"
               isLoading={loading}
-              pendingText={t('createRecipe.submitPending')}
               defaultText={t('createRecipe.submit')}
             />
           </div>

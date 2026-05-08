@@ -64,7 +64,7 @@ const LangDropdown = () => {
         </svg>
       </button>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-16 border bg-white shadow-lg">
+        <div className="absolute left-1/2 mt-2 w-16 -translate-x-1/2 border bg-white shadow-lg">
           <div className="flex flex-col">
             <LangButton label="EN" onClick={() => handleLangChange('en')} />
             <LangButton label="FI" onClick={() => handleLangChange('fi')} />

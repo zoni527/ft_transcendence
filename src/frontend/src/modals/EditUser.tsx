@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
+import RolesCheckboxes from '../components/RolesCheckboxes';
 import SubmitButton from '../components/SubmitButton';
 import {
   putUpdateUser,
@@ -12,12 +13,15 @@ import {
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
+import { validateImageFile } from '../utils/utils';
+import type { UpdateUserPayload } from '../api';
 import type { User } from '../types/types';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 
 type EditUserModalProps = {
   user: User;
   onClose: () => void;
+  onSave: (updatedUser: User) => void;
 };
 
 // Validation schema
@@ -52,11 +56,12 @@ const editUserSchema = (t: TFunction) =>
       },
     );
 
-const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
+const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const { login, user: authUser } = useAuth();
+  const { login, user: authUser, hasRole } = useAuth();
+  const [roles, setRoles] = useState<string[] | null>(user.roles ?? null);
 
   // Controlled input states
   const [fullName, setFullName] = useState(user.name);
@@ -118,23 +123,28 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
 
       const id = user.id;
 
-      const updatedUser = await putUpdateUser(
-        {
-          email: result.data.email,
-          password: result.data.password == '' ? null : result.data.password,
-          name: result.data.fullName,
-          display_name: result.data.username,
-          avatar_url,
-        },
-        id,
-        t,
-      );
+      const payload: UpdateUserPayload = {
+        email: result.data.email,
+        password: result.data.password === '' ? null : result.data.password,
+        name: result.data.fullName,
+        display_name: result.data.username,
+        avatar_url,
+      };
+
+      if (hasRole(['admin']) && !isSelf && roles !== null) {
+        payload.roles = roles;
+      }
+
+      const updatedUser = await putUpdateUser(payload, id, t);
 
       if (authUser?.id === updatedUser.id) {
         login(updatedUser);
       }
 
+      onSave(updatedUser);
+
       showNotification(t('notification.updateUserSuccess'), 'success');
+
       onClose();
     } catch (err: unknown) {
       const message =
@@ -144,6 +154,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
       setLoading(false);
     }
   };
+
+  const isSelf = authUser?.id === user.id;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -171,6 +183,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="fullName"
             label={t('signup.name')}
             type="text"
+            placeholder={t('signup.namePlace')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
@@ -180,15 +193,21 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="username"
             label={t('signup.username')}
             type="text"
+            placeholder={t('signup.usernamePlace')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
+
+          {hasRole(['admin']) && !isSelf && (
+            <RolesCheckboxes roles={roles} onChange={setRoles} />
+          )}
 
           <InputField
             id="email"
             name="email"
             label={t('signup.email')}
             type="email"
+            placeholder={t('signup.emailPlace')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -198,6 +217,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="password"
             label={t('signup.password')}
             type="password"
+            placeholder={t('signup.passwordPlace')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -207,6 +227,7 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
             name="confirmPassword"
             label={t('signup.rePassword')}
             type="password"
+            placeholder={t('signup.rePasswordPlace')}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
@@ -221,9 +242,23 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  setFileName(file ? file.name : '');
-                  setImageFile(file);
+                  const file = e.target.files?.[0] ?? null;
+
+                  try {
+                    const validFile = validateImageFile(file, t, {
+                      maxSizeMB: 5,
+                    });
+                    setFileName(validFile?.name ?? '');
+                    setImageFile(validFile);
+                  } catch (err: unknown) {
+                    const message =
+                      err instanceof Error
+                        ? err.message
+                        : t('error.genericError');
+                    showNotification(message, 'error');
+                    setFileName('');
+                    setImageFile(null);
+                  }
                 }}
               />
             </label>
@@ -236,9 +271,8 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
           {/* Submit */}
           <div className="mt-12 flex justify-center">
             <SubmitButton
-              className="rounded-full bg-orange-700 hover:bg-orange-800"
+              className="rounded-full border-3 border-orange-700 hover:border-orange-800"
               isLoading={loading}
-              pendingText={t('editUser.submitPending')}
               defaultText={t('editUser.submit')}
             />
           </div>

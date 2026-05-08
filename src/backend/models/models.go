@@ -20,28 +20,76 @@ type User struct {
 	Avatar_url    string    `json:"avatar_url"   db:"avatar_url"`
 	Created_at    time.Time `json:"created_at"   db:"created_at"`
 	Updated_at    time.Time `json:"updated_at"   db:"updated_at"`
+	Last_seen     time.Time `json:"last_seen"    db:"last_seen"`
+	Is_online     bool      `json:"is_online"` // has no db: tag! it's computed in Go before sending JSON.
 	Roles         []string  `json:"roles"        db:"roles"`
 }
 
+// Recipe is the write/request shape: what we persist and what clients send on
+// POST/PUT. The author is identified by Author_id only — never trust an author
+// object from a request body.
 type Recipe struct {
-	Id            string    `json:"id"            db:"id"`
-	Author_id     string    `json:"author_id"     db:"author_id"`
-	Title         string    `json:"title"         db:"title"`
-	Description   string    `json:"description"   db:"description"`
-	Prep_time_min int       `json:"prep_time_min" db:"prep_time_min"`
-	Cook_time_min int       `json:"cook_time_min" db:"cook_time_min"`
-	Servings      int       `json:"servings"      db:"servings"`
-	Difficulty    string    `json:"difficulty"    db:"difficulty"`
-	Cuisine       string    `json:"cuisine"       db:"cuisine"`
-	Meal_type     string    `json:"meal_type"     db:"meal_type"`
-	Image_url     string    `json:"image_url"     db:"image_url"`
-	Calories      int       `json:"calories"      db:"calories"`
-	Protein_g     float64   `json:"protein_g"     db:"protein_g"`
-	Carbs_g       float64   `json:"carbs_g"       db:"carbs_g"`
-	Fat_g         float64   `json:"fat_g"         db:"fat_g"`
-	Is_published  bool      `json:"is_published"  db:"is_published"`
-	Created_at    time.Time `json:"created_at"    db:"created_at"`
-	Updated_at    time.Time `json:"updated_at"    db:"updated_at"`
+	Id                   string    `json:"id"                   db:"id"`
+	Author_id            string    `json:"author_id"            db:"author_id"`
+	Title                string    `json:"title"                db:"title"`
+	Description          string    `json:"description"          db:"description"`
+	Preparation_time_min int       `json:"preparation_time_min" db:"preparation_time_min"`
+	Servings             int       `json:"servings"             db:"servings"`
+	Difficulty           string    `json:"difficulty"           db:"difficulty"`
+	Cuisine              string    `json:"cuisine"              db:"cuisine"`
+	Meal_type            string    `json:"meal_type"            db:"meal_type"`
+	Image_url            string    `json:"image_url"            db:"image_url"`
+	Calories             int       `json:"calories"             db:"calories"`
+	Protein_g            float64   `json:"protein_g"            db:"protein_g"`
+	Carbs_g              float64   `json:"carbs_g"              db:"carbs_g"`
+	Fat_g                float64   `json:"fat_g"                db:"fat_g"`
+	Created_at           time.Time `json:"created_at"           db:"created_at"`
+	Updated_at           time.Time `json:"updated_at"           db:"updated_at"`
+}
+
+// RecipeAuthor is a denormalized snapshot of the author fields the recipe UI
+// needs, joined in at read time so the frontend does not have to make a second
+// request to /api/users/:id just to render a card.
+type RecipeAuthor struct {
+	Id           string `json:"id"`
+	Display_name string `json:"display_name"`
+	Avatar_url   string `json:"avatar_url"`
+}
+
+// RecipeResponse is the read shape returned by GET /api/recipes and
+// GET /api/recipes/:id. It carries the author as a nested object
+type RecipeResponse struct {
+	Id                   string       `json:"id"`
+	Author               RecipeAuthor `json:"author"`
+	Title                string       `json:"title"`
+	Description          string       `json:"description"`
+	Preparation_time_min int          `json:"preparation_time_min"`
+	Servings             int          `json:"servings"`
+	Difficulty           string       `json:"difficulty"`
+	Cuisine              string       `json:"cuisine"`
+	Meal_type            string       `json:"meal_type"`
+	Image_url            string       `json:"image_url"`
+	Calories             int          `json:"calories"`
+	Protein_g            float64      `json:"protein_g"`
+	Carbs_g              float64      `json:"carbs_g"`
+	Fat_g                float64      `json:"fat_g"`
+	Created_at           time.Time    `json:"created_at"`
+	Updated_at           time.Time    `json:"updated_at"`
+}
+
+type SearchRecipeFilters struct {
+	Query      string `form:"q"`
+	Page       int    `form:"page"`
+	Difficulty string `form:"difficulty"`
+	MealType   string `form:"meal_type"`
+	Date       string `form:"date"`
+}
+
+type SearchRecipeResponse struct {
+	Id                   string `json:"id"`
+	Title                string `json:"title"`
+	Preparation_time_min int    `json:"preparation_time_min"`
+	Image_url            string `json:"image_url"`
 }
 
 type CreateUserRequest struct {
@@ -79,4 +127,35 @@ type UpdateUserParams struct {
 	Display_name    *string  `json:"display_name,omitempty"`
 	Avatar_url      *string  `json:"avatar_url,omitempty"`
 	Roles           []string `json:"roles,omitempty"`
+}
+
+type UserSearchResult struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Display_name string `json:"display_name"`
+}
+
+// Is_online is a pointer so it can be omitted from the JSON for pending rows
+// (sent/incoming buckets) and only appear on accepted/friends.
+type FriendshipListItem struct {
+	Status       string    `json:"-"                    db:"status"`
+	SentByMe     bool      `json:"-"                    db:"sent_by_me"`
+	Last_seen    time.Time `json:"-"                    db:"last_seen"`
+	Id           string    `json:"id"                   db:"id"`
+	Display_name string    `json:"display_name"         db:"display_name"`
+	Name         string    `json:"name"                 db:"name"`
+	Is_online    *bool     `json:"is_online,omitempty"`
+}
+
+// this is the body of GET /api/friendships.
+type FriendshipsResponse struct {
+	Friends  []FriendshipListItem `json:"friends"`
+	Sent     []FriendshipListItem `json:"sent"`
+	Incoming []FriendshipListItem `json:"incoming"`
+}
+
+// Body of POST /api/friendships. The requester is taken from the JWT, so the
+// client only sends the target user's id.
+type CreateFriendRequestBody struct {
+	Receiver_id string `json:"receiver_id" binding:"required"`
 }

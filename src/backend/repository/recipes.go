@@ -3,11 +3,11 @@ package repository
 // Recipe repository functions needed:
 // [done] GetAllRecipes     — GET /api/recipes
 // [done] GetRecipeById     — GET /api/recipes/:id
+// [done] SearchRecipes     — GET /api/recipes/search
 // [done] CreateRecipe      — POST /api/recipes (currently inserts the recipe row only)
 // [done] UpdateRecipe      — PUT /api/recipes/:id
 // [done] DeleteRecipe      — DELETE /api/recipes/:id
-// [TODO] GetAllRecipes should support ?include_drafts=true for admins (once auth is implemented)
-// [TODO] Add GET /api/users/:id/recipes so authors can see their own unpublished recipes
+// [TODO] Add GET /api/users/:id/recipes so authors can see their own recipes
 // [TODO] Add sorting (?sort=created_at&order=desc) to GetAllRecipes
 // [TODO] Add pagination (?page=1&limit=20) to GetAllRecipes
 
@@ -16,6 +16,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"ft_transcendence/backend/models"
 
@@ -24,7 +25,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-// GetAllRecipes returns all published recipes.
+// GetAllRecipes returns all recipes.
 // COALESCE(column, fallback) — if column is NULL, use the fallback value instead.
 // We need this because pgx can't scan NULL into a Go string or int!!!
 //
@@ -35,17 +36,24 @@ import (
 //
 // TODO: Replace COALESCE with pointer types (*string, *int) in the Recipe struct
 // so NULL fields return JSON null instead of empty strings/zeros.
-func GetAllRecipes() ([]models.Recipe, error) {
-	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
-				COALESCE(prep_time_min, 0), COALESCE(cook_time_min, 0),
-				servings, COALESCE(difficulty, ''), COALESCE(cuisine, ''),
-				COALESCE(meal_type, ''), COALESCE(image_url, ''),
-				COALESCE(calories, 0), COALESCE(protein_g, 0), COALESCE(carbs_g, 0),
-				COALESCE(fat_g, 0), is_published,
-				created_at, updated_at
-			FROM recipe
-			WHERE is_published = true
-			ORDER BY created_at DESC`
+// LEFT JOIN, not INNER: author_id is ON DELETE SET NULL, so a recipe can
+// outlive its author. We still want to return the recipe, just with an empty
+// author block.
+func GetAllRecipes() ([]models.RecipeResponse, error) {
+	sql := `SELECT r.id,
+				COALESCE(r.author_id::text, ''),
+				COALESCE(u.display_name, ''),
+				COALESCE(u.avatar_url, ''),
+				r.title, COALESCE(r.description, ''),
+				COALESCE(r.preparation_time_min, 0),
+				r.servings, COALESCE(r.difficulty, ''), COALESCE(r.cuisine, ''),
+				COALESCE(r.meal_type, ''), COALESCE(r.image_url, ''),
+				COALESCE(r.calories, 0), COALESCE(r.protein_g, 0), COALESCE(r.carbs_g, 0),
+				COALESCE(r.fat_g, 0),
+				r.created_at, r.updated_at
+			FROM recipe r
+			LEFT JOIN "user" u ON u.id = r.author_id
+			ORDER BY r.created_at DESC`
 
 	rows, err := Pool.Query(context.Background(), sql)
 	if err != nil {
@@ -53,15 +61,17 @@ func GetAllRecipes() ([]models.Recipe, error) {
 	}
 	defer rows.Close()
 
-	var recipes []models.Recipe
+	var recipes []models.RecipeResponse
 	for rows.Next() {
-		var r models.Recipe
+		var r models.RecipeResponse
 		err := rows.Scan(
-			&r.Id, &r.Author_id, &r.Title, &r.Description,
-			&r.Prep_time_min, &r.Cook_time_min, &r.Servings,
+			&r.Id,
+			&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
+			&r.Title, &r.Description,
+			&r.Preparation_time_min, &r.Servings,
 			&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,
 			&r.Calories, &r.Protein_g, &r.Carbs_g, &r.Fat_g,
-			&r.Is_published, &r.Created_at, &r.Updated_at,
+			&r.Created_at, &r.Updated_at,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning recipe row: %w", err)
@@ -76,33 +86,97 @@ func GetAllRecipes() ([]models.Recipe, error) {
 	return recipes, nil
 }
 
-// GetRecipeById returns a single recipe by UUID.
-func GetRecipeById(id string) (models.Recipe, error) {
-	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
-				COALESCE(prep_time_min, 0), COALESCE(cook_time_min, 0),
-				servings, COALESCE(difficulty, ''), COALESCE(cuisine, ''),
-				COALESCE(meal_type, ''), COALESCE(image_url, ''),
-				COALESCE(calories, 0), COALESCE(protein_g, 0), COALESCE(carbs_g, 0),
-				COALESCE(fat_g, 0), is_published,
-				created_at, updated_at
+func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+	sql := `SELECT id, title, 
+			COALESCE(preparation_time_min, 0),
+			COALESCE(image_url, '')
 			FROM recipe
-			WHERE id = $1 AND is_published = true`
+			WHERE  1=1`
+	var args []interface{}
+	pCount := 1
 
-	var r models.Recipe
+	if f.Query != "" {
+		sql += fmt.Sprintf(" AND title ILIKE $%d", pCount)
+		args = append(args, "%"+f.Query+"%")
+		pCount++
+	}
+	if f.Difficulty != "" {
+		sql += fmt.Sprintf(" AND difficulty = $%d", pCount)
+		args = append(args, f.Difficulty)
+		pCount++
+	}
+	if f.MealType != "" {
+		sql += fmt.Sprintf(" AND meal_type = $%d", pCount)
+		args = append(args, f.MealType)
+		pCount++
+	}
+
+	sortOrder := "DESC"
+	if strings.ToLower(f.Date) == "oldest" {
+		sortOrder = "ASC"
+	}
+	sql += fmt.Sprintf(" ORDER BY created_at %s LIMIT $%d OFFSET $%d", sortOrder, pCount, pCount+1)
+	args = append(args, limit, offset)
+
+	rows, err := Pool.Query(context.Background(), sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var recipes []models.SearchRecipeResponse
+	for rows.Next() {
+		var r models.SearchRecipeResponse
+		err := rows.Scan(
+			&r.Id,
+			&r.Title,
+			&r.Preparation_time_min,
+			&r.Image_url,
+		)
+		if err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, r)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("repository.SearchRecipes: %w", err)
+	}
+	return recipes, nil
+}
+
+// GetRecipeById returns a single recipe by UUID.
+func GetRecipeById(id string) (models.RecipeResponse, error) {
+	sql := `SELECT r.id,
+				COALESCE(r.author_id::text, ''),
+				COALESCE(u.display_name, ''),
+				COALESCE(u.avatar_url, ''),
+				r.title, COALESCE(r.description, ''),
+				COALESCE(r.preparation_time_min, 0),
+				r.servings, COALESCE(r.difficulty, ''), COALESCE(r.cuisine, ''),
+				COALESCE(r.meal_type, ''), COALESCE(r.image_url, ''),
+				COALESCE(r.calories, 0), COALESCE(r.protein_g, 0), COALESCE(r.carbs_g, 0),
+				COALESCE(r.fat_g, 0),
+				r.created_at, r.updated_at
+			FROM recipe r
+			LEFT JOIN "user" u ON u.id = r.author_id
+			WHERE r.id = $1`
+
+	var r models.RecipeResponse
 	err := Pool.QueryRow(context.Background(), sql, id).Scan(
-		&r.Id, &r.Author_id, &r.Title, &r.Description,
-		&r.Prep_time_min, &r.Cook_time_min, &r.Servings,
+		&r.Id,
+		&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
+		&r.Title, &r.Description,
+		&r.Preparation_time_min, &r.Servings,
 		&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,
 		&r.Calories, &r.Protein_g, &r.Carbs_g, &r.Fat_g,
-		&r.Is_published, &r.Created_at, &r.Updated_at,
+		&r.Created_at, &r.Updated_at,
 	)
 
 	if err == pgx.ErrNoRows {
-		return models.Recipe{}, &NotFoundError{"recipe not found"}
+		return models.RecipeResponse{}, &NotFoundError{"recipe not found"}
 	}
 
 	if err != nil {
-		return models.Recipe{}, fmt.Errorf("repository.GetRecipeById: %w", err)
+		return models.RecipeResponse{}, fmt.Errorf("repository.GetRecipeById: %w", err)
 	}
 
 	return r, nil
@@ -111,19 +185,19 @@ func GetRecipeById(id string) (models.Recipe, error) {
 func CreateRecipe(r *models.Recipe) (string, error) {
 	sql := `
 		INSERT INTO recipe (
-			author_id, title, description, prep_time_min, cook_time_min,
+			author_id, title, description, preparation_time_min,
 			servings, difficulty, cuisine, meal_type, image_url,
-			calories, protein_g, carbs_g, fat_g, is_published
+			calories, protein_g, carbs_g, fat_g
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 		) RETURNING id`
 
 	var newId string
 
 	err := Pool.QueryRow(context.Background(), sql,
-		r.Author_id, r.Title, r.Description, r.Prep_time_min, r.Cook_time_min,
+		r.Author_id, r.Title, r.Description, r.Preparation_time_min,
 		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
-		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
+		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g,
 	).Scan(&newId)
 	if err != nil {
 		return "", recipePostgresErrorClassification("repository.CreateRecipe", err)
@@ -136,19 +210,19 @@ func UpdateRecipe(r *models.Recipe) error {
 	sql := `
 		UPDATE recipe
 		SET (
-			title, description, prep_time_min, cook_time_min, servings,
+			title, description, preparation_time_min, servings,
 			difficulty, cuisine, meal_type, image_url, calories,
-			protein_g, carbs_g, fat_g, is_published
+			protein_g, carbs_g, fat_g
 		) = (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 		),
 			updated_at = now()
-		WHERE id = $15`
+		WHERE id = $13`
 
 	res, err := Pool.Exec(context.Background(), sql,
-		r.Title, r.Description, r.Prep_time_min, r.Cook_time_min, r.Servings,
+		r.Title, r.Description, r.Preparation_time_min, r.Servings,
 		r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url, r.Calories,
-		r.Protein_g, r.Carbs_g, r.Fat_g, r.Is_published,
+		r.Protein_g, r.Carbs_g, r.Fat_g,
 		r.Id,
 	)
 	if err != nil {

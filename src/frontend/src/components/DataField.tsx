@@ -5,9 +5,10 @@ interface DataFieldProps {
 
 const DataField = ({ label, value }: DataFieldProps) => {
   return (
-    <p className={`text-xl text-gray-700`}>
-      <strong>{label}:</strong> {value}
-    </p>
+    <div className="flex flex-col">
+      <span className="text-lg text-gray-500">{label}</span>
+      <span className="text-xl font-medium text-gray-800">{value}</span>
+    </div>
   );
 };
 

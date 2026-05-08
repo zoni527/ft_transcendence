@@ -1,5 +1,14 @@
 services:
 
+  cert_generator:
+    container_name: cert_generator
+    build: ./cert_generator
+    image: transcendence_cert_generator:dev_1.0
+    pull_policy: build
+    volumes:
+      - ../certs:/certs
+    user: root
+
   frontend:
     container_name: frontend
     build: ./frontend
@@ -7,25 +16,42 @@ services:
     pull_policy: build
     volumes:
       - ./frontend/src:/app/src
+    expose:
+      - "5173"
+    environment:
+      - NGINX_PORT_EXTERNAL=${NGINX_PORT_EXTERNAL:-8443}
     networks:
       - transcendence_network
     restart: unless-stopped
+    depends_on:
+      cert_generator:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
 
   reverse_proxy:
     container_name: reverse_proxy
     image: nginx:1.29.8-alpine
     volumes:
       - ./reverse_proxy/templates:/etc/nginx/templates
+      - ../certs/reverse_proxy.key:/certs/reverse_proxy.key:ro
+      - ../certs/reverse_proxy.crt:/certs/reverse_proxy.crt:ro
+      - ../certs/ca.crt:/certs/ca.crt:ro
     ports:
-      - "127.0.0.1:${NGINX_PORT_EXTERNAL:-8080}:${NGINX_PORT_INTERNAL:-80}"
+      - "127.0.0.1:${NGINX_PORT_EXTERNAL:-8443}:${NGINX_PORT_INTERNAL:-443}"
     environment:
-      - NGINX_PORT_INTERNAL=${NGINX_PORT_INTERNAL:-80}
+      - NGINX_PORT_INTERNAL=${NGINX_PORT_INTERNAL:-443}
+      - NGINX_PORT_EXTERNAL=${NGINX_PORT_EXTERNAL:-8443}
     networks:
       - transcendence_network
     restart: unless-stopped
     depends_on:
-      - frontend
-      - backend
+      cert_generator:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
 
   backend:
     container_name: backend
@@ -38,10 +64,19 @@ services:
       CLOUDINARY_SECRET: ${CLOUDINARY_SECRET}
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_KEY: ${CLOUDINARY_KEY}
+      NGINX_PORT_EXTERNAL: ${NGINX_PORT_EXTERNAL:-8443}
+    volumes:
+      - ../certs/backend.key:/certs/backend.key:ro
+      - ../certs/backend.crt:/certs/backend.crt:ro
+      - ../certs/ca.crt:/certs/ca.crt:ro
     networks:
       - transcendence_network
+    expose:
+      - "8443"
     restart: unless-stopped
     depends_on:
+      cert_generator:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
 
@@ -52,9 +87,17 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/certs/postgres.crt
+      -c ssl_key_file=/certs/postgres.key
+      -c ssl_ca_file=/certs/ca.crt
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d
+      - ../certs/postgres.key:/certs/postgres.key:ro
+      - ../certs/postgres.crt:/certs/postgres.crt:ro
+      - ../certs/ca.crt:/certs/ca.crt:ro
     networks:
       - transcendence_network
     expose:
@@ -65,6 +108,9 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
+    depends_on:
+      cert_generator:
+        condition: service_completed_successfully
 
   adminer:
     container_name: adminer
@@ -75,7 +121,8 @@ services:
       - "127.0.0.1:${ADMINER_PORT_EXTERNAL:-8081}:${ADMINER_PORT_INTERNAL:-8080}"
     restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:

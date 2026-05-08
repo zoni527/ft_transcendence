@@ -14,8 +14,10 @@ CREATE TABLE "user" (
     password_hash   VARCHAR NOT NULL,
     name            VARCHAR,
     display_name    VARCHAR UNIQUE NOT NULL,
+    avatar_url      VARCHAR NOT NULL DEFAULT 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777887730/f06qpjbotv8rahtc287u.png',
     created_at      TIMESTAMP DEFAULT now(),
-    updated_at      TIMESTAMP DEFAULT now()
+    updated_at      TIMESTAMP DEFAULT now(),
+    last_seen       TIMESTAMP NOT NULL DEFAULT now()
 );
 
 CREATE TABLE role (
@@ -56,67 +58,25 @@ CREATE INDEX idx_token_blacklist_expiration_date
 
 CREATE TABLE recipe (
     id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    -- TODO: GDPR — TOS should state that published recipes remain after account
+    -- TODO: GDPR — TOS should state that recipes remain after account
     --       deletion with authorship anonymized (author_id set to NULL)
     author_id               UUID CONSTRAINT fk_author_id REFERENCES "user"(id) ON DELETE SET NULL,
     title                   VARCHAR NOT NULL,
     description             TEXT,
-    prep_time_min           INT,
-    cook_time_min           INT,
+    preparation_time_min    INT,
     servings                INT DEFAULT 4,
     difficulty              VARCHAR NOT NULL CONSTRAINT recipe_difficulty_allowed_values
                                 CHECK (difficulty IN ('easy', 'medium', 'hard')),
     cuisine                 VARCHAR,
     meal_type               VARCHAR NOT NULL CONSTRAINT recipe_meal_type_allowed_values
-                                CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
+                                CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack', 'dessert')),
     image_url               VARCHAR,
     calories                INT,
     protein_g               DECIMAL,
     carbs_g                 DECIMAL,
     fat_g                   DECIMAL,
-    is_published            BOOLEAN DEFAULT false,
     created_at              TIMESTAMP DEFAULT now(),
     updated_at              TIMESTAMP DEFAULT now()
-);
-
--- TODO: consider adding created_at field to recipe_step
-CREATE TABLE recipe_step (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    recipe_id       UUID NOT NULL REFERENCES recipe(id) ON DELETE CASCADE,
-    step_number     INT NOT NULL,
-    instruction     TEXT NOT NULL,
-    media_url       VARCHAR,
-    timer_seconds   INT,
-    updated_at      TIMESTAMP DEFAULT now(),
-    UNIQUE (recipe_id, step_number)
-);
-
--- =====================
--- INGREDIENTS
--- =====================
-
-CREATE TABLE ingredient_category (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name            VARCHAR UNIQUE NOT NULL,
-    description     TEXT,
-    icon_url        VARCHAR
-);
-
-CREATE TABLE ingredient (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name            VARCHAR UNIQUE NOT NULL,
-    category_id     UUID REFERENCES ingredient_category(id) ON DELETE SET NULL,
-    -- default_unit is a form pre-fill hint only; each recipe_ingredient has its own unit field
-    default_unit    VARCHAR
-);
-
-CREATE TABLE recipe_ingredient (
-    recipe_id       UUID REFERENCES recipe(id) ON DELETE CASCADE,
-    ingredient_id   UUID REFERENCES ingredient(id) ON DELETE CASCADE,
-    quantity        DECIMAL NOT NULL,
-    unit            VARCHAR NOT NULL,
-    sort_order      INT DEFAULT 0,
-    PRIMARY KEY (recipe_id, ingredient_id)
 );
 
 -- =====================
@@ -129,3 +89,25 @@ CREATE TABLE recipe_favourite (
     created_at      TIMESTAMP DEFAULT now(),
     PRIMARY KEY (user_id, recipe_id)
 );
+
+-- =====================
+-- FRIENDSHIP
+-- =====================
+
+-- Stored directionally so the frontend can show "X sent you a request" vs "you sent X a request".
+-- Friendship are Mutual once status = 'accepted'.
+CREATE TABLE friendship (
+    requester_id    UUID REFERENCES "user"(id) ON DELETE CASCADE,
+    receiver_id     UUID REFERENCES "user"(id) ON DELETE CASCADE,
+    status          VARCHAR NOT NULL DEFAULT 'pending'
+                        CONSTRAINT friendship_status_allowed_values
+                        CHECK (status IN ('pending', 'accepted')),
+    created_at      TIMESTAMP DEFAULT now(),
+    PRIMARY KEY (requester_id, receiver_id),
+    CONSTRAINT friendship_no_self CHECK (requester_id <> receiver_id)
+);
+
+-- Blocks A->B and B->A from both existing (the PK alone doesn't).
+CREATE UNIQUE INDEX friendship_unique_pair
+    ON friendship (LEAST(requester_id, receiver_id), GREATEST(requester_id, receiver_id));
+

@@ -10,9 +10,10 @@ import type { Recipe } from '../types/types';
 
 interface AdminRecipeFieldProps {
   recipe: Recipe;
+  onDelete: (id: string) => void;
 }
 
-const AdminRecipeField = ({ recipe }: AdminRecipeFieldProps) => {
+const AdminRecipeField = ({ recipe, onDelete }: AdminRecipeFieldProps) => {
   const [isRecipeEditOpen, setIsRecipeEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { hasRole } = useAuth();
@@ -30,6 +31,7 @@ const AdminRecipeField = ({ recipe }: AdminRecipeFieldProps) => {
 
     deleteRecipe(id, t)
       .then(() => {
+        onDelete(recipe.id);
         showNotification(t('notification.recipeDeleteSuccess'), 'success');
       })
       .catch((err: unknown) => {

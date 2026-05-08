@@ -10,15 +10,11 @@ import type { User, Recipe } from '../types/types';
 import { cardBase } from '../styles/styles';
 
 const AdminPanel = () => {
-  const { user, hasRole } = useAuth();
+  const { user, hasRole, loading: authLoading } = useAuth();
   const { showNotification } = useNotification();
-
   const [users, setUsers] = useState<User[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-
   const [loading, setLoading] = useState(true);
-
-  // active tab
   const [activeSection, setActiveSection] = useState<'users' | 'recipes'>(
     'users',
   );
@@ -40,7 +36,7 @@ const AdminPanel = () => {
       .finally(() => setLoading(false));
   }, [t, showNotification]);
 
-  if (loading) {
+  if (loading || authLoading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
@@ -104,7 +100,13 @@ const AdminPanel = () => {
 
         {activeSection === 'recipes' &&
           recipes.map((recipe) => (
-            <AdminRecipeField key={recipe.id} recipe={recipe} />
+            <AdminRecipeField
+              key={recipe.id}
+              recipe={recipe}
+              onDelete={(id) =>
+                setUsers((prev) => prev.filter((u) => u.id !== id))
+              }
+            />
           ))}
       </div>
     </div>

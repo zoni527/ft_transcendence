@@ -13,6 +13,7 @@ export const csTranslations = {
     logoutSuccess: 'Odhlášení bylo úspěšné',
     createRecipeSuccess: 'Recept byl úspěšně vytvořen',
     recipeDeleteSuccess: 'Recept byl úspěšně smazán',
+    userDeleteSuccess: 'Uživatel byl úspěšně smazán',
     editRecipeSuccess: 'Recept byl úspěšně upraven',
     updateUserSuccess: 'Profil uživatele byl aktualizován',
   },
@@ -46,6 +47,8 @@ export const csTranslations = {
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
+    submit: 'Smazat uživatele',
+    submitPending: 'Mazání uživatele...',
   },
   adminPanel: {
     header: 'Administrátorský panel',
@@ -53,6 +56,7 @@ export const csTranslations = {
     recipes: 'Databáze receptů',
     edit: 'Upravit',
     delete: 'Smazat',
+    deletePending: 'Mazání...',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',

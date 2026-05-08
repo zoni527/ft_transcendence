@@ -68,8 +68,8 @@ const AdminRecipeField = ({ recipe, onDelete }: AdminRecipeFieldProps) => {
           <SubmitButton
             className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
             isLoading={loading}
-            pendingText={t('recipeDetail.submitPending')}
-            defaultText={t('recipeDetail.submit')}
+            pendingText={t('adminPanel.deletePending')}
+            defaultText={t('adminPanel.delete')}
             onClick={() => handleDelete(recipe.id)}
             type="button"
             disabled={!hasRole(['admin'])}

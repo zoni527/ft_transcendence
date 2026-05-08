@@ -372,6 +372,22 @@ export const getUserbyId = async (id: string, t: TFunction): Promise<User> => {
   return data;
 };
 
+// DELETE /api/users/:id (delete a single user by ID)
+export const deleteUser = async (id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+};
+
 // POST /api/users/login (user login)
 export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   const response = await fetch(`${baseUrl}/users/login`, {

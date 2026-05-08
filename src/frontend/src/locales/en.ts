@@ -13,6 +13,7 @@ export const enTranslations = {
     logoutSuccess: 'Logout successful',
     createRecipeSuccess: 'Recipe created successfully',
     recipeDeleteSuccess: 'Recipe deleted successfully',
+    userDeleteSuccess: 'User deleted successfully',
     editRecipeSuccess: 'Recipe edited successfully',
     updateUserSuccess: 'User profile updated',
   },
@@ -46,6 +47,8 @@ export const enTranslations = {
     roles: 'Roles',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
+    submit: 'Delete user',
+    submitPending: 'Deleting user...',
   },
   adminPanel: {
     header: 'Admin panel',
@@ -53,6 +56,7 @@ export const enTranslations = {
     recipes: 'Recipe database',
     edit: 'Edit',
     delete: 'Delete',
+    deletePending: 'Deleting...',
   },
   footer: {
     privacy: 'Privacy Policy',

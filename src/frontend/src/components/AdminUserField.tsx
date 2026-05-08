@@ -1,18 +1,46 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../utils/NotifContext';
 import EditUserModal from '../modals/EditUser';
 import ModalButton from './ModalButton';
+import SubmitButton from './SubmitButton';
 import { useAuth } from '../utils/AuthContext';
+import { deleteUser } from '../api';
 import type { User } from '../types/types';
 
 interface AdminUserFieldProps {
   user: User;
+  onDelete: (id: string) => void;
 }
 
-const AdminUserField = ({ user }: AdminUserFieldProps) => {
+const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { hasRole } = useAuth();
+  const { showNotification } = useNotification();
   const { t } = useTranslation();
+
+  const handleDelete = (id?: string) => {
+    if (loading) return;
+    if (!id) {
+      showNotification(t('error.genericError'), 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    deleteUser(id, t)
+      .then(() => {
+        onDelete(user.id);
+        showNotification(t('notification.userDeleteSuccess'), 'success');
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+        showNotification(message, 'error');
+      })
+      .finally(() => setLoading(false));
+  };
 
   return (
     <>
@@ -34,10 +62,13 @@ const AdminUserField = ({ user }: AdminUserFieldProps) => {
           />
 
           {/* Delete user */}
-          <ModalButton
+          <SubmitButton
             className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
-            onClick={() => setIsUserEditOpen(true)}
-            text={t('adminPanel.delete')}
+            isLoading={loading}
+            pendingText={t('adminPanel.deletePending')}
+            defaultText={t('adminPanel.delete')}
+            onClick={() => handleDelete(user.id)}
+            type="button"
             disabled={!hasRole(['admin'])}
           />
         </div>

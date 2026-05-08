@@ -96,7 +96,15 @@ const AdminPanel = () => {
       {/* Content */}
       <div className="mt-8 flex flex-col gap-4">
         {activeSection === 'users' &&
-          users.map((user) => <AdminUserField key={user.id} user={user} />)}
+          users.map((user) => (
+            <AdminUserField
+              key={user.id}
+              user={user}
+              onDelete={(id) =>
+                setUsers((prev) => prev.filter((u) => u.id !== id))
+              }
+            />
+          ))}
 
         {activeSection === 'recipes' &&
           recipes.map((recipe) => (
@@ -104,7 +112,7 @@ const AdminPanel = () => {
               key={recipe.id}
               recipe={recipe}
               onDelete={(id) =>
-                setUsers((prev) => prev.filter((u) => u.id !== id))
+                setRecipes((prev) => prev.filter((u) => u.id !== id))
               }
             />
           ))}

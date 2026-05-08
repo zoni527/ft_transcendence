@@ -13,6 +13,7 @@ export const fiTranslations = {
     logoutSuccess: 'Kirjauduttu ulos',
     createRecipeSuccess: 'Resepti luotu',
     recipeDeleteSuccess: 'Resepti poistettu',
+    userDeleteSuccess: 'Käyttäjä poistettu',
     editRecipeSuccess: 'Resepti päivitetty',
     updateUserSuccess: 'Käyttäjäprofiili päivitetty',
   },
@@ -46,6 +47,8 @@ export const fiTranslations = {
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
+    submit: 'Poista käyttäjä',
+    submitPending: 'Poistetaan käyttäjää...',
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
@@ -53,6 +56,7 @@ export const fiTranslations = {
     recipes: 'Reseptitietokanta',
     edit: 'Muokkaa',
     delete: 'Poista',
+    deletePending: 'Poistetaan...',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',

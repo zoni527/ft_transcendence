@@ -18,7 +18,7 @@ type CloudinaryConfig struct {
 
 var cloudinaryConfig CloudinaryConfig
 
-// InitCloudinary loads the Cloudinary credentials configuration
+// Loads the Cloudinary credentials configuration
 func InitCloudinary(cfg *config.Config) {
 	cloudinaryConfig = CloudinaryConfig{
 		Secret:    cfg.CloudinarySecret,
@@ -27,17 +27,17 @@ func InitCloudinary(cfg *config.Config) {
 	}
 }
 
-// APIKey returns the configured Cloudinary API key
+// Returns configured Cloudinary API key
 func APIKey() string {
 	return cloudinaryConfig.Key
 }
 
-// CloudName returns the configured Cloudinary cloud name
+// Returns configured Cloudinary cloud name
 func CloudName() string {
 	return cloudinaryConfig.CloudName
 }
 
-// GenerateCloudinarySignature creates the upload signature for Cloudinary
+// Creates upload signature for Cloudinary
 func GenerateCloudinarySignature(params map[string]string) string {
 	keys := make([]string, 0, len(params))
 	for k := range params {

@@ -509,11 +509,11 @@ Create a new recipe with steps and ingredients.
 **Response** `201 Created` — returns the created recipe (same format as GET /api/recipes/:id).
 
 **Errors:**
-| Status    | When                                                          |
-|-----------|---------------------------------------------------------------|
-| 400       | Missing required fields (title, author_id)                    |
-| 400       | Invalid difficulty or meal_type value                         |
-| 400       | Negative or zero numeric fields (servings, prep_time, etc.)   |
+| Status    | When                                                                  |
+|-----------|-----------------------------------------------------------------------|
+| 400       | Missing required fields (title, author_id)                            |
+| 400       | Invalid difficulty or meal_type value                                 |
+| 400       | Negative or zero numeric fields (servings, preparation_time, etc.)    |
 
 ---
 

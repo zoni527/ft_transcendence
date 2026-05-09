@@ -16,22 +16,39 @@ const (
 	RoleAdmin     = "admin"
 )
 
-var rolePermissions = map[string]map[string]bool{
-	RoleUser: map[string]bool{},
-	RoleChef: map[string]bool{
-		PermCreateRecipe: true,
-	},
-	RoleModerator: map[string]bool{
-		PermEditRecipe:      true,
-		PermDeleteRecipe:    true,
-		PermModerateContent: true,
-	},
-	RoleAdmin: map[string]bool{
-		PermCreateRecipe:    true,
-		PermEditRecipe:      true,
-		PermDeleteRecipe:    true,
-		PermModerateContent: true,
-		PermManageUsers:     true,
-		PermManageRoles:     true,
-	},
+func HasAnyRole(roleSet map[string]bool, requiredRoles ...string) bool {
+	if roleSet == nil {
+		return false
+	}
+	for _, r := range requiredRoles {
+		if roleSet[r] {
+			return true
+		}
+	}
+	return false
+}
+
+func HasPermission(roleSet, permSet map[string]bool, requiredPermission string) bool {
+	if roleSet != nil && roleSet[RoleAdmin] {
+		return true
+	}
+	if permSet == nil {
+		return false
+	}
+	return permSet[requiredPermission]
+}
+
+func HasAnyPermission(roleSet, permSet map[string]bool, permissions ...string) bool {
+	if roleSet != nil && roleSet[RoleAdmin] {
+		return true
+	}
+	if permSet == nil {
+		return false
+	}
+	for _, p := range permissions {
+		if permSet[p] {
+			return true
+		}
+	}
+	return false
 }

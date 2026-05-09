@@ -6,26 +6,22 @@ import (
 	"ft_transcendence/backend/models"
 )
 
-func CanCreateRecipe(userID string) (bool, error) {
-	return HasPermission(userID, PermCreateRecipe)
-}
-
-func CanEditRecipe(userID string, recipe *models.Recipe) (bool, error) {
+func CanEditRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) (bool, error) {
 	if recipe == nil {
 		return false, fmt.Errorf("recipe cannot be nil")
 	}
 	if userID == recipe.Author_id {
 		return true, nil
 	}
-	return HasPermission(userID, PermEditRecipe)
+	return HasPermission(roleSet, permSet, PermEditRecipe), nil
 }
 
-func CanDeleteRecipe(userID string, recipe *models.Recipe) (bool, error) {
+func CanDeleteRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) (bool, error) {
 	if recipe == nil {
 		return false, fmt.Errorf("recipe cannot be nil")
 	}
 	if userID == recipe.Author_id {
 		return true, nil
 	}
-	return HasPermission(userID, PermDeleteRecipe)
+	return HasPermission(roleSet, permSet, PermDeleteRecipe), nil
 }

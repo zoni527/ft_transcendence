@@ -1,45 +1,36 @@
 package authorization
 
-func CanEditUser(userID, targetUserID string) (bool, error) {
+func CanEditUser(roleSet map[string]bool, userID, targetUserID string) bool {
 	if userID == targetUserID {
-		return true, nil
+		return true
 	}
-	roles, err := getUserRoles(userID)
-	if err != nil {
-		return false, err
-	}
-	return hasRole(roles, RoleAdmin), nil
+	return HasAnyRole(roleSet, RoleAdmin)
 }
 
-func CanManageRoles(userID, targetUserID string) (bool, error) {
-	allowed, err := HasPermission(userID, PermManageRoles)
-	if err != nil {
-		return false, err
-	}
+func CanManageRoles(roleSet, permSet map[string]bool, userID, targetUserID string) bool {
+	allowed := HasPermission(roleSet, permSet, PermManageRoles)
 	if !allowed {
-		return false, nil
+		return false
 	}
 	if userID == targetUserID {
-		return false, nil
+		return false
 	}
-	return true, nil
+	return true
 }
 
-func CanManageUsers(userID string) (bool, error) {
-	return HasPermission(userID, PermManageUsers)
+/*----------- These functions are not used yet, to be implement with advanced permissions/GDPR----------*/
+
+func CanManageUsers(roleSet, permSet map[string]bool, userID string) bool {
+	return HasPermission(roleSet, permSet, PermManageUsers)
 }
 
-func CanModerateContent(userID string) (bool, error) {
-	return HasPermission(userID, PermModerateContent)
+func CanModerateContent(roleSet, permSet map[string]bool, userID string) bool {
+	return HasPermission(roleSet, permSet, PermModerateContent)
 }
 
-func CanDeleteUser(userID, targetUserID string) (bool, error) {
+func CanDeleteUser(roleSet map[string]bool, userID, targetUserID string) bool {
 	if userID == targetUserID {
-		return true, nil
+		return true
 	}
-	roles, err := getUserRoles(userID)
-	if err != nil {
-		return false, err
-	}
-	return hasRole(roles, RoleAdmin), nil
+	return HasAnyRole(roleSet, RoleAdmin)
 }

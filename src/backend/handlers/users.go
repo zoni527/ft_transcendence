@@ -22,6 +22,7 @@ import (
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/integrations"
+	"ft_transcendence/backend/middleware"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
@@ -244,13 +245,14 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-
-	allowed, err := authorization.CanEditUser(callerUserID, targetUserID)
-	if err != nil {
-		log.Printf("CanEditUser: %v", err)
+	roleSet, okRoles := middleware.RolesFromContext(c)
+	permSet, okPerms := middleware.PermsFromContext(c)
+	if !okRoles || !okPerms {
+		log.Printf("handlers.UpdateUser: data missing from context")
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+	allowed := authorization.CanEditUser(roleSet, callerUserID, targetUserID)
 	if !allowed {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 		return
@@ -280,12 +282,7 @@ func UpdateUser(c *gin.Context) {
 		}
 	}
 	if req.Roles != nil {
-		canManageRoles, err := authorization.CanManageRoles(callerUserID, targetUserID)
-		if err != nil {
-			log.Printf("CanManageRoles: %v", err)
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-			return
-		}
+		canManageRoles := authorization.CanManageRoles(roleSet, permSet, callerUserID, targetUserID)
 		if !canManageRoles {
 			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions or self-update not allowed"})
 			return

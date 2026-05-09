@@ -49,13 +49,15 @@ const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">
         {/* User name */}
-        <div className="flex-1 text-xl text-gray-700">{user.name}</div>
+        <div className="flex-1 text-xl font-semibold text-gray-700">
+          {user.name}
+        </div>
 
         {/* Buttons */}
-        <div className="flex gap-x-3 p-2">
+        <div className="flex flex-col gap-2 p-2 md:flex-row md:gap-3">
           {/* Edit user */}
           <ModalButton
-            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+            className="w-full rounded-xl border-3 border-slate-600 hover:border-slate-800 md:w-auto"
             onClick={() => setIsUserEditOpen(true)}
             text={t('adminPanel.edit')}
             disabled={!hasRole(['admin'])}
@@ -63,7 +65,7 @@ const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
 
           {/* Delete user */}
           <SubmitButton
-            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+            className="w-full rounded-xl border-3 border-slate-600 hover:border-slate-800 md:w-auto"
             isLoading={loading}
             pendingText={t('adminPanel.deletePending')}
             defaultText={t('adminPanel.delete')}

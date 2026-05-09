@@ -52,13 +52,15 @@ const AdminRecipeField = ({ recipe, onDelete }: AdminRecipeFieldProps) => {
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">
         {/* Recipe name */}
-        <div className="flex-1 text-xl text-gray-700">{recipe.title}</div>
+        <div className="flex-1 text-xl font-semibold text-gray-700">
+          {recipe.title}
+        </div>
 
         {/* Buttons */}
-        <div className="flex gap-x-3 p-2">
+        <div className="flex flex-col gap-2 p-2 md:flex-row md:gap-3">
           {/* Edit recipe */}
           <ModalButton
-            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+            className="w-full rounded-xl border-3 border-slate-600 hover:border-slate-800 md:w-auto"
             onClick={() => setIsRecipeEditOpen(true)}
             text={t('adminPanel.edit')}
             disabled={!hasRole(['admin'])}
@@ -66,7 +68,7 @@ const AdminRecipeField = ({ recipe, onDelete }: AdminRecipeFieldProps) => {
 
           {/* Delete recipe */}
           <SubmitButton
-            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+            className="w-full rounded-xl border-3 border-slate-600 hover:border-slate-800 md:w-auto"
             isLoading={loading}
             pendingText={t('adminPanel.deletePending')}
             defaultText={t('adminPanel.delete')}

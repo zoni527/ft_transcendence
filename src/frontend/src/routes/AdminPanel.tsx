@@ -70,7 +70,7 @@ const AdminPanel = () => {
   return (
     <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
       {/* Avatar */}
-      <div className="absolute top-8 right-8">
+      <div className="mb-8 flex flex-col items-center gap-4 md:absolute md:top-8 md:right-8 md:mb-0 md:items-end">
         <img
           src={user.avatar_url}
           alt={`${user.name}'s avatar`}
@@ -78,13 +78,13 @@ const AdminPanel = () => {
         />
       </div>
 
-      {/* Main Header */}
-      <h1 className="mb-8 text-3xl font-bold text-[#C04D31]">
+      {/* Header */}
+      <h1 className="text-center text-3xl font-bold text-[#C04D31] md:text-left">
         {t('adminPanel.header')}
       </h1>
 
       {/* Section Tabs */}
-      <div className="mt-28 flex gap-8 border-b pb-2">
+      <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-28 md:flex-row md:gap-8">
         <button
           onClick={() => setActiveSection('users')}
           className={`text-2xl font-bold transition-colors hover:cursor-pointer ${

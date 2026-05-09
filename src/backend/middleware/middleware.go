@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +35,14 @@ func Authentication() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
-
+		roles, perms, err := repository.GetEffectivePermissionsByUser(claims.Subject)
+		if err != nil {
+			log.Printf("GeteffectivePermissionsByUser: %v", err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			return
+		}
+		c.Set("userRoles", roles)
+		c.Set("userPerms", perms)
 		c.Set("token", token)
 		c.Set("userID", claims.Subject)
 		c.Set("expDate", claims.ExpiresAt.Time)
@@ -49,19 +57,24 @@ func RequireRoles(roles ...string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-
-		allowed, err := authorization.HasAnyRole(userID, roles...)
-		if err != nil {
-			log.Printf("GetRolesByUserId: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-			return
-		}
-		if allowed {
+		if userRoles, ok := RolesFromContext(c); ok {
+			allowed := false
+			for _, r := range roles {
+				if userRoles[r] {
+					allowed = true
+					break
+				}
+			}
+			if !allowed {
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+				return
+			}
 			c.Next()
 			return
 		}
-
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		log.Printf("RequireRoles: missing userRoles for user %s", userID)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
 	}
 }
 
@@ -72,18 +85,23 @@ func RequirePermission(permissions ...string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-
-		allowed, err := authorization.HasAnyPermission(userID, permissions...)
-		if err != nil {
-			log.Printf("HasAnyPermission: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		if perms, ok := PermsFromContext(c); ok {
+			allowed := false
+			for _, p := range permissions {
+				if perms[p] {
+					allowed = true
+					break
+				}
+			}
+			if !allowed {
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+				return
+			}
+			c.Next()
 			return
 		}
-		if !allowed {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
-			return
-		}
-
-		c.Next()
+		log.Printf("RequirePermission: missing perms for user %s", userID)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
 	}
 }

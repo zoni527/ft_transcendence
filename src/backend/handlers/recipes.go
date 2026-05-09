@@ -209,17 +209,21 @@ func UploadRecipeImage(c *gin.Context) {
 
 func RecipeImageSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	folder := "recipes"
+	allowedFormats := "jpg, jpeg, png, webp"
 	params := map[string]string{
-		"timestamp": timestamp,
-		"folder":    "recipes",
+		"timestamp":       timestamp,
+		"folder":          folder,
+		"allowed_formats": allowedFormats,
 	}
 	signature := integrations.GenerateCloudinarySignature(params)
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"signature":  signature,
-		"api_key":    integrations.APIKey(),
-		"cloud_name": integrations.CloudName(),
-		"timestamp":  timestamp,
-		"folder":     "recipes",
+		"signature":       signature,
+		"api_key":         integrations.APIKey(),
+		"cloud_name":      integrations.CloudName(),
+		"timestamp":       timestamp,
+		"folder":          folder,
+		"allowed_formats": allowedFormats,
 	})
 }
 

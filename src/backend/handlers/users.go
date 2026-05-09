@@ -83,17 +83,21 @@ func GetMe(c *gin.Context) {
 
 func UserAvatarSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	folder := "avatar"
+	allowedFormats := "jpg, jpeg, png, webp"
 	params := map[string]string{
-		"timestamp": timestamp,
-		"folder":    "avatar",
+		"timestamp":       timestamp,
+		"folder":          folder,
+		"allowed_formats": allowedFormats,
 	}
 	signature := integrations.GenerateCloudinarySignature(params)
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"signature":  signature,
-		"api_key":    integrations.APIKey(),
-		"cloud_name": integrations.CloudName(),
-		"timestamp":  timestamp,
-		"folder":     "avatar",
+		"signature":       signature,
+		"api_key":         integrations.APIKey(),
+		"cloud_name":      integrations.CloudName(),
+		"timestamp":       timestamp,
+		"folder":          folder,
+		"allowed_formats": allowedFormats,
 	})
 }
 

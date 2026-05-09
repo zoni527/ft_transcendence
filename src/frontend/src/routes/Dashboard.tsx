@@ -102,7 +102,7 @@ const Dashboard = () => {
 
       <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
         {/* Avatar */}
-        <div className="absolute top-8 right-8">
+        <div className="mb-8 flex flex-col items-center gap-4 md:absolute md:top-8 md:right-8 md:mb-0 md:items-end">
           <img
             src={userData.avatar_url}
             alt={`${userData.name}'s avatar`}
@@ -111,28 +111,22 @@ const Dashboard = () => {
         </div>
 
         {/* Header */}
-        <h1 className="mb-8 text-3xl font-bold text-[#C04D31]">
+        <h1 className="text-center text-3xl font-bold text-[#C04D31] md:text-left">
           {userData.name}
         </h1>
 
         {/* User Info Section */}
-        <div className="mt-28 space-y-6">
+        <div className="mt-16 space-y-6 md:mt-28">
           <div className="flex flex-col gap-4">
-            {/* Full name */}
             <div className="flex items-center justify-between border-b border-gray-300 pb-4">
               <div className="flex-1">
                 <DataField label={t('dashboard.name')} value={userData.name} />
               </div>
-              <button
-                onClick={() => {}}
-                className="rounded p-2"
-                title={t('info.name')}
-              >
+              <button className="rounded p-2" title={t('info.name')}>
                 <InfoIcon />
               </button>
             </div>
 
-            {/* Username */}
             <div className="flex items-center justify-between border-b border-gray-300 pb-4">
               <div className="flex-1">
                 <DataField
@@ -140,16 +134,11 @@ const Dashboard = () => {
                   value={userData.display_name}
                 />
               </div>
-              <button
-                onClick={() => {}}
-                className="rounded p-2"
-                title={t('info.username')}
-              >
+              <button className="rounded p-2" title={t('info.username')}>
                 <InfoIcon />
               </button>
             </div>
 
-            {/* Email */}
             <div className="flex items-center justify-between border-b border-gray-300 pb-4">
               <div className="flex-1">
                 <DataField
@@ -157,16 +146,11 @@ const Dashboard = () => {
                   value={userData.email}
                 />
               </div>
-              <button
-                onClick={() => {}}
-                className="rounded p-2"
-                title={t('info.email')}
-              >
+              <button className="rounded p-2" title={t('info.email')}>
                 <InfoIcon />
               </button>
             </div>
 
-            {/* Roles */}
             <div className="flex items-center justify-between border-b border-gray-300 pb-4">
               <div className="flex-1">
                 <DataField
@@ -174,11 +158,7 @@ const Dashboard = () => {
                   value={userData.roles.join(', ')}
                 />
               </div>
-              <button
-                onClick={() => {}}
-                className="rounded p-2"
-                title={t('info.roles')}
-              >
+              <button className="rounded p-2" title={t('info.roles')}>
                 <InfoIcon />
               </button>
             </div>
@@ -186,17 +166,17 @@ const Dashboard = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-16 flex w-full items-center justify-between">
-          {/* Create recipe */}
+        <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          {/* Left */}
           <ModalButton
-            className="rounded-xl border-3 border-slate-600 hover:border-slate-800"
+            className="order-1 rounded-xl border-3 border-slate-600 hover:border-slate-800 md:order-0"
             onClick={() => setIsCreateRecipeOpen(true)}
             text={t('dashboard.createRecipe')}
             disabled={!(hasRole(['chef', 'moderator', 'admin']) && isSelf)}
           />
 
-          <div className="flex gap-2">
-            {/* Edit user */}
+          {/* Right */}
+          <div className="order-2 flex flex-col gap-2 md:order-0 md:flex-row">
             <ModalButton
               className="rounded-xl border-3 border-slate-600 hover:border-slate-800"
               onClick={() => setIsUserEditOpen(true)}
@@ -204,7 +184,6 @@ const Dashboard = () => {
               disabled={!(hasRole(['admin']) || isSelf)}
             />
 
-            {/* Delete user */}
             <SubmitButton
               className="rounded-xl border-3 border-slate-600 hover:border-slate-800"
               isLoading={loading}

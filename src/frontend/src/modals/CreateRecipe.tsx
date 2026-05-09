@@ -252,7 +252,7 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
           {/* Submit */}
           <div className="mt-12 flex justify-center">
             <SubmitButton
-              className="rounded-full bg-orange-700 hover:bg-orange-800"
+              className="rounded-full border-3 border-orange-700 hover:border-orange-800"
               isLoading={loading}
               pendingText={t('createRecipe.submitPending')}
               defaultText={t('createRecipe.submit')}

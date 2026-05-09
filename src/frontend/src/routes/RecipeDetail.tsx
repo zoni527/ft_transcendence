@@ -187,7 +187,7 @@ const RecipeDetail = () => {
           <div className="mt-16 flex w-full justify-end gap-2">
             {/* Edit recipe */}
             <ModalButton
-              className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+              className="rounded-xl border-3 border-slate-600 hover:border-slate-800"
               onClick={() => setIsEditRecipeOpen(true)}
               text={t('recipeDetail.editRecipe')}
               disabled={
@@ -198,7 +198,7 @@ const RecipeDetail = () => {
 
             {/* Delete recipe */}
             <SubmitButton
-              className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+              className="rounded-xl border-3 border-slate-600 hover:border-slate-800"
               isLoading={loading}
               pendingText={t('recipeDetail.submitPending')}
               defaultText={t('recipeDetail.submit')}

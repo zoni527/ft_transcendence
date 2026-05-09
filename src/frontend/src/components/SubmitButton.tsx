@@ -32,7 +32,7 @@ const SubmitButton = ({
     <button
       title={resolvedTitle}
       type={type}
-      className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}
+      className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'} ${className}`}
       disabled={isLoading || disabled}
       aria-busy={isLoading}
       onClick={onClick}

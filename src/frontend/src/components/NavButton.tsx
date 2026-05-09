@@ -41,7 +41,7 @@ const NavButton = ({
       <a
         href={path}
         onClick={handleNavigation}
-        className={`${className} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+        className={`${className} ${disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'}`}
         aria-disabled={disabled}
       >
         {children}
@@ -53,7 +53,7 @@ const NavButton = ({
   return (
     <button
       onClick={handleNavigation}
-      className={`${className} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+      className={`${className} ${disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'}`}
       disabled={disabled}
     >
       {children}

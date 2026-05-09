@@ -54,31 +54,36 @@ func GetRolesByUserId(userId string) ([]string, error) {
 	return roles, nil
 }
 
-// WIP
-func GetPermissionsByRole(role string) ([]string, error) {
-	sql := `SELECT p.name
-			FROM role_permission rp
-			JOIN permission p ON rp.permission_id = p.id
-			WHERE rp.role_name = $1`
-
-	rows, err := Pool.Query(context.Background(), sql, role)
+func GetEffectivePermissionsByUser(userId string) (map[string]bool, map[string]bool, error) {
+	sql := `SELECT r.name, p.name
+			FROM user_role ur
+			JOIN role r ON ur.role_id = r.id
+			LEFT JOIN role_permission rp ON rp.role_id = r.id
+			LEFT JOIN permission p ON rp.permission_id = p.id
+			WHERE ur.user_id = $1`
+	rows, err := Pool.Query(context.Background(), sql, userId)
 	if err != nil {
-		return nil, fmt.Errorf("error querying permissions: %w", err)
+		return nil, nil, fmt.Errorf("error querying roles/permissions: %w", err)
 	}
 	defer rows.Close()
 
-	var permissions []string
+	roles := make(map[string]bool)
+	perms := make(map[string]bool)
 	for rows.Next() {
-		var permission string
-		if err := rows.Scan(&permission); err != nil {
-			return nil, fmt.Errorf("error scanning permission: %w", err)
+		var roleName string
+		var permName *string
+		if err := rows.Scan(&roleName, &permName); err != nil {
+			return nil, nil, err
 		}
-		permissions = append(permissions, permission)
+		roles[roleName] = true
+		if permName != nil && *permName != "" {
+			perms[*permName] = true
+		}
 	}
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating permissions: %w", err)
+		return nil, nil, err
 	}
-	return permissions, nil
+	return roles, perms, nil
 }
 
 // getRolesByUserIdTx is the transaction version of GetRolesByUserId.

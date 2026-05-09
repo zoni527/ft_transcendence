@@ -18,6 +18,7 @@ import { cardBase, uploadButtonBase } from '../styles/styles';
 type EditUserModalProps = {
   user: User;
   onClose: () => void;
+  onSave: (updatedUser: User) => void;
 };
 
 // Validation schema
@@ -52,7 +53,7 @@ const editUserSchema = (t: TFunction) =>
       },
     );
 
-const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
+const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
@@ -134,7 +135,10 @@ const EditUserModal = ({ user, onClose }: EditUserModalProps) => {
         login(updatedUser);
       }
 
+      onSave(updatedUser);
+
       showNotification(t('notification.updateUserSuccess'), 'success');
+
       onClose();
     } catch (err: unknown) {
       const message =

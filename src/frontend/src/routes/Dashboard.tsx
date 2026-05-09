@@ -94,6 +94,7 @@ const Dashboard = () => {
         <EditUserModal
           onClose={() => setIsUserEditOpen(false)}
           user={userData}
+          onSave={(updatedUser) => setUserData(updatedUser)}
         />
       )}
       {isCreateRecipeOpen && (

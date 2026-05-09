@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { z } from 'zod';
@@ -19,9 +18,9 @@ import type { Recipe } from '../types/types.tsx';
 import { cardBase, uploadButtonBase } from '../styles/styles.tsx';
 
 type EditRecipeModalProps = {
-  onClose: () => void;
   passedRecipe: Recipe;
-  onSuccess?: () => void;
+  onClose: () => void;
+  onSave: (updatedRecipe: Recipe) => void;
 };
 
 // Helper function for validation
@@ -53,13 +52,12 @@ const createRecipeSchema = (t: TFunction) =>
   });
 
 const EditRecipeModal = ({
-  onSuccess,
-  onClose,
   passedRecipe,
+  onClose,
+  onSave,
 }: EditRecipeModalProps) => {
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
   // Controlled input states
@@ -142,7 +140,7 @@ const EditRecipeModal = ({
 
       const id = passedRecipe.id;
 
-      const recipe = await putUpdateRecipe(
+      await putUpdateRecipe(
         {
           ...result.data,
           id,
@@ -152,11 +150,17 @@ const EditRecipeModal = ({
         t,
       );
 
+      const updatedRecipe: Recipe = {
+        ...passedRecipe,
+        ...result.data,
+        image_url,
+      };
+
+      onSave(updatedRecipe);
+
       showNotification(t('notification.editRecipeSuccess'), 'success');
 
-      onSuccess?.();
       onClose();
-      void navigate(`/recipes/${recipe.id}`);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : t('error.genericError');

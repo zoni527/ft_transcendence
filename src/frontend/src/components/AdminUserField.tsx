@@ -11,9 +11,10 @@ import type { User } from '../types/types';
 interface AdminUserFieldProps {
   user: User;
   onDelete: (id: string) => void;
+  onUpdate: (user: User) => void;
 }
 
-const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
+const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { hasRole } = useAuth();
@@ -45,7 +46,11 @@ const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
   return (
     <>
       {isUserEditOpen && (
-        <EditUserModal onClose={() => setIsUserEditOpen(false)} user={user} />
+        <EditUserModal
+          onClose={() => setIsUserEditOpen(false)}
+          user={user}
+          onSave={onUpdate}
+        />
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">
         {/* User name */}

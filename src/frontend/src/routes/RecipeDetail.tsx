@@ -85,7 +85,7 @@ const RecipeDetail = () => {
         <EditRecipeModal
           passedRecipe={recipe}
           onClose={() => setIsEditRecipeOpen(false)}
-          onSuccess={fetchRecipe}
+          onSave={(updatedRecipe) => setRecipe(updatedRecipe)}
         />
       )}
 

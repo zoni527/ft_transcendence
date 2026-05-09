@@ -31,8 +31,10 @@ const AdminPanel = () => {
     Promise.all([getUsers(t), getRecipes(t)])
       .then(([usersData, recipesData]) => {
         if (cancelled) return;
-        setUsers(usersData);
-        setRecipes(recipesData);
+        setUsers([...usersData].sort((a, b) => a.name.localeCompare(b.name)));
+        setRecipes(
+          [...recipesData].sort((a, b) => a.title.localeCompare(b.title)),
+        );
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -118,6 +120,15 @@ const AdminPanel = () => {
               onDelete={(id) =>
                 setUsers((prev) => prev.filter((u) => u.id !== id))
               }
+              onUpdate={(updatedUser) =>
+                setUsers((prev) =>
+                  [
+                    ...prev.map((u) =>
+                      u.id === updatedUser.id ? updatedUser : u,
+                    ),
+                  ].sort((a, b) => a.name.localeCompare(b.name)),
+                )
+              }
             />
           ))}
 
@@ -128,6 +139,15 @@ const AdminPanel = () => {
               recipe={recipe}
               onDelete={(id) =>
                 setRecipes((prev) => prev.filter((u) => u.id !== id))
+              }
+              onUpdate={(updatedRecipe) =>
+                setRecipes((prev) =>
+                  [
+                    ...prev.map((r) =>
+                      r.id === updatedRecipe.id ? updatedRecipe : r,
+                    ),
+                  ].sort((a, b) => a.title.localeCompare(b.title)),
+                )
               }
             />
           ))}

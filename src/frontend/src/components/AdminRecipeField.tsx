@@ -11,9 +11,14 @@ import type { Recipe } from '../types/types';
 interface AdminRecipeFieldProps {
   recipe: Recipe;
   onDelete: (id: string) => void;
+  onUpdate: (recipe: Recipe) => void;
 }
 
-const AdminRecipeField = ({ recipe, onDelete }: AdminRecipeFieldProps) => {
+const AdminRecipeField = ({
+  recipe,
+  onDelete,
+  onUpdate,
+}: AdminRecipeFieldProps) => {
   const [isRecipeEditOpen, setIsRecipeEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { hasRole } = useAuth();
@@ -48,6 +53,7 @@ const AdminRecipeField = ({ recipe, onDelete }: AdminRecipeFieldProps) => {
         <EditRecipeModal
           onClose={() => setIsRecipeEditOpen(false)}
           passedRecipe={recipe}
+          onSave={onUpdate}
         />
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">

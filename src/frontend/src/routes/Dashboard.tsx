@@ -170,7 +170,7 @@ const Dashboard = () => {
         <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
           {/* Left */}
           <ModalButton
-            className="order-1 rounded-xl border-3 border-slate-600 hover:border-slate-800 md:order-0"
+            className="order-1 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
             onClick={() => setIsCreateRecipeOpen(true)}
             text={t('dashboard.createRecipe')}
             disabled={!(hasRole(['chef', 'moderator', 'admin']) && isSelf)}
@@ -179,14 +179,14 @@ const Dashboard = () => {
           {/* Right */}
           <div className="order-2 flex flex-col gap-2 md:order-0 md:flex-row">
             <ModalButton
-              className="rounded-xl border-3 border-slate-600 hover:border-slate-800"
+              className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
               onClick={() => setIsUserEditOpen(true)}
               text={t('dashboard.editUser')}
               disabled={!(hasRole(['admin']) || isSelf)}
             />
 
             <SubmitButton
-              className="rounded-xl border-3 border-slate-600 hover:border-slate-800"
+              className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
               isLoading={loading}
               pendingText={t('dashboard.submitPending')}
               defaultText={t('dashboard.submit')}

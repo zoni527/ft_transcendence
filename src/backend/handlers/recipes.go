@@ -20,6 +20,7 @@ import (
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/integrations"
+	"ft_transcendence/backend/middleware"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
@@ -112,8 +113,14 @@ func UpdateRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-
-	allowed, err := authorization.CanEditRecipe(userId, &original)
+	roleSet, okRoles := middleware.RolesFromContext(c)
+	permSet, okPerms := middleware.PermsFromContext(c)
+	if !okRoles || !okPerms {
+		log.Printf("handlers.UpdateRecipe: data missing from context")
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	allowed, err := authorization.CanEditRecipe(roleSet, permSet, userId, &original)
 	if err != nil {
 		log.Printf("CanEditRecipe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -165,8 +172,14 @@ func DeleteRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-
-	allowed, err := authorization.CanDeleteRecipe(userId, &original)
+	roleSet, okRoles := middleware.RolesFromContext(c)
+	permSet, okPerms := middleware.PermsFromContext(c)
+	if !okRoles || !okPerms {
+		log.Printf("handlers.DeleteRecipe: data missing from context")
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	allowed, err := authorization.CanDeleteRecipe(roleSet, permSet, userId, &original)
 	if err != nil {
 		log.Printf("CanDeleteRecipe: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

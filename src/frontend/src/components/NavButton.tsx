@@ -26,10 +26,11 @@ const NavButton = ({
 
     e.preventDefault();
 
-    // If `onClick` is provided, use it (for custom actions like logout)
-    if (onClick) {
-      onClick();
-    } else if (path && !disabled) {
+    if (disabled) return;
+
+    onClick?.();
+
+    if (path) {
       void navigate(path);
     }
   };

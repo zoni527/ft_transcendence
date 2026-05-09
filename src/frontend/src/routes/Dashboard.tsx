@@ -112,7 +112,7 @@ const Dashboard = () => {
 
         {/* Header */}
         <h1 className="mb-8 text-3xl font-bold text-[#C04D31]">
-          {t('common.welcome')}, {userData.name}!
+          {userData.name}
         </h1>
 
         {/* User Info Section */}

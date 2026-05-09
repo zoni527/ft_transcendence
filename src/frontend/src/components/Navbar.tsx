@@ -35,16 +35,23 @@ const Navbar = () => {
 
   return (
     <nav className={`${cardBase} mt-2 px-4 py-3`}>
-      <div className="relative flex items-center justify-center">
-        {/* Centered Recipes Button */}
-        <div className="flex text-xl font-semibold">
+      <div className="relative flex items-center">
+        {/* Left (Desktop only) */}
+        <div className="hidden text-xl font-semibold sm:flex">
           <NavButton path="/" className={navLeftBase}>
             {t('nav.recipes')}
           </NavButton>
         </div>
 
-        {/* Desktop Right Menu */}
-        <div className="absolute right-0 hidden items-center gap-4 sm:flex">
+        {/* Center (Mobile only) */}
+        <div className="flex w-full justify-center text-xl font-semibold sm:hidden">
+          <NavButton path="/" className={navLeftBase}>
+            {t('nav.recipes')}
+          </NavButton>
+        </div>
+
+        {/* Right (Desktop menu) */}
+        <div className="hidden items-center gap-4 sm:ml-auto sm:flex">
           {user && hasRole(['admin']) && (
             <NavButton
               path="/admin"
@@ -79,8 +86,8 @@ const Navbar = () => {
             </NavButton>
           ) : (
             <NavButton
-              className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
               onClick={handleLogout}
+              className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
             >
               {t('nav.logout')}
             </NavButton>
@@ -89,7 +96,7 @@ const Navbar = () => {
           <LangDropdown />
         </div>
 
-        {/* Mobile Hamburger */}
+        {/* Mobile hamburger */}
         <button
           className="absolute right-0 sm:hidden"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -98,7 +105,7 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile dropdown */}
       {menuOpen && (
         <div className="mt-4 flex flex-col items-center gap-3 sm:hidden">
           {user && hasRole(['admin']) && (

@@ -196,7 +196,7 @@ const EditRecipeModal = ({
             id="title"
             name="title"
             label={t('createRecipe.title')}
-            type="text"
+            placeholder={t('createRecipe.titlePlace')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -205,6 +205,7 @@ const EditRecipeModal = ({
             id="description"
             name="description"
             label={t('createRecipe.description')}
+            placeholder={t('createRecipe.descriptionPlace')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -213,7 +214,7 @@ const EditRecipeModal = ({
             id="preparation_time_min"
             name="preparation_time_min"
             label={t('createRecipe.prep')}
-            type="text"
+            placeholder={t('createRecipe.prepPlace')}
             value={preparation_time_min.toString()}
             onChange={(e) => setPrepTimeMin(Number(e.target.value))}
           />
@@ -222,7 +223,7 @@ const EditRecipeModal = ({
             id="servings"
             name="servings"
             label={t('createRecipe.servings')}
-            type="text"
+            placeholder={t('createRecipe.servingsPlace')}
             value={servings.toString()}
             onChange={(e) => setServings(Number(e.target.value))}
           />
@@ -231,6 +232,7 @@ const EditRecipeModal = ({
             id="difficulty"
             name="difficulty"
             label={t('difficulty.type')}
+            placeholder={t('createRecipe.difficultyPlace')}
             options={[
               { value: 'easy', label: t('difficulty.type_easy') },
               { value: 'medium', label: t('difficulty.type_medium') },
@@ -244,7 +246,7 @@ const EditRecipeModal = ({
             id="cuisine"
             name="cuisine"
             label={t('createRecipe.cuisine')}
-            type="text"
+            placeholder={t('createRecipe.cuisinePlace')}
             value={cuisine}
             onChange={(e) => setCuisine(e.target.value)}
           />
@@ -253,6 +255,7 @@ const EditRecipeModal = ({
             id="meal_type"
             name="meal_type"
             label={t('meal.type')}
+            placeholder={t('createRecipe.mealTypePlace')}
             options={[
               { value: 'breakfast', label: t('meal.type_breakfast') },
               { value: 'lunch', label: t('meal.type_lunch') },
@@ -267,7 +270,7 @@ const EditRecipeModal = ({
             id="calories"
             name="calories"
             label={t('createRecipe.calories')}
-            type="text"
+            placeholder={t('createRecipe.caloriesPlace')}
             value={calories.toString()}
             onChange={(e) => setCalories(Number(e.target.value))}
           />
@@ -276,7 +279,7 @@ const EditRecipeModal = ({
             id="protein_g"
             name="protein_g"
             label={t('createRecipe.protein')}
-            type="text"
+            placeholder={t('createRecipe.proteinPlace')}
             value={protein.toString()}
             onChange={(e) => setProtein(Number(e.target.value))}
           />
@@ -285,7 +288,7 @@ const EditRecipeModal = ({
             id="carbs_g"
             name="carbs_g"
             label={t('createRecipe.carbs')}
-            type="text"
+            placeholder={t('createRecipe.carbsPlace')}
             value={carbs.toString()}
             onChange={(e) => setCarbs(Number(e.target.value))}
           />
@@ -294,7 +297,7 @@ const EditRecipeModal = ({
             id="fat_g"
             name="fat_g"
             label={t('createRecipe.fat')}
-            type="text"
+            placeholder={t('createRecipe.fatPlace')}
             value={fat.toString()}
             onChange={(e) => setFat(Number(e.target.value))}
           />

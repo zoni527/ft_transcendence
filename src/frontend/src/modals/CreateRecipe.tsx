@@ -162,30 +162,40 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
 
         {/* Information fields */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <InputField id="title" name="title" label={t('createRecipe.title')} />
+          <InputField
+            id="title"
+            name="title"
+            label={t('createRecipe.title')}
+            placeholder={t('createRecipe.titlePlace')}
+          />
 
           <InputTextArea
             id="description"
             name="description"
             label={t('createRecipe.description')}
+            placeholder={t('createRecipe.descriptionPlace')}
           />
 
           <InputField
             id="preparation_time_min"
             name="preparation_time_min"
             label={t('createRecipe.prep')}
+            placeholder={t('createRecipe.prepPlace')}
           />
 
           <InputField
             id="servings"
             name="servings"
             label={t('createRecipe.servings')}
+            placeholder={t('createRecipe.servingsPlace')}
           />
 
           <SelectField
             id="difficulty"
             name="difficulty"
             label={t('difficulty.type')}
+            defaultValue=""
+            placeholder={t('createRecipe.difficultyPlace')}
             options={[
               { value: 'easy', label: t('difficulty.type_easy') },
               { value: 'medium', label: t('difficulty.type_medium') },
@@ -197,12 +207,15 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
             id="cuisine"
             name="cuisine"
             label={t('createRecipe.cuisine')}
+            placeholder={t('createRecipe.cuisinePlace')}
           />
 
           <SelectField
             id="meal_type"
             name="meal_type"
             label={t('meal.type')}
+            defaultValue=""
+            placeholder={t('createRecipe.mealTypePlace')}
             options={[
               { value: 'breakfast', label: t('meal.type_breakfast') },
               { value: 'lunch', label: t('meal.type_lunch') },
@@ -215,18 +228,27 @@ const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {
             id="calories"
             name="calories"
             label={t('createRecipe.calories')}
+            placeholder={t('createRecipe.caloriesPlace')}
           />
           <InputField
             id="protein_g"
             name="protein_g"
             label={t('createRecipe.protein')}
+            placeholder={t('createRecipe.proteinPlace')}
           />
           <InputField
             id="carbs_g"
             name="carbs_g"
             label={t('createRecipe.carbs')}
+            placeholder={t('createRecipe.carbsPlace')}
           />
-          <InputField id="fat_g" name="fat_g" label={t('createRecipe.fat')} />
+
+          <InputField
+            id="fat_g"
+            name="fat_g"
+            label={t('createRecipe.fat')}
+            placeholder={t('createRecipe.fatPlace')}
+          />
 
           {/* Image Upload */}
           <div className="mt-12 flex items-center gap-3">

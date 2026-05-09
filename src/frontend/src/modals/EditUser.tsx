@@ -175,6 +175,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             name="fullName"
             label={t('signup.name')}
             type="text"
+            placeholder={t('signup.namePlace')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
@@ -184,6 +185,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             name="username"
             label={t('signup.username')}
             type="text"
+            placeholder={t('signup.usernamePlace')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -193,6 +195,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             name="email"
             label={t('signup.email')}
             type="email"
+            placeholder={t('signup.emailPlace')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -202,6 +205,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             name="password"
             label={t('signup.password')}
             type="password"
+            placeholder={t('signup.passwordPlace')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -211,6 +215,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             name="confirmPassword"
             label={t('signup.rePassword')}
             type="password"
+            placeholder={t('signup.rePasswordPlace')}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />

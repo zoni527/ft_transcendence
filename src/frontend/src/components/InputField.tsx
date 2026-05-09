@@ -19,9 +19,11 @@ const InputField = ({
   value,
   onChange,
 }: InputFieldProps) => {
+  const isControlled = value !== undefined;
+
   return (
     <div>
-      <label htmlFor={id} className={`${inputLabelText}`}>
+      <label htmlFor={id} className={inputLabelText}>
         {label}
       </label>
 
@@ -31,8 +33,7 @@ const InputField = ({
         type={type}
         placeholder={placeholder}
         className={`${cardBase} ${inputFieldBase}`}
-        value={value}
-        onChange={onChange}
+        {...(isControlled ? { value, onChange } : {})}
       />
     </div>
   );

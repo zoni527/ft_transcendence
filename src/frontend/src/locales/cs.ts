@@ -2,6 +2,7 @@ export const csTranslations = {
   nav: {
     recipes: 'Recepty',
     dashboard: 'Profil',
+    friends: 'Přátelé',
     signup: 'Registrovat se',
     login: 'Přihlásit se',
     logout: 'Odhlásit se',

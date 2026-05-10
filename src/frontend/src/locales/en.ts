@@ -2,6 +2,7 @@ export const enTranslations = {
   nav: {
     recipes: 'Recipes',
     dashboard: 'Profile',
+    friends: 'Friends',
     signup: 'Sign up',
     login: 'Log in',
     logout: 'Log out',

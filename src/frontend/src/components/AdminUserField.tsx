@@ -68,6 +68,16 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
 
         {/* Right side: buttons */}
         <div className="flex shrink-0 flex-col gap-2 p-2 md:flex-row md:gap-3">
+          {/* Online/Offline Indicator */}
+          {/* className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 ${
+              userData.is_online ? 'bg-green-500' : 'bg-red-500'
+            }`}
+            title={userData.is_online ? 'Online' : 'Offline'} */}
+          <div
+            className={`h-4 w-4 rounded-full border-2 border-slate-950 bg-green-500`}
+            title={'Online'}
+          />
+
           <ModalButton
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             onClick={() => setIsUserEditOpen(true)}

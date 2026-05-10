@@ -95,13 +95,23 @@ const AdminPanel = () => {
   return (
     <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
       {/* Avatar */}
-      <div className="mb-8 flex flex-col items-center gap-4 md:absolute md:top-8 md:right-8 md:mb-0 md:items-end">
+      <div className="relative mb-8 flex flex-col items-center gap-4 md:absolute md:top-8 md:right-12 md:mb-0 md:items-end">
         <img
           src={user.avatar_url}
           alt={`${user.name}'s avatar`}
-          className="h-28 w-28 rounded-full border-2 border-gray-300"
+          className="h-28 w-28 rounded-full border-2 border-slate-600"
         />
       </div>
+
+      {/* Online/Offline Indicator */}
+      {/* className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 ${
+              userData.is_online ? 'bg-green-500' : 'bg-red-500'
+            }`}
+            title={userData.is_online ? 'Online' : 'Offline'} */}
+      <div
+        className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 bg-green-500`}
+        title={'Online'}
+      />
 
       {/* Header */}
       <h1 className="text-center text-3xl font-bold text-[#C04D31] md:text-left">
@@ -109,7 +119,7 @@ const AdminPanel = () => {
       </h1>
 
       {/* Section Tabs */}
-      <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-28 md:flex-row md:gap-8">
+      <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-32 md:flex-row md:gap-8">
         <button
           onClick={() => setActiveSection('users')}
           className={`text-2xl font-bold transition-colors hover:cursor-pointer ${

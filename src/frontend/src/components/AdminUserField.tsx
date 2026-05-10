@@ -66,8 +66,28 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
           </div>
         </div>
 
-        {/* Right side: buttons */}
-        <div className="flex shrink-0 flex-col gap-2 p-2 md:flex-row md:gap-3">
+        <div className="flex flex-col items-center gap-2 p-2 md:flex-row md:gap-3">
+          {/* Buttons */}
+          <div className="flex flex-col gap-2 p-2 md:flex-row md:gap-3">
+            {/* Edit user */}
+            <ModalButton
+              className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
+              onClick={() => setIsUserEditOpen(true)}
+              text={t('adminPanel.edit')}
+              disabled={!hasRole(['admin'])}
+            />
+
+            {/* Delete user */}
+            <SubmitButton
+              className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
+              isLoading={loading}
+              defaultText={t('adminPanel.delete')}
+              onClick={() => handleDelete(user.id)}
+              type="button"
+              disabled={!hasRole(['admin'])}
+            />
+          </div>
+
           {/* Online/Offline Indicator */}
           {/* className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 ${
               userData.is_online ? 'bg-green-500' : 'bg-red-500'
@@ -76,22 +96,6 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
           <div
             className={`h-4 w-4 rounded-full border-2 border-slate-950 bg-green-500`}
             title={'Online'}
-          />
-
-          <ModalButton
-            className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-            onClick={() => setIsUserEditOpen(true)}
-            text={t('adminPanel.edit')}
-            disabled={!hasRole(['admin'])}
-          />
-
-          <SubmitButton
-            className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-            isLoading={loading}
-            defaultText={t('adminPanel.delete')}
-            onClick={() => handleDelete(user.id)}
-            type="button"
-            disabled={!hasRole(['admin'])}
           />
         </div>
       </div>

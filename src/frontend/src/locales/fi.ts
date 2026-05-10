@@ -312,5 +312,7 @@ export const fiTranslations = {
     serverError: 'Sisäinen palvelinvirhe, yritä myöhemmin uudelleen',
     authError:
       'Rekisteröinti onnistui, mutta automaattinen kirjautuminen epäonnistui, kirjaudu sisään manuaalisesti',
+    invalidFileType: 'Virheellinen tiedostotyyppi',
+    fileTooLarge: 'Tiedosto on liian suuri',
   },
 };

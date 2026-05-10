@@ -311,5 +311,7 @@ export const enTranslations = {
     rateLimit: 'Too many requests — rate limit exceeded',
     serverError: 'An internal server error occurred, please try again later',
     authError: 'Signup succeeded but automatic login failed, please log in',
+    invalidFileType: 'Invalid file type',
+    fileTooLarge: 'File too large',
   },
 };

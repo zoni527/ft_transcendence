@@ -13,7 +13,7 @@ import {
   uploadImageToCloudinary,
 } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue } from '../utils/utils.tsx';
+import { getStringValue, validateImageFile } from '../utils/utils.tsx';
 import type { Recipe } from '../types/types.tsx';
 import { cardBase, uploadButtonBase } from '../styles/styles.tsx';
 
@@ -312,9 +312,23 @@ const EditRecipeModal = ({
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  setFileName(file ? file.name : '');
-                  setImageFile(file);
+                  const file = e.target.files?.[0] ?? null;
+
+                  try {
+                    const validFile = validateImageFile(file, t, {
+                      maxSizeMB: 5,
+                    });
+                    setFileName(validFile?.name ?? '');
+                    setImageFile(validFile);
+                  } catch (err: unknown) {
+                    const message =
+                      err instanceof Error
+                        ? err.message
+                        : t('error.genericError');
+                    showNotification(message, 'error');
+                    setFileName('');
+                    setImageFile(null);
+                  }
                 }}
               />
             </label>

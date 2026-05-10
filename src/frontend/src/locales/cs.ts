@@ -313,5 +313,7 @@ export const csTranslations = {
     serverError: 'Došlo k interní chybě serveru, zkuste to prosím později',
     authError:
       'Registrace byla úspěšná, ale automatické přihlášení selhalo, přihlaste se prosím ručně',
+    invalidFileType: 'Neplatný typ souboru',
+    fileTooLarge: 'Soubor je příliš velký',
   },
 };

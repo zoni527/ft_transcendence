@@ -17,6 +17,7 @@ export function validateImageFile(
 
   const maxSizeMB = options?.maxSizeMB ?? 5;
   const allowedTypes = options?.allowedTypes ?? [
+    'image/jpg',
     'image/jpeg',
     'image/png',
     'image/webp',

@@ -37,7 +37,7 @@ func Authentication() gin.HandlerFunc {
 		}
 		roles, perms, err := repository.GetEffectivePermissionsByUser(claims.Subject)
 		if err != nil {
-			log.Printf("GeteffectivePermissionsByUser: %v", err)
+			log.Printf("GetEffectivePermissionsByUser: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}

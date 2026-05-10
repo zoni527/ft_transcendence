@@ -23,36 +23,49 @@ const AdminPanel = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) return;
-    if (!hasRole(['admin'])) return;
 
-    let cancelled = false;
+    const fetchData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    Promise.all([getUsers(t), getRecipes(t)])
-      .then(([usersData, recipesData]) => {
+      if (!hasRole(['admin'])) {
+        setLoading(false);
+        return;
+      }
+
+      let cancelled = false;
+
+      try {
+        const [usersData, recipesData] = await Promise.all([
+          getUsers(t),
+          getRecipes(t),
+        ]);
+
         if (cancelled) return;
 
-        setUsers(usersData);
-
+        setUsers([...usersData].sort((a, b) => a.name.localeCompare(b.name)));
         setRecipes(
           [...recipesData].sort((a, b) => a.title.localeCompare(b.title)),
         );
-      })
-      .catch((err: unknown) => {
+      } catch (err: unknown) {
         if (cancelled) return;
 
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
         showNotification(message, 'error');
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
 
-    return () => {
-      cancelled = true;
+      return () => {
+        cancelled = true;
+      };
     };
+
+    void fetchData();
   }, [authLoading, user, hasRole, t, showNotification]);
 
   const sortedUsers = useMemo(() => {

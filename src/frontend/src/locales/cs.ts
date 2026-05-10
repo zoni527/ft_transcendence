@@ -56,6 +56,9 @@ export const csTranslations = {
     moderator: 'moderátor',
     admin: 'správce',
   },
+  friends: {
+    header: 'Přátelé',
+  },
   adminPanel: {
     header: 'Administrátorský panel',
     users: 'Databáze uživatelů',

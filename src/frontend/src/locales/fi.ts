@@ -56,6 +56,9 @@ export const fiTranslations = {
     moderator: 'moderaattori',
     admin: 'ylläpitäjä',
   },
+  friends: {
+    header: 'Ystävät',
+  },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
     users: 'Käyttäjätietokanta',

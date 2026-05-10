@@ -56,6 +56,9 @@ export const enTranslations = {
     moderator: 'moderator',
     admin: 'admin',
   },
+  friends: {
+    header: 'Friends',
+  },
   adminPanel: {
     header: 'Admin panel',
     users: 'User database',

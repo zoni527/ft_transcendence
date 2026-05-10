@@ -13,7 +13,7 @@ import {
   uploadImageToCloudinary,
 } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue, validateImageFile } from '../utils/utils.tsx';
+import { validateImageFile } from '../utils/utils.tsx';
 import type { Recipe } from '../types/types.tsx';
 import { cardBase, uploadButtonBase } from '../styles/styles.tsx';
 
@@ -97,34 +97,28 @@ const EditRecipeModal = ({
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    void handleSubmitAsync(e);
+    void handleSubmitAsync();
   };
 
-  const handleSubmitAsync = async (
-    e: React.SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmitAsync = async () => {
     if (loading) return;
-
     setLoading(true);
 
     try {
-      const form = e.currentTarget;
-      const formData = new FormData(form);
-
       const schema = createRecipeSchema(t);
 
       const result = schema.safeParse({
-        title: getStringValue(formData, 'title'),
-        description: getStringValue(formData, 'description'),
-        preparation_time_min: getStringValue(formData, 'preparation_time_min'),
-        servings: getStringValue(formData, 'servings'),
-        difficulty: getStringValue(formData, 'difficulty'),
-        cuisine: getStringValue(formData, 'cuisine'),
-        meal_type: getStringValue(formData, 'meal_type'),
-        calories: getStringValue(formData, 'calories'),
-        protein_g: getStringValue(formData, 'protein_g'),
-        carbs_g: getStringValue(formData, 'carbs_g'),
-        fat_g: getStringValue(formData, 'fat_g'),
+        title,
+        description,
+        preparation_time_min,
+        servings,
+        difficulty,
+        cuisine,
+        meal_type,
+        calories,
+        protein_g: protein,
+        carbs_g: carbs,
+        fat_g: fat,
       });
 
       if (!result.success) {

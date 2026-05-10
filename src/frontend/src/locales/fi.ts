@@ -2,6 +2,7 @@ export const fiTranslations = {
   nav: {
     recipes: 'Reseptit',
     dashboard: 'Käyttäjäprofiili',
+    friends: 'Ystävät',
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
     logout: 'Kirjaudu ulos',

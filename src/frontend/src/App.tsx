@@ -4,6 +4,7 @@ import AdminPanel from './routes/AdminPanel';
 import AuthProvider from './utils/AuthProvider';
 import Banner from './components/Banner';
 import Footer from './components/Footer';
+import Friends from './routes/Friends';
 import Navbar from './components/Navbar';
 import Dashboard from './routes/Dashboard';
 import Login from './routes/Login';
@@ -32,6 +33,7 @@ const App = () => {
                   <Route path="/recipes/:id" element={<RecipeDetail />} />
                   <Route path="/me" element={<Dashboard />} />
                   <Route path="/users/:id" element={<Dashboard />} />
+                  <Route path="/friends" element={<Friends />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />

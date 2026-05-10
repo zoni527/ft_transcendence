@@ -282,6 +282,27 @@ FROM (VALUES
         35, 2, 'medium', 'Middle Eastern', 'lunch',
         'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Falafel_Wrap.jpg',
         520, 16.0, 68.0, 22.0
+    ),
+    (
+        'alice', 'Classic Tiramisu',
+        E'Step 1: Whisk egg yolks and sugar together until pale and thick, then fold in mascarpone until smooth.\nStep 2: In a separate bowl, whip heavy cream to soft peaks and gently fold into the mascarpone mixture.\nStep 3: Combine strong espresso with a splash of dark rum or amaretto in a shallow dish.\nStep 4: Briefly dip ladyfingers into the coffee—just enough to soak but not disintegrate—and layer them in the base of a dish.\nStep 5: Spread half the cream over the biscuits, then repeat with a second layer of soaked ladyfingers and the remaining cream.\nStep 6: Dust heavily with high-quality cocoa powder and chill for at least six hours to set.',
+        25, 6, 'medium', 'Italian', 'dessert',
+        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778440639/recipe-seed/tiramisu.jpg',
+        450, 8.0, 42.0, 28.0
+    ),
+    (
+        'bobby', 'Chocolate Lava Cake',
+        E'Step 1: Melt dark chocolate and butter together in a double boiler until glossy.\nStep 2: Whisk eggs, egg yolks, and sugar until thickened and light in color.\nStep 3: Fold the melted chocolate into the egg mixture, then sift in a small amount of flour and a pinch of salt.\nStep 4: Grease individual ramekins and dust with cocoa powder so the cakes release easily.\nStep 5: Divide the batter among the ramekins and bake at 200°C for exactly twelve minutes until the sides are firm but the center wobbles.\nStep 6: Let rest for one minute, then invert onto plates and serve immediately with vanilla bean ice cream.',
+        20, 4, 'medium', 'French', 'dessert',
+        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778440701/recipe-seed/lava-cake.webp',
+        580, 7.0, 48.0, 38.0
+    ),
+    (
+        'charlie', 'Berry Pavlova',
+        E'Step 1: Whisk egg whites with a pinch of salt until stiff peaks form.\nStep 2: Add caster sugar one tablespoon at a time, whisking constantly until the meringue is thick, glossy, and no longer feels gritty.\nStep 3: Fold in a teaspoon of cornstarch and white vinegar to ensure a marshmallowy center.\nStep 4: Spoon the meringue onto a lined tray in a large circle and bake at 120°C for ninety minutes until the shell is crisp.\nStep 5: Let the meringue cool completely inside the oven with the door slightly ajar to prevent cracking.\nStep 6: Top with billows of whipped cream and a mountain of fresh raspberries, strawberries, and passionfruit pulp.',
+        110, 8, 'hard', 'Australian', 'dessert',
+        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778440764/recipe-seed/berry-pavlova.webp',
+        310, 4.0, 52.0, 10.0
     )
 ) AS r(author_dn, title, description, prep_time, servings, difficulty,
        cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)

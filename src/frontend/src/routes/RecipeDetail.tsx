@@ -103,7 +103,7 @@ const RecipeDetail = () => {
         </h1>
 
         {/* Description */}
-        <h2 className="mb-6 text-lg font-semibold">{recipe.description}</h2>
+        <h2 className="mb-6 text-lg font-semibold whitespace-pre-line">{recipe.description}</h2>
 
         {/* Recipe Info Fields */}
         <div className="mt-6 space-y-16">

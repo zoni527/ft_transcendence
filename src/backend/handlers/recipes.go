@@ -120,12 +120,7 @@ func UpdateRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	allowed, err := authorization.CanEditRecipe(roleSet, permSet, userId, &original)
-	if err != nil {
-		log.Printf("CanEditRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
+	allowed := authorization.CanEditRecipe(roleSet, permSet, userId, &original)
 	if !allowed {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
@@ -179,12 +174,7 @@ func DeleteRecipe(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	allowed, err := authorization.CanDeleteRecipe(roleSet, permSet, userId, &original)
-	if err != nil {
-		log.Printf("CanDeleteRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
+	allowed := authorization.CanDeleteRecipe(roleSet, permSet, userId, &original)
 	if !allowed {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return

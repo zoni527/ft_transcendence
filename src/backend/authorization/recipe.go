@@ -1,27 +1,19 @@
 package authorization
 
 import (
-	"fmt"
-
 	"ft_transcendence/backend/models"
 )
 
-func CanEditRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) (bool, error) {
-	if recipe == nil {
-		return false, fmt.Errorf("recipe cannot be nil")
-	}
+func CanEditRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) bool {
 	if userID == recipe.Author_id {
-		return true, nil
+		return true
 	}
-	return HasPermission(roleSet, permSet, PermEditRecipe), nil
+	return HasPermission(roleSet, permSet, PermEditRecipe)
 }
 
-func CanDeleteRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) (bool, error) {
-	if recipe == nil {
-		return false, fmt.Errorf("recipe cannot be nil")
-	}
+func CanDeleteRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) bool {
 	if userID == recipe.Author_id {
-		return true, nil
+		return true
 	}
-	return HasPermission(roleSet, permSet, PermDeleteRecipe), nil
+	return HasPermission(roleSet, permSet, PermDeleteRecipe)
 }

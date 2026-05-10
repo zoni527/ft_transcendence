@@ -94,50 +94,45 @@ WHERE r.name = 'user'
 
 -- =====================
 -- RECIPES (25 unique titles, one row each)
--- Authored only by users with admin or chef role.
--- Cuisines, meal types, difficulty rotate through small pools.
+-- Authored by users with admin or chef role: alice, bobby, charlie.
+-- Each title is paired with a hand-picked Cloudinary image.
 -- =====================
 INSERT INTO recipe (author_id, title, description, preparation_time_min, servings,
                     difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
 SELECT
-    authors.id,
-    (ARRAY[
-        'Pasta Carbonara', 'Chicken Fried Rice', 'Garlic Tomato Bruschetta', 'Pesto Pasta Salad',
-        'Traditional Miso Soup', 'Street-style Beef Tacos', 'Classic Caesar Salad', 'Creamy Mushroom Risotto',
-        'Authentic Pad Thai', 'Vegetable Stir Fry', 'Spicy Tuna Roll', 'Margherita Pizza',
-        'Beef Bourguignon', 'Chickpea Curry', 'Grilled Salmon with Asparagus', 'Greek Souvlaki',
-        'Eggplant Parmesan', 'Quinoa Buddha Bowl', 'French Onion Soup', 'Lamb Rogan Josh',
-        'BBQ Pulled Pork Sandwich', 'Caprese Skewers', 'Shakshuka', 'Butter Chicken', 'Falafel Wrap'
-    ])[g],
-    'A high-quality, ' || (ARRAY['delicious', 'quick', 'nutritious', 'family-friendly', 'gourmet'])[((g - 1) % 5) + 1] ||
-    ' recipe for ' || (ARRAY['everyday cooking.', 'special occasions.', 'weekend meal prep.', 'busy weeknights.'])[((g - 1) % 4) + 1],
-    15 + (g % 75),                                  -- 15..89 minutes
-    1 + (g % 8),                                    -- 1..8 servings
-    (ARRAY['easy', 'medium', 'hard'])[((g - 1) % 3) + 1],
-    (ARRAY['Italian', 'Asian', 'Mexican', 'French', 'Indian', 'Greek', 'Middle Eastern', 'American', 'Thai', 'Japanese'])[((g - 1) % 10) + 1],
-    (ARRAY['breakfast', 'lunch', 'dinner', 'snack', 'dessert'])[((g - 1) % 5) + 1],
-    (ARRAY[
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539163/ko9mymntptndrupaw8ib.jpg',
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539232/pkxfz0nto6t4kzfgys4q.jpg',
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539266/dxssmqprpxhsgyxjupql.jpg',
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539308/uof4c0bvl1kb6csvchdn.jpg',
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539350/another_image_1.jpg',
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777539400/another_image_2.jpg'
-    ])[((g - 1) % 6) + 1],
-    150 + (g * 13) % 850,                           -- 150..999 cal
-    10 + (g % 50)::decimal,                         -- 10..59 g protein
-    10 + (g % 100)::decimal,                        -- 10..109 g carbs
-    2 + (g % 45)::decimal                           -- 2..46 g fat
-FROM generate_series(1, 25) g
-JOIN LATERAL (
-    SELECT u.id
-    FROM "user" u
-    JOIN user_role ur ON ur.user_id = u.id
-    JOIN role r       ON r.id = ur.role_id
-    WHERE r.name IN ('admin', 'chef')
-    ORDER BY u.id -- Consistent ordering
-    OFFSET ((g - 1) % (SELECT COUNT(*) FROM user_role ur2 JOIN role r2 ON r2.id = ur2.role_id WHERE r2.name IN ('admin', 'chef'))) LIMIT 1
-) AS authors ON TRUE;
+    u.id,
+    r.title, r.description, r.prep_time, r.servings, r.difficulty,
+    r.cuisine, r.meal_type, r.image_url,
+    r.calories, r.protein_g, r.carbs_g, r.fat_g
+FROM (VALUES
+    ('alice',   'Pasta Carbonara',               'Crispy pancetta, silky egg yolk, and pecorino over al dente spaghetti.',         25, 4, 'medium', 'Italian',        'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Pasta_Carbonara.jpg',               600, 25.0,  60.0, 28.0),
+    ('bobby',   'Chicken Fried Rice',            'Wok-charred jasmine rice tossed with chicken, scallions, and soy.',              20, 4, 'easy',   'Asian',          'lunch',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Chicken_Fried_Rice.jpg',            550, 28.0,  72.0, 14.0),
+    ('charlie', 'Garlic Tomato Bruschetta',      'Charred sourdough rubbed with garlic, topped with diced tomato and basil.',      15, 6, 'easy',   'Italian',        'snack',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Garlic_Tomato_Bruschetta.jpg',      240,  7.0,  35.0,  8.0),
+    ('alice',   'Pesto Pasta Salad',             'Cold fusilli folded with basil pesto, cherry tomato, and toasted pine nuts.',    20, 4, 'easy',   'Italian',        'lunch',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Pesto_Pasta_Salad.jpg',             510, 14.0,  68.0, 22.0),
+    ('bobby',   'Traditional Miso Soup',         'Dashi-rich broth with silken tofu, wakame, and sliced spring onion.',            15, 4, 'easy',   'Japanese',       'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Traditional_Miso_Soup.jpg',         150,  9.0,  12.0,  6.0),
+    ('charlie', 'Street-style Beef Tacos',       'Marinated skirt steak on charred corn tortillas with onion, cilantro, and lime.', 35, 4, 'medium', 'Mexican',        'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Street-style_Beef_Tacos.jpg',       470, 30.0,  35.0, 22.0),
+    ('alice',   'Classic Caesar Salad',          'Crisp romaine, parmesan shavings, and house croutons in anchovy dressing.',      20, 4, 'easy',   'American',       'lunch',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Classic_Caesar_Salad.jpg',          360, 10.0,  18.0, 28.0),
+    ('bobby',   'Creamy Mushroom Risotto',       'Slow-stirred arborio with mixed mushrooms, white wine, and parmesan finish.',    45, 4, 'hard',   'Italian',        'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Creamy_Mushroom_Risotto.jpg',       560, 14.0,  78.0, 18.0),
+    ('charlie', 'Authentic Pad Thai',            'Wok-tossed rice noodles with shrimp, tamarind, peanut, and bean sprouts.',       30, 4, 'medium', 'Thai',           'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Pad_Thai.jpg',                      600, 24.0,  82.0, 18.0),
+    ('alice',   'Vegetable Stir Fry',            'Quick-fired seasonal vegetables with ginger, garlic, and a glossy soy glaze.',   20, 4, 'easy',   'Asian',          'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Vegetable_stir_fry.jpg',            310,  9.0,  46.0,  9.0),
+    ('bobby',   'Spicy Tuna Roll',               'Sushi rice rolled with sashimi tuna, sriracha mayo, and toasted sesame.',        40, 2, 'hard',   'Japanese',       'lunch',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Spicy_Tuna_Roll.jpg',                410, 21.0,  58.0, 10.0),
+    ('charlie', 'Margherita Pizza',              'Wood-fired dough, San Marzano tomato, fior di latte, and fresh basil.',          60, 4, 'medium', 'Italian',        'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Margherita_Pizza.jpg',               740, 28.0,  92.0, 26.0),
+    ('alice',   'Beef Bourguignon',              'Braised beef in red wine with pearl onions, lardons, and button mushrooms.',    180, 6, 'hard',   'French',         'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Beef_Bourguignon.jpg',               720, 42.0,  18.0, 38.0),
+    ('bobby',   'Chickpea Curry',                'Coconut-tomato curry with chickpeas, fresh ginger, and warming spices.',         30, 4, 'easy',   'Indian',         'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Chickpea_Curry.jpg',                 450, 14.0,  56.0, 18.0),
+    ('charlie', 'Grilled Salmon with Asparagus', 'Skin-crisp salmon fillet with charred asparagus and lemon.',                     25, 2, 'medium', 'American',       'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Grilled_Salmon_with_Asparagus.jpg',  520, 38.0,  10.0, 32.0),
+    ('alice',   'Greek Souvlaki',                'Yogurt-marinated lamb skewers with tzatziki, warm pita, and tomato.',            35, 4, 'medium', 'Greek',          'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Greek_Souvlaki.jpg',                 520, 32.0,  38.0, 24.0),
+    ('bobby',   'Eggplant Parmesan',             'Layered fried eggplant, basil-tomato sauce, and bubbling mozzarella.',           60, 4, 'medium', 'Italian',        'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Eggplant_Parmesan.jpg',              560, 20.0,  46.0, 30.0),
+    ('charlie', 'Quinoa Buddha Bowl',            'Fluffy quinoa with roasted vegetables, avocado, and tahini drizzle.',            25, 2, 'easy',   'American',       'lunch',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Quinoa_Buddha_Bowl.jpg',             480, 16.0,  62.0, 18.0),
+    ('alice',   'French Onion Soup',             'Slow-caramelized onions in beef broth, topped with gruyere-melted toast.',       75, 4, 'medium', 'French',         'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/French_Onion_Soup.jpg',              420, 16.0,  38.0, 22.0),
+    ('bobby',   'Lamb Rogan Josh',               'Slow-cooked lamb in Kashmiri chili and yogurt gravy with whole spices.',         90, 6, 'hard',   'Indian',         'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Lamb_Rogan_Josh.jpg',                660, 40.0,  16.0, 42.0),
+    ('charlie', 'BBQ Pulled Pork Sandwich',      'Slow-smoked pork shoulder, tangy BBQ sauce, and pickle slaw on a brioche bun.', 240, 6, 'hard',   'American',       'lunch',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/BBQ_Pulled_Pork_Sandwich.jpg',       720, 36.0,  56.0, 32.0),
+    ('alice',   'Caprese Skewers',               'Cherry tomato, mini mozzarella, and basil with balsamic glaze.',                 15, 6, 'easy',   'Italian',        'snack',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Caprese_Skewers.jpg',                210,  9.0,   8.0, 14.0),
+    ('bobby',   'Shakshuka',                     'Eggs poached in spiced tomato-pepper sauce, finished with feta and parsley.',    30, 4, 'easy',   'Middle Eastern', 'breakfast', 'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Shakshuka.jpg',                      400, 18.0,  24.0, 24.0),
+    ('charlie', 'Butter Chicken',                'Tandoori chicken in a velvety tomato-cream sauce with kasuri methi.',            45, 4, 'medium', 'Indian',         'dinner',    'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Butter_Chicken.jpg',                 620, 34.0,  22.0, 38.0),
+    ('alice',   'Falafel Wrap',                  'Crispy chickpea fritters in pita with hummus, pickles, and tahini sauce.',       35, 2, 'medium', 'Middle Eastern', 'lunch',     'https://res.cloudinary.com/dhuk7trpf/image/upload/recipe-seed/Falafel_Wrap.jpg',                   520, 16.0,  68.0, 22.0)
+) AS r(author_dn, title, description, prep_time, servings, difficulty,
+       cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
+JOIN "user" u ON u.display_name = r.author_dn;
 
 -- =====================
 -- FRIENDSHIPS

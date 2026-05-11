@@ -20,7 +20,6 @@ CREATE TABLE "user" (
     last_seen       TIMESTAMP NOT NULL DEFAULT now()
 );
 
-
 CREATE TABLE role (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name            VARCHAR UNIQUE NOT NULL, -- admin, moderator, chef, user

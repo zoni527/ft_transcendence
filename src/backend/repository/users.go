@@ -116,8 +116,8 @@ func getRolesByUserIdTx(tx pgx.Tx, userId string) ([]string, error) {
 // GetAllUsers returns all users with their roles attached.
 func GetAllUsers() ([]models.User, error) {
 	sql := `SELECT id, email, name, display_name, avatar_url,
-            created_at, updated_at, last_seen
-        	FROM "user" `
+				created_at, updated_at, last_seen
+			FROM "user" `
 
 	rows, err := Pool.Query(context.Background(), sql)
 	if err != nil {
@@ -164,9 +164,9 @@ func GetAllUsers() ([]models.User, error) {
 // GetUserById returns a single user by UUID, with roles attached.
 func GetUserById(id string) (models.User, error) {
 	sql := `SELECT id, email, name, display_name, avatar_url,
-            created_at, updated_at, last_seen
-    	    FROM "user"
-        	WHERE id = $1`
+				created_at, updated_at, last_seen
+			FROM "user"
+			WHERE id = $1`
 
 	var u models.User
 	err := Pool.QueryRow(context.Background(), sql, id).Scan(

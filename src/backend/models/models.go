@@ -23,6 +23,9 @@ type User struct {
 	Roles         []string  `json:"roles"        db:"roles"`
 }
 
+// Recipe is the write/request shape: what we persist and what clients send on
+// POST/PUT. The author is identified by Author_id only — never trust an author
+// object from a request body.
 type Recipe struct {
 	Id                   string    `json:"id"                   db:"id"`
 	Author_id            string    `json:"author_id"            db:"author_id"`
@@ -40,6 +43,37 @@ type Recipe struct {
 	Fat_g                float64   `json:"fat_g"                db:"fat_g"`
 	Created_at           time.Time `json:"created_at"           db:"created_at"`
 	Updated_at           time.Time `json:"updated_at"           db:"updated_at"`
+}
+
+// RecipeAuthor is a denormalized snapshot of the author fields the recipe UI
+// needs, joined in at read time so the frontend does not have to make a second
+// request to /api/users/:id just to render a card.
+type RecipeAuthor struct {
+	Id           string `json:"id"`
+	Display_name string `json:"display_name"`
+	Avatar_url   string `json:"avatar_url"`
+}
+
+// RecipeResponse is the read shape returned by GET /api/recipes and
+// GET /api/recipes/:id. It carries the author as a nested object instead of a
+// raw author_id.
+type RecipeResponse struct {
+	Id                   string       `json:"id"`
+	Author               RecipeAuthor `json:"author"`
+	Title                string       `json:"title"`
+	Description          string       `json:"description"`
+	Preparation_time_min int          `json:"preparation_time_min"`
+	Servings             int          `json:"servings"`
+	Difficulty           string       `json:"difficulty"`
+	Cuisine              string       `json:"cuisine"`
+	Meal_type            string       `json:"meal_type"`
+	Image_url            string       `json:"image_url"`
+	Calories             int          `json:"calories"`
+	Protein_g            float64      `json:"protein_g"`
+	Carbs_g              float64      `json:"carbs_g"`
+	Fat_g                float64      `json:"fat_g"`
+	Created_at           time.Time    `json:"created_at"`
+	Updated_at           time.Time    `json:"updated_at"`
 }
 
 type CreateUserRequest struct {

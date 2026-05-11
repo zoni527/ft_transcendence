@@ -395,7 +395,11 @@ Get all recipes.
 [
   {
     "id": "uuid",
-    "author_id": "uuid",
+    "author": {
+      "id": "uuid",
+      "display_name": "jane_cooks",
+      "avatar_url": "https://res.cloudinary.com/.../jane.png"
+    },
     "title": "Pasta Carbonara",
     "description": "Classic Italian pasta",
     "preparation_time_min": 20,
@@ -414,6 +418,10 @@ Get all recipes.
 ]
 ```
 
+If the original author has been deleted (`author_id` is NULL on the row), the
+`author` object is returned with empty string fields rather than `null`, so the
+shape stays stable on the frontend.
+
 ---
 
 ### GET /api/recipes/:id
@@ -424,7 +432,11 @@ Get a single recipe by ID.
 ```json
 {
   "id": "uuid",
-  "author_id": "uuid",
+  "author": {
+    "id": "uuid",
+    "display_name": "jane_cooks",
+    "avatar_url": "https://res.cloudinary.com/.../jane.png"
+  },
   "title": "Pasta Carbonara",
   "description": "Classic Italian pasta",
   "preparation_time_min": 20,

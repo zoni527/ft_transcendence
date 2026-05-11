@@ -34,16 +34,24 @@ import (
 //
 // TODO: Replace COALESCE with pointer types (*string, *int) in the Recipe struct
 // so NULL fields return JSON null instead of empty strings/zeros.
-func GetAllRecipes() ([]models.Recipe, error) {
-	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
-				COALESCE(preparation_time_min, 0),
-				servings, COALESCE(difficulty, ''), COALESCE(cuisine, ''),
-				COALESCE(meal_type, ''), COALESCE(image_url, ''),
-				COALESCE(calories, 0), COALESCE(protein_g, 0), COALESCE(carbs_g, 0),
-				COALESCE(fat_g, 0),
-				created_at, updated_at
-			FROM recipe
-			ORDER BY created_at DESC`
+// LEFT JOIN, not INNER: author_id is ON DELETE SET NULL, so a recipe can
+// outlive its author. We still want to return the recipe, just with an empty
+// author block.
+func GetAllRecipes() ([]models.RecipeResponse, error) {
+	sql := `SELECT r.id,
+				COALESCE(r.author_id::text, ''),
+				COALESCE(u.display_name, ''),
+				COALESCE(u.avatar_url, ''),
+				r.title, COALESCE(r.description, ''),
+				COALESCE(r.preparation_time_min, 0),
+				r.servings, COALESCE(r.difficulty, ''), COALESCE(r.cuisine, ''),
+				COALESCE(r.meal_type, ''), COALESCE(r.image_url, ''),
+				COALESCE(r.calories, 0), COALESCE(r.protein_g, 0), COALESCE(r.carbs_g, 0),
+				COALESCE(r.fat_g, 0),
+				r.created_at, r.updated_at
+			FROM recipe r
+			LEFT JOIN "user" u ON u.id = r.author_id
+			ORDER BY r.created_at DESC`
 
 	rows, err := Pool.Query(context.Background(), sql)
 	if err != nil {
@@ -51,11 +59,13 @@ func GetAllRecipes() ([]models.Recipe, error) {
 	}
 	defer rows.Close()
 
-	var recipes []models.Recipe
+	var recipes []models.RecipeResponse
 	for rows.Next() {
-		var r models.Recipe
+		var r models.RecipeResponse
 		err := rows.Scan(
-			&r.Id, &r.Author_id, &r.Title, &r.Description,
+			&r.Id,
+			&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
+			&r.Title, &r.Description,
 			&r.Preparation_time_min, &r.Servings,
 			&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,
 			&r.Calories, &r.Protein_g, &r.Carbs_g, &r.Fat_g,
@@ -75,20 +85,27 @@ func GetAllRecipes() ([]models.Recipe, error) {
 }
 
 // GetRecipeById returns a single recipe by UUID.
-func GetRecipeById(id string) (models.Recipe, error) {
-	sql := `SELECT id, COALESCE(author_id::text, ''), title, COALESCE(description, ''),
-				COALESCE(preparation_time_min, 0),
-				servings, COALESCE(difficulty, ''), COALESCE(cuisine, ''),
-				COALESCE(meal_type, ''), COALESCE(image_url, ''),
-				COALESCE(calories, 0), COALESCE(protein_g, 0), COALESCE(carbs_g, 0),
-				COALESCE(fat_g, 0),
-				created_at, updated_at
-			FROM recipe
-			WHERE id = $1`
+func GetRecipeById(id string) (models.RecipeResponse, error) {
+	sql := `SELECT r.id,
+				COALESCE(r.author_id::text, ''),
+				COALESCE(u.display_name, ''),
+				COALESCE(u.avatar_url, ''),
+				r.title, COALESCE(r.description, ''),
+				COALESCE(r.preparation_time_min, 0),
+				r.servings, COALESCE(r.difficulty, ''), COALESCE(r.cuisine, ''),
+				COALESCE(r.meal_type, ''), COALESCE(r.image_url, ''),
+				COALESCE(r.calories, 0), COALESCE(r.protein_g, 0), COALESCE(r.carbs_g, 0),
+				COALESCE(r.fat_g, 0),
+				r.created_at, r.updated_at
+			FROM recipe r
+			LEFT JOIN "user" u ON u.id = r.author_id
+			WHERE r.id = $1`
 
-	var r models.Recipe
+	var r models.RecipeResponse
 	err := Pool.QueryRow(context.Background(), sql, id).Scan(
-		&r.Id, &r.Author_id, &r.Title, &r.Description,
+		&r.Id,
+		&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
+		&r.Title, &r.Description,
 		&r.Preparation_time_min, &r.Servings,
 		&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,
 		&r.Calories, &r.Protein_g, &r.Carbs_g, &r.Fat_g,
@@ -96,11 +113,11 @@ func GetRecipeById(id string) (models.Recipe, error) {
 	)
 
 	if err == pgx.ErrNoRows {
-		return models.Recipe{}, &NotFoundError{"recipe not found"}
+		return models.RecipeResponse{}, &NotFoundError{"recipe not found"}
 	}
 
 	if err != nil {
-		return models.Recipe{}, fmt.Errorf("repository.GetRecipeById: %w", err)
+		return models.RecipeResponse{}, fmt.Errorf("repository.GetRecipeById: %w", err)
 	}
 
 	return r, nil

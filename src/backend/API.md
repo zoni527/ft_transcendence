@@ -586,8 +586,6 @@ Upload an image for a recipe. Uses multipart form data.
 
 ### PUT /api/recipes/:id
 
-### PUT /api/recipes/:id
-
 Update a recipe.
 
 **Authentication:** `middleware.Authentication()`
@@ -614,7 +612,7 @@ Update a recipe.
 }
 ```
 
-**Response** `200 OK` — returns the updated recipe.
+**Response** `200 OK` — returns the updated recipe's id.
 
 **Errors:**
 | Status    | When                                          |

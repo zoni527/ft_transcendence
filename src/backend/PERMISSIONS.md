@@ -127,7 +127,7 @@ router.POST("/api/recipes",
 ### Authorship checks
 
 For "edit your own thing" routes, the handler runs the authorship check
-*after* AuthMiddleware. Use the authorization functions
+*after* `middleware.Authentication()`. Use the authorization functions
 from [authorization/recipe.go](authorization/recipe.go):
 
 - `CanEditRecipe(roleSet, permSet, userID, authorID)` — true if user is author or has `edit_recipe` permission

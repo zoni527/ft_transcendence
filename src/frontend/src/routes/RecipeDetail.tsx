@@ -116,11 +116,7 @@ const RecipeDetail = () => {
               />
               <DataField
                 label={t('recipeDetail.prep')}
-                value={recipe.prep_time_min}
-              />
-              <DataField
-                label={t('recipeDetail.cook')}
-                value={recipe.cook_time_min}
+                value={recipe.preparation_time_min}
               />
               <DataField
                 label={t('recipeDetail.servings')}

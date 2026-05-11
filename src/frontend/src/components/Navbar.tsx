@@ -10,7 +10,7 @@ import { cardBase, buttonBase, navLeftBase } from '../styles/styles';
 const Navbar = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const { t } = useTranslation();
 
   const handleLogout = () => {
@@ -42,6 +42,15 @@ const Navbar = () => {
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
+        {user && hasRole(['admin']) && (
+          <NavButton
+            path="/admin"
+            className={`${buttonBase} rounded-full bg-orange-700 hover:bg-orange-800`}
+          >
+            {t('nav.admin')}
+          </NavButton>
+        )}
+
         {!user ? (
           <NavButton
             path="/signup"

@@ -4,8 +4,7 @@ import type { Recipe, User } from './types/types';
 interface CreateRecipePayload {
   title: string;
   description: string;
-  prep_time_min: number;
-  cook_time_min: number;
+  preparation_time_min: number;
   servings: number;
   difficulty: string;
   cuisine: string;
@@ -15,15 +14,13 @@ interface CreateRecipePayload {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
-  is_published: boolean;
 }
 
 interface UpdateRecipePayload {
   id: string;
   title: string;
   description: string;
-  prep_time_min: number;
-  cook_time_min: number;
+  preparation_time_min: number;
   servings: number;
   difficulty: string;
   cuisine: string;
@@ -33,7 +30,6 @@ interface UpdateRecipePayload {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
-  is_published: boolean;
 }
 
 interface CreateRecipeResponse {
@@ -193,7 +189,7 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
   }
 }
 
-// GET /api/recipes (get all published recipes)
+// GET /api/recipes (get all recipes)
 export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
 
@@ -305,6 +301,23 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
   return data.user;
 };
 
+// GET /api/users (get all users)
+export const getUsers = async (t: TFunction): Promise<User[]> => {
+  const response = await fetch(`${baseUrl}/users`);
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  const data: unknown = await response.json();
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data as User[];
+};
+
 // GET /api/users/me (user authentication)
 export const getMe = async (t: TFunction): Promise<User> => {
   const response = await fetch(`${baseUrl}/users/me`, {
@@ -357,6 +370,22 @@ export const getUserbyId = async (id: string, t: TFunction): Promise<User> => {
   }
 
   return data;
+};
+
+// DELETE /api/users/:id (delete a single user by ID)
+export const deleteUser = async (id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
 };
 
 // POST /api/users/login (user login)

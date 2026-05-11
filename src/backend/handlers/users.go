@@ -365,7 +365,15 @@ func DeleteUser(c *gin.Context) {
         return
 	}
 
-	isTargetAdmin, err:= repository.DeleteUser()
+	userRoles, _ := c.Get("userRoles")
+    roleMap := userRoles.(map[string]bool)
+    
+    if !authorization.HasAnyRole(roleMap, "admin") {
+        c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+        return
+    }
+
+	isTargetAdmin, err:= authorization.HasAnyRole()
 
 
 

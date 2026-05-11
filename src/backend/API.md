@@ -70,6 +70,7 @@ Get all users.
     "name": "Jane",
     "display_name": "jane_cooks",
     "created_at": "2026-04-09T12:00:00Z",
+    "is_online": true,
     "updated_at": "2026-04-09T12:00:00Z",
     "roles": ["user"]
   }
@@ -517,7 +518,6 @@ Create a new recipe.
 
 ```json
 {
-  "author_id": "uuid",
   "title": "Pasta Carbonara",
   "description": "Classic Italian pasta",
   "preparation_time_min": 20,
@@ -541,6 +541,8 @@ Create a new recipe.
 | 400 | Missing required fields (title, author_id) |
 | 400 | Invalid difficulty or meal_type value |
 | 400 | Negative or zero numeric fields (servings, preparation_time, etc.) |
+| 401 | Unauthorized — missing or invalid JWT |
+| 403 | Forbidden — user lacks create_recipe permission |
 
 ---
 

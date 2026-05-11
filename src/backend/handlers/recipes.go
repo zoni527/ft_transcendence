@@ -131,7 +131,6 @@ func UpdateRecipe(c *gin.Context) {
 	}
 
 	r.Id = recipeId
-	r.Author_id = original.Author.Id
 	if err := repository.UpdateRecipe(&r); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return

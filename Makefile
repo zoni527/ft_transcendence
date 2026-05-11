@@ -1,6 +1,9 @@
 # ---------------------------------------------------------------------------- #
-all: env_validation
+all: env_validation certs
 	docker compose --file ./src/compose.yaml up --detach
+
+certs:
+	mkdir -p certs
 
 backend: env_validation
 	docker compose --file ./src/compose.yaml up --detach --build backend

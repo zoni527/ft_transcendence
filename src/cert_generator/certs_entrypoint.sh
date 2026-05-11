@@ -68,5 +68,6 @@ openssl x509 -req 2>/dev/null \
 # Postgres key permissions and ownership setting
 chmod 600 ${CERTS_DIR}/postgres.key
 chown 70:70 ${CERTS_DIR}/postgres.key
+rm ${CERTS_DIR}/ca.key
 
 echo "Certificates generated"

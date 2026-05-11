@@ -8,7 +8,7 @@ services:
         FROM alpine:3.22
         RUN apk update && apk add --no-cache openssl
     volumes:
-      - cert_data:/certs
+      - ../certs:/certs
       - ./cert_generator/certs_entrypoint.sh:/usr/local/bin/certs_entrypoint.sh:ro
     entrypoint: ["/usr/local/bin/certs_entrypoint.sh"]
     user: root
@@ -34,7 +34,9 @@ services:
     image: nginx:1.29.8-alpine
     volumes:
       - ./reverse_proxy/templates:/etc/nginx/templates
-      - cert_data:/certs:ro
+      - ../certs/reverse_proxy.key:/certs/reverse_proxy.key:ro
+      - ../certs/reverse_proxy.crt:/certs/reverse_proxy.crt:ro
+      - ../certs/ca.crt:/certs/ca.crt:ro
     ports:
       - "127.0.0.1:${NGINX_PORT_EXTERNAL:-8443}:${NGINX_PORT_INTERNAL:-443}"
     environment:
@@ -60,7 +62,8 @@ services:
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_KEY: ${CLOUDINARY_KEY}
     volumes:
-      - cert_data:/certs:ro
+      - ../certs/backend.key:/certs/backend.key:ro
+      - ../certs/backend.crt:/certs/backend.crt:ro
     networks:
       - transcendence_network
     expose:
@@ -87,7 +90,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d
-      - cert_data:/certs:ro
+      - ../certs/postgres.key:/certs/postgres.key:ro
+      - ../certs/postgres.crt:/certs/postgres.crt:ro
+      - ../certs/ca.crt:/certs/ca.crt:ro
     networks:
       - transcendence_network
     expose:
@@ -116,7 +121,6 @@ services:
 
 volumes:
   postgres_data:
-  cert_data:
 
 networks:
   transcendence_network:

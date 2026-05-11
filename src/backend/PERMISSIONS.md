@@ -93,11 +93,11 @@ in the code today.
 Reads the `token` cookie, validates the JWT, checks the token blacklist, and stores user data on the Gin 
 context: `userID`, `userRoles`, `userPerms`, `token`, `expDate`.
 
-| Status | When |
-|---|---|
-| 401 `{"error":"unauthorized"}`   | Missing `token` cookie |
+| Status                           | When                                           |
+|----------------------------------|------------------------------------------------|
+| 401 `{"error":"unauthorized"}`   | Missing `token` cookie                         |
 | 401 `{"error":"invalid token"}`  | JWT validation failed, or token is blacklisted |
-| 500                              | Blacklist lookup itself errored |
+| 500                              | Blacklist lookup itself errored                |
 
 ### RequireRoles()
 

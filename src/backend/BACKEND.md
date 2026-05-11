@@ -172,12 +172,12 @@ Validates the user by reading the `token` cookie, validating the JWT, checking t
 - `token` — the raw JWT
 - `expDate` — token expiration time
 
-**Returns:**
-| Status | When |
-|---|---|
-| 401 `{"error":"unauthorized"}`   | No `token` cookie |
+**Returns:** 
+| Status                           | When                                          |
+|----------------------------------|-----------------------------------------------|
+| 401 `{"error":"unauthorized"}`   | No `token` cookie                             |
 | 401 `{"error":"invalid token"}`  | JWT validation failed or token is blacklisted |
-| 500                              | Blacklist lookup errored |
+| 500                              | Blacklist lookup errored                      |
 
 ### Role-Based Access Control
 

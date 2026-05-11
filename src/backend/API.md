@@ -14,16 +14,22 @@ The API uses **JWT tokens** stored in an HttpOnly cookie. When you call `/api/us
 - Authenticated endpoints require `middleware.Authentication()` which validates the JWT and blocks requests without a valid token.
 - Permission/role checks use `middleware.RequirePermission()` or `middleware.RequireRoles()` after authentication.
 
-| Status    | When                                          |
-|-----------|-----------------------------------------------|
-| 401       | Missing `token` cookie or JWT validation failed |
+| Status    | When                                               |
+|-----------|----------------------------------------------------|
+| 401       | Missing `token` cookie or JWT validation failed    |
 | 403       | Authenticated but lacks required permissions/roles |
 
 ---
 
 ## Rate Limiting
 
-> **TODO:** Rate limiting middleware not implemented yet.
+Requests are rate-limited per API key. If you exceed the limit, the server responds with `429 Too Many Requests`.
+
+| Header                    | Description                                   |
+|---------------------------|-----------------------------------------------|
+| `X-RateLimit-Limit`       | Max requests per window                       |
+| `X-RateLimit-Remaining`   | Requests left in current window               |
+| `X-RateLimit-Reset`       | Seconds until the window resets               |
 
 ---
 
@@ -37,8 +43,8 @@ All errors return JSON in this format:
 }
 ```
 
-| Status    | Meaning                                                   |
-|-----------|-----------------------------------------------------------|
+| Status    | Meaning                                                  |
+|-----------|----------------------------------------------------------|
 | 400       | Bad request — invalid or missing data                    |
 | 401       | Unauthorized — missing or invalid JWT token              |
 | 403       | Forbidden — lacks required permissions/roles             |
@@ -555,11 +561,11 @@ Get a pre-signed Cloudinary signature for uploading recipe images. Required for 
 ```
 
 **Errors:**
-| Status    | When                                  |
-|-----------|---------------------------------------|
-| 401       | Unauthorized — missing or invalid JWT |
+| Status    | When                                         |
+|-----------|----------------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT        |
 | 403       | Forbidden — lacks `create_recipe` permission |
-| 500       | Failed to generate signature          |
+| 500       | Failed to generate signature                 |
 
 ---
 
@@ -615,12 +621,12 @@ Update a recipe.
 **Response** `200 OK` — returns the updated recipe's id.
 
 **Errors:**
-| Status    | When                                          |
-|-----------|-----------------------------------------------|
-| 400       | Missing required fields or invalid values     |
-| 401       | Unauthorized — missing or invalid JWT         |
+| Status    | When                                            |
+|-----------|-------------------------------------------------|
+| 400       | Missing required fields or invalid values       |
+| 401       | Unauthorized — missing or invalid JWT           |
 | 403       | Forbidden — not the author and lacks permission |
-| 404       | Recipe not found                              |
+| 404       | Recipe not found                                |
 
 ---
 
@@ -637,11 +643,11 @@ Delete a recipe. Cascades: removes its favourites.
 **Response** `204 No Content`
 
 **Errors:**
-| Status    | When                                          |
-|-----------|-----------------------------------------------|
-| 401       | Unauthorized — missing or invalid JWT         |
+| Status    | When                                            | 
+|-----------|-------------------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT           |
 | 403       | Forbidden — not the author and lacks permission |
-| 404       | Recipe not found                              |
+| 404       | Recipe not found                                |
 
 ---
 

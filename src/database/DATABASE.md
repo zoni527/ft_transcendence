@@ -98,10 +98,6 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 | Table                     | Purpose                                                       |
 |---------------------------|---------------------------------------------------------------|
 | `recipe`                  | Recipe details (title, description, nutrition, etc.)          |
-| `recipe_step`             | Ordered cooking steps for each recipe                         |
-| `ingredient_category`     | Categories for ingredients (e.g. poultry, dairy)              |
-| `ingredient`              | Ingredient definitions with default units                     |
-| `recipe_ingredient`       | Links recipes to ingredients with quantities (many-to-many)   |
 
 **Engagement:**
 | Table                 | Purpose                                       |
@@ -111,9 +107,8 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 ### Key Design Decisions
 
 - **Favourite count is computed, not stored** — instead of a `has_been_favourite_times` column on recipe, we count from `recipe_favourite` with `COUNT(*)`. This prevents the count from going out of sync.
-- **Serving-based ingredient scaling** — `recipe.servings` stores the base serving count. `recipe_ingredient.quantity` stores the amount for that base. Scaling (e.g. 4 servings → 2 servings) is done in app logic: `adjusted = quantity * (desired / base)`.
 - **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
-- **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its steps, ingredients, and favourites.
+- **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its favourites.
 - **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship). TOS should state that created recipes remain after account deletion with authorship anonymized.
 
 ## Accessing the Database

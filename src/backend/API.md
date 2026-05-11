@@ -418,9 +418,7 @@ Get all recipes.
 
 ### GET /api/recipes/:id
 
-Get a single recipe by ID, including its steps and ingredients.
-
-> **TODO:** Currently returns only the base recipe fields. Steps and ingredients are not yet included in the response.
+Get a single recipe by ID.
 
 **Response** `200 OK`
 ```json
@@ -440,23 +438,7 @@ Get a single recipe by ID, including its steps and ingredients.
   "carbs_g": 60.0,
   "fat_g": 22.0,
   "created_at": "2026-04-09T12:00:00Z",
-  "updated_at": "2026-04-09T12:00:00Z",
-  "steps": [
-    {
-      "step_number": 1,
-      "instruction": "Boil water and cook pasta",
-      "media_url": null,
-      "timer_seconds": 600
-    }
-  ],
-  "ingredients": [
-    {
-      "name": "Spaghetti",
-      "quantity": 400,
-      "unit": "g",
-      "sort_order": 1
-    }
-  ]
+  "updated_at": "2026-04-09T12:00:00Z"
 }
 ```
 
@@ -469,7 +451,7 @@ Get a single recipe by ID, including its steps and ingredients.
 
 ### POST /api/recipes
 
-Create a new recipe with steps and ingredients.
+Create a new recipe.
 
 **Request body:**
 ```json
@@ -486,23 +468,7 @@ Create a new recipe with steps and ingredients.
   "calories": 550,
   "protein_g": 25.0,
   "carbs_g": 60.0,
-  "fat_g": 22.0,
-  "steps": [
-    {
-      "step_number": 1,
-      "instruction": "Boil water and cook pasta",
-      "media_url": null,
-      "timer_seconds": 600
-    }
-  ],
-  "ingredients": [
-    {
-      "ingredient_id": "uuid",
-      "quantity": 400,
-      "unit": "g",
-      "sort_order": 1
-    }
-  ]
+  "fat_g": 22.0
 }
 ```
 
@@ -580,7 +546,7 @@ Replace a recipe completely. All fields are required.
 
 ### DELETE /api/recipes/:id
 
-Delete a recipe. Cascades: removes its steps, ingredients, and favourites.
+Delete a recipe. Cascades: removes its favourites.
 
 **Response** `204 No Content`
 
@@ -588,86 +554,6 @@ Delete a recipe. Cascades: removes its steps, ingredients, and favourites.
 | Status    | When              |
 |-----------|-------------------|
 | 404       | Recipe not found  |
-
----
-
-## Ingredients
-
-### GET /api/ingredients
-
-Get all ingredients.
-
-**Response** `200 OK`
-```json
-[
-  {
-    "id": "uuid",
-    "name": "Spaghetti",
-    "category": "grains",
-    "default_unit": "g"
-  }
-]
-```
-
----
-
-### POST /api/ingredients
-
-Create a new ingredient.
-
-**Request body:**
-```json
-{
-  "name": "Spaghetti",
-  "category_id": "uuid",
-  "default_unit": "g"
-}
-```
-
-**Response** `201 Created` — returns the created ingredient.
-
-**Errors:**
-| Status    | When                              |
-|-----------|-----------------------------------|
-| 400       | Missing name                      |
-| 409       | Ingredient name already exists    |
-
----
-
-## Ingredient Categories
-
-### GET /api/ingredient-categories
-
-Get all ingredient categories.
-
-**Response** `200 OK`
-```json
-[
-  {
-    "id": "uuid",
-    "name": "Dairy",
-    "description": "Milk, cheese, butter, etc.",
-    "icon_url": "/icons/dairy.png"
-  }
-]
-```
-
----
-
-### POST /api/ingredient-categories
-
-Create a new ingredient category.
-
-**Request body:**
-```json
-{
-  "name": "Dairy",
-  "description": "Milk, cheese, butter, etc.",
-  "icon_url": "/icons/dairy.png"
-}
-```
-
-**Response** `201 Created`
 
 ---
 
@@ -753,10 +639,6 @@ Get all recipes a user has favourited.
 | POST /api/recipes/:id/image       | TODO      |
 | PUT /api/recipes/:id              | TODO      |
 | DELETE /api/recipes/:id           | done      |
-| GET /api/ingredients              | TODO      |
-| POST /api/ingredients             | TODO      |
-| GET /api/ingredient-categories    | TODO      |
-| POST /api/ingredient-categories   | TODO      |
 | POST /api/recipes/:id/favourite   | TODO      |
 | DELETE /api/recipes/:id/favourite | TODO      |
 | GET /api/users/:id/favourites     | TODO      |

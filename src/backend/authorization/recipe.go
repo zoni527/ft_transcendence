@@ -1,18 +1,14 @@
 package authorization
 
-import (
-	"ft_transcendence/backend/models"
-)
-
-func CanEditRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) bool {
-	if userID == recipe.Author_id {
+func CanEditRecipe(roleSet, permSet map[string]bool, userID, authorID string) bool {
+	if userID == authorID {
 		return true
 	}
 	return HasPermission(roleSet, permSet, PermEditRecipe)
 }
 
-func CanDeleteRecipe(roleSet, permSet map[string]bool, userID string, recipe *models.Recipe) bool {
-	if userID == recipe.Author_id {
+func CanDeleteRecipe(roleSet, permSet map[string]bool, userID, authorID string) bool {
+	if userID == authorID {
 		return true
 	}
 	return HasPermission(roleSet, permSet, PermDeleteRecipe)

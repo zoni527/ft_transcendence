@@ -101,7 +101,7 @@ const RecipeDetail = () => {
 
         {/* Description */}
         <div className="mt-16 mb-24 flex flex-col">
-          <span className="text-lg text-gray-500">
+          <span className="text-xl text-gray-500">
             {t('recipeDetail.description')}
           </span>
 

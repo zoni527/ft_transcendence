@@ -55,6 +55,8 @@ export const csTranslations = {
     recipes: 'Databáze receptů',
     edit: 'Upravit',
     delete: 'Smazat',
+    sortFullName: 'A-Z: Celé jméno',
+    sortUsername: 'A-Z: Přezdívka',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',

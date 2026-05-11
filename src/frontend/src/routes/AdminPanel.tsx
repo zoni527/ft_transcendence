@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AdminUserField from '../components/AdminUserField.tsx';
 import AdminRecipeField from '../components/AdminRecipeField.tsx';
@@ -18,7 +18,7 @@ const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState<'users' | 'recipes'>(
     'users',
   );
-
+  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -31,7 +31,9 @@ const AdminPanel = () => {
     Promise.all([getUsers(t), getRecipes(t)])
       .then(([usersData, recipesData]) => {
         if (cancelled) return;
-        setUsers([...usersData].sort((a, b) => a.name.localeCompare(b.name)));
+
+        setUsers(usersData);
+
         setRecipes(
           [...recipesData].sort((a, b) => a.title.localeCompare(b.title)),
         );
@@ -52,6 +54,14 @@ const AdminPanel = () => {
       cancelled = true;
     };
   }, [authLoading, user, hasRole, t, showNotification]);
+
+  const sortedUsers = useMemo(() => {
+    return [...users].sort((a, b) =>
+      sortBy === 'name'
+        ? a.name.localeCompare(b.name)
+        : a.display_name.localeCompare(b.display_name),
+    );
+  }, [users, sortBy]);
 
   if (loading || authLoading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
@@ -110,10 +120,39 @@ const AdminPanel = () => {
         </button>
       </div>
 
+      {/* Sort Controls */}
+      {activeSection === 'users' && (
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex gap-3">
+            <button
+              onClick={() => setSortBy('name')}
+              className={`text-lg font-bold transition-colors hover:cursor-pointer ${
+                sortBy === 'name'
+                  ? 'text-[#C04D31]'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('adminPanel.sortFullName')}
+            </button>
+
+            <button
+              onClick={() => setSortBy('username')}
+              className={`text-lg font-bold transition-colors hover:cursor-pointer ${
+                sortBy === 'username'
+                  ? 'text-[#C04D31]'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('adminPanel.sortUsername')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className="mt-8 flex flex-col gap-4">
         {activeSection === 'users' &&
-          users.map((listedUser) => (
+          sortedUsers.map((listedUser) => (
             <AdminUserField
               key={listedUser.id}
               user={listedUser}
@@ -122,11 +161,7 @@ const AdminPanel = () => {
               }
               onUpdate={(updatedUser) =>
                 setUsers((prev) =>
-                  [
-                    ...prev.map((u) =>
-                      u.id === updatedUser.id ? updatedUser : u,
-                    ),
-                  ].sort((a, b) => a.name.localeCompare(b.name)),
+                  prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
                 )
               }
             />
@@ -138,7 +173,7 @@ const AdminPanel = () => {
               key={recipe.id}
               recipe={recipe}
               onDelete={(id) =>
-                setRecipes((prev) => prev.filter((u) => u.id !== id))
+                setRecipes((prev) => prev.filter((r) => r.id !== id))
               }
               onUpdate={(updatedRecipe) =>
                 setRecipes((prev) =>

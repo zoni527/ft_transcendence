@@ -55,6 +55,8 @@ export const enTranslations = {
     recipes: 'Recipe database',
     edit: 'Edit',
     delete: 'Delete',
+    sortFullName: 'A-Z: Full name',
+    sortUsername: 'A-Z: Username',
   },
   footer: {
     privacy: 'Privacy Policy',
@@ -188,7 +190,7 @@ export const enTranslations = {
   },
   signup: {
     header: 'Sign up',
-    name: 'Full Name',
+    name: 'Full name',
     namePlace: 'Enter your full name',
     username: 'Username / Alias',
     usernamePlace: 'Enter your username / alias',

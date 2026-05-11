@@ -99,7 +99,7 @@ const Signup = () => {
 
       {/* Input Fields */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Full Name */}
+        {/* Full name */}
         <InputField
           id="fullName"
           name="fullName"

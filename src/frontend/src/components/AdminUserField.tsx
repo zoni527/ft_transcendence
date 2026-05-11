@@ -53,14 +53,19 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
         />
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-        {/* User name */}
-        <div className="flex-1 text-xl font-semibold text-gray-700">
-          {user.name}
+        {/* Left side: names */}
+        <div className="flex flex-col gap-2 md:flex-col lg:flex-row lg:items-center lg:gap-6">
+          {/* Full name */}
+          <div className="text-xl font-semibold text-gray-700">{user.name}</div>
+
+          {/* Username */}
+          <div className="text-xl font-semibold text-gray-700">
+            {user.display_name}
+          </div>
         </div>
 
-        {/* Buttons */}
+        {/* Right side: buttons */}
         <div className="flex flex-col gap-2 p-2 md:flex-row md:gap-3">
-          {/* Edit user */}
           <ModalButton
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             onClick={() => setIsUserEditOpen(true)}
@@ -68,7 +73,6 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
             disabled={!hasRole(['admin'])}
           />
 
-          {/* Delete user */}
           <SubmitButton
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             isLoading={loading}

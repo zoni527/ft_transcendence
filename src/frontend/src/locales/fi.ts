@@ -55,6 +55,8 @@ export const fiTranslations = {
     recipes: 'Reseptitietokanta',
     edit: 'Muokkaa',
     delete: 'Poista',
+    sortFullName: 'A-Z: Koko nimi',
+    sortUsername: 'A-Z: Käyttäjätunnus',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',

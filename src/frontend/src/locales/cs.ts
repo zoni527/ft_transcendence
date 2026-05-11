@@ -5,7 +5,7 @@ export const csTranslations = {
     signup: 'Registrovat se',
     login: 'Přihlásit se',
     logout: 'Odhlásit se',
-    admin: 'Admin',
+    admin: 'Administrátor',
   },
   notification: {
     signupSuccess: 'Účet vytvořen',

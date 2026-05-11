@@ -5,7 +5,7 @@ export const fiTranslations = {
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
     logout: 'Kirjaudu ulos',
-    admin: 'Admin',
+    admin: 'Ylläpitäjä',
   },
   notification: {
     signupSuccess: 'Tili luotu',

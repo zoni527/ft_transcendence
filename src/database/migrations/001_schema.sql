@@ -20,8 +20,6 @@ CREATE TABLE "user" (
     last_seen       TIMESTAMP DEFAULT now()
 );
 
-CREATE INDEX idx_user_last_seen ON "user"(last_seen);
-
 
 CREATE TABLE role (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

@@ -11,9 +11,10 @@ import type { User } from '../types/types';
 interface AdminUserFieldProps {
   user: User;
   onDelete: (id: string) => void;
+  onUpdate: (user: User) => void;
 }
 
-const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
+const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { hasRole } = useAuth();
@@ -45,27 +46,38 @@ const AdminUserField = ({ user, onDelete }: AdminUserFieldProps) => {
   return (
     <>
       {isUserEditOpen && (
-        <EditUserModal onClose={() => setIsUserEditOpen(false)} user={user} />
+        <EditUserModal
+          onClose={() => setIsUserEditOpen(false)}
+          user={user}
+          onSave={onUpdate}
+        />
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-        {/* User name */}
-        <div className="flex-1 text-xl text-gray-700">{user.name}</div>
+        {/* Left side */}
+        <div className="flex min-w-0 flex-col gap-2 md:flex-row md:items-center md:gap-6">
+          {/* Name */}
+          <div className="w-64 truncate text-xl font-semibold text-gray-700">
+            {user.name}
+          </div>
 
-        {/* Buttons */}
-        <div className="flex gap-x-3 p-2">
-          {/* Edit user */}
+          {/* Username */}
+          <div className="w-64 truncate text-xl font-semibold text-gray-700">
+            {user.display_name}
+          </div>
+        </div>
+
+        {/* Right side: buttons */}
+        <div className="flex shrink-0 flex-col gap-2 p-2 md:flex-row md:gap-3">
           <ModalButton
-            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+            className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             onClick={() => setIsUserEditOpen(true)}
             text={t('adminPanel.edit')}
             disabled={!hasRole(['admin'])}
           />
 
-          {/* Delete user */}
           <SubmitButton
-            className="rounded-xl bg-slate-600 hover:bg-[#C04D31]"
+            className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             isLoading={loading}
-            pendingText={t('adminPanel.deletePending')}
             defaultText={t('adminPanel.delete')}
             onClick={() => handleDelete(user.id)}
             type="button"

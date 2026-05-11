@@ -25,6 +25,7 @@ export const fiTranslations = {
     insufficientPermissions: 'Riittämättömät käyttöoikeudet',
   },
   recipeDetail: {
+    description: 'Valmistusvaiheet',
     author: 'Tekijä',
     prep: 'Valmisteluaika (min)',
     servings: 'Annosta',
@@ -36,7 +37,6 @@ export const fiTranslations = {
     fat: 'Rasva (g)',
     editRecipe: 'Muokkaa reseptiä',
     submit: 'Poista resepti',
-    submitPending: 'Reseptiä poistetaan...',
   },
   dashboard: {
     name: 'Koko nimi',
@@ -47,8 +47,7 @@ export const fiTranslations = {
     roles: 'Roolit',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
-    submit: 'Poista käyttäjä',
-    submitPending: 'Poistetaan käyttäjää...',
+    submit: 'Poista profiili',
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
@@ -56,7 +55,8 @@ export const fiTranslations = {
     recipes: 'Reseptitietokanta',
     edit: 'Muokkaa',
     delete: 'Poista',
-    deletePending: 'Poistetaan...',
+    sortFullName: 'A-Z: Koko nimi',
+    sortUsername: 'A-Z: Käyttäjätunnus',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',
@@ -187,7 +187,6 @@ export const fiTranslations = {
     password: 'Salasana',
     passwordPlace: 'Syötä salasana',
     submit: 'Jatka',
-    submitPending: 'Kirjaudutaan sisään...',
   },
   signup: {
     header: 'Rekisteröidy',
@@ -202,20 +201,21 @@ export const fiTranslations = {
     rePassword: 'Vahvista salasana',
     rePasswordPlace: 'Syötä salasana uudelleen',
     submit: 'Jatka',
-    submitPending: 'Rekisteröintiä käsitellään...',
   },
   createRecipe: {
     header: 'Luo resepti',
     title: 'Reseptin nimi',
     titlePlace: 'Syötä reseptin nimi',
-    description: 'Lyhyt kuvaus',
-    descriptionPlace: 'Syötä lyhyt kuvaus',
+    description: 'Valmistusvaiheet',
+    descriptionPlace: 'Vaihe 1 ...\nVaihe 2 ...\nVaihe 3 ...',
     prep: 'Valmistusaika (min)',
     prepPlace: 'Syötä valmistusaika minuutteina',
     servings: 'Annokset',
     servingsPlace: 'Syötä annosten määrä',
+    difficultyPlace: 'Valitse vaikeustaso',
     cuisine: 'Ruokakulttuuri',
     cuisinePlace: 'Syötä ruokakulttuuri',
+    mealTypePlace: 'Valitse ateriatyyppi',
     calories: 'Kalorit (kcal)',
     caloriesPlace: 'Syötä kalorit (kcal)',
     protein: 'Proteiini (g)',
@@ -228,18 +228,15 @@ export const fiTranslations = {
     no: 'Ei',
     uploadImage: 'Lataa kuva',
     submit: 'Lähetä',
-    submitPending: 'Lähetetään reseptiä...',
   },
   editUser: {
     header: 'Muokkaa profiilia',
     uploadAvatar: 'Lataa profiilikuva',
     submit: 'Lähetä',
-    submitPending: 'Profiilia päivitetään...',
   },
   editRecipe: {
     header: 'Muokkaa reseptiä',
     submit: 'Lähetä',
-    submitPending: 'Reseptiä päivitetään...',
   },
   difficulty: {
     type: 'Vaikeusaste',
@@ -253,6 +250,7 @@ export const fiTranslations = {
     type_lunch: 'Lounas',
     type_dinner: 'Päivällinen',
     type_snack: 'Välipala',
+    type_dessert: 'Jälkiruoka',
   },
   loginValidation: {
     emailRequired: 'Sähköposti on pakollinen',
@@ -310,5 +308,7 @@ export const fiTranslations = {
     serverError: 'Sisäinen palvelinvirhe, yritä myöhemmin uudelleen',
     authError:
       'Rekisteröinti onnistui, mutta automaattinen kirjautuminen epäonnistui, kirjaudu sisään manuaalisesti',
+    invalidFileType: 'Virheellinen tiedostotyyppi',
+    fileTooLarge: 'Tiedosto on liian suuri',
   },
 };

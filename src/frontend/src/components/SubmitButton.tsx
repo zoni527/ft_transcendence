@@ -5,7 +5,6 @@ import { buttonBase } from '../styles/styles';
 interface SubmitButtonProps {
   isLoading: boolean;
   defaultText: string;
-  pendingText: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit';
   disabled?: boolean;
@@ -16,7 +15,6 @@ interface SubmitButtonProps {
 const SubmitButton = ({
   isLoading,
   defaultText,
-  pendingText,
   onClick,
   type = 'submit',
   disabled = false,
@@ -32,12 +30,26 @@ const SubmitButton = ({
     <button
       title={resolvedTitle}
       type={type}
-      className={`${buttonBase} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}
+      className={` ${buttonBase} ${disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'} relative flex items-center justify-center ${className} `}
       disabled={isLoading || disabled}
       aria-busy={isLoading}
       onClick={onClick}
     >
-      {isLoading ? pendingText : defaultText}
+      {isLoading ? (
+        <>
+          {/* Invisible text keeps original button width */}
+          <span className="invisible">{defaultText}</span>
+
+          {/* Loader overlay */}
+          <div className="absolute inset-0 flex items-center justify-center space-x-1">
+            <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+            <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+            <div className="h-2.5 w-2.5 animate-bounce rounded-full bg-current" />
+          </div>
+        </>
+      ) : (
+        defaultText
+      )}
     </button>
   );
 };

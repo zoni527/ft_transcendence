@@ -25,6 +25,7 @@ export const csTranslations = {
     insufficientPermissions: 'Nedostatečná oprávnění',
   },
   recipeDetail: {
+    description: 'Postup přípravy',
     author: 'Autor',
     prep: 'Doba přípravy (min)',
     servings: 'Porce',
@@ -36,7 +37,6 @@ export const csTranslations = {
     fat: 'Tuky (g)',
     editRecipe: 'Upravit recept',
     submit: 'Smazat recept',
-    submitPending: 'Mažu recept...',
   },
   dashboard: {
     name: 'Celé jméno',
@@ -47,8 +47,7 @@ export const csTranslations = {
     roles: 'Role',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
-    submit: 'Smazat uživatele',
-    submitPending: 'Mazání uživatele...',
+    submit: 'Smazat profil',
   },
   adminPanel: {
     header: 'Administrátorský panel',
@@ -56,7 +55,8 @@ export const csTranslations = {
     recipes: 'Databáze receptů',
     edit: 'Upravit',
     delete: 'Smazat',
-    deletePending: 'Mazání...',
+    sortFullName: 'A-Z: Celé jméno',
+    sortUsername: 'A-Z: Přezdívka',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',
@@ -187,7 +187,6 @@ export const csTranslations = {
     password: 'Heslo',
     passwordPlace: 'Zadejte své heslo',
     submit: 'Pokračovat',
-    submitPending: 'Přihlašování...',
   },
   signup: {
     header: 'Registrovat se',
@@ -202,20 +201,21 @@ export const csTranslations = {
     rePassword: 'Potvrďte heslo',
     rePasswordPlace: 'Zadejte své heslo znovu',
     submit: 'Pokračovat',
-    submitPending: 'Vytváření účtu...',
   },
   createRecipe: {
     header: 'Vytvořit recept',
     title: 'Název receptu',
     titlePlace: 'Zadejte název receptu',
-    description: 'Krátký popis',
-    descriptionPlace: 'Zadejte krátký popis',
+    description: 'Postup přípravy',
+    descriptionPlace: 'Krok 1 ...\nKrok 2 ...\nKrok 3 ...',
     prep: 'Příprava (min)',
     prepPlace: 'Zadejte dobu přípravy v minutách',
     servings: 'Porce',
     servingsPlace: 'Zadejte počet porcí',
+    difficultyPlace: 'Vyberte obtížnost',
     cuisine: 'Typ kuchyně',
     cuisinePlace: 'Zadejte typ kuchyně',
+    mealTypePlace: 'Vyberte typ jídla',
     calories: 'Kalorie (kcal)',
     caloriesPlace: 'Zadejte množství kalorií v kcal',
     protein: 'Bílkoviny (g)',
@@ -228,18 +228,15 @@ export const csTranslations = {
     no: 'Ne',
     uploadImage: 'Nahrát obrázek',
     submit: 'Odeslat',
-    submitPending: 'Odesílám recept...',
   },
   editUser: {
     header: 'Upravit profil',
     uploadAvatar: 'Nahrát avatar',
     submit: 'Odeslat',
-    submitPending: 'Úprava profilu...',
   },
   editRecipe: {
     header: 'Upravit recept',
     submit: 'Odeslat',
-    submitPending: 'Úprava receptu...',
   },
   difficulty: {
     type: 'Obtížnost',
@@ -253,6 +250,7 @@ export const csTranslations = {
     type_lunch: 'Oběd',
     type_dinner: 'Večeře',
     type_snack: 'Svačina',
+    type_dessert: 'Dezert',
   },
   loginValidation: {
     emailRequired: 'E-mail je povinný',
@@ -311,5 +309,7 @@ export const csTranslations = {
     serverError: 'Došlo k interní chybě serveru, zkuste to prosím později',
     authError:
       'Registrace byla úspěšná, ale automatické přihlášení selhalo, přihlaste se prosím ručně',
+    invalidFileType: 'Neplatný typ souboru',
+    fileTooLarge: 'Soubor je příliš velký',
   },
 };

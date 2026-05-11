@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { z } from 'zod';
@@ -14,14 +13,14 @@ import {
   uploadImageToCloudinary,
 } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue } from '../utils/utils.tsx';
+import { validateImageFile } from '../utils/utils.tsx';
 import type { Recipe } from '../types/types.tsx';
 import { cardBase, uploadButtonBase } from '../styles/styles.tsx';
 
 type EditRecipeModalProps = {
-  onClose: () => void;
   passedRecipe: Recipe;
-  onSuccess?: () => void;
+  onClose: () => void;
+  onSave: (updatedRecipe: Recipe) => void;
 };
 
 // Helper function for validation
@@ -43,7 +42,7 @@ const createRecipeSchema = (t: TFunction) =>
       errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
     }),
     cuisine: z.string().min(1, t('recValidation.cuisineRequired')),
-    meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
+    meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack', 'dessert'], {
       errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),
     calories: requiredNumber(t('recValidation.calories'), 0, t),
@@ -53,13 +52,12 @@ const createRecipeSchema = (t: TFunction) =>
   });
 
 const EditRecipeModal = ({
-  onSuccess,
-  onClose,
   passedRecipe,
+  onClose,
+  onSave,
 }: EditRecipeModalProps) => {
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
   // Controlled input states
@@ -99,34 +97,28 @@ const EditRecipeModal = ({
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    void handleSubmitAsync(e);
+    void handleSubmitAsync();
   };
 
-  const handleSubmitAsync = async (
-    e: React.SyntheticEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmitAsync = async () => {
     if (loading) return;
-
     setLoading(true);
 
     try {
-      const form = e.currentTarget;
-      const formData = new FormData(form);
-
       const schema = createRecipeSchema(t);
 
       const result = schema.safeParse({
-        title: getStringValue(formData, 'title'),
-        description: getStringValue(formData, 'description'),
-        preparation_time_min: getStringValue(formData, 'preparation_time_min'),
-        servings: getStringValue(formData, 'servings'),
-        difficulty: getStringValue(formData, 'difficulty'),
-        cuisine: getStringValue(formData, 'cuisine'),
-        meal_type: getStringValue(formData, 'meal_type'),
-        calories: getStringValue(formData, 'calories'),
-        protein_g: getStringValue(formData, 'protein_g'),
-        carbs_g: getStringValue(formData, 'carbs_g'),
-        fat_g: getStringValue(formData, 'fat_g'),
+        title,
+        description,
+        preparation_time_min,
+        servings,
+        difficulty,
+        cuisine,
+        meal_type,
+        calories,
+        protein_g: protein,
+        carbs_g: carbs,
+        fat_g: fat,
       });
 
       if (!result.success) {
@@ -142,7 +134,7 @@ const EditRecipeModal = ({
 
       const id = passedRecipe.id;
 
-      const recipe = await putUpdateRecipe(
+      await putUpdateRecipe(
         {
           ...result.data,
           id,
@@ -152,11 +144,17 @@ const EditRecipeModal = ({
         t,
       );
 
+      const updatedRecipe: Recipe = {
+        ...passedRecipe,
+        ...result.data,
+        image_url,
+      };
+
+      onSave(updatedRecipe);
+
       showNotification(t('notification.editRecipeSuccess'), 'success');
 
-      onSuccess?.();
       onClose();
-      void navigate(`/recipes/${recipe.id}`);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : t('error.genericError');
@@ -192,7 +190,7 @@ const EditRecipeModal = ({
             id="title"
             name="title"
             label={t('createRecipe.title')}
-            type="text"
+            placeholder={t('createRecipe.titlePlace')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -201,6 +199,7 @@ const EditRecipeModal = ({
             id="description"
             name="description"
             label={t('createRecipe.description')}
+            placeholder={t('createRecipe.descriptionPlace')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -209,7 +208,7 @@ const EditRecipeModal = ({
             id="preparation_time_min"
             name="preparation_time_min"
             label={t('createRecipe.prep')}
-            type="text"
+            placeholder={t('createRecipe.prepPlace')}
             value={preparation_time_min.toString()}
             onChange={(e) => setPrepTimeMin(Number(e.target.value))}
           />
@@ -218,7 +217,7 @@ const EditRecipeModal = ({
             id="servings"
             name="servings"
             label={t('createRecipe.servings')}
-            type="text"
+            placeholder={t('createRecipe.servingsPlace')}
             value={servings.toString()}
             onChange={(e) => setServings(Number(e.target.value))}
           />
@@ -227,6 +226,7 @@ const EditRecipeModal = ({
             id="difficulty"
             name="difficulty"
             label={t('difficulty.type')}
+            placeholder={t('createRecipe.difficultyPlace')}
             options={[
               { value: 'easy', label: t('difficulty.type_easy') },
               { value: 'medium', label: t('difficulty.type_medium') },
@@ -240,7 +240,7 @@ const EditRecipeModal = ({
             id="cuisine"
             name="cuisine"
             label={t('createRecipe.cuisine')}
-            type="text"
+            placeholder={t('createRecipe.cuisinePlace')}
             value={cuisine}
             onChange={(e) => setCuisine(e.target.value)}
           />
@@ -249,11 +249,13 @@ const EditRecipeModal = ({
             id="meal_type"
             name="meal_type"
             label={t('meal.type')}
+            placeholder={t('createRecipe.mealTypePlace')}
             options={[
               { value: 'breakfast', label: t('meal.type_breakfast') },
               { value: 'lunch', label: t('meal.type_lunch') },
               { value: 'dinner', label: t('meal.type_dinner') },
               { value: 'snack', label: t('meal.type_snack') },
+              { value: 'dessert', label: t('meal.type_dessert') },
             ]}
             value={meal_type}
             onChange={(e) => setMealType(e.target.value)}
@@ -263,7 +265,7 @@ const EditRecipeModal = ({
             id="calories"
             name="calories"
             label={t('createRecipe.calories')}
-            type="text"
+            placeholder={t('createRecipe.caloriesPlace')}
             value={calories.toString()}
             onChange={(e) => setCalories(Number(e.target.value))}
           />
@@ -272,7 +274,7 @@ const EditRecipeModal = ({
             id="protein_g"
             name="protein_g"
             label={t('createRecipe.protein')}
-            type="text"
+            placeholder={t('createRecipe.proteinPlace')}
             value={protein.toString()}
             onChange={(e) => setProtein(Number(e.target.value))}
           />
@@ -281,7 +283,7 @@ const EditRecipeModal = ({
             id="carbs_g"
             name="carbs_g"
             label={t('createRecipe.carbs')}
-            type="text"
+            placeholder={t('createRecipe.carbsPlace')}
             value={carbs.toString()}
             onChange={(e) => setCarbs(Number(e.target.value))}
           />
@@ -290,7 +292,7 @@ const EditRecipeModal = ({
             id="fat_g"
             name="fat_g"
             label={t('createRecipe.fat')}
-            type="text"
+            placeholder={t('createRecipe.fatPlace')}
             value={fat.toString()}
             onChange={(e) => setFat(Number(e.target.value))}
           />
@@ -305,9 +307,23 @@ const EditRecipeModal = ({
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  setFileName(file ? file.name : '');
-                  setImageFile(file);
+                  const file = e.target.files?.[0] ?? null;
+
+                  try {
+                    const validFile = validateImageFile(file, t, {
+                      maxSizeMB: 5,
+                    });
+                    setFileName(validFile?.name ?? '');
+                    setImageFile(validFile);
+                  } catch (err: unknown) {
+                    const message =
+                      err instanceof Error
+                        ? err.message
+                        : t('error.genericError');
+                    showNotification(message, 'error');
+                    setFileName('');
+                    setImageFile(null);
+                  }
                 }}
               />
             </label>
@@ -320,9 +336,8 @@ const EditRecipeModal = ({
           {/* Submit */}
           <div className="mt-12 flex justify-center">
             <SubmitButton
-              className="rounded-full bg-orange-700 hover:bg-orange-800"
+              className="rounded-full border-3 border-orange-700 hover:border-orange-800"
               isLoading={loading}
-              pendingText={t('editRecipe.submitPending')}
               defaultText={t('editRecipe.submit')}
             />
           </div>

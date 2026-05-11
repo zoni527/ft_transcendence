@@ -22,7 +22,6 @@ import (
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/integrations"
-	"ft_transcendence/backend/middleware"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
@@ -249,8 +248,8 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-	roleSet, okRoles := middleware.RolesFromContext(c)
-	permSet, okPerms := middleware.PermsFromContext(c)
+	roleSet, okRoles := authorization.RolesFromContext(c)
+	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
 		log.Printf("handlers.UpdateUser: data missing from context")
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

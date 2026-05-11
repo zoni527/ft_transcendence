@@ -57,7 +57,7 @@ func RequireRoles(roles ...string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		if userRoles, ok := RolesFromContext(c); ok {
+		if userRoles, ok := authorization.RolesFromContext(c); ok {
 			allowed := false
 			for _, r := range roles {
 				if userRoles[r] {
@@ -85,7 +85,7 @@ func RequirePermission(permissions ...string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		if perms, ok := PermsFromContext(c); ok {
+		if perms, ok := authorization.PermsFromContext(c); ok {
 			allowed := false
 			for _, p := range permissions {
 				if perms[p] {

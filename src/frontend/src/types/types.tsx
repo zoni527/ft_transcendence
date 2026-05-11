@@ -26,6 +26,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   roles: string[];
+  is_online: boolean;
 }
 
 export type AuthContextType = {

@@ -34,7 +34,7 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:8080"},
+		AllowOrigins:     []string{"https://localhost:8443"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
@@ -81,7 +81,7 @@ func main() {
 		handlers.DeleteRecipe)
 	router.POST("/api/recipes/:id/image", handlers.UploadRecipeImage) // not implemented yet
 
-	if err := router.Run("0.0.0.0:8080"); err != nil {
+	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
 }

@@ -79,7 +79,7 @@ export interface CloudinaryResponse {
   secure_url: string;
 }
 
-const baseUrl = 'http://localhost:8080/api';
+const baseUrl = 'https://localhost:8443/api';
 
 // Validation for CreateRecipeResponse
 function isCreateRecipeResponse(data: unknown): data is CreateRecipeResponse {

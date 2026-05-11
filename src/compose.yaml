@@ -23,21 +23,27 @@ services:
     networks:
       - transcendence_network
     restart: unless-stopped
+    depends_on:
+      cert_generator:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
 
   reverse_proxy:
     container_name: reverse_proxy
     image: nginx:1.29.8-alpine
     volumes:
       - ./reverse_proxy/templates:/etc/nginx/templates
+      - cert_data:/certs:ro
     ports:
-      - "127.0.0.1:${NGINX_PORT_EXTERNAL:-8080}:${NGINX_PORT_INTERNAL:-80}"
+      - "127.0.0.1:${NGINX_PORT_EXTERNAL:-8443}:${NGINX_PORT_INTERNAL:-443}"
     environment:
-      - NGINX_PORT_INTERNAL=${NGINX_PORT_INTERNAL:-80}
+      - NGINX_PORT_INTERNAL=${NGINX_PORT_INTERNAL:-443}
     networks:
       - transcendence_network
     restart: unless-stopped
     depends_on:
-      - frontend
+      - cert_generator
       - backend
 
   backend:
@@ -52,9 +58,11 @@ services:
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_KEY: ${CLOUDINARY_KEY}
     volumes:
-      - cert_data
+      - cert_data:/certs:ro
     networks:
       - transcendence_network
+    expose:
+      - "8443"
     restart: unless-stopped
     depends_on:
       postgres:
@@ -67,6 +75,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/certs/postgres.crt
+      -c ssl_key_file=/certs/postgres.key
+      -c ssl_ca_file=/certs/ca.crt
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d

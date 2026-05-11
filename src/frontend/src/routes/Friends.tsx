@@ -108,7 +108,6 @@ const Friends = () => {
               <SubmitButton
                 className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
                 isLoading={loading}
-                pendingText={t('dashboard.submitPending')}
                 defaultText={t('dashboard.submit')}
                 type="button"
               />
@@ -118,7 +117,6 @@ const Friends = () => {
                 <SubmitButton
                   className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
                   isLoading={loading}
-                  pendingText={t('dashboard.submitPending')}
                   defaultText={t('dashboard.submit')}
                   type="button"
                 />

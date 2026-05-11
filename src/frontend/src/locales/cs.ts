@@ -36,7 +36,7 @@ export const csTranslations = {
     fat: 'Tuky (g)',
     editRecipe: 'Upravit recept',
     submit: 'Smazat recept',
-    submitPending: 'Mažu recept...',
+    submitPending: 'Mazání...',
   },
   dashboard: {
     name: 'Celé jméno',
@@ -48,7 +48,7 @@ export const csTranslations = {
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
-    submitPending: 'Mazání profilu...',
+    submitPending: 'Mazání...',
   },
   adminPanel: {
     header: 'Administrátorský panel',
@@ -202,7 +202,7 @@ export const csTranslations = {
     rePassword: 'Potvrďte heslo',
     rePasswordPlace: 'Zadejte své heslo znovu',
     submit: 'Pokračovat',
-    submitPending: 'Vytváření účtu...',
+    submitPending: 'Registrování...',
   },
   createRecipe: {
     header: 'Vytvořit recept',
@@ -230,18 +230,18 @@ export const csTranslations = {
     no: 'Ne',
     uploadImage: 'Nahrát obrázek',
     submit: 'Odeslat',
-    submitPending: 'Odesílám recept...',
+    submitPending: 'Odesílám...',
   },
   editUser: {
     header: 'Upravit profil',
     uploadAvatar: 'Nahrát avatar',
     submit: 'Odeslat',
-    submitPending: 'Úprava profilu...',
+    submitPending: 'Upravuji...',
   },
   editRecipe: {
     header: 'Upravit recept',
     submit: 'Odeslat',
-    submitPending: 'Úprava receptu...',
+    submitPending: 'Upravuji...',
   },
   difficulty: {
     type: 'Obtížnost',

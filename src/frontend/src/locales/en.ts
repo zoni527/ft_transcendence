@@ -36,7 +36,7 @@ export const enTranslations = {
     fat: 'Fat (g)',
     editRecipe: 'Edit recipe',
     submit: 'Delete recipe',
-    submitPending: 'Deleting recipe...',
+    submitPending: 'Deleting...',
   },
   dashboard: {
     name: 'Full name',
@@ -48,7 +48,7 @@ export const enTranslations = {
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
     submit: 'Delete profile',
-    submitPending: 'Deleting profile...',
+    submitPending: 'Deleting...',
   },
   adminPanel: {
     header: 'Admin panel',
@@ -230,18 +230,18 @@ export const enTranslations = {
     no: 'No',
     uploadImage: 'Upload image',
     submit: 'Submit',
-    submitPending: 'Submitting recipe...',
+    submitPending: 'Submitting...',
   },
   editUser: {
     header: 'Edit profile',
     uploadAvatar: 'Upload avatar',
     submit: 'Submit',
-    submitPending: 'Updating profile...',
+    submitPending: 'Updating...',
   },
   editRecipe: {
     header: 'Edit recipe',
     submit: 'Submit',
-    submitPending: 'Updating recipe...',
+    submitPending: 'Updating...',
   },
   difficulty: {
     type: 'Difficulty',

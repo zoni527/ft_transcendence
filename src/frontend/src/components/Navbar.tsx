@@ -70,7 +70,7 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {!user && !loading ? (
+          {loading ? null : !user ? (
             <NavButton
               path="/signup"
               className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}
@@ -86,7 +86,7 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {!user && !loading ? (
+          {loading ? null : !user ? (
             <NavButton
               path="/login"
               className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}

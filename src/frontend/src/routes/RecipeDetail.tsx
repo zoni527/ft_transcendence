@@ -73,7 +73,7 @@ const RecipeDetail = () => {
     );
   }
 
-  const isSelf = recipe.author_id === user?.id;
+  const isSelf = recipe.author.display_name === user?.id;
 
   return (
     <>
@@ -117,7 +117,7 @@ const RecipeDetail = () => {
           <div className="flex-1 space-y-6 border-b border-gray-300 pb-8 md:border-r md:border-b-0 md:pr-4 md:pb-4">
             <DataField
               label={t('recipeDetail.author')}
-              value={recipe.author_id}
+              value={recipe.author.display_name}
             />
 
             <DataField

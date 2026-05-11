@@ -77,7 +77,6 @@ Flow:
 
 ## Why frontend must use credentials include
 
-Frontend and backend are different origins (`5173` and `8080`).
 For browser to include cookies in cross-origin requests, frontend must set:
 
 ```ts

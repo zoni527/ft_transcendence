@@ -389,9 +389,12 @@ func nullableString(value *string) any {
 func UpdateLastSeen(userId string) error {
 	sql := `UPDATE "user" SET last_seen = NOW() WHERE id = $1`
 
-	_, err := Pool.Exec(context.Background(), sql, userId)
+	commandTag, err := Pool.Exec(context.Background(), sql, userId)
 	if err != nil {
 		return fmt.Errorf("UpdateLastSeen: %w", err)
+	}
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("UpdateLastSeen: %w", pgx.ErrNoRows)
 	}
 	return nil
 }
@@ -399,9 +402,12 @@ func UpdateLastSeen(userId string) error {
 func MarkOffline(userId string) error {
 	sql := `UPDATE "user" SET last_seen = '1970-01-01' WHERE id = $1`
 
-	_, err := Pool.Exec(context.Background(), sql, userId)
+	commandTag, err := Pool.Exec(context.Background(), sql, userId)
 	if err != nil {
 		return fmt.Errorf("MarkOffline: %w", err)
+	}
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("MarkOffline: %w", pgx.ErrNoRows)
 	}
 	return nil
 }

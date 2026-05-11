@@ -35,9 +35,10 @@ JWT_SECRET=PASTE_GENERATED_VALUE_HERE
 ```
 
 How this key is used in this project:
-- On startup, `LoadJWTSecret()` reads `JWT_SECRET` from env.
-- On signup/login, backend uses it to sign JWTs.
-- On protected routes, backend uses the same key to validate JWT signature.
+- On startup, `config.Load()` reads `JWT_SECRET` from env into `cfg.JWTSecret`.
+- In `main.go`, the backend passes that value to `authorization.InitJWTSecret(cfg.JWTSecret)`.
+- On signup/login, backend uses the initialized JWT secret to sign JWTs.
+- On protected routes, backend uses the same initialized key to validate JWT signatures.
 
 ## What is the cookie used for?
 

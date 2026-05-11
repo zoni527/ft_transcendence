@@ -23,8 +23,6 @@ The API uses **JWT tokens** stored in an HttpOnly cookie. When you call `/api/us
 
 ## Rate Limiting
 
-> **TODO:** Rate limiting middleware not implemented yet. Spec below describes target behavior.
-
 Requests are rate-limited per API key. If you exceed the limit, the server responds with `429 Too Many Requests`.
 
 | Header                    | Description                                   |

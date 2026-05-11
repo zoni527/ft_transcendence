@@ -620,8 +620,6 @@ Delete a recipe. Cascades: removes its favourites.
 
 ---
 
-# <<<<<<< HEAD
-
 ## Ingredients
 
 ### GET /api/ingredients

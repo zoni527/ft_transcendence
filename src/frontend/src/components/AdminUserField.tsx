@@ -53,13 +53,14 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
         />
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-        {/* Left side: names */}
-        <div className="flex flex-col gap-2 md:flex-col lg:flex-row lg:items-center lg:gap-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6">
           {/* Full name */}
-          <div className="text-xl font-semibold text-gray-700">{user.name}</div>
+          <div className="w-64 truncate text-xl font-semibold text-gray-700">
+            {user.name}
+          </div>
 
           {/* Username */}
-          <div className="text-xl font-semibold text-gray-700">
+          <div className="w-64 truncate text-xl font-semibold text-gray-700">
             {user.display_name}
           </div>
         </div>

@@ -123,10 +123,10 @@ const AdminPanel = () => {
       {/* Sort Controls */}
       {activeSection === 'users' && (
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex gap-3">
+          <div className="flex gap-6">
             <button
               onClick={() => setSortBy('name')}
-              className={`text-lg font-bold transition-colors hover:cursor-pointer ${
+              className={`w-64 truncate text-left text-lg font-bold transition-colors hover:cursor-pointer ${
                 sortBy === 'name'
                   ? 'text-[#C04D31]'
                   : 'text-gray-500 hover:text-gray-700'
@@ -137,7 +137,7 @@ const AdminPanel = () => {
 
             <button
               onClick={() => setSortBy('username')}
-              className={`text-lg font-bold transition-colors hover:cursor-pointer ${
+              className={`w-64 truncate text-left text-lg font-bold transition-colors hover:cursor-pointer ${
                 sortBy === 'username'
                   ? 'text-[#C04D31]'
                   : 'text-gray-500 hover:text-gray-700'
@@ -150,7 +150,7 @@ const AdminPanel = () => {
       )}
 
       {/* Content */}
-      <div className="mt-8 flex flex-col gap-4">
+      <div className="mt-10 flex flex-col gap-4">
         {activeSection === 'users' &&
           sortedUsers.map((listedUser) => (
             <AdminUserField

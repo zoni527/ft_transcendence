@@ -17,13 +17,11 @@ const FriendField = ({ user }: FriendFieldProps) => {
           {/* Buttons */}
 
           {/* Online/Offline Indicator */}
-          {/* className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 ${
-              userData.is_online ? 'bg-green-500' : 'bg-red-500'
-            }`}
-            title={userData.is_online ? 'Online' : 'Offline'} */}
           <div
-            className={`h-4 w-4 rounded-full border-2 border-slate-950 bg-green-500`}
-            title={'Online'}
+            className={`h-4 w-4 rounded-full border-2 border-slate-950 ${
+              user.is_online ? 'bg-green-500' : 'bg-red-500'
+            }`}
+            title={user.is_online ? 'Online' : 'Offline'}
           />
         </div>
       </div>

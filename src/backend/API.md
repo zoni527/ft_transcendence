@@ -453,6 +453,12 @@ Get a single recipe by ID.
 
 Create a new recipe.
 
+**Authentication/Authorization:**
+- Requires a valid JWT in the authentication cookie.
+- Requires the `create_recipe` permission.
+- Returns `401 Unauthorized` if the JWT cookie is missing or invalid.
+- Returns `403 Forbidden` if the authenticated user does not have the `create_recipe` permission.
+
 **Request body:**
 ```json
 {

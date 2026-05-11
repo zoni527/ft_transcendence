@@ -250,6 +250,7 @@ export const enTranslations = {
     type_lunch: 'Lunch',
     type_dinner: 'Dinner',
     type_snack: 'Snack',
+    type_dessert: 'Dessert',
   },
   loginValidation: {
     emailRequired: 'Email is required',

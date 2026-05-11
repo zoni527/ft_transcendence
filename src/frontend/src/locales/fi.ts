@@ -250,6 +250,7 @@ export const fiTranslations = {
     type_lunch: 'Lounas',
     type_dinner: 'Päivällinen',
     type_snack: 'Välipala',
+    type_dessert: 'Jälkiruoka',
   },
   loginValidation: {
     emailRequired: 'Sähköposti on pakollinen',

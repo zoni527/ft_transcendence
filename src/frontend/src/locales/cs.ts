@@ -250,6 +250,7 @@ export const csTranslations = {
     type_lunch: 'Oběd',
     type_dinner: 'Večeře',
     type_snack: 'Svačina',
+    type_dessert: 'Dezert',
   },
   loginValidation: {
     emailRequired: 'E-mail je povinný',

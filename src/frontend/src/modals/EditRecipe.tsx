@@ -42,7 +42,7 @@ const createRecipeSchema = (t: TFunction) =>
       errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
     }),
     cuisine: z.string().min(1, t('recValidation.cuisineRequired')),
-    meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack'], {
+    meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack', 'dessert'], {
       errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),
     calories: requiredNumber(t('recValidation.calories'), 0, t),
@@ -255,6 +255,7 @@ const EditRecipeModal = ({
               { value: 'lunch', label: t('meal.type_lunch') },
               { value: 'dinner', label: t('meal.type_dinner') },
               { value: 'snack', label: t('meal.type_snack') },
+              { value: 'dessert', label: t('meal.type_dessert') },
             ]}
             value={meal_type}
             onChange={(e) => setMealType(e.target.value)}

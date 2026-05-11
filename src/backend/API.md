@@ -478,7 +478,7 @@ Create a new recipe.
 }
 ```
 
-**Response** `201 Created` — returns the created recipe (same format as GET /api/recipes/:id).
+**Response** `201 Created` — returns the created recipe's id.
 
 **Errors:**
 | Status    | When                                                                  |

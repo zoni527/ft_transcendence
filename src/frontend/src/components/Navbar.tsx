@@ -14,7 +14,7 @@ const Navbar = () => {
 
   const { showNotification } = useNotification();
   const navigate = useNavigate();
-  const { user, logout, hasRole } = useAuth();
+  const { user, logout, hasRole, loading } = useAuth();
   const { t } = useTranslation();
 
   const handleLogout = () => {
@@ -61,7 +61,7 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {!user ? (
+          {!user && !loading ? (
             <NavButton
               path="/signup"
               className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}
@@ -77,7 +77,7 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {!user ? (
+          {!user && !loading ? (
             <NavButton
               path="/login"
               className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}

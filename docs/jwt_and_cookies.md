@@ -70,9 +70,9 @@ Example route:
 
 Flow:
 1. Browser sends `token` cookie.
-2. `AuthMiddleware` reads cookie.
+2. `middleware.Authentication()` reads the cookie.
 3. Backend validates JWT signature and claims.
-4. Middleware puts authenticated user id into Gin context as `userID`.
+4. `middleware.Authentication()` puts the authenticated user id into Gin context as `userID`.
 5. Handler uses `userID` to load user data from database.
 
 ## Why frontend must use credentials include

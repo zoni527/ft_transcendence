@@ -1,6 +1,10 @@
 export interface Recipe {
   id: string;
-  author_id: string;
+  author: {
+    id: string;
+    display_name: string;
+    avatar_url: string;
+  };
   title: string;
   description: string;
   preparation_time_min: number;

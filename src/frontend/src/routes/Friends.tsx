@@ -95,7 +95,7 @@ const Friends = () => {
         </h1>
 
         {/* Friends Section */}
-        <div className="mt-16 space-y-6 md:mt-32">
+        <div className="mt-16 space-y-6 md:mt-36">
           {/* Content */}
           <div className="mt-8 flex flex-col gap-4">
             {users.map((listedUser) => (

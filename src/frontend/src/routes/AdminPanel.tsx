@@ -117,7 +117,7 @@ const AdminPanel = () => {
       </h1>
 
       {/* Section Tabs */}
-      <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-32 md:flex-row md:gap-8">
+      <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-36 md:flex-row md:gap-8">
         <button
           onClick={() => setActiveSection('users')}
           className={`text-2xl font-bold transition-colors hover:cursor-pointer ${

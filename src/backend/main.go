@@ -70,7 +70,7 @@ func main() {
 	router.GET("/api/users/avatar",
 		middleware.Authentication(),
 		handlers.UserAvatarSignature)
-	router.DELETE("/api/users/:id", handlers.DeleteUser) // not implemented yet
+	router.DELETE("/api/users/:id", handlers.DeleteUser)
 	router.GET("/api/users/search",
 		middleware.Authentication(),
 		handlers.SearchUser)

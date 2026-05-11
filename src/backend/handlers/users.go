@@ -358,8 +358,18 @@ func UpdateUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	// TODO: call repository.DeleteUser()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	targetId := c.Param("id")
+
+	if !authorization.IsValidUUID(targetId) {
+        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
+        return
+	}
+
+	isTargetAdmin, err:= repository.DeleteUser()
+
+
+
+	c.Status(http.StatusNoContent)
 }
 
 func SearchUser(c *gin.Context) {

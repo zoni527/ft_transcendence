@@ -7,7 +7,7 @@ package repository
 
 // [done] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
 // [done] UpdateUser        — PUT /api/users/:id (self-update + admin update)
-// [TODO] DeleteUser        — DELETE /api/users/:id
+// [done] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
 // [TODO] Add pagination (?page=1&limit=20) to GetAllUsers
 
@@ -441,3 +441,18 @@ func MarkOffline(userId string) error {
 	}
 	return nil
 }
+
+func DeleteUser(userId string) error {
+	sql := `DELETE FROM "user" WHERE id = $1`
+
+	res, err := Pool.Exec(context.Background(), sql, userId)
+	if err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+	if res.RowsAffected() == 0 {
+		return &NotFoundError{"user not found"}
+	}
+
+	return nil
+}
+

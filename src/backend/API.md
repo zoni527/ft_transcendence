@@ -6,27 +6,26 @@ Base URL: `http://localhost:8080`
 
 ## Authentication
 
-> **TODO:** API key middleware not implemented yet. Spec below describes target behavior.
+The API uses **JWT tokens** stored in an HttpOnly cookie. When you call `/api/users/login` successfully, the server sets a `token` cookie containing the JWT. All subsequent authenticated requests automatically include this cookie.
 
-All API requests require an API key in the header:
+**Token lifespan:** 1 hour. After expiration, login again.
 
-```
-X-API-Key: your_api_key_here
-```
+**Behind the scenes:**
+- Authenticated endpoints require `middleware.Authentication()` which validates the JWT and blocks requests without a valid token.
+- Permission/role checks use `middleware.RequirePermission()` or `middleware.RequireRoles()` after authentication.
 
-Requests without a valid API key will receive `401 Unauthorized`.
+| Status    | When                                          |
+|-----------|-----------------------------------------------|
+| 401       | Missing `token` cookie or JWT validation failed |
+| 403       | Authenticated but lacks required permissions/roles |
+
+---
 
 ## Rate Limiting
 
-> **TODO:** Rate limiting middleware not implemented yet. Spec below describes target behavior.
+> **TODO:** Rate limiting middleware not implemented yet.
 
-Requests are rate-limited per API key. If you exceed the limit, the server responds with `429 Too Many Requests`.
-
-| Header                    | Description                                   |
-|---------------------------|-----------------------------------------------|
-| `X-RateLimit-Limit`       | Max requests per window                       |
-| `X-RateLimit-Remaining`   | Requests left in current window               |
-| `X-RateLimit-Reset`       | Seconds until the window resets               |
+---
 
 ## Common Error Responses
 
@@ -38,13 +37,13 @@ All errors return JSON in this format:
 }
 ```
 
-| Status    | Meaning                                   |
-|-----------|-------------------------------------------|
-| 400       | Bad request — invalid or missing data     |
-| 401       | Unauthorized — missing or invalid API key |
-| 404       | Not found — resource does not exist       |
-| 429       | Too many requests — rate limit exceeded   |
-| 500       | Internal server error                     |
+| Status    | Meaning                                                   |
+|-----------|-----------------------------------------------------------|
+| 400       | Bad request — invalid or missing data                    |
+| 401       | Unauthorized — missing or invalid JWT token              |
+| 403       | Forbidden — lacks required permissions/roles             |
+| 404       | Not found — resource does not exist                      |
+| 500       | Internal server error                                    |
 
 ---
 
@@ -169,13 +168,13 @@ Create a new user.
 
 Update a user profile. Requires authentication.
 
-**Authentication:** JWT token in `token` cookie
+**Authentication:** JWT token in `token` cookie (via `middleware.Authentication()`)
 
 **Permissions:**
-- A user can update their own profile
+- A user can update their own profile (all fields except roles)
 - A user can change their own password
 - An admin can update any user's profile fields
-- An admin can update roles
+- An admin can update roles (only)
 - An admin cannot change another user's password
 
 **Request body:**
@@ -501,10 +500,9 @@ Get a single recipe by ID.
 Create a new recipe.
 
 **Authentication/Authorization:**
-- Requires a valid JWT in the authentication cookie.
-- Requires the `create_recipe` permission.
-- Returns `401 Unauthorized` if the JWT cookie is missing or invalid.
-- Returns `403 Forbidden` if the authenticated user does not have the `create_recipe` permission.
+- Requires: `middleware.Authentication()` + `middleware.RequirePermission("create_recipe")`
+- Returns `401 Unauthorized` if the JWT cookie is missing or invalid
+- Returns `403 Forbidden` if the authenticated user does not have `create_recipe` permission
 
 **Request body:**
 ```json
@@ -544,7 +542,7 @@ Create a new recipe.
 
 Get a pre-signed Cloudinary signature for uploading recipe images. Required for secure client-side image uploads.
 
-**Requires:** Valid JWT in `token` cookie (set during login).
+**Authentication:** `middleware.Authentication()` + `middleware.RequirePermission("create_recipe")`
 
 **Response** `200 OK`
 ```json
@@ -560,6 +558,7 @@ Get a pre-signed Cloudinary signature for uploading recipe images. Required for 
 | Status    | When                                  |
 |-----------|---------------------------------------|
 | 401       | Unauthorized — missing or invalid JWT |
+| 403       | Forbidden — lacks `create_recipe` permission |
 | 500       | Failed to generate signature          |
 
 ---
@@ -587,17 +586,43 @@ Upload an image for a recipe. Uses multipart form data.
 
 ### PUT /api/recipes/:id
 
-Replace a recipe completely. All fields are required.
+### PUT /api/recipes/:id
 
-**Request body:** same as POST /api/recipes (without author_id, which cannot be changed).
+Update a recipe.
+
+**Authentication:** `middleware.Authentication()`
+
+**Authorization:**
+- Owner (author) can edit their own recipe
+- Users with `edit_recipe` permission can edit any recipe
+
+**Request body:**
+```json
+{
+  "title": "Pasta Carbonara",
+  "description": "Classic Italian pasta",
+  "preparation_time_min": 20,
+  "servings": 4,
+  "difficulty": "medium",
+  "cuisine": "italian",
+  "meal_type": "dinner",
+  "image_url": "/images/carbonara.jpg",
+  "calories": 550,
+  "protein_g": 25.0,
+  "carbs_g": 60.0,
+  "fat_g": 22.0
+}
+```
 
 **Response** `200 OK` — returns the updated recipe.
 
 **Errors:**
-| Status    | When                                      |
-|-----------|-------------------------------------------|
-| 400       | Missing required fields or invalid values |
-| 404       | Recipe not found                          |
+| Status    | When                                          |
+|-----------|-----------------------------------------------|
+| 400       | Missing required fields or invalid values     |
+| 401       | Unauthorized — missing or invalid JWT         |
+| 403       | Forbidden — not the author and lacks permission |
+| 404       | Recipe not found                              |
 
 ---
 
@@ -605,12 +630,20 @@ Replace a recipe completely. All fields are required.
 
 Delete a recipe. Cascades: removes its favourites.
 
+**Authentication:** `middleware.Authentication()`
+
+**Authorization:**
+- Owner (author) can delete their own recipe
+- Users with `delete_recipe` permission can delete any recipe
+
 **Response** `204 No Content`
 
 **Errors:**
-| Status    | When              |
-|-----------|-------------------|
-| 404       | Recipe not found  |
+| Status    | When                                          |
+|-----------|-----------------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT         |
+| 403       | Forbidden — not the author and lacks permission |
+| 404       | Recipe not found                              |
 
 ---
 

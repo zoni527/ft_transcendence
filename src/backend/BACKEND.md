@@ -8,18 +8,23 @@
 ## Architecture Layers
 
 ```
-Routes (main.go)              → defines routes, calls handlers
-Handlers (handlers/)          → validates input, sends JSON responses
+Routes (main.go)              → defines routes, attaches middleware, calls handlers
+Middleware                    → authenticates user, checks permissions/roles
+Handlers (handlers/)          → validates input, calls authorization checks, calls repository, returns JSON
+Authorization (authorization/) → JWT handling, permissions/roles logic, token blacklist
 Repository (repository/)      → handles SQL queries, returns Go structs
 PostgreSQL                    → stores the actual data
 ```
 In particular:
-- **main.go** — defines **Gin** routes and wires them to handler functions.
-- **handlers/** — receives requests, validates input, calls repository functions, returns JSON.
+- **main.go** — defines **Gin** routes and wires them to middleware and handler functions.
+- **middleware/** — `Authentication()` validates JWT and loads user info; `RequireRoles()` and `RequirePermission()` gate routes by role/permission.
+- **handlers/** — receives requests, validates input, calls authorization functions for authorship checks, calls repository functions, returns JSON.
+- **authorization/** — JWT token generation/validation, token blacklist management, permission/role helpers, and authorship checking functions.
+- **config/** — loads environment variables for JWT secret and Cloudinary credentials.
 - **repository/** — pgx query functions (`GetAllUsers`, `CreateUser`, etc.). Only talks to the database.
 - Each layer only talks to the one below it.
 
-For user updates, the handler decides whether the caller is editing their own profile or acting as an admin, then allows only the fields that fit that role.
+For user updates or recipe modifications, handlers use authorization functions to check whether the caller is editing their own content or holds necessary permissions.
 
 ## Connection Pool (pgxpool)
 
@@ -145,9 +150,116 @@ func CreateUser(u user) (user, error) {
 | 200  | `http.StatusOK`                   | Success (GET, PUT)                       |
 | 201  | `http.StatusCreated`              | Successfully created a resource (POST)   |
 | 400  | `http.StatusBadRequest`           | User sent invalid/missing data           |
+| 403  | `http.StatusForbidden`            | User lacks required permissions/roles    |
 | 404  | `http.StatusNotFound`             | Resource doesn't exist (wrong ID, etc.)  |
 | 500  | `http.StatusInternalServerError`  | Server/DB error (not the user's fault)   |
 
+## Middleware
+
+Routes are protected by middleware that runs before handlers. Middleware is stacked; all conditions must pass for the handler to run.
+
+### Authentication
+
+```go
+middleware.Authentication()
+```
+
+Validates the user by reading the `token` cookie, validating the JWT, checking the token blacklist, and storing user data on the Gin context:
+
+- `userID` — the user's UUID
+- `userRoles` — a map of role names the user holds
+- `userPerms` — a map of permissions the user has (flattened from all roles)
+- `token` — the raw JWT
+- `expDate` — token expiration time
+
+**Returns:**
+| Status | When |
+|---|---|
+| 401 `{"error":"unauthorized"}`   | No `token` cookie |
+| 401 `{"error":"invalid token"}`  | JWT validation failed or token is blacklisted |
+| 500                              | Blacklist lookup errored |
+
+### Role-Based Access Control
+
+```go
+middleware.RequireRoles("admin", "moderator")
+```
+
+Checks if the user has at least one of the required roles. Must come after `Authentication()`. Returns `403 Forbidden` if the user lacks all specified roles.
+
+**Example:**
+```go
+router.POST("/api/recipes",
+    middleware.Authentication(),
+    middleware.RequireRoles("chef", "admin"),
+    handlers.CreateRecipe)
+```
+
+### Permission-Based Access Control
+
+```go
+middleware.RequirePermission("create_recipe", "edit_recipe")
+```
+
+Checks if the user has at least one of the required permissions. Must come after `Authentication()`. Admin users automatically pass all permission checks. Returns `403 Forbidden` if the user lacks all specified permissions.
+
+**Example:**
+```go
+router.POST("/api/recipes",
+    middleware.Authentication(),
+    middleware.RequirePermission("create_recipe"),
+    handlers.CreateRecipe)
+```
+
+## Authorization Functions
+
+Helper functions for role and permission checks inside handlers:
+
+- `HasAnyRole(roleSet, ...roles)` — true if user holds at least one role
+- `HasPermission(roleSet, permSet, permission)` — true if user has permission (admin always passes)
+- `HasAnyPermission(roleSet, permSet, ...permissions)` — true if user has at least one permission
+- `CanEditRecipe(roleSet, permSet, userID, authorID)` — true if user is author or has `edit_recipe` permission
+- `CanDeleteRecipe(roleSet, permSet, userID, authorID)` — true if user is author or has `delete_recipe` permission
+
+**Authorship Pattern:**
+For "edit your own thing" endpoints, handlers check authorship first:
+
+```go
+func UpdateRecipe(c *gin.Context) {
+    userID := c.GetString("userID")
+    roleSet, _ := authorization.RolesFromContext(c)
+    permSet, _ := authorization.PermsFromContext(c)
+    
+    original, err := repository.GetRecipeById(recipeID)
+    
+    if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.Id) {
+        c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+        return
+    }
+    
+    // ... update the recipe
+}
+```
+
+## JWT Tokens
+
+- `GenerateJWTToken(userID)` — creates a signed JWT with 1-hour expiration
+- `ValidateJWTToken(token)` — parses and validates the JWT signature and expiration
+- `InitJWTSecret(secret)` — loads the JWT secret from the environment (called at startup)
+- `TokenCleanupLoop()` — background goroutine that clears expired tokens from the blacklist (called at startup)
+
+Tokens are stored in the `token` cookie (HttpOnly, SameSite=Lax). When a user logs out, their token is added to the blacklist table so it cannot be replayed.
+
+## Configuration
+
+Loads environment variables at startup:
+
+- `JWT_SECRET` — secret key for signing JWT tokens
+- `CLOUDINARY_KEY` — Cloudinary API key for image uploads
+- `CLOUDINARY_SECRET` — Cloudinary API secret
+- `CLOUDINARY_CLOUD_NAME` — Cloudinary cloud name
+
+Missing variables cause the app to exit on startup.
 
 ## Connecting Gin handlers to repository functions
 

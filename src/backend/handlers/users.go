@@ -352,7 +352,7 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-
+	markOnline(&user)
 	c.IndentedJSON(http.StatusOK, user)
 }
 

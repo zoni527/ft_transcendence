@@ -61,12 +61,14 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          <NavButton
-            path="/friends"
-            className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}
-          >
-            {t('nav.friends')}
-          </NavButton>
+          {user && (
+            <NavButton
+              path="/friends"
+              className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}
+            >
+              {t('nav.friends')}
+            </NavButton>
+          )}
 
           {!user && !loading ? (
             <NavButton

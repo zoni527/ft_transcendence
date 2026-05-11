@@ -696,10 +696,10 @@ Get all recipes a user has favourited.
 | GET /api/users/me                 | done   |
 | GET /api/users/session            | done   |
 | PUT /api/users/me/heartbeat       | done   |
-| GET /api/users/search?q=          | TODO   |
-| POST /api/users                   | TODO   |
-| PUT /api/users/:id                | TODO   |
+| POST /api/users                   | done   |
+| PUT /api/users/:id                | done   |
 | DELETE /api/users/:id             | TODO   |
+| GET /api/users/search?q=          | TODO   |
 | GET /api/recipes                  | done   |
 | GET /api/recipes/:id              | done   |
 | GET /api/recipes/image-signature  | done   |

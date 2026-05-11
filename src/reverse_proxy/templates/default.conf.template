@@ -4,8 +4,8 @@ server {
 	listen ${NGINX_PORT_INTERNAL} ssl;
 
 	ssl_protocols		TLSv1.2 TLSv1.3;
-	ssl_certificate		/certs/backend.crt;
-	ssl_certificate_key	/certs/backend.key;
+	ssl_certificate		/certs/reverse_proxy.crt;
+	ssl_certificate_key	/certs/reverse_proxy.key;
 
 	# Backend
 	location /api/ {

@@ -20,6 +20,21 @@ openssl req -x509 -noenc -newkey rsa:2048 2>/dev/null \
 	-days	${DAYS} \
 	-subj	"/C=FI/ST=UUSIMAA/L=Helsinki/O=42/OU=Hive/CN=ft_transcendence_ca"
 
+# Reverse proxy cert
+openssl req -noenc -newkey rsa:2048 2>/dev/null \
+	-keyout	${CERTS_DIR}/reverse_proxy.key \
+	-out	${CERTS_DIR}/reverse_proxy.csr \
+	-subj	"/C=FI/ST=UUSIMAA/L=Helsinki/O=42/OU=Hive/CN=reverse_proxy" \
+	-addext	"subjectAltName = DNS:reverse_proxy, DNS:localhost"
+openssl x509 -req 2>/dev/null \
+	-in		${CERTS_DIR}/reverse_proxy.csr \
+	-CA		${CERTS_DIR}/ca.crt \
+	-CAkey	${CERTS_DIR}/ca.key \
+	-CAcreateserial \
+	-copy_extensions copyall \
+	-out	${CERTS_DIR}/reverse_proxy.crt \
+	-days	${DAYS}
+
 # Backend cert
 openssl req -noenc -newkey rsa:2048 2>/dev/null \
 	-keyout	${CERTS_DIR}/backend.key \

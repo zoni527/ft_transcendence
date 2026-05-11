@@ -779,6 +779,7 @@ Get all recipes a user has favourited.
 | POST /api/users/logout            | done   |
 | GET /api/users/me                 | done   |
 | GET /api/users/session            | done   |
+| PUT /api/users/me/heartbeat       | done   |
 | GET /api/users/search?q=          | TODO   |
 | POST /api/users                   | TODO   |
 | PUT /api/users/:id                | TODO   |

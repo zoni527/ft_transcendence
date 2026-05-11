@@ -53,8 +53,9 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
         />
       )}
       <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6">
-          {/* Full name */}
+        {/* Left side */}
+        <div className="flex min-w-0 flex-col gap-2 md:flex-row md:items-center md:gap-6">
+          {/* Name */}
           <div className="w-64 truncate text-xl font-semibold text-gray-700">
             {user.name}
           </div>
@@ -66,7 +67,7 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
         </div>
 
         {/* Right side: buttons */}
-        <div className="flex flex-col gap-2 p-2 md:flex-row md:gap-3">
+        <div className="flex shrink-0 flex-col gap-2 p-2 md:flex-row md:gap-3">
           <ModalButton
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             onClick={() => setIsUserEditOpen(true)}

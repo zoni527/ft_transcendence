@@ -122,11 +122,11 @@ const AdminPanel = () => {
 
       {/* Sort Controls */}
       {activeSection === 'users' && (
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex gap-6">
+        <div className="mt-6 flex w-full justify-center md:justify-start">
+          <div className="flex flex-col items-center gap-3 md:flex-row md:items-start md:gap-6">
             <button
               onClick={() => setSortBy('name')}
-              className={`w-64 truncate text-left text-lg font-bold transition-colors hover:cursor-pointer ${
+              className={`text-lg font-bold transition-colors hover:cursor-pointer md:w-64 md:text-left ${
                 sortBy === 'name'
                   ? 'text-[#C04D31]'
                   : 'text-gray-500 hover:text-gray-700'
@@ -137,7 +137,7 @@ const AdminPanel = () => {
 
             <button
               onClick={() => setSortBy('username')}
-              className={`w-64 truncate text-left text-lg font-bold transition-colors hover:cursor-pointer ${
+              className={`text-lg font-bold transition-colors hover:cursor-pointer md:w-64 md:text-left ${
                 sortBy === 'username'
                   ? 'text-[#C04D31]'
                   : 'text-gray-500 hover:text-gray-700'

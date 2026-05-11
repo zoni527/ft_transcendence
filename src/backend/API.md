@@ -69,8 +69,9 @@ Get all users.
     "email": "user@example.com",
     "name": "Jane",
     "display_name": "jane_cooks",
-    "created_at": "2026-04-09T12:00:00Z",
+    "last_seen": "2026-05-11T14:30:00Z",
     "is_online": true,
+    "created_at": "2026-04-09T12:00:00Z",
     "updated_at": "2026-04-09T12:00:00Z",
     "roles": ["user"]
   }
@@ -114,6 +115,8 @@ Get a single user by ID.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
   "roles": ["user"]
@@ -150,6 +153,8 @@ Create a new user.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
   "roles": ["user"]
@@ -209,6 +214,8 @@ Update a user profile. Requires authentication.
   "email": "newemail@example.com",
   "name": "Jane Doe",
   "display_name": "jane_updated",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "avatar_url": "https://example.com/avatar.png",
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
@@ -315,6 +322,8 @@ Get the profile of the currently authenticated user.
   "email": "user@example.com",
   "name": "Jane",
   "display_name": "jane_cooks",
+  "last_seen": "2026-05-11T14:30:00Z",
+  "is_online": true,
   "created_at": "2026-04-09T12:00:00Z",
   "updated_at": "2026-04-09T12:00:00Z",
   "roles": ["user"]
@@ -365,6 +374,8 @@ Check whether the current browser session is authenticated.
     "email": "user@example.com",
     "name": "Jane",
     "display_name": "jane_cooks",
+    "last_seen": "2026-05-11T14:30:00Z",
+    "is_online": true,
     "created_at": "2026-04-09T12:00:00Z",
     "updated_at": "2026-04-09T12:00:00Z",
     "roles": ["user"]
@@ -533,12 +544,16 @@ Create a new recipe.
 }
 ```
 
+**Notes:**
+
+- `author_id` is automatically derived from the authenticated user and cannot be specified in the request body.
+
 **Response** `201 Created` — returns the created recipe's id.
 
 **Errors:**
 | Status | When |
 |-----------|-----------------------------------------------------------------------|
-| 400 | Missing required fields (title, author_id) |
+| 400 | Missing required fields (title, description, etc) or invalid values |
 | 400 | Invalid difficulty or meal_type value |
 | 400 | Negative or zero numeric fields (servings, preparation_time, etc.) |
 | 401 | Unauthorized — missing or invalid JWT |

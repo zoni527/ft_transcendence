@@ -54,6 +54,38 @@ func GetRolesByUserId(userId string) ([]string, error) {
 	return roles, nil
 }
 
+func GetEffectivePermissionsByUser(userId string) (map[string]bool, map[string]bool, error) {
+	sql := `SELECT r.name, p.name
+			FROM user_role ur
+			JOIN role r ON ur.role_id = r.id
+			LEFT JOIN role_permission rp ON rp.role_id = r.id
+			LEFT JOIN permission p ON rp.permission_id = p.id
+			WHERE ur.user_id = $1`
+	rows, err := Pool.Query(context.Background(), sql, userId)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error querying roles/permissions: %w", err)
+	}
+	defer rows.Close()
+
+	roles := make(map[string]bool)
+	perms := make(map[string]bool)
+	for rows.Next() {
+		var roleName string
+		var permName *string
+		if err := rows.Scan(&roleName, &permName); err != nil {
+			return nil, nil, err
+		}
+		roles[roleName] = true
+		if permName != nil && *permName != "" {
+			perms[*permName] = true
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, err
+	}
+	return roles, perms, nil
+}
+
 // getRolesByUserIdTx is the transaction version of GetRolesByUserId.
 func getRolesByUserIdTx(tx pgx.Tx, userId string) ([]string, error) {
 	sql := `SELECT r.name

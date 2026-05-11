@@ -15,17 +15,17 @@ import (
 	"net/http"
 	"net/mail"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
 
+	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/integrations"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/nbutton23/zxcvbn-go"
 	"golang.org/x/crypto/bcrypt"
@@ -43,7 +43,7 @@ func GetUsers(c *gin.Context) {
 
 func GetUserById(c *gin.Context) {
 	id := c.Param("id")
-	if !isValidUUID(id) {
+	if !authorization.IsValidUUID(id) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
 		return
 	}
@@ -63,7 +63,7 @@ func GetUserById(c *gin.Context) {
 
 func GetMe(c *gin.Context) {
 	userID := c.GetString("userID")
-	if !isValidUUID(userID) {
+	if !authorization.IsValidUUID(userID) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
@@ -80,6 +80,26 @@ func GetMe(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, user)
 }
 
+func UserAvatarSignature(c *gin.Context) {
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	folder := "avatar"
+	allowedFormats := "jpg, jpeg, png, webp"
+	params := map[string]string{
+		"timestamp":       timestamp,
+		"folder":          folder,
+		"allowed_formats": allowedFormats,
+	}
+	signature := integrations.GenerateCloudinarySignature(params)
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"signature":       signature,
+		"api_key":         integrations.APIKey(),
+		"cloud_name":      integrations.CloudName(),
+		"timestamp":       timestamp,
+		"folder":          folder,
+		"allowed_formats": allowedFormats,
+	})
+}
+
 func GetSession(c *gin.Context) {
 	token, err := c.Cookie("token")
 	if err != nil {
@@ -87,28 +107,28 @@ func GetSession(c *gin.Context) {
 		return
 	}
 
-	claims, err := ValidateJWTToken(token)
+	claims, err := authorization.ValidateJWTToken(token)
 	if err != nil {
-		clearAuthCookie(c)
+		authorization.ClearAuthCookie(c)
 		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
 
-	blacklisted, err := isTokenBlacklisted(token)
+	blacklisted, err := authorization.IsTokenBlacklisted(token)
 	if err != nil {
 		log.Printf("GetSession blacklist check: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	if blacklisted {
-		clearAuthCookie(c)
+		authorization.ClearAuthCookie(c)
 		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
 
 	user, err := repository.GetUserById(claims.Subject)
 	if err == pgx.ErrNoRows {
-		clearAuthCookie(c)
+		authorization.ClearAuthCookie(c)
 		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
@@ -161,7 +181,7 @@ func CreateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	token, err := generateJWTToken(data.Id)
+	token, err := authorization.GenerateJWTToken(data.Id)
 	if err != nil {
 		log.Printf("CreateUser generateJWTToken error: %v", err)
 		c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false})
@@ -193,7 +213,7 @@ func LoginUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
-	token, err := generateJWTToken(data.Id)
+	token, err := authorization.GenerateJWTToken(data.Id)
 	if err != nil {
 		log.Printf("LoginUser generateJWTToken error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -207,37 +227,36 @@ func LoginUser(c *gin.Context) {
 func LogoutUser(c *gin.Context) {
 	token := c.GetString("token")
 	expDate := c.GetTime("expDate")
-	if err := addTokenToBlacklist(token, expDate); err != nil {
+	if err := authorization.AddTokenToBlacklist(token, expDate); err != nil {
 		log.Printf("LogoutUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	clearAuthCookie(c)
+	authorization.ClearAuthCookie(c)
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
 func UpdateUser(c *gin.Context) {
 	targetUserID := c.Param("id")
-	if !isValidUUID(targetUserID) {
+	if !authorization.IsValidUUID(targetUserID) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
 	callerUserID := c.GetString("userID")
-	if !isValidUUID(callerUserID) {
+	if !authorization.IsValidUUID(callerUserID) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-
-	callerRoles, err := repository.GetRolesByUserId(callerUserID)
-	if err != nil {
-		log.Printf("UpdateUser GetRolesByUserId: %v", err)
+	roleSet, okRoles := authorization.RolesFromContext(c)
+	permSet, okPerms := authorization.PermsFromContext(c)
+	if !okRoles || !okPerms {
+		log.Printf("handlers.UpdateUser: data missing from context")
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	callerIsAdmin := hasRole(callerRoles, "admin")
-	callerIsOwner := callerUserID == targetUserID
-	if !callerIsOwner && !callerIsAdmin {
+	allowed := authorization.CanEditUser(roleSet, callerUserID, targetUserID)
+	if !allowed {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 		return
 	}
@@ -251,7 +270,7 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if req.Password != nil && !callerIsOwner {
+	if req.Password != nil && callerUserID != targetUserID {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "password can only be changed by the account owner"})
 		return
 	}
@@ -265,11 +284,12 @@ func UpdateUser(c *gin.Context) {
 			return
 		}
 	}
-	if req.Roles != nil && !callerIsAdmin {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "roles can only be changed by an admin"})
-		return
-	}
 	if req.Roles != nil {
+		canManageRoles := authorization.CanManageRoles(roleSet, permSet, callerUserID, targetUserID)
+		if !canManageRoles {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions or self-update not allowed"})
+			return
+		}
 		if err := validateRoles(req.Roles); err != nil {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -325,11 +345,6 @@ func DeleteUser(c *gin.Context) {
 func SearchUsers(c *gin.Context) {
 	// TODO: call repository.SearchUsers()
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
-}
-
-func clearAuthCookie(c *gin.Context) {
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("token", "", -1, "/", "", false, true)
 }
 
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.
@@ -578,15 +593,6 @@ func isValidDisplayName(displayName string) bool {
 	return hasAlphaNum
 }
 
-func hasRole(roles []string, role string) bool {
-	for _, currentRole := range roles {
-		if currentRole == role {
-			return true
-		}
-	}
-	return false
-}
-
 func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
 	return req.Email != nil ||
 		req.Name != nil ||
@@ -594,122 +600,4 @@ func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
 		req.Display_name != nil ||
 		req.Avatar_url != nil ||
 		req.Roles != nil
-}
-
-// Secret key used to sign every generated JWT
-var jwtSecret []byte
-
-// Initialize JWT secret from JWT_SECRET at startup.
-func LoadJWTSecret() {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		log.Fatal("Error loading JWT secret")
-	}
-	jwtSecret = []byte(secret)
-}
-
-// Function to generate JWT to be sent to frontend for authentication on successful login
-func generateJWTToken(userID string) (string, error) {
-	now := time.Now()
-	claims := jwt.RegisteredClaims{
-		Subject:   userID,
-		ExpiresAt: jwt.NewNumericDate(now.Add(1 * time.Hour)),
-		IssuedAt:  jwt.NewNumericDate(now),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
-}
-
-// Function to validate JWT sent by frontend
-func ValidateJWTToken(token string) (*jwt.RegisteredClaims, error) {
-	claims := &jwt.RegisteredClaims{}
-	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
-		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
-			return nil, fmt.Errorf("unexpected signing method %s", t.Method.Alg())
-		}
-		return jwtSecret, nil
-	})
-	if err != nil || !parsedToken.Valid {
-		return nil, fmt.Errorf("invalid token")
-	}
-	if claims.Subject == "" {
-		return nil, fmt.Errorf("missing userID")
-	}
-	if claims.ExpiresAt == nil {
-		return nil, fmt.Errorf("missing expiration date")
-	}
-	return claims, nil
-}
-
-// Middleware to check cookies validity and JWT before granting access to restricted paths
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token, err := c.Cookie("token")
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-			return
-		}
-		claims, err := ValidateJWTToken(token)
-		if err != nil {
-			log.Printf("ValidateJWTToken failed: %v", err)
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-			return
-		}
-		blacklisted, err := isTokenBlacklisted(token)
-		if err != nil {
-			log.Printf("Check blacklist failed: %v", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-			return
-		}
-		if blacklisted {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-			return
-		}
-		c.Set("token", token)
-		c.Set("userID", claims.Subject)
-		c.Set("expDate", claims.ExpiresAt.Time)
-		c.Next()
-	}
-}
-
-func isTokenBlacklisted(token string) (bool, error) {
-	exist, err := repository.GetTokenBlacklisted(token)
-	if err != nil {
-		return false, fmt.Errorf("check token blacklist: %w", err)
-	}
-	return exist, nil
-}
-
-func addTokenToBlacklist(token string, expirationDate time.Time) error {
-	err := repository.AddTokenToBlacklist(token, expirationDate)
-	if err != nil {
-		return fmt.Errorf("addTokenToBlacklist: %w", err)
-	}
-	return nil
-}
-
-func TokenCleanupLoop() {
-	ticker := time.NewTicker(1 * time.Hour)
-	defer ticker.Stop()
-	for range ticker.C {
-		if err := repository.CleanExpiredTokens(time.Now()); err != nil {
-			log.Printf("TokenCleanupLoop: %v", err)
-		}
-	}
-}
-
-func UserAvatarSignature(c *gin.Context) {
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	params := map[string]string{
-		"timestamp": timestamp,
-		"folder":    "avatar",
-	}
-	signature := GenerateCloudinarySignature(params)
-	c.IndentedJSON(http.StatusOK, gin.H{
-		"signature":  signature,
-		"api_key":    string(cloudinaryKey),
-		"cloud_name": string(cloudinaryCloudName),
-		"timestamp":  timestamp,
-		"folder":     "avatar",
-	})
 }

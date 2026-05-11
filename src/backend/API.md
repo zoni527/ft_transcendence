@@ -704,8 +704,6 @@ Create a new ingredient category.
 
 ---
 
-> > > > > > > cb54140 (feat(backend): add heartbeat endpoint for online status)
-
 ## Favourites
 
 ### POST /api/recipes/:id/favourite

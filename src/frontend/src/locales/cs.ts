@@ -205,7 +205,7 @@ export const csTranslations = {
     title: 'Název receptu',
     titlePlace: 'Zadejte název receptu',
     description: 'Postup přípravy',
-    descriptionPlace: 'Krok 1: ...\nKrok 2: ...\nKrok 3: ...',
+    descriptionPlace: 'Krok 1 ...\nKrok 2 ...\nKrok 3 ...',
     prep: 'Příprava (min)',
     prepPlace: 'Zadejte dobu přípravy v minutách',
     servings: 'Porce',

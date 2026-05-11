@@ -205,7 +205,7 @@ export const fiTranslations = {
     title: 'Reseptin nimi',
     titlePlace: 'Syötä reseptin nimi',
     description: 'Valmistusvaiheet',
-    descriptionPlace: 'Vaihe 1: ...\nVaihe 2: ...\nVaihe 3: ...',
+    descriptionPlace: 'Vaihe 1 ...\nVaihe 2 ...\nVaihe 3 ...',
     prep: 'Valmistusaika (min)',
     prepPlace: 'Syötä valmistusaika minuutteina',
     servings: 'Annokset',

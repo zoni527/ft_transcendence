@@ -205,7 +205,7 @@ export const enTranslations = {
     title: 'Recipe name',
     titlePlace: 'Enter recipe name',
     description: 'Preparation steps',
-    descriptionPlace: 'Step 1: ...\nStep 2: ...\nStep 3: ...',
+    descriptionPlace: 'Step 1 ...\nStep 2 ...\nStep 3 ...',
     prep: 'Preparation time (min)',
     prepPlace: 'Enter preparation time in minutes',
     servings: 'Servings',

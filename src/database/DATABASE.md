@@ -107,7 +107,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 ### Key Design Decisions
 
 - **Favourite count is computed, not stored** — instead of a `has_been_favourite_times` column on recipe, we count from `recipe_favourite` with `COUNT(*)`. This prevents the count from going out of sync.
-- **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack) are validated at the database level.
+- **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack/dessert) are validated at the database level.
 - **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its favourites.
 - **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship). TOS should state that created recipes remain after account deletion with authorship anonymized.
 

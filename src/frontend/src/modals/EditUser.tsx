@@ -262,7 +262,6 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             <SubmitButton
               className="rounded-full border-3 border-orange-700 hover:border-orange-800"
               isLoading={loading}
-              pendingText={t('editUser.submitPending')}
               defaultText={t('editUser.submit')}
             />
           </div>

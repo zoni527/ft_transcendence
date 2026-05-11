@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
-  const { user: authUser, hasRole, loading: authLoading } = useAuth();
+  const { user: authUser, hasRole, loading: authLoading, logout } = useAuth();
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -36,6 +36,7 @@ const Dashboard = () => {
 
     deleteUser(id, t)
       .then(() => {
+        logout();
         void navigate('/');
         showNotification(t('notification.userDeleteSuccess'), 'success');
       })
@@ -188,7 +189,6 @@ const Dashboard = () => {
             <SubmitButton
               className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
               isLoading={loading}
-              pendingText={t('dashboard.submitPending')}
               defaultText={t('dashboard.submit')}
               onClick={() => handleDelete(userData.id)}
               type="button"

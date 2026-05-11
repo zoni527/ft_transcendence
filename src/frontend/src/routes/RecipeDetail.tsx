@@ -38,7 +38,7 @@ const RecipeDetail = () => {
 
   useEffect(() => {
     if (!id) return;
-    if (!recipe) fetchRecipe();
+    if (!recipe || recipe.id !== id) fetchRecipe();
   }, [id, recipe, fetchRecipe]);
 
   const handleDelete = (id?: string) => {
@@ -170,7 +170,6 @@ const RecipeDetail = () => {
           <SubmitButton
             className="order-2 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
             isLoading={loading}
-            pendingText={t('recipeDetail.submitPending')}
             defaultText={t('recipeDetail.submit')}
             onClick={() => handleDelete(id)}
             type="button"

@@ -36,7 +36,6 @@ export const csTranslations = {
     fat: 'Tuky (g)',
     editRecipe: 'Upravit recept',
     submit: 'Smazat recept',
-    submitPending: 'Mazání...',
   },
   dashboard: {
     name: 'Celé jméno',
@@ -48,7 +47,6 @@ export const csTranslations = {
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
-    submitPending: 'Mazání...',
   },
   adminPanel: {
     header: 'Administrátorský panel',
@@ -56,7 +54,6 @@ export const csTranslations = {
     recipes: 'Databáze receptů',
     edit: 'Upravit',
     delete: 'Smazat',
-    deletePending: 'Mazání...',
   },
   footer: {
     privacy: 'Zásady ochrany osobních údajů',
@@ -187,7 +184,6 @@ export const csTranslations = {
     password: 'Heslo',
     passwordPlace: 'Zadejte své heslo',
     submit: 'Pokračovat',
-    submitPending: 'Přihlašování...',
   },
   signup: {
     header: 'Registrovat se',
@@ -202,7 +198,6 @@ export const csTranslations = {
     rePassword: 'Potvrďte heslo',
     rePasswordPlace: 'Zadejte své heslo znovu',
     submit: 'Pokračovat',
-    submitPending: 'Registrování...',
   },
   createRecipe: {
     header: 'Vytvořit recept',
@@ -230,18 +225,15 @@ export const csTranslations = {
     no: 'Ne',
     uploadImage: 'Nahrát obrázek',
     submit: 'Odeslat',
-    submitPending: 'Odesílám...',
   },
   editUser: {
     header: 'Upravit profil',
     uploadAvatar: 'Nahrát avatar',
     submit: 'Odeslat',
-    submitPending: 'Upravuji...',
   },
   editRecipe: {
     header: 'Upravit recept',
     submit: 'Odeslat',
-    submitPending: 'Upravuji...',
   },
   difficulty: {
     type: 'Obtížnost',

@@ -36,7 +36,6 @@ export const fiTranslations = {
     fat: 'Rasva (g)',
     editRecipe: 'Muokkaa reseptiä',
     submit: 'Poista resepti',
-    submitPending: 'Poistetaan...',
   },
   dashboard: {
     name: 'Koko nimi',
@@ -48,7 +47,6 @@ export const fiTranslations = {
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
     submit: 'Poista profiili',
-    submitPending: 'Poistetaan...',
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
@@ -56,7 +54,6 @@ export const fiTranslations = {
     recipes: 'Reseptitietokanta',
     edit: 'Muokkaa',
     delete: 'Poista',
-    deletePending: 'Poistetaan...',
   },
   footer: {
     privacy: 'Tietosuojakäytäntö',
@@ -187,7 +184,6 @@ export const fiTranslations = {
     password: 'Salasana',
     passwordPlace: 'Syötä salasana',
     submit: 'Jatka',
-    submitPending: 'Kirjaudutaan...',
   },
   signup: {
     header: 'Rekisteröidy',
@@ -202,7 +198,6 @@ export const fiTranslations = {
     rePassword: 'Vahvista salasana',
     rePasswordPlace: 'Syötä salasana uudelleen',
     submit: 'Jatka',
-    submitPending: 'Rekisteröidään...',
   },
   createRecipe: {
     header: 'Luo resepti',
@@ -230,18 +225,15 @@ export const fiTranslations = {
     no: 'Ei',
     uploadImage: 'Lataa kuva',
     submit: 'Lähetä',
-    submitPending: 'Lähetetään...',
   },
   editUser: {
     header: 'Muokkaa profiilia',
     uploadAvatar: 'Lataa profiilikuva',
     submit: 'Lähetä',
-    submitPending: 'Päivitetään...',
   },
   editRecipe: {
     header: 'Muokkaa reseptiä',
     submit: 'Lähetä',
-    submitPending: 'Päivitetään...',
   },
   difficulty: {
     type: 'Vaikeusaste',

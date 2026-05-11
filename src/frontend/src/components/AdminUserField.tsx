@@ -72,7 +72,6 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
           <SubmitButton
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             isLoading={loading}
-            pendingText={t('adminPanel.deletePending')}
             defaultText={t('adminPanel.delete')}
             onClick={() => handleDelete(user.id)}
             type="button"

@@ -337,7 +337,6 @@ const EditRecipeModal = ({
             <SubmitButton
               className="rounded-full border-3 border-orange-700 hover:border-orange-800"
               isLoading={loading}
-              pendingText={t('editRecipe.submitPending')}
               defaultText={t('editRecipe.submit')}
             />
           </div>

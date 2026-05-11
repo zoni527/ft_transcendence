@@ -17,7 +17,7 @@ CREATE TABLE "user" (
     avatar_url      VARCHAR NOT NULL DEFAULT 'https://res.cloudinary.com/dhuk7trpf/image/upload/v1777887730/f06qpjbotv8rahtc287u.png',
     created_at      TIMESTAMP DEFAULT now(),
     updated_at      TIMESTAMP DEFAULT now(),
-    last_seen       TIMESTAMP DEFAULT now()
+    last_seen       TIMESTAMP NOT NULL DEFAULT now()
 );
 
 

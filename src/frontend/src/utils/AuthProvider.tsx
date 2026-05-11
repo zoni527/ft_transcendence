@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { AuthContext } from './AuthContext';
-import { getSession } from '../api';
+import { getSession, putHeartbeat } from '../api';
 import type { User } from '../types/types';
 
 type Props = {
@@ -44,6 +44,19 @@ const AuthProvider = ({ children, t }: Props) => {
       isMounted = false;
     };
   }, [t]);
+
+  // Heartbeat effect
+  useEffect(() => {
+    if (!user) return;
+
+    void putHeartbeat(t).catch(console.error);
+
+    const interval = setInterval(() => {
+      void putHeartbeat(t).catch(console.error);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [user, t]);
 
   const login = (userData: User) => {
     setUser(userData);

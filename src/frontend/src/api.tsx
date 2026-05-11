@@ -466,6 +466,22 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   }
 };
 
+// PUT /api/users/me/heartbeat
+export const putHeartbeat = async (t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/me/heartbeat`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+};
+
 // PUT /api/users/:id (user update)
 export const putUpdateUser = async (
   payload: UpdateUserPayload,

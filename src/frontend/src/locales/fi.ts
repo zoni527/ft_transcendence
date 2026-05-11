@@ -25,6 +25,7 @@ export const fiTranslations = {
     insufficientPermissions: 'Riittämättömät käyttöoikeudet',
   },
   recipeDetail: {
+    description: 'Valmistusvaiheet',
     author: 'Tekijä',
     prep: 'Valmisteluaika (min)',
     servings: 'Annosta',

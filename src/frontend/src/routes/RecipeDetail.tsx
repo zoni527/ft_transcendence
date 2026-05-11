@@ -100,9 +100,17 @@ const RecipeDetail = () => {
         </h1>
 
         {/* Description */}
-        <h2 className="mb-6 text-lg font-semibold whitespace-pre-line">
-          {recipe.description}
-        </h2>
+        <div className="mt-16 mb-24 flex flex-col">
+          <span className="text-lg text-gray-500">
+            {t('recipeDetail.description')}
+          </span>
+
+          <ul className="list-disc space-y-2 pl-5 text-xl font-medium text-gray-800">
+            {recipe.description.split('\n').map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ul>
+        </div>
 
         {/* Recipe Info Fields */}
         <div className="mt-6 flex flex-col space-y-8 md:flex-row md:space-y-0 md:space-x-8">

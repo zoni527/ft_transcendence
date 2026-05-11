@@ -25,6 +25,7 @@ export const enTranslations = {
     insufficientPermissions: 'Insufficient permissions',
   },
   recipeDetail: {
+    description: 'Preparation steps',
     author: 'Author',
     prep: 'Preparation time (min)',
     servings: 'Servings',

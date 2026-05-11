@@ -25,6 +25,7 @@ export const csTranslations = {
     insufficientPermissions: 'Nedostatečná oprávnění',
   },
   recipeDetail: {
+    description: 'Postup přípravy',
     author: 'Autor',
     prep: 'Doba přípravy (min)',
     servings: 'Porce',

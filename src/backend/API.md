@@ -230,19 +230,20 @@ Update a user profile. Requires authentication.
 
 ### DELETE /api/users/:id
 
-Delete a user. Cascades: removes their roles and favourites. Recipes they authored keep existing with `author_id` set to NULL.
+Delete a user. Requires authentication. A user may delete their own account; admins may delete any account. Cascades: removes the user's role assignments, favourites, and friendships. Recipes they authored remain with `author_id` set to NULL.
 
-**Response** `200 OK`
-```json
-{
-  "message": "user deleted"
-}
-```
+On self-delete the caller's JWT is added to the token blacklist and the auth cookie is cleared in the response.
+
+**Response** `204 No Content`
 
 **Errors:**
-| Status    | When                      |
-|-----------|---------------------------|
-| 404       | User not found            |
+| Status    | When                                                              |
+|-----------|-------------------------------------------------------------------|
+| 401       | Missing or invalid auth cookie                                    |
+| 403       | Caller is not the target user and is not an admin                 |
+| 403       | Target is the last remaining admin                                |
+| 404       | User not found (or malformed UUID in path)                        |
+| 500       | Internal server error                                             |
 
 ---
 
@@ -722,7 +723,7 @@ Get all recipes a user has favourited.
 | PUT /api/users/me/heartbeat       | done      |
 | POST /api/users                   | done      |
 | PUT /api/users/:id                | done      |
-| DELETE /api/users/:id             | TODO      |
+| DELETE /api/users/:id             | done      |
 | GET /api/users/search?q=          | done      |
 | GET /api/recipes                  | done      |
 | GET /api/recipes/:id              | done      |

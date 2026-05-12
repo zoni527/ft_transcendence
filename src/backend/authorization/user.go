@@ -34,5 +34,3 @@ func CanDeleteUser(roleSet map[string]bool, userID, targetUserID string) bool {
 	}
 	return HasAnyRole(roleSet, RoleAdmin)
 }
-
-

@@ -61,15 +61,6 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {user && (
-            <NavButton
-              path="/friends"
-              className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}
-            >
-              {t('nav.friends')}
-            </NavButton>
-          )}
-
           {loading ? null : !user ? (
             <NavButton
               path="/signup"
@@ -129,18 +120,6 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {user && (
-            <NavButton
-              path="/friends"
-              onClick={() => {
-                setMenuOpen(false);
-              }}
-              className={`${buttonBase} w-full rounded-full border-3 border-orange-700 hover:border-orange-800`}
-            >
-              {t('nav.friends')}
-            </NavButton>
-          )}
-
           {!user ? (
             <NavButton
               path="/signup"
@@ -162,7 +141,6 @@ const Navbar = () => {
               {t('nav.dashboard')}
             </NavButton>
           )}
-
           {!user ? (
             <NavButton
               path="/login"
@@ -184,7 +162,6 @@ const Navbar = () => {
               {t('nav.logout')}
             </NavButton>
           )}
-
           <LangDropdown />
         </div>
       )}

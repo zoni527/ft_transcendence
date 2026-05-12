@@ -357,29 +357,6 @@ func UpdateUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, user)
 }
 
-func DeleteUser(c *gin.Context) {
-	targetId := c.Param("id")
-
-	if !authorization.IsValidUUID(targetId) {
-        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
-        return
-	}
-
-	userRoles, _ := c.Get("userRoles")
-    roleMap := userRoles.(map[string]bool)
-    
-    if !authorization.HasAnyRole(roleMap, "admin") {
-        c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
-        return
-    }
-
-	isTargetAdmin, err:= authorization.HasAnyRole()
-
-
-
-	c.Status(http.StatusNoContent)
-}
-
 func SearchUser(c *gin.Context) {
 	query := c.Query("q")
 	query = strings.TrimSpace(query)
@@ -667,5 +644,44 @@ func Heartbeat(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+	c.Status(http.StatusNoContent)
+}
+
+func DeleteUser(c *gin.Context) {
+	targetUserID := c.Param("id")
+	if !authorization.IsValidUUID(targetUserID) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	callerUserID := c.GetString("userID")
+	if !authorization.IsValidUUID(callerUserID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+
+	roleSet, ok := authorization.RolesFromContext(c)
+	if !ok {
+		log.Printf("handlers.DeleteUser: data missing from context")
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	if !authorization.CanDeleteUser(roleSet, callerUserID, targetUserID) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		return
+	}
+
+	if err := repository.DeleteUser(targetUserID); err != nil {
+		var nf *repository.NotFoundError
+		if errors.As(err, &nf) {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
+			return
+		}
+		log.Printf("handlers.DeleteUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	LogoutUser(c) // but i kinda have to log that user out? not myself???
 	c.Status(http.StatusNoContent)
 }

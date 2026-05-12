@@ -364,6 +364,7 @@ func DeleteUser(c *gin.Context) {
 
 func SearchUser(c *gin.Context) {
 	query := c.Query("q")
+	query = strings.TrimSpace(query)
 	if query == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "search query not included"})
 		return
@@ -372,13 +373,13 @@ func SearchUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
 		return
 	}
-	user, err := repository.SearchUserByUsername(query)
+	users, err := repository.SearchUsersByUsername(query)
 	if err != nil {
 		log.Printf("SearchUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, user)
+	c.IndentedJSON(http.StatusOK, users)
 }
 
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.

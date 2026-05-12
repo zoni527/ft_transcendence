@@ -672,6 +672,17 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
+	isLastAdmin, err := repository.IsLastAdmin(targetUserID)
+	if err != nil {
+		log.Printf("handlers.DeleteUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if isLastAdmin {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
+		return
+	}
+
 	if err := repository.DeleteUser(targetUserID); err != nil {
 		var nf *repository.NotFoundError
 		if errors.As(err, &nf) {
@@ -682,6 +693,14 @@ func DeleteUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	LogoutUser(c) // but i kinda have to log that user out? not myself???
+
+	if callerUserID == targetUserID {
+		token := c.GetString("token")
+		expDate := c.GetTime("expDate")
+		if err := authorization.AddTokenToBlacklist(token, expDate); err != nil {
+			log.Printf("handlers.DeleteUser blacklist: %v", err)
+		}
+		authorization.ClearAuthCookie(c)
+	}
 	c.Status(http.StatusNoContent)
 }

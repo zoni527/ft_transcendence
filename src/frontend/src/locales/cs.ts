@@ -311,5 +311,6 @@ export const csTranslations = {
       'Registrace byla úspěšná, ale automatické přihlášení selhalo, přihlaste se prosím ručně',
     invalidFileType: 'Neplatný typ souboru',
     fileTooLarge: 'Soubor je příliš velký',
+    forbidden: 'Přístup odepřen: Chybí potřebná oprávnění.',
   },
 };

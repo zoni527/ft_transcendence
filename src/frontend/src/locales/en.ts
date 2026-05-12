@@ -309,5 +309,6 @@ export const enTranslations = {
     authError: 'Signup succeeded but automatic login failed, please log in',
     invalidFileType: 'Invalid file type',
     fileTooLarge: 'File too large',
+    forbidden: 'Permission Denied: No permissions to perform this action.',
   },
 };

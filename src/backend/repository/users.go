@@ -98,7 +98,7 @@ func SearchUsersByUsername(username string) ([]models.UserSearchResult, error) {
 	}
 	defer rows.Close()
 
-	var users []models.UserSearchResult
+	users := make([]models.UserSearchResult, 0)
 	for rows.Next() {
 		var u models.UserSearchResult
 		err := rows.Scan(

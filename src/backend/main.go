@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"strconv"
+	"unicode"
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/config"
@@ -32,9 +36,24 @@ func main() {
 	authorization.InitJWTSecret(cfg.JWTSecret)
 	integrations.InitCloudinary(cfg)
 
+	// Port from environment
+	port := os.Getenv("NGINX_PORT_EXTERNAL")
+	for _, d := range port {
+		if !unicode.IsDigit(d) {
+			log.Fatal("Bad port:", port)
+		}
+	}
+	if port == "" {
+		port = "8443"
+	}
+	portNum, err := strconv.Atoi(port)
+	if err != nil || (portNum < 1024 || portNum > 1<<16) {
+		log.Fatal("Bad port:", port)
+	}
+
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://localhost:8443"},
+		AllowOrigins:     []string{fmt.Sprintf("https://localhost:%v", port)},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
@@ -81,7 +100,7 @@ func main() {
 		handlers.DeleteRecipe)
 	router.POST("/api/recipes/:id/image", handlers.UploadRecipeImage) // not implemented yet
 
-	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {
+	if err := router.RunTLS(fmt.Sprintf(":%v", port), "/certs/backend.crt", "/certs/backend.key"); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
 }

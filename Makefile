@@ -14,6 +14,7 @@ clean:
 fclean: clean
 	docker rmi --force transcendence_backend:dev_1.0
 	docker rmi --force transcendence_frontend:dev_1.0
+	rm -rf certs
 
 dbclean:
 	docker compose --file ./src/compose.yaml down -v

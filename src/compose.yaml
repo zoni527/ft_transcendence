@@ -20,6 +20,10 @@ services:
     pull_policy: build
     volumes:
       - ./frontend/src:/app/src
+    expose:
+      - "5173"
+    environment:
+      - NGINX_PORT_EXTERNAL=${NGINX_PORT_EXTERNAL:-8443}
     networks:
       - transcendence_network
     restart: unless-stopped
@@ -41,6 +45,7 @@ services:
       - "127.0.0.1:${NGINX_PORT_EXTERNAL:-8443}:${NGINX_PORT_INTERNAL:-443}"
     environment:
       - NGINX_PORT_INTERNAL=${NGINX_PORT_INTERNAL:-443}
+      - NGINX_PORT_EXTERNAL=${NGINX_PORT_EXTERNAL:-8443}
     networks:
       - transcendence_network
     restart: unless-stopped
@@ -64,6 +69,7 @@ services:
     volumes:
       - ../certs/backend.key:/certs/backend.key:ro
       - ../certs/backend.crt:/certs/backend.crt:ro
+      - ../certs/ca.crt:/certs/ca.crt:ro
     networks:
       - transcendence_network
     expose:

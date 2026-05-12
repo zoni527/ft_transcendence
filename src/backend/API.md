@@ -93,7 +93,7 @@ Search users display name. Useful for the "Add Friend" feature.
 **Query parameters:**
 | Param | Type      | Description                                   |
 |-------|-----------|-----------------------------------------------|
-| q     | string    | Search term (matches display_name)    |
+| q     | string    | Search term (matches display_name)            |
 
 **Response** `200 OK`
 ```json
@@ -727,7 +727,7 @@ Get all recipes a user has favourited.
 | POST /api/users                   | done      |
 | PUT /api/users/:id                | done      |
 | DELETE /api/users/:id             | TODO      |
-| GET /api/users/search?q=          | TODO      |
+| GET /api/users/search?q=          | done      |
 | GET /api/recipes                  | done      |
 | GET /api/recipes/:id              | done      |
 | GET /api/recipes/image-signature  | done      |

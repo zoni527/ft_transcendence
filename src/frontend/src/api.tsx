@@ -61,6 +61,11 @@ interface UpdateUserPayload {
   avatar_url: string | null;
 }
 
+export interface getSearchResponse {
+  id: string;
+  username: string;
+}
+
 interface LoginSignupResponse {
   id: string;
   email: string;
@@ -101,6 +106,23 @@ function isSessionResponse(data: unknown): data is SessionResponse {
   const obj = data as Record<string, unknown>;
 
   return typeof obj.authenticated === 'boolean' && isUserResponse(obj.user);
+}
+
+// Validation for getSearchResponse
+function isGetSearchResponse(data: unknown): data is getSearchResponse[] {
+  if (!Array.isArray(data)) {
+    return false;
+  }
+
+  return data.every((item) => {
+    if (typeof item !== 'object' || item === null) {
+      return false;
+    }
+
+    const obj = item as Record<string, unknown>;
+
+    return typeof obj.id === 'string' && typeof obj.username === 'string';
+  });
 }
 
 // Validation for UserResponse
@@ -302,7 +324,10 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
 };
 
 // GET /api/users/:id (get a user by ID)
-export const getSearch = async ({ query }, t: TFunction) => {
+export const getSearch = async (
+  query: string,
+  t: TFunction,
+): Promise<getSearchResponse[]> => {
   const response = await fetch(`${baseUrl}/users/search?q=${query}`, {
     method: 'GET',
     credentials: 'include',
@@ -321,7 +346,7 @@ export const getSearch = async ({ query }, t: TFunction) => {
     throw new Error(errorMessage);
   }
 
-  if (!isUserResponse(data)) {
+  if (!isGetSearchResponse(data)) {
     throw new Error(t('error.invalidResponse'));
   }
 

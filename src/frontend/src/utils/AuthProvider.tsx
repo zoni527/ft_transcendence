@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { AuthContext } from './AuthContext';
 import { getSession, putHeartbeat } from '../api';
-import { useNotification } from './NotifContext';
 import type { User } from '../types/types';
 
 type Props = {
@@ -13,7 +12,6 @@ type Props = {
 const AuthProvider = ({ children, t }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { showNotification } = useNotification();
 
   const hasRole = (roles: string[]) => {
     return user?.roles.some((r) => roles.includes(r)) ?? false;
@@ -55,10 +53,7 @@ const AuthProvider = ({ children, t }: Props) => {
       try {
         await putHeartbeat(t);
       } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : t('error.genericError');
-
-        showNotification(message, 'error');
+        console.error('Heartbeat failed', err);
       }
     };
 
@@ -69,7 +64,7 @@ const AuthProvider = ({ children, t }: Props) => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [user, t, showNotification]);
+  }, [user, t]);
 
   const login = (userData: User) => {
     setUser(userData);

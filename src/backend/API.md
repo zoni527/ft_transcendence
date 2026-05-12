@@ -88,19 +88,18 @@ Get all users.
 
 ### GET /api/users/search?q=
 
-Search users by name or display name. Useful for the "Add Friend" feature.
+Search users display name. Useful for the "Add Friend" feature.
 
 **Query parameters:**
 | Param | Type      | Description                                   |
 |-------|-----------|-----------------------------------------------|
-| q     | string    | Search term (matches name or display_name)    |
+| q     | string    | Search term (matches display_name)    |
 
 **Response** `200 OK`
 ```json
 [
   {
     "id": "uuid",
-    "name": "Jane",
     "display_name": "jane_cooks"
   }
 ]

@@ -55,6 +55,11 @@ func main() {
 	router.POST("/api/users/logout", middleware.Authentication(), handlers.LogoutUser)
 	router.GET("/api/users/me", middleware.Authentication(), handlers.GetMe)
 
+	//heartbeat - update server state
+	router.PUT("/api/users/me/heartbeat",
+		middleware.Authentication(),
+		handlers.Heartbeat)
+
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)
 	router.GET("/api/recipes/:id", handlers.GetRecipeById)

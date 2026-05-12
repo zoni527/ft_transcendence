@@ -31,12 +31,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const onlineThreshold = 60 * time.Second
+
+func markOnline(user *models.User) {
+	user.Is_online = time.Since(user.Last_seen) < onlineThreshold
+}
+
 func GetUsers(c *gin.Context) {
 	users, err := repository.GetAllUsers()
 	if err != nil {
 		log.Printf("GetUsers error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
+	}
+	for i := range users {
+		markOnline(&users[i])
 	}
 	c.IndentedJSON(http.StatusOK, users)
 }
@@ -58,6 +67,7 @@ func GetUserById(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+	markOnline(&user)
 	c.IndentedJSON(http.StatusOK, user)
 }
 
@@ -77,6 +87,7 @@ func GetMe(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+	markOnline(&user)
 	c.IndentedJSON(http.StatusOK, user)
 }
 
@@ -137,7 +148,7 @@ func GetSession(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-
+	markOnline(&user)
 	c.IndentedJSON(http.StatusOK, gin.H{"authenticated": true, "user": user})
 }
 
@@ -232,6 +243,14 @@ func LogoutUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+
+	userID := c.GetString("userID")
+	if userID != "" {
+		if err := repository.MarkOffline(userID); err != nil {
+			log.Printf("LogoutUser MarkOffline: %v", err)
+		}
+	}
+
 	authorization.ClearAuthCookie(c)
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
@@ -333,7 +352,7 @@ func UpdateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-
+	markOnline(&user)
 	c.IndentedJSON(http.StatusOK, user)
 }
 
@@ -600,4 +619,19 @@ func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
 		req.Display_name != nil ||
 		req.Avatar_url != nil ||
 		req.Roles != nil
+}
+
+func Heartbeat(c *gin.Context) {
+	userID := c.GetString("userID")
+
+	if !authorization.IsValidUUID(userID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+	if err := repository.UpdateLastSeen(userID); err != nil {
+		log.Printf("Heartbeat error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.Status(http.StatusNoContent)
 }

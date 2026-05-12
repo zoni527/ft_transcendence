@@ -20,6 +20,8 @@ type User struct {
 	Avatar_url    string    `json:"avatar_url"   db:"avatar_url"`
 	Created_at    time.Time `json:"created_at"   db:"created_at"`
 	Updated_at    time.Time `json:"updated_at"   db:"updated_at"`
+	Last_seen     time.Time `json:"last_seen"    db:"last_seen"`
+	Is_online     bool      `json:"is_online"` // has no db: tag! it's computed in Go before sending JSON.
 	Roles         []string  `json:"roles"        db:"roles"`
 }
 

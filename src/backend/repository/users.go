@@ -116,7 +116,7 @@ func getRolesByUserIdTx(tx pgx.Tx, userId string) ([]string, error) {
 // GetAllUsers returns all users with their roles attached.
 func GetAllUsers() ([]models.User, error) {
 	sql := `SELECT id, email, name, display_name, avatar_url,
-				created_at, updated_at
+				created_at, updated_at, last_seen
 			FROM "user" `
 
 	rows, err := Pool.Query(context.Background(), sql)
@@ -136,6 +136,7 @@ func GetAllUsers() ([]models.User, error) {
 			&u.Avatar_url,
 			&u.Created_at,
 			&u.Updated_at,
+			&u.Last_seen,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning user row: %w", err)
@@ -163,7 +164,7 @@ func GetAllUsers() ([]models.User, error) {
 // GetUserById returns a single user by UUID, with roles attached.
 func GetUserById(id string) (models.User, error) {
 	sql := `SELECT id, email, name, display_name, avatar_url,
-				created_at, updated_at
+				created_at, updated_at, last_seen
 			FROM "user"
 			WHERE id = $1`
 
@@ -176,6 +177,7 @@ func GetUserById(id string) (models.User, error) {
 		&u.Avatar_url,
 		&u.Created_at,
 		&u.Updated_at,
+		&u.Last_seen,
 	)
 
 	if err == pgx.ErrNoRows {
@@ -319,7 +321,7 @@ func UpdateUser(id string, params models.UpdateUserParams) (models.User, error) 
 				avatar_url = COALESCE($5, avatar_url),
 				updated_at = NOW()
 			WHERE id = $6
-			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at`
+			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at, last_seen`
 
 	var u models.User
 	err = tx.QueryRow(context.Background(), sql,
@@ -337,6 +339,7 @@ func UpdateUser(id string, params models.UpdateUserParams) (models.User, error) 
 		&u.Avatar_url,
 		&u.Created_at,
 		&u.Updated_at,
+		&u.Last_seen,
 	)
 	if err == pgx.ErrNoRows {
 		return models.User{}, pgx.ErrNoRows
@@ -381,4 +384,30 @@ func nullableString(value *string) any {
 		return nil
 	}
 	return *value
+}
+
+func UpdateLastSeen(userId string) error {
+	sql := `UPDATE "user" SET last_seen = NOW() WHERE id = $1`
+
+	commandTag, err := Pool.Exec(context.Background(), sql, userId)
+	if err != nil {
+		return fmt.Errorf("UpdateLastSeen: %w", err)
+	}
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("UpdateLastSeen: %w", pgx.ErrNoRows)
+	}
+	return nil
+}
+
+func MarkOffline(userId string) error {
+	sql := `UPDATE "user" SET last_seen = '1970-01-01' WHERE id = $1`
+
+	commandTag, err := Pool.Exec(context.Background(), sql, userId)
+	if err != nil {
+		return fmt.Errorf("MarkOffline: %w", err)
+	}
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("MarkOffline: %w", pgx.ErrNoRows)
+	}
+	return nil
 }

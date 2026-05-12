@@ -5,6 +5,7 @@ import { useNotification } from '../utils/NotifContext';
 import FriendField from '../components/FriendField';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
+import UserStatus from '../components/UserStatus';
 import { getUsers } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User } from '../types/types';
@@ -82,11 +83,9 @@ const Friends = () => {
         </div>
 
         {/* Online/Offline Indicator */}
-        <div
-          className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 ${
-            user.is_online ? 'bg-green-500' : 'bg-red-500'
-          }`}
-          title={user.is_online ? 'Online' : 'Offline'}
+        <UserStatus
+          isOnline={user.is_online}
+          className={'absolute top-8 right-8'}
         />
 
         {/* Header */}

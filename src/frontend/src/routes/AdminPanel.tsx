@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import AdminUserField from '../components/AdminUserField.tsx';
 import AdminRecipeField from '../components/AdminRecipeField.tsx';
 import StatusBox from '../components/StatusBox';
+import UserStatus from '../components/UserStatus.tsx';
 import { useAuth } from '../utils/AuthContext';
 import { getUsers, getRecipes } from '../api';
 import { useNotification } from '../utils/NotifContext.ts';
@@ -104,11 +105,9 @@ const AdminPanel = () => {
       </div>
 
       {/* Online/Offline Indicator */}
-      <div
-        className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 ${
-          user.is_online ? 'bg-green-500' : 'bg-red-500'
-        }`}
-        title={user.is_online ? 'Online' : 'Offline'}
+      <UserStatus
+        isOnline={user.is_online}
+        className={'absolute top-8 right-8'}
       />
 
       {/* Header */}

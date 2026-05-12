@@ -1,3 +1,4 @@
+import UserStatus from './UserStatus';
 import type { User } from '../types/types';
 
 interface FriendFieldProps {
@@ -17,12 +18,7 @@ const FriendField = ({ user }: FriendFieldProps) => {
           {/* Buttons */}
 
           {/* Online/Offline Indicator */}
-          <div
-            className={`h-4 w-4 rounded-full border-2 border-slate-950 ${
-              user.is_online ? 'bg-green-500' : 'bg-red-500'
-            }`}
-            title={user.is_online ? 'Online' : 'Offline'}
-          />
+          <UserStatus isOnline={user.is_online} />
         </div>
       </div>
     </>

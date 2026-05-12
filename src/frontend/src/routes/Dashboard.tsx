@@ -9,6 +9,7 @@ import InfoIcon from '../components/InfoIcon';
 import ModalButton from '../components/ModalButton';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
+import UserStatus from '../components/UserStatus';
 import { getUserbyId, deleteUser } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User } from '../types/types';
@@ -113,11 +114,9 @@ const Dashboard = () => {
         </div>
 
         {/* Online/Offline Indicator */}
-        <div
-          className={`absolute top-8 right-8 h-4 w-4 rounded-full border-2 border-slate-950 ${
-            userData.is_online ? 'bg-green-500' : 'bg-red-500'
-          }`}
-          title={userData.is_online ? 'Online' : 'Offline'}
+        <UserStatus
+          isOnline={userData.is_online}
+          className={'absolute top-8 right-8'}
         />
 
         {/* Header */}

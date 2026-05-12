@@ -344,6 +344,33 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
   return data.user;
 };
 
+// GET /api/users/:id (get a user by ID)
+export const getSearch = async ({ query }, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/search?q=${query}`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isUserResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
 // GET /api/users (get all users)
 export const getUsers = async (t: TFunction): Promise<User[]> => {
   const response = await fetch(`${baseUrl}/users`);

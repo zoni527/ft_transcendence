@@ -18,3 +18,9 @@ src/backend/backend
 
 # Local folder
 local
+
+# Certificates and keys
+certs
+*.crt
+*.key
+*.pem

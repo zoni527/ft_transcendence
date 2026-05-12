@@ -43,7 +43,7 @@ Four roles, seeded in [002_seed.sql](../database/migrations/002_seed.sql).
 | `admin`       | Everything. Manages users, roles, and site settings.                      |
 
 Roles are additive: a chef who is also a moderator holds both. The default
-signup flow assigns `user` only ([repository/users.go:193](repository/users.go#L193)).
+signup flow assigns `user` only.
 
 ## Permissions
 
@@ -72,11 +72,12 @@ Two patterns the table doesn't show:
 
 Two middlewares run before any protected route:
 
-- `AuthMiddleware` — "are you logged in?" (identity)
-- `RequiredRolesMiddleware` — "do you have one of these roles?" (authorization)
+- `Authentication()` — "are you logged in?" (identity)
+- `RequireRoles()` or `RequirePermission()` — "do you have the required roles/permissions?" (authorization)
 
 These stack because they answer **different** questions: one identifies
-the user, the other checks what they can do. You always need both.
+the user, the other checks what they can do. You need `Authentication()` 
+before any other middleware.
 
 If both pass, the handler runs. Some handlers do an extra check of their
 own (e.g. authorship — see below). That's the only handler-level pattern
@@ -84,39 +85,55 @@ in the code today.
 
 > **Rule of thumb for adding new middleware:** stack middlewares that ask
 > different questions, replace middlewares that ask the same question. So
-> a future `RequiredPermissionsMiddleware` would *replace*
-> `RequiredRolesMiddleware` on the affected routes (same question, finer
-> grain), not run alongside it.
+> `RequirePermission()` and `RequireRoles()` answer the same question (authorization)
+> in different ways — use one or the other, not both.
 
-### AuthMiddleware
+### Authentication()
 
-[handlers/users.go:396](handlers/users.go#L396). Reads the `token` cookie,
-validates the JWT, checks the token blacklist, and stores `userID` on the
-Gin context.
+Reads the `token` cookie, validates the JWT, checks the token blacklist, and stores user data on the Gin 
+context: `userID`, `userRoles`, `userPerms`, `token`, `expDate`.
 
-| Status | When |
-|---|---|
-| 401 `{"error":"unauthorized"}`   | Missing `token` cookie |
+| Status                           | When                                           |
+|----------------------------------|------------------------------------------------|
+| 401 `{"error":"unauthorized"}`   | Missing `token` cookie                         |
 | 401 `{"error":"invalid token"}`  | JWT validation failed, or token is blacklisted |
-| 500                              | Blacklist lookup itself errored |
+| 500                              | Blacklist lookup itself errored                |
 
-### RequiredRolesMiddleware
+### RequireRoles()
 
-[handlers/recipes.go:441](handlers/recipes.go#L441). Looks up the user's
-roles via `GetRolesByUserId` and allows the request if *any* of the user's
-roles match the allowed list. Returns `403 Forbidden` on failure.
+Checks if the user has at least one of the required roles. 
+Must come after `Authentication()`. Returns `403 Forbidden` on failure.
 
 ```go
 router.POST("/api/recipes",
-    handlers.AuthMiddleware(),
-    handlers.RequiredRolesMiddleware("chef", "moderator", "admin"),
+    middleware.Authentication(),
+    middleware.RequireRoles("chef", "admin"),
+    handlers.CreateRecipe)
+```
+
+### RequirePermission()
+
+Checks if the user has at least one of the required permissions.
+Must come after `Authentication()`. Admin users automatically 
+pass all permission checks. Returns `403 Forbidden` on failure.
+
+```go
+router.POST("/api/recipes",
+    middleware.Authentication(),
+    middleware.RequirePermission("create_recipe"),
     handlers.CreateRecipe)
 ```
 
 ### Authorship checks
 
 For "edit your own thing" routes, the handler runs the authorship check
-*after* AuthMiddleware and *instead of* RequiredRolesMiddleware. Pattern:
+*after* `middleware.Authentication()`. Use the authorization functions
+from [authorization/recipe.go](authorization/recipe.go):
+
+- `CanEditRecipe(roleSet, permSet, userID, authorID)` — true if user is author or has `edit_recipe` permission
+- `CanDeleteRecipe(roleSet, permSet, userID, authorID)` — true if user is author or has `delete_recipe` permission
+
+Pattern:
 
 ```go
 // inside handler
@@ -127,19 +144,15 @@ if err != nil {
 }
 
 userID := c.GetString("userID")
-roles, err := repository.GetRolesByUserId(userID)
-if err != nil {
-    log.Printf("GetRolesByUserId: %v", err)
-    c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-    return
-}
+roleSet, _ := authorization.RolesFromContext(c)
+permSet, _ := authorization.PermsFromContext(c)
 
-isOwner := recipe.Author_id == userID
-isPrivileged := contains(roles, "moderator") || contains(roles, "admin")
-if !isOwner && !isPrivileged {
+if !authorization.CanEditRecipe(roleSet, permSet, userID, recipe.Author.Id) {
     c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
     return
 }
+
+// ... proceed with edit
 ```
 
 Used by `PUT /api/recipes/:id` and `DELETE /api/recipes/:id`.
@@ -154,7 +167,7 @@ Used by `PUT /api/recipes/:id` and `DELETE /api/recipes/:id`.
 
 Grant a role to a user. Admin only.
 
-**Auth:** AuthMiddleware + RequiredRolesMiddleware("admin")
+**Auth:** `middleware.Authentication()` + `middleware.RequireRoles("admin")`
 
 **Body**
 ```json
@@ -186,7 +199,7 @@ partial-success ambiguity.
 
 Revoke a role from a user. Admin only.
 
-**Auth:** AuthMiddleware + RequiredRolesMiddleware("admin")
+**Auth:** `middleware.Authentication()` + `middleware.RequireRoles("admin")`
 
 **Response** `204 No Content`
 

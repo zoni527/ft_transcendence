@@ -90,7 +90,8 @@ func SearchUsersByUsername(username string) ([]models.UserSearchResult, error) {
 	searchTerm := "%" + username + "%"
 	sql := `SELECT id, display_name
 		    FROM "user"
-		    WHERE display_name ILIKE $1`
+		    WHERE display_name ILIKE $1
+			LIMIT 5`
 	rows, err := Pool.Query(context.Background(), sql, searchTerm)
 	if err != nil {
 		return nil, fmt.Errorf("error querying users: %w", err)

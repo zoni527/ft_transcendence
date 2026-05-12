@@ -114,3 +114,8 @@ type UpdateUserParams struct {
 	Avatar_url      *string  `json:"avatar_url,omitempty"`
 	Roles           []string `json:"roles,omitempty"`
 }
+
+type UserSearchResult struct {
+	Id           string
+	Display_name string
+}

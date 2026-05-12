@@ -372,13 +372,13 @@ func SearchUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
 		return
 	}
-	users, err := repository.SearchUserByUsername(query)
+	user, err := repository.SearchUserByUsername(query)
 	if err != nil {
 		log.Printf("SearchUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, users)
+	c.IndentedJSON(http.StatusOK, user)
 }
 
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.

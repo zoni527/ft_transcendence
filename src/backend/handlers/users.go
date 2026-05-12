@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	"unicode/utf8"
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/integrations"
@@ -361,9 +362,23 @@ func DeleteUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
-func SearchUsers(c *gin.Context) {
-	// TODO: call repository.SearchUsers()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+func SearchUser(c *gin.Context) {
+	query := c.Query("q")
+	if query == "" {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "search query not included"})
+		return
+	}
+	if utf8.RuneCountInString(query) < 2 {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
+		return
+	}
+	users, err := repository.SearchUserByUsername(query)
+	if err != nil {
+		log.Printf("SearchUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, users)
 }
 
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.

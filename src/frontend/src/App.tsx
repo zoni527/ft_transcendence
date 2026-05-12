@@ -19,9 +19,9 @@ const App = () => {
   const { t } = useTranslation();
 
   return (
-    <NotificationProvider>
-      <Router>
-        <AuthProvider t={t}>
+    <AuthProvider t={t}>
+      <NotificationProvider>
+        <Router>
           <div className="flex min-h-screen flex-col">
             <Banner />
             <div className="flex-1 p-4">
@@ -43,9 +43,9 @@ const App = () => {
             </div>
             <Footer className="mt-20" />
           </div>
-        </AuthProvider>
-      </Router>
-    </NotificationProvider>
+        </Router>
+      </NotificationProvider>
+    </AuthProvider>
   );
 };
 

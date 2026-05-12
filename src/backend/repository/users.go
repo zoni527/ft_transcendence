@@ -455,4 +455,3 @@ func DeleteUser(userId string) error {
 
 	return nil
 }
-

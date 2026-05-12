@@ -231,6 +231,9 @@ func LoginUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+	if err := repository.UpdateLastSeen(data.Id); err != nil {
+		log.Printf("LoginUser UpdateLastSeen: %v", err)
+	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("token", token, 3600, "/", "", true, true)
 	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})

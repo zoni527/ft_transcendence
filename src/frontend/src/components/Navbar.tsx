@@ -4,18 +4,34 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LangDropdown from './LangDropDown';
 import NavButton from './NavButton';
+import SearchField from './SearchField.tsx';
 import { useAuth } from '../utils/AuthContext';
-import { postLogout } from '../api.tsx';
+import { getSearch, postLogout } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 import { cardBase, buttonBase, navLeftBase } from '../styles/styles';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { user, logout, hasRole, loading } = useAuth();
   const { t } = useTranslation();
+
+  const handleSearch = (value: string) => {
+    if (loading) return;
+
+    getSearch({ query: value }, t)
+      .then(async (id) => {
+        void navigate(`/users/${id}`);
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+      })
+      .finally();
+  };
 
   const handleLogout = () => {
     postLogout(t)
@@ -41,6 +57,10 @@ const Navbar = () => {
           <NavButton path="/" className={navLeftBase}>
             {t('nav.recipes')}
           </NavButton>
+        </div>
+
+        <div>
+          <SearchField onSearch={handleSearch} />
         </div>
 
         {/* Center (Mobile only) */}

@@ -7,6 +7,7 @@ import NavButton from './NavButton';
 import SearchField from './SearchField.tsx';
 import { useAuth } from '../utils/AuthContext';
 import { getSearch, postLogout } from '../api.tsx';
+import type { getSearchResponse } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 import { cardBase, buttonBase, navLeftBase } from '../styles/styles';
 
@@ -17,20 +18,29 @@ const Navbar = () => {
   const { user, logout, hasRole, loading } = useAuth();
   const { t } = useTranslation();
 
-  const handleSearch = (value: string) => {
+  const [results, setResults] = useState<getSearchResponse[]>([]);
+  const [open, setOpen] = useState(false);
+
+  const handleSelectUser = (id: string) => {
+    setOpen(false);
+    setResults([]);
+    void navigate(`/users/${id}`);
+  };
+
+  const handleSearch = (query: string) => {
     if (loading) return;
 
-    getSearch({ query: value }, t)
-      .then(async (id) => {
-        void navigate(`/users/${id}`);
+    getSearch(query, t)
+      .then((found) => {
+        setResults(found);
+        setOpen(true);
       })
       .catch((err: unknown) => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
         showNotification(message, 'error');
-      })
-      .finally();
+      });
   };
 
   const handleLogout = () => {
@@ -59,8 +69,22 @@ const Navbar = () => {
           </NavButton>
         </div>
 
-        <div>
+        <div className="relative w-full md:w-auto">
           <SearchField onSearch={handleSearch} />
+
+          {open && results.length > 0 && (
+            <ul className="absolute left-0 z-50 mt-2 w-full rounded-md border bg-white shadow-lg">
+              {results.map((user) => (
+                <li
+                  key={user.id}
+                  onClick={() => handleSelectUser(user.id)}
+                  className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                >
+                  {user.username}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Center (Mobile only) */}

@@ -20,8 +20,8 @@ const App = () => {
 
   return (
     <NotificationProvider>
-      <AuthProvider t={t}>
-        <Router>
+      <Router>
+        <AuthProvider t={t}>
           <div className="flex min-h-screen flex-col">
             <Banner />
             <div className="flex-1 p-4">
@@ -43,8 +43,8 @@ const App = () => {
             </div>
             <Footer className="mt-20" />
           </div>
-        </Router>
-      </AuthProvider>
+        </AuthProvider>
+      </Router>
     </NotificationProvider>
   );
 };

@@ -142,9 +142,9 @@ func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.Se
 			return nil, err
 		}
 		recipes = append(recipes, r)
-		if err := rows.Err(); err != nil {
-			return nil, fmt.Errorf("repository.SearchRecipes: %w", err)
-		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("repository.SearchRecipes: %w", err)
 	}
 	return recipes, nil
 }

@@ -6,7 +6,7 @@ package handlers
 // [done] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
 // [done] UpdateUser   — PUT /api/users/:id (self-update + admin update)
 // [TODO] DeleteUser    — DELETE /api/users/:id
-// [TODO] SearchUsers   — GET /api/users/search?q=
+// [done] SearchUsers   — GET /api/users/search?q=
 
 import (
 	"errors"
@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	"unicode/utf8"
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/integrations"
@@ -361,9 +362,24 @@ func DeleteUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
-func SearchUsers(c *gin.Context) {
-	// TODO: call repository.SearchUsers()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+func SearchUser(c *gin.Context) {
+	query := c.Query("q")
+	query = strings.TrimSpace(query)
+	if query == "" {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "search query not included"})
+		return
+	}
+	if utf8.RuneCountInString(query) < 2 {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
+		return
+	}
+	users, err := repository.SearchUsersByUsername(query)
+	if err != nil {
+		log.Printf("SearchUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, users)
 }
 
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.

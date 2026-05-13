@@ -86,6 +86,36 @@ func GetEffectivePermissionsByUser(userId string) (map[string]bool, map[string]b
 	return roles, perms, nil
 }
 
+func SearchUsersByUsername(username string) ([]models.UserSearchResult, error) {
+	searchTerm := "%" + username + "%"
+	sql := `SELECT id, display_name
+		    FROM "user"
+		    WHERE display_name ILIKE $1
+			LIMIT 10`
+	rows, err := Pool.Query(context.Background(), sql, searchTerm)
+	if err != nil {
+		return nil, fmt.Errorf("error querying users: %w", err)
+	}
+	defer rows.Close()
+
+	users := make([]models.UserSearchResult, 0)
+	for rows.Next() {
+		var u models.UserSearchResult
+		err := rows.Scan(
+			&u.Id,
+			&u.Display_name,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning user row: %w", err)
+		}
+		users = append(users, u)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating user rows: %w", err)
+	}
+	return users, nil
+}
+
 // getRolesByUserIdTx is the transaction version of GetRolesByUserId.
 func getRolesByUserIdTx(tx pgx.Tx, userId string) ([]string, error) {
 	sql := `SELECT r.name

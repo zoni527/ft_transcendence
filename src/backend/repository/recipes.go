@@ -87,7 +87,9 @@ func GetAllRecipes() ([]models.RecipeResponse, error) {
 }
 
 func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
-	sql := `SELECT id, title, preparation_time_min, image_url
+	sql := `SELECT id, title, 
+			COALESCE(preparation_time_min, 0),
+			COALESCE(image_url, '')
 			FROM recipe
 			WHERE  1=1`
 	var args []interface{}
@@ -140,6 +142,9 @@ func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.Se
 			return nil, err
 		}
 		recipes = append(recipes, r)
+		if err := rows.Err(); err != nil {
+			return nil, fmt.Errorf("repository.SearchRecipes: %w", err)
+		}
 	}
 	return recipes, nil
 }

@@ -65,7 +65,7 @@ func SearchRecipes(c *gin.Context) {
 
 	recipes, err := repository.SearchRecipes(f, limitInt, offset)
 	if err != nil {
-		log.Printf("SearchRecipes: %v", err)
+		log.Printf("handlers.SearchRecipes: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

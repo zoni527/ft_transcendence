@@ -600,27 +600,6 @@ Get a pre-signed Cloudinary signature for uploading recipe images. Required for 
 
 ---
 
-### POST /api/recipes/:id/image
-
-Upload an image for a recipe. Uses multipart form data.
-
-**Request:** `multipart/form-data` with field `image` (JPEG, PNG, max 5MB).
-
-**Response** `200 OK`
-```json
-{
-  "image_url": "/images/recipes/uuid.jpg"
-}
-```
-
-**Errors:**
-| Status    | When                                          |
-|-----------|-----------------------------------------------|
-| 400       | No file, wrong format, or exceeds size limit  |
-| 404       | Recipe not found                              |
-
----
-
 ### PUT /api/recipes/:id
 
 Update a recipe.
@@ -763,7 +742,6 @@ Get all recipes a user has favourited.
 | GET /api/recipes/search           | done      |
 | GET /api/recipes/image-signature  | done      |
 | POST /api/recipes                 | TODO      |
-| POST /api/recipes/:id/image       | TODO      |
 | PUT /api/recipes/:id              | TODO      |
 | DELETE /api/recipes/:id           | done      |
 | POST /api/recipes/:id/favourite   | TODO      |

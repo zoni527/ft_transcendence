@@ -94,9 +94,8 @@ CREATE TABLE recipe_favourite (
 -- FRIENDSHIP
 -- =====================
 
--- Stored directionally so the frontend can show
--- "X sent you a request" vs "you sent X a request".
--- Mutual once status = 'accepted'.
+-- Stored directionally so the frontend can show "X sent you a request" vs "you sent X a request".
+-- Friendship are Mutual once status = 'accepted'.
 CREATE TABLE friendship (
     requester_id    UUID REFERENCES "user"(id) ON DELETE CASCADE,
     receiver_id     UUID REFERENCES "user"(id) ON DELETE CASCADE,
@@ -107,4 +106,8 @@ CREATE TABLE friendship (
     PRIMARY KEY (requester_id, receiver_id),
     CONSTRAINT friendship_no_self CHECK (requester_id <> receiver_id)
 );
+
+-- Blocks A->B and B->A from both existing (the PK alone doesn't).
+CREATE UNIQUE INDEX friendship_unique_pair
+    ON friendship (LEAST(requester_id, receiver_id), GREATEST(requester_id, receiver_id));
 

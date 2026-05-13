@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AdminUserField from '../components/AdminUserField.tsx';
 import AdminRecipeField from '../components/AdminRecipeField.tsx';
-import SearchBar from '../components/SearchBar.tsx';
 import SectionButton from '../components/SectionButton.tsx';
 import SortButtons from '../components/SortButtons.tsx';
 import StatusBox from '../components/StatusBox';
@@ -119,18 +118,8 @@ const AdminPanel = () => {
       </h1>
 
       {/* Tabs */}
-      <div className="mt-16 flex flex-col items-center gap-4 border-b pb-2 md:mt-20">
-        {/* Search */}
-        {activeSection === 'users' ? (
-          <SearchBar />
-        ) : (
-          <div className="invisible">
-            <SearchBar />
-          </div>
-        )}
-
-        {/* Selection */}
-        <div className="mb-4 flex flex-row justify-center gap-8 md:gap-24">
+      <div className="mt-16 border-b pb-2 md:mt-20">
+        <div className="mb-4 flex justify-center gap-8 md:gap-24">
           <SectionButton
             label={t('adminPanel.users')}
             section="users"

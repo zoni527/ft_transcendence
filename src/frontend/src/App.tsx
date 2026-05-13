@@ -11,7 +11,6 @@ import PrivacyPolicy from './routes/PrivacyPolicy';
 import NotificationProvider from './utils/NotifProvider';
 import RecipeDetail from './routes/RecipeDetail';
 import Recipes from './routes/Recipes';
-import SearchBar from './components/SearchBar';
 import Signup from './routes/Signup';
 import TermsService from './routes/TermsService';
 
@@ -23,9 +22,6 @@ const App = () => {
       <NotificationProvider>
         <Router>
           <div className="flex min-h-screen flex-col">
-            <div className="mx-auto max-w-5xl">
-              <SearchBar />
-            </div>
             <Banner />
             <div className="flex-1 p-4">
               <div className="mx-auto max-w-7xl">

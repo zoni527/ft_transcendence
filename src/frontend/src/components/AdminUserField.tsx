@@ -4,7 +4,6 @@ import { useNotification } from '../utils/NotifContext';
 import EditUserModal from '../modals/EditUser';
 import ModalButton from './ModalButton';
 import SubmitButton from './SubmitButton';
-import UserStatus from './UserStatus';
 import { useAuth } from '../utils/AuthContext';
 import { deleteUser } from '../api';
 import type { User } from '../types/types';
@@ -57,12 +56,12 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
         {/* Left side */}
         <div className="flex min-w-0 flex-col gap-2 md:flex-row md:items-center md:gap-6">
           {/* Name */}
-          <div className="w-64 truncate text-xl font-semibold text-gray-700">
+          <div className="w-60 shrink-0 truncate text-xl font-semibold text-gray-700">
             {user.name}
           </div>
 
           {/* Username */}
-          <div className="w-64 truncate text-xl font-semibold text-gray-700">
+          <div className="w-60 shrink-0 truncate text-xl font-semibold text-gray-700">
             {user.display_name}
           </div>
         </div>
@@ -88,9 +87,6 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
               disabled={!hasRole(['admin'])}
             />
           </div>
-
-          {/* Online/Offline Indicator */}
-          <UserStatus isOnline={user.is_online} />
         </div>
       </div>
     </>

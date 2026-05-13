@@ -61,8 +61,8 @@ export const enTranslations = {
   },
   adminPanel: {
     header: 'Admin panel',
-    users: 'User database',
-    recipes: 'Recipe database',
+    users: 'Users',
+    recipes: 'Recipes',
     edit: 'Edit',
     delete: 'Delete',
     sortFullName: 'A-Z: Full name',

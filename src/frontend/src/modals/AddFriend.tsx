@@ -5,11 +5,12 @@ import SearchBar from '../components/SearchBar.tsx';
 
 import { cardBase } from '../styles/styles.tsx';
 
-type CreateRecipeModalProps = {
+type AddFriendModalProps = {
   onClose: () => void;
+  onSelectUser: () => void;
 };
 
-const AddFriendModal = ({ onClose }: CreateRecipeModalProps) => {
+const AddFriendModal = ({ onClose, onSelectUser }: AddFriendModalProps) => {
   const { t } = useTranslation();
 
   // Disable background scroll
@@ -52,7 +53,7 @@ const AddFriendModal = ({ onClose }: CreateRecipeModalProps) => {
         {/* Search bar */}
         <div className="flex justify-center">
           <div className="w-full max-w-md">
-            <SearchBar />
+            <SearchBar onClose={onClose} onSelectUser={onSelectUser} />
           </div>
         </div>
       </div>

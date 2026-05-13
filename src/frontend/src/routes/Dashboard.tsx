@@ -157,7 +157,13 @@ const Dashboard = () => {
         <CreateRecipeModal onClose={() => setIsCreateRecipeOpen(false)} />
       )}
       {isAddFriendOpen && (
-        <AddFriendModal onClose={() => setIsAddFriendOpen(false)} />
+        <AddFriendModal
+          onClose={() => setIsAddFriendOpen(false)}
+          onSelectUser={() => {
+            setIsAddFriendOpen(false);
+            setActiveSection('profile');
+          }}
+        />
       )}
 
       <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>

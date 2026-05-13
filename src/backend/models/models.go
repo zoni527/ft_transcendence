@@ -78,6 +78,22 @@ type RecipeResponse struct {
 	Updated_at           time.Time    `json:"updated_at"`
 }
 
+type SearchRecipeFilters struct {
+	Query      string `form:"q"`
+	Page       int    `form:"page"`
+	MealType   string `form:"meal_type"`
+	Date       string `form:"date"`
+	Difficulty string `form:"difficulty"`
+	Cuisine    string `form:"cuisine"`
+}
+
+type SearchRecipeResponse struct {
+	Id                   string `json:"id"`
+	Title                string `json:"title"`
+	Preparation_time_min int    `json:"preparation_time_min"`
+	Image_url            string `json:"image_url"`
+}
+
 type CreateUserRequest struct {
 	Email        string `json:"email"        binding:"required"`
 	Password     string `json:"password"     binding:"required,min=8,max=20"`

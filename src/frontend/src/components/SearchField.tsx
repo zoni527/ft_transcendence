@@ -1,17 +1,17 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { inputFieldBase } from '../styles/styles';
 
 type SearchFieldProps = {
   placeholder?: string;
   onSearch: (value: string) => void;
 };
 
-const SearchField = ({
-  placeholder = 'Search...',
-  onSearch,
-}: SearchFieldProps) => {
+const SearchField = ({ placeholder, onSearch }: SearchFieldProps) => {
+  const { t } = useTranslation();
   const [value, setValue] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSearch(value.trim());
   };
@@ -22,16 +22,9 @@ const SearchField = ({
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={placeholder}
-        className="w-full rounded-md border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder={placeholder || t('common.search')}
+        className={`${inputFieldBase} rounded-full shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]`}
       />
-
-      <button
-        type="submit"
-        className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-      >
-        Search
-      </button>
     </form>
   );
 };

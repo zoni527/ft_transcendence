@@ -57,8 +57,7 @@ type RecipeAuthor struct {
 }
 
 // RecipeResponse is the read shape returned by GET /api/recipes and
-// GET /api/recipes/:id. It carries the author as a nested object instead of a
-// raw author_id.
+// GET /api/recipes/:id. It carries the author as a nested object
 type RecipeResponse struct {
 	Id                   string       `json:"id"`
 	Author               RecipeAuthor `json:"author"`
@@ -118,4 +117,20 @@ type UpdateUserParams struct {
 type UserSearchResult struct {
 	Id           string `json:"id"`
 	Display_name string `json:"display_name"`
+}
+
+// An item in a list of friendships.
+type FriendshipListItem struct {
+	Status       string `json:"-"            db:"status"`
+	SentByMe     bool   `json:"-"            db:"sent_by_me"`
+	Id           string `json:"id"           db:"id"`
+	Display_name string `json:"display_name" db:"display_name"`
+	Name         string `json:"name"         db:"name"`
+}
+
+// this is the body of GET /api/friendships.
+type FriendshipsResponse struct {
+	Friends  []FriendshipListItem `json:"friends"`
+	Sent     []FriendshipListItem `json:"sent"`
+	Incoming []FriendshipListItem `json:"incoming"`
 }

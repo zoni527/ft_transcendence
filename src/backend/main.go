@@ -47,7 +47,7 @@ func main() {
 		nginxPort = "8443"
 	}
 	portNum, err := strconv.Atoi(nginxPort)
-	if err != nil || (portNum < 1024 || portNum > 1<<16) {
+	if err != nil || (portNum < 1 || portNum > 1<<16-1) {
 		log.Fatal("Bad nginx port:", nginxPort)
 	}
 

@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"ft_transcendence/backend/models"
 
@@ -81,6 +82,64 @@ func GetAllRecipes() ([]models.RecipeResponse, error) {
 		return nil, fmt.Errorf("error iterating recipe rows: %w", err)
 	}
 
+	return recipes, nil
+}
+
+func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+	sql := `SELECT id, title, preparation_time_min, image_url
+			FROM recipe
+			WHERE  1=1`
+	var args []interface{}
+	pCount := 1
+
+	if f.Query != "" {
+		sql += fmt.Sprintf(" AND title ILIKE $%d", pCount)
+		args = append(args, "%"+f.Query+"%")
+		pCount++
+	}
+
+	if f.Cuisine != "" {
+		sql += fmt.Sprintf(" AND cuisine = $%d", pCount)
+		args = append(args, f.Cuisine)
+		pCount++
+	}
+	if f.Difficulty != "" {
+		sql += fmt.Sprintf(" AND difficulty = $%d", pCount)
+		args = append(args, f.Difficulty)
+		pCount++
+	}
+	if f.MealType != "" {
+		sql += fmt.Sprintf(" AND meal_type = $%d", pCount)
+		args = append(args, f.MealType)
+		pCount++
+	}
+
+	sortOrder := "DESC"
+	if strings.ToLower(f.Date) == "oldest" {
+		sortOrder = "ASC"
+	}
+	sql += fmt.Sprintf(" ORDER BY created_at %s LIMIT $%d OFFSET $%d", sortOrder, pCount, pCount+1)
+	args = append(args, limit, offset)
+
+	rows, err := Pool.Query(context.Background(), sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var recipes []models.SearchRecipeResponse
+	for rows.Next() {
+		var r models.SearchRecipeResponse
+		err := rows.Scan(
+			&r.Id,
+			&r.Title,
+			&r.Preparation_time_min,
+			&r.Image_url,
+		)
+		if err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, r)
+	}
 	return recipes, nil
 }
 

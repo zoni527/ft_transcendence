@@ -66,27 +66,25 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
           </div>
         </div>
 
+        {/* Buttons */}
         <div className="flex flex-col items-center gap-2 p-2 md:flex-row md:gap-3">
-          {/* Buttons */}
-          <div className="flex flex-col gap-2 p-2 md:flex-row md:gap-3">
-            {/* Edit user */}
-            <ModalButton
-              className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-              onClick={() => setIsUserEditOpen(true)}
-              text={t('adminPanel.edit')}
-              disabled={!hasRole(['admin'])}
-            />
+          {/* Edit user */}
+          <ModalButton
+            className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
+            onClick={() => setIsUserEditOpen(true)}
+            text={t('adminPanel.edit')}
+            disabled={!hasRole(['admin'])}
+          />
 
-            {/* Delete user */}
-            <SubmitButton
-              className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-              isLoading={loading}
-              defaultText={t('adminPanel.delete')}
-              onClick={() => handleDelete(user.id)}
-              type="button"
-              disabled={!hasRole(['admin'])}
-            />
-          </div>
+          {/* Delete user */}
+          <SubmitButton
+            className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
+            isLoading={loading}
+            defaultText={t('adminPanel.delete')}
+            onClick={() => handleDelete(user.id)}
+            type="button"
+            disabled={!hasRole(['admin'])}
+          />
         </div>
       </div>
     </>

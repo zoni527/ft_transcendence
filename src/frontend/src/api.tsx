@@ -73,7 +73,7 @@ export interface UpdateUserPayload {
 
 export interface getSearchResponse {
   id: string;
-  username: string;
+  display_name: string;
 }
 
 interface LoginSignupResponse {
@@ -131,7 +131,7 @@ function isGetSearchResponse(data: unknown): data is getSearchResponse[] {
 
     const obj = item as Record<string, unknown>;
 
-    return typeof obj.id === 'string' && typeof obj.username === 'string';
+    return typeof obj.id === 'string' && typeof obj.display_name === 'string';
   });
 }
 

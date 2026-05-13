@@ -8,7 +8,6 @@ import EditUserModal from '../modals/EditUser';
 import FriendField from '../components/FriendField';
 import InfoIcon from '../components/InfoIcon';
 import ModalButton from '../components/ModalButton';
-import SearchBar from '../components/SearchBar';
 import SectionButton from '../components/SectionButton';
 import SortButtons from '../components/SortButtons';
 import StatusBox from '../components/StatusBox';
@@ -178,18 +177,8 @@ const Dashboard = () => {
         </h1>
 
         {/* Tabs */}
-        <div className="mt-16 flex flex-col items-center gap-4 border-b pb-2 md:mt-20">
-          {/* Search */}
-          {activeSection === 'friends' ? (
-            <SearchBar />
-          ) : (
-            <div className="invisible">
-              <SearchBar />
-            </div>
-          )}
-
-          {/* Selection */}
-          <div className="mb-4 flex flex-row justify-center gap-8 md:gap-24">
+        <div className="mt-16 border-b pb-2 md:mt-20">
+          <div className="mb-4 flex justify-center gap-8 md:gap-24">
             <SectionButton
               label={t('nav.dashboard')}
               section="profile"

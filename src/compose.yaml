@@ -66,6 +66,7 @@ services:
       CLOUDINARY_SECRET: ${CLOUDINARY_SECRET}
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_KEY: ${CLOUDINARY_KEY}
+      NGINX_PORT_EXTERNAL: ${NGINX_PORT_EXTERNAL:-8443}
     volumes:
       - ../certs/backend.key:/certs/backend.key:ro
       - ../certs/backend.crt:/certs/backend.crt:ro

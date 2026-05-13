@@ -293,6 +293,7 @@ export const csTranslations = {
     welcome: 'Vítejte',
     rightsReserved: 'RISE. Všechna práva vyhrazena.',
     noFile: 'Žádný soubor nebyl vybrán',
+    search: 'Hledat...',
   },
   error: {
     error: 'Chyba:',

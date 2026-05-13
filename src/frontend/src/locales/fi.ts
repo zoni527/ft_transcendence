@@ -293,6 +293,7 @@ export const fiTranslations = {
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
     noFile: 'Tiedostoa ei valittu',
+    search: 'Hae...',
   },
   error: {
     error: 'Virhe:',

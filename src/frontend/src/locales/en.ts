@@ -50,6 +50,7 @@ export const enTranslations = {
     editUser: 'Edit profile',
     submit: 'Delete profile',
     addFriend: 'Add friend',
+    noResults: 'No results...',
   },
   adminPanel: {
     header: 'Admin panel',

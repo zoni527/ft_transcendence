@@ -2,8 +2,6 @@
 
 Base URL: `https://localhost:8443`
 
-> **TODO:** Switch to HTTPS (required by subject).
-
 ## Authentication
 
 The API uses **JWT tokens** stored in an HttpOnly cookie. When you call `/api/users/login` successfully, the server sets a `token` cookie containing the JWT. All subsequent authenticated requests automatically include this cookie.

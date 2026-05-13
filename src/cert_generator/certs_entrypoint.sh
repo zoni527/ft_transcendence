@@ -9,8 +9,11 @@ mkdir -p ${CERTS_DIR}
 CERT_FILES="\
 ${CERTS_DIR}/ca.crt\
 ${CERTS_DIR}/reverse_proxy.crt\
+${CERTS_DIR}/reverse_proxy.key\
 ${CERTS_DIR}/backend.crt\
+${CERTS_DIR}/backend.key\
 ${CERTS_DIR}/postgres.crt\
+${CERTS_DIR}/postgres.key\
 "
 
 all_certs_exist=true
@@ -95,7 +98,9 @@ openssl x509 -req 2>/dev/null \
 
 # Postgres key permissions and ownership setting
 echo "Setting permissions and ownership"
-chmod 600 ${CERTS_DIR}/postgres.key || true
+chmod 600 ${CERTS_DIR}/reverse_proxy.key
+chmod 600 ${CERTS_DIR}/backend.key
+chmod 600 ${CERTS_DIR}/postgres.key
 chown 70:70 ${CERTS_DIR}/postgres.key || true
 rm ${CERTS_DIR}/ca.key
 

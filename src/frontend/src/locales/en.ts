@@ -50,9 +50,6 @@ export const enTranslations = {
     editUser: 'Edit profile',
     submit: 'Delete profile',
   },
-  friends: {
-    header: 'Friends',
-  },
   adminPanel: {
     header: 'Admin panel',
     users: 'User database',

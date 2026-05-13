@@ -50,9 +50,6 @@ export const fiTranslations = {
     editUser: 'Muokkaa profiilia',
     submit: 'Poista profiili',
   },
-  friends: {
-    header: 'Ystävät',
-  },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
     users: 'Käyttäjätietokanta',

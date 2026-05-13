@@ -50,9 +50,6 @@ export const csTranslations = {
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
   },
-  friends: {
-    header: 'Přátelé',
-  },
   adminPanel: {
     header: 'Administrátorský panel',
     users: 'Databáze uživatelů',

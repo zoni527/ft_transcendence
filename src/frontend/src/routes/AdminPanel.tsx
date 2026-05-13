@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AdminUserField from '../components/AdminUserField.tsx';
 import AdminRecipeField from '../components/AdminRecipeField.tsx';
+import SectionButton from '../components/SectionButton.tsx';
 import StatusBox from '../components/StatusBox';
 import UserStatus from '../components/UserStatus.tsx';
 import { useAuth } from '../utils/AuthContext';
@@ -117,27 +118,19 @@ const AdminPanel = () => {
 
       {/* Section Tabs */}
       <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-36 md:flex-row md:gap-8">
-        <button
-          onClick={() => setActiveSection('users')}
-          className={`text-2xl font-bold transition-colors hover:cursor-pointer ${
-            activeSection === 'users'
-              ? 'text-[#C04D31]'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          {t('adminPanel.users')}
-        </button>
+        <SectionButton
+          label={t('adminPanel.users')}
+          section="users"
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
 
-        <button
-          onClick={() => setActiveSection('recipes')}
-          className={`text-2xl font-bold transition-colors hover:cursor-pointer ${
-            activeSection === 'recipes'
-              ? 'text-[#C04D31]'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          {t('adminPanel.recipes')}
-        </button>
+        <SectionButton
+          label={t('adminPanel.recipes')}
+          section="recipes"
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
       </div>
 
       {/* Sort Controls */}
@@ -171,6 +164,7 @@ const AdminPanel = () => {
 
       {/* Content */}
       <div className="mt-10 flex flex-col gap-4">
+        {/* Users */}
         {activeSection === 'users' &&
           sortedUsers.map((listedUser) => (
             <AdminUserField
@@ -187,6 +181,7 @@ const AdminPanel = () => {
             />
           ))}
 
+        {/* Recipes */}
         {activeSection === 'recipes' &&
           recipes.map((recipe) => (
             <AdminRecipeField

@@ -2,15 +2,9 @@ services:
 
   cert_generator:
     container_name: cert_generator
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM alpine:3.22
-        RUN apk update && apk add --no-cache openssl
+    build: ./cert_generator
     volumes:
       - ../certs:/certs
-      - ./cert_generator/certs_entrypoint.sh:/usr/local/bin/certs_entrypoint.sh:ro
-    entrypoint: ["/usr/local/bin/certs_entrypoint.sh"]
     user: root
 
   frontend:

@@ -6,15 +6,11 @@ DAYS=365
 
 mkdir -p ${CERTS_DIR}
 
-CERT_FILES="
-	${CERTS_DIR}/ca.crt
-	${CERTS_DIR}/ca.key
-	${CERTS_DIR}/reverse_proxy.crt
-	${CERTS_DIR}/reverse_proxy.key
-	${CERTS_DIR}/backend.crt
-	${CERTS_DIR}/backend.key
-	${CERTS_DIR}/postgres.crt
-	${CERTS_DIR}/postgres.key
+CERT_FILES="\
+${CERTS_DIR}/ca.crt\
+${CERTS_DIR}/reverse_proxy.crt\
+${CERTS_DIR}/backend.crt\
+${CERTS_DIR}/postgres.crt\
 "
 
 all_certs_exist=true
@@ -42,14 +38,16 @@ fi
 echo "Generating certificates..."
 
 # Certificate authority, used to sign other certificates
-openssl req -x509 -noenc -newkey rsa:2048 2>/dev/null \
+echo "Generating certificate authority"
+openssl req -x509 -noenc -newkey rsa:2048 \
 	-keyout	${CERTS_DIR}/ca.key \
 	-out	${CERTS_DIR}/ca.crt \
 	-days	${DAYS} \
 	-subj	"/C=FI/ST=UUSIMAA/L=Helsinki/O=42/OU=Hive/CN=ft_transcendence_ca"
 
 # Reverse proxy cert
-openssl req -noenc -newkey rsa:2048 2>/dev/null \
+echo "Generating reverse proxy cert"
+openssl req -noenc -newkey rsa:2048 \
 	-keyout	${CERTS_DIR}/reverse_proxy.key \
 	-out	${CERTS_DIR}/reverse_proxy.csr \
 	-subj	"/C=FI/ST=UUSIMAA/L=Helsinki/O=42/OU=Hive/CN=reverse_proxy" \
@@ -64,7 +62,8 @@ openssl x509 -req 2>/dev/null \
 	-days	${DAYS}
 
 # Backend cert
-openssl req -noenc -newkey rsa:2048 2>/dev/null \
+echo "Generating backend cert"
+openssl req -noenc -newkey rsa:2048 \
 	-keyout	${CERTS_DIR}/backend.key \
 	-out	${CERTS_DIR}/backend.csr \
 	-subj	"/C=FI/ST=UUSIMAA/L=Helsinki/O=42/OU=Hive/CN=backend" \
@@ -79,7 +78,8 @@ openssl x509 -req 2>/dev/null \
 	-days	${DAYS}
 
 # Database cert
-openssl req -noenc -newkey rsa:2048 2>/dev/null \
+echo "Generating database cert"
+openssl req -noenc -newkey rsa:2048 \
 	-keyout	${CERTS_DIR}/postgres.key \
 	-out	${CERTS_DIR}/postgres.csr \
 	-subj	"/C=FI/ST=UUSIMAA/L=Helsinki/O=42/OU=Hive/CN=postgres" \
@@ -94,8 +94,9 @@ openssl x509 -req 2>/dev/null \
 	-days	${DAYS}
 
 # Postgres key permissions and ownership setting
-chmod 600 ${CERTS_DIR}/postgres.key
-chown 70:70 ${CERTS_DIR}/postgres.key
+echo "Setting permissions and ownership"
+chmod 600 ${CERTS_DIR}/postgres.key || true
+chown 70:70 ${CERTS_DIR}/postgres.key || true
 rm ${CERTS_DIR}/ca.key
 
 echo "Certificates generated"

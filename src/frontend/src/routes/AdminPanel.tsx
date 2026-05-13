@@ -19,7 +19,7 @@ const AdminPanel = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<'users' | 'recipes'>(
-    'users',
+    'recipes',
   );
   const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
   const { t } = useTranslation();
@@ -121,15 +121,15 @@ const AdminPanel = () => {
       <div className="mt-16 border-b pb-2 md:mt-20">
         <div className="mb-4 flex justify-center gap-8 md:gap-24">
           <SectionButton
-            label={t('adminPanel.users')}
-            section="users"
+            label={t('adminPanel.recipes')}
+            section="recipes"
             activeSection={activeSection}
             setActiveSection={setActiveSection}
           />
 
           <SectionButton
-            label={t('adminPanel.recipes')}
-            section="recipes"
+            label={t('adminPanel.users')}
+            section="users"
             activeSection={activeSection}
             setActiveSection={setActiveSection}
           />
@@ -156,23 +156,6 @@ const AdminPanel = () => {
 
       {/* Content */}
       <div className="mt-12 flex flex-col gap-4">
-        {/* Users */}
-        {activeSection === 'users' &&
-          sortedUsers.map((listedUser) => (
-            <AdminUserField
-              key={listedUser.id}
-              user={listedUser}
-              onDelete={(id) =>
-                setUsers((prev) => prev.filter((u) => u.id !== id))
-              }
-              onUpdate={(updatedUser) =>
-                setUsers((prev) =>
-                  prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
-                )
-              }
-            />
-          ))}
-
         {/* Recipes */}
         {activeSection === 'recipes' &&
           recipes.map((recipe) => (
@@ -189,6 +172,23 @@ const AdminPanel = () => {
                       r.id === updatedRecipe.id ? updatedRecipe : r,
                     ),
                   ].sort((a, b) => a.title.localeCompare(b.title)),
+                )
+              }
+            />
+          ))}
+
+        {/* Users */}
+        {activeSection === 'users' &&
+          sortedUsers.map((listedUser) => (
+            <AdminUserField
+              key={listedUser.id}
+              user={listedUser}
+              onDelete={(id) =>
+                setUsers((prev) => prev.filter((u) => u.id !== id))
+              }
+              onUpdate={(updatedUser) =>
+                setUsers((prev) =>
+                  prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
                 )
               }
             />

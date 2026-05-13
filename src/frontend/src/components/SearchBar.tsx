@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
 import SearchField from './SearchField.tsx';
 import { useAuth } from '../utils/AuthContext';
 import { getSearch } from '../api.tsx';
 import type { getSearchResponse } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 
-const SearchBar = () => {
+type SearchBarProps = {
+  onClose: () => void;
+  onSelectUser: () => void;
+};
+
+const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { loading } = useAuth();
@@ -18,6 +22,8 @@ const SearchBar = () => {
 
   const handleSelectUser = (id: string) => {
     setResults([]);
+    onClose();
+    onSelectUser();
     void navigate(`/users/${id}`);
   };
 
@@ -40,7 +46,7 @@ const SearchBar = () => {
     <div className="relative w-full">
       <SearchField onSearch={handleSearch} />
 
-      <div className="mt-8 max-h-64 overflow-y-auto rounded-md border border-gray-400 bg-white shadow">
+      <div className="mt-8 max-h-46 overflow-y-auto rounded-md border border-gray-300 bg-white shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]">
         {results.length > 0 ? (
           <ul>
             {results.map((user) => (

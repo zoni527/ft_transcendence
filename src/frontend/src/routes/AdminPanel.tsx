@@ -18,11 +18,21 @@ const AdminPanel = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState<'users' | 'recipes'>(
-    'recipes',
-  );
-  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
   const { t } = useTranslation();
+
+  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
+  const [activeSection, setActiveSection] = useState<'users' | 'recipes'>(
+    () => {
+      return (
+        (localStorage.getItem('adminActiveSection') as 'users' | 'recipes') ||
+        'recipes'
+      );
+    },
+  );
+
+  useEffect(() => {
+    localStorage.setItem('adminActiveSection', activeSection);
+  }, [activeSection]);
 
   useEffect(() => {
     if (authLoading) return;

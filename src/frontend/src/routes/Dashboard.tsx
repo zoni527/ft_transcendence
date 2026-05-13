@@ -32,13 +32,36 @@ const Dashboard = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
   const [activeSection, setActiveSection] = useState<'profile' | 'friends'>(
-    'profile',
+    () => {
+      return (
+        (localStorage.getItem('dashboardActiveSection') as
+          | 'profile'
+          | 'friends') || 'profile'
+      );
+    },
   );
+
   const [activeSubsection, setActiveSubsection] = useState<
     'accepted' | 'incoming' | 'outgoing'
-  >('accepted');
-  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
+  >(() => {
+    return (
+      (localStorage.getItem('dashboardActiveSubsection') as
+        | 'accepted'
+        | 'incoming'
+        | 'outgoing') || 'accepted'
+    );
+  });
+
+  useEffect(() => {
+    localStorage.setItem('dashboardActiveSection', activeSection);
+  }, [activeSection]);
+
+  useEffect(() => {
+    localStorage.setItem('dashboardActiveSubsection', activeSubsection);
+  }, [activeSubsection]);
 
   useEffect(() => {
     if (authLoading) return;

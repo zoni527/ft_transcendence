@@ -499,6 +499,39 @@ Get a single recipe by ID.
 
 ---
 
+### GET /api/recipes/search?q=
+
+Search recipes by title with optional filters.
+
+**Query parameters:**
+| Param      | Type      | Description                                                   |
+|------------|-----------|---------------------------------------------------------------|
+| q          | string    | Search term (matches recipe title, case-insensitive)          |
+| page       | int       | Page number for pagination (default: 1)                       |
+| meal_type  | string    | Filter by meal type (breakfast/lunch/dinner/snack)            |
+| difficulty | string    | Filter by difficulty (easy/medium/hard)                       |
+| cuisine    | string    | Filter by cuisine (exact match, e.g. "italian")               |
+| date       | string    | Sort order: "oldest" (ASC) or "newest" (DESC, default)        |
+
+**Response** `200 OK`
+```json
+[
+  {
+    "id": "uuid",
+    "title": "Pasta Carbonara",
+    "preparation_time_min": 20,
+    "image_url": "/images/carbonara.jpg"
+  }
+]
+```
+
+**Notes:**
+- Returns a paginated list with 10 results per page
+- If page ≤ 0, defaults to page 1
+- All filters are optional
+
+---
+
 ### POST /api/recipes
 
 Create a new recipe.
@@ -727,6 +760,7 @@ Get all recipes a user has favourited.
 | GET /api/users/search?q=          | done      |
 | GET /api/recipes                  | done      |
 | GET /api/recipes/:id              | done      |
+| GET /api/recipes/search           | done      |
 | GET /api/recipes/image-signature  | done      |
 | POST /api/recipes                 | TODO      |
 | POST /api/recipes/:id/image       | TODO      |

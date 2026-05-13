@@ -6,9 +6,37 @@ DAYS=365
 
 mkdir -p ${CERTS_DIR}
 
-if [ -f "${CERTS_DIR}/ca.crt" ]; then
+CERT_FILES="
+	${CERTS_DIR}/ca.crt
+	${CERTS_DIR}/ca.key
+	${CERTS_DIR}/reverse_proxy.crt
+	${CERTS_DIR}/reverse_proxy.key
+	${CERTS_DIR}/backend.crt
+	${CERTS_DIR}/backend.key
+	${CERTS_DIR}/postgres.crt
+	${CERTS_DIR}/postgres.key
+"
+
+all_certs_exist=true
+some_certs_exist=false
+
+for f in ${CERT_FILES}; do
+	if [ -f "${f}" ]; then
+		some_certs_exist=true
+	else
+		all_certs_exist=false
+	fi
+done
+
+if [ "${all_certs_exist}" = true ]; then
 	echo "Certificates already generated"
 	exit 0
+fi
+
+if [ "${some_certs_exist}" = true ]; then
+	echo "Partial state detected, regenerating all"
+	rm -rf ${CERTS_DIR}
+	mkdir -p ${CERTS_DIR}
 fi
 
 echo "Generating certificates..."

@@ -53,7 +53,10 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{fmt.Sprintf("https://localhost:%v", nginxPort)},
+		AllowOrigins: []string{
+			fmt.Sprintf("https://localhost:%v", nginxPort),
+			fmt.Sprintf("https://127.0.0.1:%v", nginxPort),
+		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,

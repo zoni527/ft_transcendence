@@ -15,10 +15,8 @@ const SearchBar = () => {
   const { t } = useTranslation();
 
   const [results, setResults] = useState<getSearchResponse[]>([]);
-  const [open, setOpen] = useState(false);
 
   const handleSelectUser = (id: string) => {
-    setOpen(false);
     setResults([]);
     void navigate(`/users/${id}`);
   };
@@ -29,7 +27,6 @@ const SearchBar = () => {
     getSearch(query, t)
       .then((found) => {
         setResults(found);
-        setOpen(true);
       })
       .catch((err: unknown) => {
         const message =
@@ -43,19 +40,25 @@ const SearchBar = () => {
     <div className="relative w-full">
       <SearchField onSearch={handleSearch} />
 
-      {open && results.length > 0 && (
-        <ul className="absolute right-0 left-0 z-50 mt-2 w-full rounded-md border bg-white shadow-lg">
-          {results.map((user) => (
-            <li
-              key={user.id}
-              onClick={() => handleSelectUser(user.id)}
-              className="cursor-pointer px-4 py-2 hover:bg-gray-100"
-            >
-              {user.display_name}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="mt-8 max-h-64 overflow-y-auto rounded-md border border-gray-400 bg-white shadow">
+        {results.length > 0 ? (
+          <ul>
+            {results.map((user) => (
+              <li
+                key={user.id}
+                onClick={() => handleSelectUser(user.id)}
+                className="cursor-pointer border-b border-gray-300 px-4 py-2 text-gray-800 last:border-b-0 hover:bg-gray-100"
+              >
+                {user.display_name}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="px-4 py-3 text-sm text-gray-400">
+            {t('dashboard.noResults')}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

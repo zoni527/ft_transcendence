@@ -50,6 +50,7 @@ export const csTranslations = {
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
     addFriend: 'Přidat přítele',
+    noResults: 'Žádné výsledky...',
   },
   roles: {
     user: 'uživatel',

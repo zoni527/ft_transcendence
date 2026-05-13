@@ -50,6 +50,7 @@ export const fiTranslations = {
     editUser: 'Muokkaa profiilia',
     submit: 'Poista profiili',
     addFriend: 'Lisää kaveri',
+    noResults: 'Ei tuloksia...',
   },
   roles: {
     user: 'käyttäjä',

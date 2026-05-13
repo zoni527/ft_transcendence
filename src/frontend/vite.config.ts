@@ -8,7 +8,7 @@ export default defineConfig({
     host: true,
     port: 5173,
     hmr: {
-      clientPort: import.meta.env.NGINX_PORT_EXTERNAL,
+      clientPort: process.env.NGINX_PORT_EXTERNAL,
     },
     watch: {
       usePolling: true,

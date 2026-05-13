@@ -5,12 +5,14 @@ import { useNotification } from '../utils/NotifContext';
 import CreateRecipeModal from '../modals/CreateRecipe';
 import DataField from '../components/DataField';
 import EditUserModal from '../modals/EditUser';
+import FriendField from '../components/FriendField';
 import InfoIcon from '../components/InfoIcon';
 import ModalButton from '../components/ModalButton';
+import SectionButton from '../components/SectionButton';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import UserStatus from '../components/UserStatus';
-import { getUserbyId, deleteUser } from '../api';
+import { getUserbyId, deleteUser, getUsers } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User } from '../types/types';
 import { cardBase } from '../styles/styles';
@@ -18,6 +20,7 @@ import { cardBase } from '../styles/styles';
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
   const [userData, setUserData] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
@@ -25,6 +28,45 @@ const Dashboard = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [activeSection, setActiveSection] = useState<'profile' | 'friends'>(
+    'profile',
+  );
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    const fetchData = async () => {
+      if (!authUser) {
+        setLoading(false);
+        return;
+      }
+
+      let cancelled = false;
+
+      try {
+        const users = await getUsers(t);
+
+        if (cancelled) return;
+
+        setUsers([...users].sort((a, b) => a.name.localeCompare(b.name)));
+      } catch (err: unknown) {
+        if (cancelled) return;
+
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+
+      return () => {
+        cancelled = true;
+      };
+    };
+
+    void fetchData();
+  }, [authLoading, authUser, hasRole, t, showNotification]);
 
   const handleDelete = (id?: string) => {
     if (loading) return;
@@ -124,86 +166,120 @@ const Dashboard = () => {
           {userData.name}
         </h1>
 
-        {/* User Info Section */}
-        <div className="mt-16 space-y-6 md:mt-36">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-              <div className="flex-1">
-                <DataField label={t('dashboard.name')} value={userData.name} />
-              </div>
-              <button className="rounded p-2" title={t('info.name')}>
-                <InfoIcon />
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-              <div className="flex-1">
-                <DataField
-                  label={t('dashboard.username')}
-                  value={userData.display_name}
-                />
-              </div>
-              <button className="rounded p-2" title={t('info.username')}>
-                <InfoIcon />
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-              <div className="flex-1">
-                <DataField
-                  label={t('dashboard.email')}
-                  value={userData.email}
-                />
-              </div>
-              <button className="rounded p-2" title={t('info.email')}>
-                <InfoIcon />
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-              <div className="flex-1">
-                <DataField
-                  label={t('dashboard.roles')}
-                  value={userData.roles
-                    .map((role) => t(`roles.${role}`))
-                    .join(', ')}
-                />
-              </div>
-              <button className="rounded p-2" title={t('info.roles')}>
-                <InfoIcon />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          {/* Left */}
-          <ModalButton
-            className="order-1 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
-            onClick={() => setIsCreateRecipeOpen(true)}
-            text={t('dashboard.createRecipe')}
-            disabled={!(hasRole(['chef', 'moderator', 'admin']) && isSelf)}
+        {/* Section Tabs */}
+        <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-36 md:flex-row md:gap-8">
+          <SectionButton
+            label={t('nav.dashboard')}
+            section="profile"
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
           />
 
-          {/* Right */}
-          <div className="order-2 flex flex-col gap-2 md:order-0 md:flex-row">
-            <ModalButton
-              className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
-              onClick={() => setIsUserEditOpen(true)}
-              text={t('dashboard.editUser')}
-              disabled={!(hasRole(['admin']) || isSelf)}
-            />
+          <SectionButton
+            label={t('nav.friends')}
+            section="friends"
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
+        </div>
 
-            <SubmitButton
-              className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
-              isLoading={loading}
-              defaultText={t('dashboard.submit')}
-              onClick={() => handleDelete(userData.id)}
-              type="button"
-              disabled={!(hasRole(['admin']) || isSelf)}
-            />
-          </div>
+        {/* Content */}
+        <div className="mt-10 flex flex-col gap-4">
+          {/* Profile */}
+          {activeSection === 'profile' && (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                  <div className="flex-1">
+                    <DataField
+                      label={t('dashboard.name')}
+                      value={userData.name}
+                    />
+                  </div>
+                  <button className="rounded p-2" title={t('info.name')}>
+                    <InfoIcon />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                  <div className="flex-1">
+                    <DataField
+                      label={t('dashboard.username')}
+                      value={userData.display_name}
+                    />
+                  </div>
+                  <button className="rounded p-2" title={t('info.username')}>
+                    <InfoIcon />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                  <div className="flex-1">
+                    <DataField
+                      label={t('dashboard.email')}
+                      value={userData.email}
+                    />
+                  </div>
+                  <button className="rounded p-2" title={t('info.email')}>
+                    <InfoIcon />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                  <div className="flex-1">
+                    <DataField
+                      label={t('dashboard.roles')}
+                      value={userData.roles.join(', ')}
+                    />
+                  </div>
+                  <button className="rounded p-2" title={t('info.roles')}>
+                    <InfoIcon />
+                  </button>
+                </div>
+              </div>
+
+              {/* Bottom buttons */}
+              <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                {/* Left */}
+                <ModalButton
+                  className="order-1 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
+                  onClick={() => setIsCreateRecipeOpen(true)}
+                  text={t('dashboard.createRecipe')}
+                  disabled={
+                    !(hasRole(['chef', 'moderator', 'admin']) && isSelf)
+                  }
+                />
+
+                {/* Right */}
+                <div className="order-2 flex flex-col gap-2 md:order-0 md:flex-row">
+                  <ModalButton
+                    className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
+                    onClick={() => setIsUserEditOpen(true)}
+                    text={t('dashboard.editUser')}
+                    disabled={!(hasRole(['admin']) || isSelf)}
+                  />
+
+                  <SubmitButton
+                    className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
+                    isLoading={loading}
+                    defaultText={t('dashboard.submit')}
+                    onClick={() => handleDelete(userData.id)}
+                    type="button"
+                    disabled={!(hasRole(['admin']) || isSelf)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Friends */}
+          {activeSection === 'friends' && (
+            <div className="mt-8 flex flex-col gap-4">
+              {users.map((listedUser) => (
+                <FriendField key={listedUser.id} user={listedUser} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>

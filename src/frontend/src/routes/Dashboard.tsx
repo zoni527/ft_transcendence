@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
+import AddFriendModal from '../modals/AddFriend';
 import CreateRecipeModal from '../modals/CreateRecipe';
 import DataField from '../components/DataField';
 import EditUserModal from '../modals/EditUser';
@@ -25,6 +26,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
+  const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
   const { user: authUser, hasRole, loading: authLoading, logout } = useAuth();
   const { showNotification } = useNotification();
   const navigate = useNavigate();
@@ -154,6 +156,9 @@ const Dashboard = () => {
       {isCreateRecipeOpen && (
         <CreateRecipeModal onClose={() => setIsCreateRecipeOpen(false)} />
       )}
+      {isAddFriendOpen && (
+        <AddFriendModal onClose={() => setIsAddFriendOpen(false)} />
+      )}
 
       <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
         {/* Avatar */}
@@ -186,12 +191,14 @@ const Dashboard = () => {
               setActiveSection={setActiveSection}
             />
 
-            <SectionButton
-              label={t('nav.friends')}
-              section="friends"
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-            />
+            {isSelf && (
+              <SectionButton
+                label={t('nav.friends')}
+                section="friends"
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
+            )}
           </div>
         </div>
 
@@ -218,54 +225,52 @@ const Dashboard = () => {
           {/* Profile */}
           {activeSection === 'profile' && (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-                  <div className="flex-1">
-                    <DataField
-                      label={t('dashboard.name')}
-                      value={userData.name}
-                    />
-                  </div>
-                  <button className="rounded p-2" title={t('info.name')}>
-                    <InfoIcon />
-                  </button>
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex-1">
+                  <DataField
+                    label={t('dashboard.name')}
+                    value={userData.name}
+                  />
                 </div>
+                <button className="rounded p-2" title={t('info.name')}>
+                  <InfoIcon />
+                </button>
+              </div>
 
-                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-                  <div className="flex-1">
-                    <DataField
-                      label={t('dashboard.username')}
-                      value={userData.display_name}
-                    />
-                  </div>
-                  <button className="rounded p-2" title={t('info.username')}>
-                    <InfoIcon />
-                  </button>
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex-1">
+                  <DataField
+                    label={t('dashboard.username')}
+                    value={userData.display_name}
+                  />
                 </div>
+                <button className="rounded p-2" title={t('info.username')}>
+                  <InfoIcon />
+                </button>
+              </div>
 
-                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-                  <div className="flex-1">
-                    <DataField
-                      label={t('dashboard.email')}
-                      value={userData.email}
-                    />
-                  </div>
-                  <button className="rounded p-2" title={t('info.email')}>
-                    <InfoIcon />
-                  </button>
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex-1">
+                  <DataField
+                    label={t('dashboard.email')}
+                    value={userData.email}
+                  />
                 </div>
+                <button className="rounded p-2" title={t('info.email')}>
+                  <InfoIcon />
+                </button>
+              </div>
 
-                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-                  <div className="flex-1">
-                    <DataField
-                      label={t('dashboard.roles')}
-                      value={userData.roles.join(', ')}
-                    />
-                  </div>
-                  <button className="rounded p-2" title={t('info.roles')}>
-                    <InfoIcon />
-                  </button>
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex-1">
+                  <DataField
+                    label={t('dashboard.roles')}
+                    value={userData.roles.join(', ')}
+                  />
                 </div>
+                <button className="rounded p-2" title={t('info.roles')}>
+                  <InfoIcon />
+                </button>
               </div>
 
               {/* Bottom buttons */}
@@ -301,10 +306,13 @@ const Dashboard = () => {
               </div>
             </div>
           )}
+        </div>
 
-          {/* Friends */}
-          {activeSection === 'friends' &&
-            sortedUsers.map((listedUser) => (
+        {/* Friends */}
+        {activeSection === 'friends' && (
+          <div className="flex flex-col gap-4">
+            {/* Friends list */}
+            {sortedUsers.map((listedUser) => (
               <FriendField
                 key={listedUser.id}
                 user={listedUser}
@@ -320,7 +328,19 @@ const Dashboard = () => {
                 }
               />
             ))}
-        </div>
+
+            {/* Bottom buttons */}
+            <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              {/* Left */}
+              <ModalButton
+                className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
+                onClick={() => setIsAddFriendOpen(true)}
+                text={t('dashboard.addFriend')}
+                disabled={!isSelf}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

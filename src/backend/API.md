@@ -88,7 +88,7 @@ Get all users.
 
 ### GET /api/users/search?q=
 
-Search users display name. Useful for the "Add Friend" feature.
+Search users by display name. Useful for the "Add Friend" feature.
 
 **Query parameters:**
 | Param | Type      | Description                                   |

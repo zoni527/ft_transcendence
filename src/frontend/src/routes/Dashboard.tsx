@@ -13,6 +13,7 @@ import SectionButton from '../components/SectionButton';
 import SortButtons from '../components/SortButtons';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
+import SubsectionButton from '../components/SubsectionButton';
 import UserStatus from '../components/UserStatus';
 import { getUserbyId, deleteUser, getUsers } from '../api';
 import { useAuth } from '../utils/AuthContext';
@@ -34,6 +35,9 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState<'profile' | 'friends'>(
     'profile',
   );
+  const [activeSubsection, setActiveSubsection] = useState<
+    'accepted' | 'incoming' | 'outgoing'
+  >('accepted');
   const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
 
   useEffect(() => {
@@ -188,7 +192,7 @@ const Dashboard = () => {
         </h1>
 
         {/* Tabs */}
-        <div className="mt-16 border-b pb-2 md:mt-20">
+        <div className="mt-16 pb-2 md:mt-20">
           <div className="mb-4 flex justify-center gap-8 md:gap-24">
             <SectionButton
               label={t('nav.dashboard')}
@@ -206,6 +210,34 @@ const Dashboard = () => {
               />
             )}
           </div>
+        </div>
+
+        {/* Sub-Tabs */}
+        <div className="border-b">
+          {activeSection === 'friends' && (
+            <div className="mb-4 flex justify-center gap-8 md:gap-24">
+              <SubsectionButton
+                label={t('nav.accepted')}
+                subsection="accepted"
+                activeSubsection={activeSubsection}
+                setActiveSubsection={setActiveSubsection}
+              />
+
+              <SubsectionButton
+                label={t('nav.incoming')}
+                subsection="incoming"
+                activeSubsection={activeSubsection}
+                setActiveSubsection={setActiveSubsection}
+              />
+
+              <SubsectionButton
+                label={t('nav.outgoing')}
+                subsection="outgoing"
+                activeSubsection={activeSubsection}
+                setActiveSubsection={setActiveSubsection}
+              />
+            </div>
+          )}
         </div>
 
         {/* Sort Controls */}

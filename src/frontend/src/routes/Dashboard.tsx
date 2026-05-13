@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
@@ -8,7 +8,9 @@ import EditUserModal from '../modals/EditUser';
 import FriendField from '../components/FriendField';
 import InfoIcon from '../components/InfoIcon';
 import ModalButton from '../components/ModalButton';
+import SearchBar from '../components/SearchBar';
 import SectionButton from '../components/SectionButton';
+import SortButtons from '../components/SortButtons';
 import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import UserStatus from '../components/UserStatus';
@@ -31,6 +33,7 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState<'profile' | 'friends'>(
     'profile',
   );
+  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
 
   useEffect(() => {
     if (authLoading) return;
@@ -67,6 +70,14 @@ const Dashboard = () => {
 
     void fetchData();
   }, [authLoading, authUser, hasRole, t, showNotification]);
+
+  const sortedUsers = useMemo(() => {
+    return [...users].sort((a, b) =>
+      sortBy === 'name'
+        ? a.name.localeCompare(b.name)
+        : a.display_name.localeCompare(b.display_name),
+    );
+  }, [users, sortBy]);
 
   const handleDelete = (id?: string) => {
     if (loading) return;
@@ -166,25 +177,55 @@ const Dashboard = () => {
           {userData.name}
         </h1>
 
-        {/* Section Tabs */}
-        <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-36 md:flex-row md:gap-8">
-          <SectionButton
-            label={t('nav.dashboard')}
-            section="profile"
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
+        {/* Tabs */}
+        <div className="mt-16 flex flex-col items-center gap-4 border-b pb-2 md:mt-20">
+          {/* Search */}
+          {activeSection === 'friends' ? (
+            <SearchBar />
+          ) : (
+            <div className="invisible">
+              <SearchBar />
+            </div>
+          )}
 
-          <SectionButton
-            label={t('nav.friends')}
-            section="friends"
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
+          {/* Selection */}
+          <div className="mb-4 flex flex-row justify-center gap-8 md:gap-24">
+            <SectionButton
+              label={t('nav.dashboard')}
+              section="profile"
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+            />
+
+            <SectionButton
+              label={t('nav.friends')}
+              section="friends"
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+            />
+          </div>
         </div>
 
+        {/* Sort Controls */}
+        {activeSection === 'friends' && (
+          <SortButtons
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            options={[
+              {
+                value: 'name',
+                label: t('adminPanel.sortFullName'),
+              },
+              {
+                value: 'username',
+                label: t('adminPanel.sortUsername'),
+              },
+            ]}
+          />
+        )}
+
         {/* Content */}
-        <div className="mt-10 flex flex-col gap-4">
+        <div className="mt-12 flex flex-col gap-4">
           {/* Profile */}
           {activeSection === 'profile' && (
             <div className="flex flex-col gap-4">
@@ -273,13 +314,23 @@ const Dashboard = () => {
           )}
 
           {/* Friends */}
-          {activeSection === 'friends' && (
-            <div className="mt-8 flex flex-col gap-4">
-              {users.map((listedUser) => (
-                <FriendField key={listedUser.id} user={listedUser} />
-              ))}
-            </div>
-          )}
+          {activeSection === 'friends' &&
+            sortedUsers.map((listedUser) => (
+              <FriendField
+                key={listedUser.id}
+                user={listedUser}
+                onDelete={(id) =>
+                  setUsers((prev) => prev.filter((u) => u.id !== id))
+                }
+                onUpdate={(updatedUser) =>
+                  setUsers((prev) =>
+                    prev.map((u) =>
+                      u.id === updatedUser.id ? updatedUser : u,
+                    ),
+                  )
+                }
+              />
+            ))}
         </div>
       </div>
     </>

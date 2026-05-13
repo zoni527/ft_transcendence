@@ -1,7 +1,7 @@
 export const fiTranslations = {
   nav: {
     recipes: 'Reseptit',
-    dashboard: 'Käyttäjäprofiili',
+    dashboard: 'Profiili',
     friends: 'Ystävät',
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
@@ -52,8 +52,8 @@ export const fiTranslations = {
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
-    users: 'Käyttäjätietokanta',
-    recipes: 'Reseptitietokanta',
+    users: 'Käyttäjät',
+    recipes: 'Reseptit',
     edit: 'Muokkaa',
     delete: 'Poista',
     sortFullName: 'A-Z: Koko nimi',
@@ -290,7 +290,7 @@ export const fiTranslations = {
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
     noFile: 'Tiedostoa ei valittu',
-    search: 'Hae...',
+    search: 'Hae käyttäjiä...',
   },
   error: {
     error: 'Virhe:',

@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AdminUserField from '../components/AdminUserField.tsx';
 import AdminRecipeField from '../components/AdminRecipeField.tsx';
+import SearchBar from '../components/SearchBar.tsx';
 import SectionButton from '../components/SectionButton.tsx';
+import SortButtons from '../components/SortButtons.tsx';
 import StatusBox from '../components/StatusBox';
 import UserStatus from '../components/UserStatus.tsx';
 import { useAuth } from '../utils/AuthContext';
@@ -116,54 +118,55 @@ const AdminPanel = () => {
         {t('adminPanel.header')}
       </h1>
 
-      {/* Section Tabs */}
-      <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-36 md:flex-row md:gap-8">
-        <SectionButton
-          label={t('adminPanel.users')}
-          section="users"
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-        />
+      {/* Tabs */}
+      <div className="mt-16 flex flex-col items-center gap-4 border-b pb-2 md:mt-20">
+        {/* Search */}
+        {activeSection === 'users' ? (
+          <SearchBar />
+        ) : (
+          <div className="invisible">
+            <SearchBar />
+          </div>
+        )}
 
-        <SectionButton
-          label={t('adminPanel.recipes')}
-          section="recipes"
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-        />
+        {/* Selection */}
+        <div className="mb-4 flex flex-row justify-center gap-8 md:gap-24">
+          <SectionButton
+            label={t('adminPanel.users')}
+            section="users"
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
+
+          <SectionButton
+            label={t('adminPanel.recipes')}
+            section="recipes"
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
+        </div>
       </div>
 
       {/* Sort Controls */}
       {activeSection === 'users' && (
-        <div className="mt-6 flex w-full justify-center md:justify-start">
-          <div className="flex flex-col items-center gap-3 md:flex-row md:items-start md:gap-6">
-            <button
-              onClick={() => setSortBy('name')}
-              className={`text-lg font-bold transition-colors hover:cursor-pointer md:w-64 md:text-left ${
-                sortBy === 'name'
-                  ? 'text-[#C04D31]'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t('adminPanel.sortFullName')}
-            </button>
-
-            <button
-              onClick={() => setSortBy('username')}
-              className={`text-lg font-bold transition-colors hover:cursor-pointer md:w-64 md:text-left ${
-                sortBy === 'username'
-                  ? 'text-[#C04D31]'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t('adminPanel.sortUsername')}
-            </button>
-          </div>
-        </div>
+        <SortButtons
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          options={[
+            {
+              value: 'name',
+              label: t('adminPanel.sortFullName'),
+            },
+            {
+              value: 'username',
+              label: t('adminPanel.sortUsername'),
+            },
+          ]}
+        />
       )}
 
       {/* Content */}
-      <div className="mt-10 flex flex-col gap-4">
+      <div className="mt-12 flex flex-col gap-4">
         {/* Users */}
         {activeSection === 'users' &&
           sortedUsers.map((listedUser) => (

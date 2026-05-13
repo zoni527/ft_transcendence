@@ -52,8 +52,8 @@ export const enTranslations = {
   },
   adminPanel: {
     header: 'Admin panel',
-    users: 'User database',
-    recipes: 'Recipe database',
+    users: 'Users',
+    recipes: 'Recipes',
     edit: 'Edit',
     delete: 'Delete',
     sortFullName: 'A-Z: Full name',
@@ -290,7 +290,7 @@ export const enTranslations = {
     welcome: 'Welcome',
     rightsReserved: 'RISE. All Rights Reserved.',
     noFile: 'No file chosen',
-    search: 'Search...',
+    search: 'Search users...',
   },
   error: {
     error: 'Error:',

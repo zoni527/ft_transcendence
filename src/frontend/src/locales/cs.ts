@@ -49,6 +49,7 @@ export const csTranslations = {
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
+    addFriend: 'Přidat přítele',
   },
   adminPanel: {
     header: 'Administrátorský panel',

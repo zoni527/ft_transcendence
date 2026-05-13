@@ -49,6 +49,7 @@ export const enTranslations = {
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
     submit: 'Delete profile',
+    addFriend: 'Add friend',
   },
   adminPanel: {
     header: 'Admin panel',

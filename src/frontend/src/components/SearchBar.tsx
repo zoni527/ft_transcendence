@@ -40,28 +40,22 @@ const SearchBar = () => {
   };
 
   return (
-    <div className={`mt-2 px-4 py-3`}>
-      <div className="relative flex items-center">
-        {/* Left (Desktop only) */}
+    <div className="relative w-full">
+      <SearchField onSearch={handleSearch} />
 
-        <div className="relative w-full md:w-auto">
-          <SearchField onSearch={handleSearch} />
-
-          {open && results.length > 0 && (
-            <ul className="absolute left-0 z-50 mt-2 w-full rounded-md border bg-white shadow-lg">
-              {results.map((user) => (
-                <li
-                  key={user.id}
-                  onClick={() => handleSelectUser(user.id)}
-                  className="cursor-pointer px-4 py-2 hover:bg-gray-100"
-                >
-                  {user.display_name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
+      {open && results.length > 0 && (
+        <ul className="absolute right-0 left-0 z-50 mt-2 w-full rounded-md border bg-white shadow-lg">
+          {results.map((user) => (
+            <li
+              key={user.id}
+              onClick={() => handleSelectUser(user.id)}
+              className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+            >
+              {user.display_name}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

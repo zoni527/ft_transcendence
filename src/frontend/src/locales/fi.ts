@@ -49,6 +49,7 @@ export const fiTranslations = {
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
     submit: 'Poista profiili',
+    addFriend: 'Lisää kaveri',
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',

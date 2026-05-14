@@ -164,6 +164,6 @@ type GoogleUser struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
 	Email         string `json:"email"`
-	EmailVerified bool   `json:"email_verified"`
+	VerifiedEmail bool   `json:"verified_email"`
 	Picture       string `json:"picture"`
 }

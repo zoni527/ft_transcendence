@@ -13,9 +13,15 @@ interface AdminUserFieldProps {
   user: User;
   onDelete: (id: string) => void;
   onUpdate: (user: User) => void;
+  onClick?: () => void;
 }
 
-const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
+const AdminUserField = ({
+  user,
+  onDelete,
+  onUpdate,
+  onClick,
+}: AdminUserFieldProps) => {
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { hasRole } = useAuth();
@@ -53,7 +59,10 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
           onSave={onUpdate}
         />
       )}
-      <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+      <div
+        className="flex items-center justify-between border-b border-gray-300 pt-4 pb-4 pl-2 hover:cursor-pointer hover:bg-gray-100"
+        onClick={onClick}
+      >
         {/* Left side */}
         <div className="flex min-w-0 flex-col gap-2 md:flex-row md:items-center md:gap-6">
           {/* Name */}
@@ -75,7 +84,10 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
           {/* Edit user */}
           <ModalButton
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-            onClick={() => setIsUserEditOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsUserEditOpen(true);
+            }}
             text={t('adminPanel.edit')}
             disabled={!hasRole(['admin'])}
           />
@@ -85,7 +97,10 @@ const AdminUserField = ({ user, onDelete, onUpdate }: AdminUserFieldProps) => {
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             isLoading={loading}
             defaultText={t('adminPanel.delete')}
-            onClick={() => handleDelete(user.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(user.id);
+            }}
             type="button"
             disabled={!hasRole(['admin'])}
           />

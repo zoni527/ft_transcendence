@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AdminUserField from '../components/AdminUserField.tsx';
 import AdminRecipeField from '../components/AdminRecipeField.tsx';
@@ -18,6 +19,7 @@ const AdminPanel = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
@@ -165,7 +167,7 @@ const AdminPanel = () => {
       )}
 
       {/* Content */}
-      <div className="mt-12 flex flex-col gap-4">
+      <div className="mt-12 flex flex-col">
         {/* Recipes */}
         {activeSection === 'recipes' &&
           recipes.map((recipe) => (
@@ -184,6 +186,9 @@ const AdminPanel = () => {
                   ].sort((a, b) => a.title.localeCompare(b.title)),
                 )
               }
+              onClick={() => {
+                void navigate(`/recipes/${recipe.id}`);
+              }}
             />
           ))}
 
@@ -201,6 +206,9 @@ const AdminPanel = () => {
                   prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
                 )
               }
+              onClick={() => {
+                void navigate(`/users/${listedUser.id}`);
+              }}
             />
           ))}
       </div>

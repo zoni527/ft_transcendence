@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { buttonBase } from '../styles/styles';
 
 interface ModalButtonProps {
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   title?: string;
   text: string;
   disabled?: boolean;

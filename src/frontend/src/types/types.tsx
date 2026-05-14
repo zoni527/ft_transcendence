@@ -40,3 +40,9 @@ export type AuthContextType = {
   loading: boolean;
   hasRole: (roles: string[]) => boolean;
 };
+
+export interface FriendshipListItem {
+  id: string;
+  display_name: string;
+  name: string;
+}

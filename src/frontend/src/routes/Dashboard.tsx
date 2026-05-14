@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
@@ -15,15 +15,21 @@ import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import SubsectionButton from '../components/SubsectionButton';
 import UserStatus from '../components/UserStatus';
-import { getUserbyId, deleteUser, getUsers } from '../api';
+import { getUserbyId, deleteUser, getFriendships } from '../api';
 import { useAuth } from '../utils/AuthContext';
-import type { User } from '../types/types';
+import type { User, FriendshipListItem } from '../types/types';
 import { cardBase } from '../styles/styles';
+
+type FriendshipWithStatus = FriendshipListItem & {
+  status: 'accepted' | 'incoming' | 'outgoing';
+};
 
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
   const [userData, setUserData] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [friendshipUsers, setFriendshipUsers] = useState<
+    FriendshipWithStatus[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
@@ -66,46 +72,42 @@ const Dashboard = () => {
   useEffect(() => {
     if (authLoading) return;
 
+    let cancelled = false;
+
     const fetchData = async () => {
       if (!authUser) {
         setLoading(false);
         return;
       }
 
-      let cancelled = false;
-
       try {
-        const users = await getUsers(t);
+        const data = await getFriendships(t);
 
         if (cancelled) return;
 
-        setUsers([...users].sort((a, b) => a.name.localeCompare(b.name)));
+        const combinedFriends = [
+          ...data.friends.map((u) => ({ ...u, status: 'accepted' as const })),
+          ...data.sent.map((u) => ({ ...u, status: 'outgoing' as const })),
+          ...data.incoming.map((u) => ({ ...u, status: 'incoming' as const })),
+        ];
+
+        setFriendshipUsers(combinedFriends);
       } catch (err: unknown) {
         if (cancelled) return;
-
         const message =
           err instanceof Error ? err.message : t('error.genericError');
-
         showNotification(message, 'error');
       } finally {
         if (!cancelled) setLoading(false);
       }
-
-      return () => {
-        cancelled = true;
-      };
     };
 
     void fetchData();
-  }, [authLoading, authUser, hasRole, t, showNotification]);
 
-  const sortedUsers = useMemo(() => {
-    return [...users].sort((a, b) =>
-      sortBy === 'name'
-        ? a.name.localeCompare(b.name)
-        : a.display_name.localeCompare(b.display_name),
-    );
-  }, [users, sortBy]);
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, authUser, t, showNotification]);
 
   const handleDelete = (id?: string) => {
     if (loading) return;
@@ -374,27 +376,29 @@ const Dashboard = () => {
         {activeSection === 'friends' && (
           <div className="flex flex-col">
             {/* Friends list */}
-            {sortedUsers.map((listedUser) => (
-              <FriendField
-                key={listedUser.id}
-                user={listedUser}
-                subsection={activeSubsection}
-                onDelete={(id) =>
-                  setUsers((prev) => prev.filter((u) => u.id !== id))
-                }
-                onUpdate={(updatedUser) =>
-                  setUsers((prev) =>
-                    prev.map((u) =>
-                      u.id === updatedUser.id ? updatedUser : u,
-                    ),
-                  )
-                }
-                onClick={() => {
-                  setActiveSection('profile');
-                  void navigate(`/users/${listedUser.id}`);
-                }}
-              />
-            ))}
+            {friendshipUsers
+              .filter((u) => u.status === activeSubsection)
+              .sort((a, b) =>
+                sortBy === 'name'
+                  ? a.display_name.localeCompare(b.display_name)
+                  : a.display_name.localeCompare(b.display_name),
+              )
+              .map((listedUser) => (
+                <FriendField
+                  key={listedUser.id}
+                  user={listedUser}
+                  subsection={activeSubsection}
+                  onDelete={(id) =>
+                    setFriendshipUsers((prev) =>
+                      prev.filter((u) => u.id !== id),
+                    )
+                  }
+                  onClick={() => {
+                    setActiveSection('profile');
+                    void navigate(`/users/${listedUser.id}`);
+                  }}
+                />
+              ))}
 
             {/* Bottom buttons */}
             <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">

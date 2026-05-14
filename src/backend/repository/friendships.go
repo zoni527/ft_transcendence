@@ -12,7 +12,7 @@ import (
 //TODO: AcceptFriendRequest:   Flip status from pending to accepted (only the receiver can do this)
 //TODO: DeleteFriendship:      Remove the row (covers cancel, reject, unfriend)
 
-//getting a list of everyone I have a "friendship" with, identifying who the other person is, and checking if I was the one who started the request.
+// getting a list of everyone I have a "friendship" with, identifying who the other person is, and checking if I was the one who started the request.
 func GetFriendshipsForUser(userID string) ([]models.FriendshipListItem, error) {
 	sql := `SELECT f.status, (f.requester_id = $1) AS sent_by_me,
 			u.id, u.display_name, COALESCE(u.name, '') AS name
@@ -24,7 +24,7 @@ func GetFriendshipsForUser(userID string) ([]models.FriendshipListItem, error) {
 						  END
 			WHERE f.requester_id = $1 OR f.receiver_id = $1
 			ORDER BY u.display_name ASC
-			`	
+			`
 	rows, err := Pool.Query(context.Background(), sql, userID)
 	if err != nil {
 		return nil, fmt.Errorf("query friendships: %w", err)

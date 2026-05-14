@@ -169,11 +169,9 @@ function isFriendshipListItem(data: unknown): data is FriendshipListItem {
   const obj = data as Record<string, unknown>;
 
   return (
-    typeof obj.id === 'number' &&
-    typeof obj.username === 'string' &&
-    typeof obj.is_online === 'boolean' &&
-    (obj.profile_picture === undefined ||
-      typeof obj.profile_picture === 'string')
+    typeof obj.id === 'string' &&
+    typeof obj.display_name === 'string' &&
+    typeof obj.name === 'string'
   );
 }
 

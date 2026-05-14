@@ -46,3 +46,7 @@ export interface FriendshipListItem {
   display_name: string;
   name: string;
 }
+
+export interface AcceptedFriend extends FriendshipListItem {
+  is_online: boolean;
+}

@@ -1,5 +1,10 @@
 import type { TFunction } from 'i18next';
-import type { Recipe, User, FriendshipListItem } from './types/types';
+import type {
+  Recipe,
+  User,
+  FriendshipListItem,
+  AcceptedFriend,
+} from './types/types';
 
 interface CreateRecipePayload {
   title: string;
@@ -62,7 +67,7 @@ interface UpdateUserPayload {
 }
 
 interface FriendshipsResponse {
-  friends: FriendshipListItem[];
+  friends: AcceptedFriend[];
   sent: FriendshipListItem[];
   incoming: FriendshipListItem[];
 }
@@ -165,15 +170,22 @@ function isFriendshipListItem(data: unknown): data is FriendshipListItem {
   );
 }
 
+// Validation for OnlineFriend
+function isAcceptedFriend(data: unknown): data is AcceptedFriend {
+  if (!isFriendshipListItem(data)) return false;
+
+  const obj = data as unknown as Record<string, unknown>;
+  return typeof obj.is_online === 'boolean';
+}
+
 // Validation for Friendships
 function isFriendshipsResponse(data: unknown): data is FriendshipsResponse {
   if (typeof data !== 'object' || data === null) return false;
-
   const obj = data as Record<string, unknown>;
 
   return (
     Array.isArray(obj.friends) &&
-    obj.friends.every(isFriendshipListItem) &&
+    obj.friends.every(isAcceptedFriend) &&
     Array.isArray(obj.sent) &&
     obj.sent.every(isFriendshipListItem) &&
     Array.isArray(obj.incoming) &&

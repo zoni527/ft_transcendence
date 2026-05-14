@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import SubmitButton from './SubmitButton';
 import UserStatus from './UserStatus';
 import type { FriendshipListItem, AcceptedFriend } from '../types/types';
@@ -15,6 +16,8 @@ const FriendField = ({
   onDelete,
   onClick,
 }: FriendFieldProps) => {
+  const [loading] = useState(false);
+
   return (
     <div
       className="flex items-center justify-between border-b border-gray-300 pt-4 pb-4 pl-2 hover:cursor-pointer hover:bg-gray-100"
@@ -38,10 +41,9 @@ const FriendField = ({
         {subsection === 'accepted' && 'is_online' in user && (
           <UserStatus isOnline={user.is_online} />
         )}
-
         <SubmitButton
           className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-          isLoading={false}
+          isLoading={loading}
           defaultText="Placeholder"
           onClick={(e) => {
             e.stopPropagation();

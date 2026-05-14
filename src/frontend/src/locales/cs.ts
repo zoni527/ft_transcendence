@@ -54,6 +54,7 @@ export const csTranslations = {
     submit: 'Smazat profil',
     addFriend: 'Přidat přítele',
     noResults: 'Žádné výsledky...',
+    noEntries: 'Zatím zde není nikdo k zobrazení!',
   },
   roles: {
     user: 'uživatel',

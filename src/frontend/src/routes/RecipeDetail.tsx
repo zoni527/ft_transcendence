@@ -167,24 +167,23 @@ const RecipeDetail = () => {
 
         {/* Bottom Buttons */}
         <div className="mt-16 flex flex-col gap-4 md:flex-row md:items-center md:justify-end">
-          <ModalButton
-            className="order-1 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
-            onClick={() => setIsEditRecipeOpen(true)}
-            text={t('recipeDetail.editRecipe')}
-            disabled={
-              !hasRole(['moderator', 'admin']) && !(hasRole(['chef']) && isSelf)
-            }
-          />
-          <SubmitButton
-            className="order-2 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
-            isLoading={loading}
-            defaultText={t('recipeDetail.submit')}
-            onClick={() => handleDelete(id)}
-            type="button"
-            disabled={
-              !hasRole(['moderator', 'admin']) && !(hasRole(['chef']) && isSelf)
-            }
-          />
+          {(hasRole(['moderator', 'admin']) ||
+            (hasRole(['chef']) && isSelf)) && (
+            <>
+              <ModalButton
+                className="order-1 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
+                onClick={() => setIsEditRecipeOpen(true)}
+                text={t('recipeDetail.editRecipe')}
+              />
+              <SubmitButton
+                className="order-2 rounded-xl border-2 border-slate-600 hover:border-slate-950 md:order-0"
+                isLoading={loading}
+                defaultText={t('recipeDetail.submit')}
+                onClick={() => handleDelete(id)}
+                type="button"
+              />
+            </>
+          )}
         </div>
       </div>
     </>

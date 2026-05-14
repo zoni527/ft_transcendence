@@ -375,30 +375,36 @@ const Dashboard = () => {
         {/* Friends */}
         {activeSection === 'friends' && (
           <div className="flex flex-col">
-            {/* Friends list */}
-            {friendshipUsers
-              .filter((u) => u.status === activeSubsection)
-              .sort((a, b) =>
-                sortBy === 'name'
-                  ? a.display_name.localeCompare(b.display_name)
-                  : a.display_name.localeCompare(b.display_name),
-              )
-              .map((listedUser) => (
-                <FriendField
-                  key={listedUser.id}
-                  user={listedUser}
-                  subsection={activeSubsection}
-                  onDelete={(id) =>
-                    setFriendshipUsers((prev) =>
-                      prev.filter((u) => u.id !== id),
-                    )
-                  }
-                  onClick={() => {
-                    setActiveSection('profile');
-                    void navigate(`/users/${listedUser.id}`);
-                  }}
-                />
-              ))}
+            {friendshipUsers.filter((u) => u.status === activeSubsection)
+              .length === 0 ? (
+              <div className="p-4 text-lg font-semibold text-gray-500 italic">
+                {t('dashboard.noEntries')}
+              </div>
+            ) : (
+              friendshipUsers
+                .filter((u) => u.status === activeSubsection)
+                .sort((a, b) =>
+                  sortBy === 'name'
+                    ? a.display_name.localeCompare(b.display_name)
+                    : a.display_name.localeCompare(b.display_name),
+                )
+                .map((listedUser) => (
+                  <FriendField
+                    key={listedUser.id}
+                    user={listedUser}
+                    subsection={activeSubsection}
+                    onDelete={(id) =>
+                      setFriendshipUsers((prev) =>
+                        prev.filter((u) => u.id !== id),
+                      )
+                    }
+                    onClick={() => {
+                      setActiveSection('profile');
+                      void navigate(`/users/${listedUser.id}`);
+                    }}
+                  />
+                ))
+            )}
 
             {/* Bottom buttons */}
             <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">

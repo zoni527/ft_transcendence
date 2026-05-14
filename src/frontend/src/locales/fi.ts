@@ -54,6 +54,7 @@ export const fiTranslations = {
     submit: 'Poista profiili',
     addFriend: 'Lisää kaveri',
     noResults: 'Ei tuloksia...',
+    noEntries: 'Täällä ei ole vielä ketään näytettäväksi!',
   },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',

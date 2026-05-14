@@ -19,9 +19,10 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const GoogleOAuthLockedPassword = "OAUTH_LOCKED_GOOGLE"
-const GenericInternalErrorMsg = "internal server error"
-const DisplayNameVersionLimit = 1000
+const googleOAuthLockedPassword = "OAUTH_LOCKED_GOOGLE"
+const genericInternalErrorMsg = "internal server error"
+const unauthorizedErrorMsg = "unauthorized"
+const displayNameVersionLimit = 1000
 
 func RandomStateToken() string {
 	b := make([]byte, 32)
@@ -58,19 +59,19 @@ func GoogleCallback(c *gin.Context) {
 	client := integrations.GoogleOAuthConfig.Client(c, token)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
-		reportError(c, http.StatusUnauthorized, "unauthorized")
+		reportError(c, http.StatusUnauthorized, unauthorizedErrorMsg)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		reportError(c, http.StatusUnauthorized, "unauthorized")
+		reportError(c, http.StatusUnauthorized, unauthorizedErrorMsg)
 		return
 	}
 
 	var gu models.GoogleUser
-	if err := json.NewDecoder(resp.Body).Decode(&gu); err != nil || !gu.EmailVerified {
-		reportError(c, http.StatusUnauthorized, "unauthorized")
+	if err := json.NewDecoder(resp.Body).Decode(&gu); err != nil || !gu.VerifiedEmail {
+		reportError(c, http.StatusUnauthorized, unauthorizedErrorMsg)
 		return
 	}
 
@@ -82,19 +83,19 @@ func GoogleCallback(c *gin.Context) {
 			return
 		}
 		log.Printf("getOrCreateGoogleUser: %v", err)
-		reportError(c, http.StatusInternalServerError, GenericInternalErrorMsg)
+		reportError(c, http.StatusInternalServerError, genericInternalErrorMsg)
 	}
 
 	jwt, err := authorization.GenerateJWTToken(u.Id)
 	if err != nil {
 		log.Printf("LoginUser GenerateJWTToken: %v", err)
-		reportError(c, http.StatusInternalServerError, GenericInternalErrorMsg)
+		reportError(c, http.StatusInternalServerError, genericInternalErrorMsg)
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("token", jwt, 3600, "/", "", true, true)
 
-	c.Redirect(http.StatusMovedPermanently, "/")
+	c.Redirect(http.StatusSeeOther, "/")
 }
 
 type errorUnauthorized struct {
@@ -113,7 +114,7 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 
 	// User found
 	if err == nil {
-		if user.Password_hash != GoogleOAuthLockedPassword {
+		if user.Password_hash != googleOAuthLockedPassword {
 			return models.User{}, &errorUnauthorized{"not a google user"}
 		}
 		return user, nil
@@ -123,12 +124,12 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 	stem := gu.Email[:strings.IndexByte(gu.Email, '@')]
 	params := models.CreateUserParams{
 		Email:           gu.Email,
-		Password_hashed: GoogleOAuthLockedPassword,
+		Password_hashed: googleOAuthLockedPassword,
 		Name:            gu.Name,
 		Display_name:    stem,
 	}
 
-	for i := range DisplayNameVersionLimit {
+	for i := range displayNameVersionLimit {
 		_, err := repository.GetCredentialsByDisplayName(params.Display_name)
 		if err == pgx.ErrNoRows {
 			return repository.CreateUser(params)

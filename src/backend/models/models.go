@@ -119,13 +119,14 @@ type UserSearchResult struct {
 	Display_name string `json:"display_name"`
 }
 
-// An item in a list of friendships.
 type FriendshipListItem struct {
-	Status       string `json:"-"            db:"status"`
-	SentByMe     bool   `json:"-"            db:"sent_by_me"`
-	Id           string `json:"id"           db:"id"`
-	Display_name string `json:"display_name" db:"display_name"`
-	Name         string `json:"name"         db:"name"`
+	Status       string    `json:"-"            db:"status"`
+	SentByMe     bool      `json:"-"            db:"sent_by_me"`
+	Last_seen    time.Time `json:"-"            db:"last_seen"`
+	Id           string    `json:"id"           db:"id"`
+	Display_name string    `json:"display_name" db:"display_name"`
+	Name         string    `json:"name"         db:"name"`
+	Is_online    bool      `json:"is_online"`
 }
 
 // this is the body of GET /api/friendships.

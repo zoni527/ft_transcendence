@@ -22,7 +22,7 @@ const FriendField = ({
 
   return (
     <div
-      className="flex items-center justify-between border-b border-gray-300 pb-4"
+      className="flex items-center justify-between border-b border-gray-300 pt-4 pb-4 pl-2 hover:cursor-pointer hover:bg-gray-100"
       onClick={onClick}
     >
       {/* Left side */}
@@ -45,7 +45,10 @@ const FriendField = ({
           className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
           isLoading={loading}
           defaultText="Delete"
-          onClick={() => onDelete(user.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(user.id);
+          }}
           type="button"
         />
       </div>

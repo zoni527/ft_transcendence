@@ -238,7 +238,7 @@ const Dashboard = () => {
         {/* Sub-Tabs */}
         <div className="border-b">
           {activeSection === 'friends' && (
-            <div className="mb-4 flex justify-center gap-3 md:gap-24">
+            <div className="mb-4 flex justify-center gap-3 sm:gap-12 md:gap-24">
               <SubsectionButton
                 label={t('nav.accepted')}
                 subsection="accepted"
@@ -372,7 +372,7 @@ const Dashboard = () => {
 
         {/* Friends */}
         {activeSection === 'friends' && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
             {/* Friends list */}
             {sortedUsers.map((listedUser) => (
               <FriendField

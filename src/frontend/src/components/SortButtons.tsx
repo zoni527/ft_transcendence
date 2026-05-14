@@ -15,7 +15,7 @@ const SortButtons = <T extends string>({
   setSortBy,
 }: SortButtonsProps<T>) => {
   return (
-    <div className="mt-6 flex flex-col items-center pb-4 md:flex-row md:justify-between">
+    <div className="mt-6 flex flex-col items-center pb-4 md:flex-row md:justify-between md:pl-2">
       <div className="flex min-w-0 flex-col items-center gap-2 md:flex-row md:items-center md:gap-6">
         {options.map((opt) => {
           const isActive = sortBy === opt.value;

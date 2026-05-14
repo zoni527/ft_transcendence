@@ -238,7 +238,7 @@ const Dashboard = () => {
         {/* Sub-Tabs */}
         <div className="border-b">
           {activeSection === 'friends' && (
-            <div className="mb-4 flex justify-center gap-8 md:gap-24">
+            <div className="mb-4 flex justify-center gap-3 md:gap-24">
               <SubsectionButton
                 label={t('nav.accepted')}
                 subsection="accepted"
@@ -337,10 +337,10 @@ const Dashboard = () => {
               {/* Bottom buttons */}
               <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 {/* Left */}
-                <div className="order-1 md:order-0">
+                <div className="order-1 w-full md:order-0 md:w-auto">
                   {hasRole(['chef', 'moderator', 'admin']) && isSelf && (
                     <ModalButton
-                      className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
+                      className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
                       onClick={() => setIsCreateRecipeOpen(true)}
                       text={t('dashboard.createRecipe')}
                     />
@@ -349,15 +349,15 @@ const Dashboard = () => {
 
                 {/* Right */}
                 {(hasRole(['admin']) || isSelf) && (
-                  <div className="order-2 flex flex-col gap-2 md:order-0 md:ml-auto md:flex-row">
+                  <div className="order-2 flex w-full flex-col gap-2 md:order-0 md:ml-auto md:w-auto md:flex-row">
                     <ModalButton
-                      className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
+                      className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
                       onClick={() => setIsUserEditOpen(true)}
                       text={t('dashboard.editUser')}
                     />
 
                     <SubmitButton
-                      className="rounded-xl border-2 border-slate-600 hover:border-slate-950"
+                      className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
                       isLoading={loading}
                       defaultText={t('dashboard.submit')}
                       onClick={() => handleDelete(userData.id)}
@@ -378,6 +378,7 @@ const Dashboard = () => {
               <FriendField
                 key={listedUser.id}
                 user={listedUser}
+                subsection={activeSubsection}
                 onDelete={(id) =>
                   setUsers((prev) => prev.filter((u) => u.id !== id))
                 }

@@ -6,13 +6,22 @@ interface FriendFieldProps {
   user: User;
   onDelete: (id: string) => void;
   onUpdate: (user: User) => void;
+  onClick?: () => void;
 }
 
-const FriendField = ({ user, onDelete, onUpdate }: FriendFieldProps) => {
+const FriendField = ({
+  user,
+  onDelete,
+  onUpdate,
+  onClick,
+}: FriendFieldProps) => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+    <div
+      className="flex items-center justify-between border-b border-gray-300 pb-4"
+      onClick={onClick}
+    >
       {/* Left side */}
       <div className="flex min-w-0 flex-col gap-2 md:flex-row md:items-center md:gap-6">
         {/* Name */}

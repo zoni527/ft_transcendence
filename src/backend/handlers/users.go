@@ -41,7 +41,7 @@ func markOnline(user *models.User) {
 func GetUsers(c *gin.Context) {
 	users, err := repository.GetAllUsers()
 	if err != nil {
-		log.Printf("GetUsers error: %v", err)
+		log.Printf("GetUsers: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -64,7 +64,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		log.Printf("GetUserById error: %v", err)
+		log.Printf("GetUserById: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -84,7 +84,7 @@ func GetMe(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		log.Printf("Getme error: %v", err)
+		log.Printf("Getme: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -145,7 +145,7 @@ func GetSession(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		log.Printf("GetSession error: %v", err)
+		log.Printf("GetSession: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -173,7 +173,7 @@ func CreateUser(c *gin.Context) {
 	}
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
-		log.Printf("CreateUser hashPassword error: %v", err)
+		log.Printf("CreateUser hashPassword: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -189,13 +189,13 @@ func CreateUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
-		log.Printf("CreateUser error: %v", err)
+		log.Printf("CreateUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	token, err := authorization.GenerateJWTToken(data.Id)
 	if err != nil {
-		log.Printf("CreateUser generateJWTToken error: %v", err)
+		log.Printf("CreateUser generateJWTToken: %v", err)
 		c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false})
 		return
 	}
@@ -217,7 +217,7 @@ func LoginUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 			return
 		}
-		log.Printf("LoginUser error: %v", err)
+		log.Printf("LoginUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -227,7 +227,7 @@ func LoginUser(c *gin.Context) {
 	}
 	token, err := authorization.GenerateJWTToken(data.Id)
 	if err != nil {
-		log.Printf("LoginUser generateJWTToken error: %v", err)
+		log.Printf("LoginUser GenerateJWTToken: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -327,7 +327,7 @@ func UpdateUser(c *gin.Context) {
 	if req.Password != nil {
 		hash, err := hashPassword(*req.Password)
 		if err != nil {
-			log.Printf("UpdateUser hashPassword error: %v", err)
+			log.Printf("UpdateUser hashPassword: %v", err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}
@@ -643,7 +643,7 @@ func Heartbeat(c *gin.Context) {
 		return
 	}
 	if err := repository.UpdateLastSeen(userID); err != nil {
-		log.Printf("Heartbeat error: %v", err)
+		log.Printf("Heartbeat: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

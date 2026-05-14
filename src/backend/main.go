@@ -103,6 +103,9 @@ func main() {
 		handlers.DeleteRecipe)
 	router.POST("/api/recipes/:id/image", handlers.UploadRecipeImage) // not implemented yet
 
+	// Friendships
+	router.GET("/api/friendships", middleware.Authentication(), handlers.GetFriendships)
+
 	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}

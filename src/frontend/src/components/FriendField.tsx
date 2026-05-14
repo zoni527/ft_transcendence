@@ -9,13 +9,8 @@ interface FriendFieldProps {
   onClick?: () => void;
 }
 
-const FriendField = ({
-  user,
-  subsection,
-  onDelete,
-  onClick,
-}: FriendFieldProps) => {
-  const [loading, setLoading] = useState(false);
+const FriendField = ({ user, onDelete, onClick }: FriendFieldProps) => {
+  const [loading] = useState(false);
 
   return (
     <div
@@ -40,7 +35,7 @@ const FriendField = ({
         <SubmitButton
           className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
           isLoading={loading}
-          defaultText="Delete"
+          defaultText="Placeholder"
           onClick={(e) => {
             e.stopPropagation();
             onDelete(user.id);

@@ -121,6 +121,18 @@ func main() {
 	router.PATCH("/api/friendships/:id", middleware.Authentication(), handlers.AcceptFriendRequest)
 	router.DELETE("/api/friendships/:id", middleware.Authentication(), handlers.DeleteFriendship)
 
+	/*--------------Public API endpoints------------*/
+	publicAPI := router.Group("/api/v1")
+	publicAPI.Use(middleware.APIKeyAuthenticator())
+	publicAPI.Use(middleware.RateLimiter(1, 5))
+	{
+		publicAPI.GET("/recipes", handlers.GetAllRecipes)
+		publicAPI.GET("/recipes/:id", handlers.GetRecipeById)
+		publicAPI.POST("/recipes", handlers.CreateRecipe)
+		publicAPI.PUT("/recipes/:id", handlers.UpdateRecipe)
+		publicAPI.DELETE("/recipes/:id", handlers.DeleteRecipe)
+	}
+
 	/* ---------------------------------------------------------------------- */
 
 	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {

@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { Recipe, User } from './types/types';
+import type { Recipe, User, FriendshipListItem } from './types/types';
 
 interface CreateRecipePayload {
   title: string;
@@ -59,6 +59,12 @@ interface UpdateUserPayload {
   name: string | null;
   display_name: string | null;
   avatar_url: string | null;
+}
+
+interface FriendshipsResponse {
+  friends: FriendshipListItem[];
+  sent: FriendshipListItem[];
+  incoming: FriendshipListItem[];
 }
 
 export interface getSearchResponse {
@@ -143,6 +149,37 @@ function isUserResponse(data: unknown): data is User {
     typeof obj.updated_at === 'string' &&
     Array.isArray(obj.roles) &&
     obj.roles.every((role) => typeof role === 'string')
+  );
+}
+
+// Validation for FriendshipListItem
+function isFriendshipListItem(data: unknown): data is FriendshipListItem {
+  if (typeof data !== 'object' || data === null) return false;
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    typeof obj.id === 'number' &&
+    typeof obj.username === 'string' &&
+    typeof obj.is_online === 'boolean' &&
+    (obj.profile_picture === undefined ||
+      typeof obj.profile_picture === 'string')
+  );
+}
+
+// Validation for Friendships
+function isFriendshipsResponse(data: unknown): data is FriendshipsResponse {
+  if (typeof data !== 'object' || data === null) return false;
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    Array.isArray(obj.friends) &&
+    obj.friends.every(isFriendshipListItem) &&
+    Array.isArray(obj.sent) &&
+    obj.sent.every(isFriendshipListItem) &&
+    Array.isArray(obj.incoming) &&
+    obj.incoming.every(isFriendshipListItem)
   );
 }
 
@@ -563,6 +600,31 @@ export const putUpdateUser = async (
   }
 
   if (!isUserResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// GET /api/friendships (get all friendships)
+export const getFriendships = async (
+  t: TFunction,
+): Promise<FriendshipsResponse> => {
+  const response = await fetch(`${baseUrl}/friendships`);
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  if (!isFriendshipsResponse(data)) {
     throw new Error(t('error.invalidResponse'));
   }
 

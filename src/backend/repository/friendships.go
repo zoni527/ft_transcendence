@@ -14,7 +14,7 @@ import (
 
 // getting a list of everyone I have a "friendship" with, identifying who the other person is, and checking if I was the one who started the request.
 func GetFriendshipsForUser(userID string) ([]models.FriendshipListItem, error) {
-	sql := `SELECT f.status, (f.requester_id = $1) AS sent_by_me,
+	sql := `SELECT f.status, (f.requester_id = $1) AS sent_by_me, u.last_seen,
 			u.id, u.display_name, COALESCE(u.name, '') AS name
 			FROM friendship f
 			JOIN "user" u
@@ -34,7 +34,7 @@ func GetFriendshipsForUser(userID string) ([]models.FriendshipListItem, error) {
 	var items []models.FriendshipListItem
 	for rows.Next() {
 		var it models.FriendshipListItem
-		if err := rows.Scan(&it.Status, &it.SentByMe, &it.Id, &it.Display_name, &it.Name); err != nil {
+		if err := rows.Scan(&it.Status, &it.SentByMe, &it.Last_seen, &it.Id, &it.Display_name, &it.Name); err != nil {
 			return nil, fmt.Errorf("scan friendship: %w", err)
 		}
 		items = append(items, it)

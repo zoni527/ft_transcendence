@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/models"
@@ -38,6 +39,7 @@ func GetFriendships(c *gin.Context) {
 	for _, row := range rows {
 		switch {
 		case row.Status == "accepted":
+			row.Is_online = time.Since(row.Last_seen) < onlineThreshold
 			resp.Friends = append(resp.Friends, row)
 		case row.SentByMe:
 			resp.Sent = append(resp.Sent, row)

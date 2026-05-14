@@ -119,14 +119,16 @@ type UserSearchResult struct {
 	Display_name string `json:"display_name"`
 }
 
+// Is_online is a pointer so it can be omitted from the JSON for pending rows
+// (sent/incoming buckets) and only appear on accepted/friends.
 type FriendshipListItem struct {
-	Status       string    `json:"-"            db:"status"`
-	SentByMe     bool      `json:"-"            db:"sent_by_me"`
-	Last_seen    time.Time `json:"-"            db:"last_seen"`
-	Id           string    `json:"id"           db:"id"`
-	Display_name string    `json:"display_name" db:"display_name"`
-	Name         string    `json:"name"         db:"name"`
-	Is_online    bool      `json:"is_online"`
+	Status       string    `json:"-"                    db:"status"`
+	SentByMe     bool      `json:"-"                    db:"sent_by_me"`
+	Last_seen    time.Time `json:"-"                    db:"last_seen"`
+	Id           string    `json:"id"                   db:"id"`
+	Display_name string    `json:"display_name"         db:"display_name"`
+	Name         string    `json:"name"                 db:"name"`
+	Is_online    *bool     `json:"is_online,omitempty"`
 }
 
 // this is the body of GET /api/friendships.

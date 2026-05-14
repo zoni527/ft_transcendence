@@ -39,7 +39,8 @@ func GetFriendships(c *gin.Context) {
 	for _, row := range rows {
 		switch {
 		case row.Status == "accepted":
-			row.Is_online = time.Since(row.Last_seen) < onlineThreshold
+			online := time.Since(row.Last_seen) < onlineThreshold
+			row.Is_online = &online
 			resp.Friends = append(resp.Friends, row)
 		case row.SentByMe:
 			resp.Sent = append(resp.Sent, row)

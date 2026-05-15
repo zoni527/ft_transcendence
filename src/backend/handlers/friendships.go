@@ -12,9 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//TODO: GetFriendships:       GET    /api/friendships
+//done: GetFriendships:       GET    /api/friendships
 //TODO: CreateFriendRequest:  POST   /api/friendships
-//TODO: AcceptFriendRequest:  PATCH  /api/friendships/:id
+//done: AcceptFriendRequest:  PATCH  /api/friendships/:id
 //TODO: DeleteFriendship:     DELETE /api/friendships/:id
 
 func GetFriendships(c *gin.Context) {
@@ -56,8 +56,35 @@ func CreateFriendRequest(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
+// PATCH /api/friendships/:id — :id is the requester's user ID (the friend
+// who sent me the pending request). The receiver is the logged-in user.
 func AcceptFriendRequest(c *gin.Context) {
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	receiverID := c.GetString("userID")
+	if !authorization.IsValidUUID(receiverID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+
+	requesterID := c.Param("id")
+	if !authorization.IsValidUUID(requesterID) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "friend request not found"})
+		return
+	}
+	if requesterID == receiverID {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "cannot accept your own request"})
+		return
+	}
+
+	if err := repository.AcceptFriendRequest(requesterID, receiverID); err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return
+		}
+		log.Printf("handlers.AcceptFriendRequest: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"status": "accepted"})
 }
 
 func DeleteFriendship(c *gin.Context) {

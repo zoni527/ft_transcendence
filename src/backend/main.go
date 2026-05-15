@@ -57,7 +57,7 @@ func main() {
 			fmt.Sprintf("https://localhost:%v", nginxPort),
 			fmt.Sprintf("https://127.0.0.1:%v", nginxPort),
 		},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	}))
@@ -105,6 +105,7 @@ func main() {
 
 	// Friendships
 	router.GET("/api/friendships", middleware.Authentication(), handlers.GetFriendships)
+	router.PATCH("/api/friendships/:id", middleware.Authentication(), handlers.AcceptFriendRequest)
 
 	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {
 		log.Fatal("Server failed to start:", err)

@@ -312,6 +312,7 @@ export const csTranslations = {
     newest: 'Nejnovější první',
     oldest: 'Nejstarší první',
     loadMore: 'Další recepty...',
+    searchUser: 'Hledat uživatele...',
   },
   error: {
     error: 'Chyba:',

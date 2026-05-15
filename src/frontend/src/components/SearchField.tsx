@@ -22,7 +22,7 @@ const SearchField = ({ placeholder, onSearch }: SearchFieldProps) => {
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={placeholder || t('common.search')}
+        placeholder={placeholder || t('common.searchUser')}
         className={`${inputFieldBase} rounded-full shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]`}
       />
     </form>

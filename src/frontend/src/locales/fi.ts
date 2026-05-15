@@ -312,6 +312,7 @@ export const fiTranslations = {
     newest: 'Uusin ensin',
     oldest: 'Vanhin ensin',
     loadMore: 'Lisää reseptejä...',
+    searchUser: 'Hae käyttäjiä...',
   },
   error: {
     error: 'Virhe:',

@@ -312,6 +312,7 @@ export const enTranslations = {
     newest: 'Newest first',
     oldest: 'Oldest first',
     loadMore: 'More recipes...',
+    searchUser: 'Search users...',
   },
   error: {
     error: 'Error:',

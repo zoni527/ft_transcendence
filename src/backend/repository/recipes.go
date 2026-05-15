@@ -12,6 +12,7 @@ package repository
 // [TODO] Add pagination (?page=1&limit=20) to GetAllRecipes
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -19,7 +20,6 @@ import (
 
 	"ft_transcendence/backend/models"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -27,12 +27,12 @@ import (
 )
 
 type RecipeRepository interface {
-	GetAllRecipes(c *gin.Context) ([]models.RecipeResponse, error)
-	GetRecipeById(c *gin.Context, id string) (models.RecipeResponse, error)
-	CreateRecipe(c *gin.Context, r *models.Recipe) (string, error)
-	UpdateRecipe(c *gin.Context, r *models.Recipe) error
-	DeleteRecipe(c *gin.Context, id string) error
-	SearchRecipes(c *gin.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error)
+	GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error)
+	GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error)
+	CreateRecipe(ctx context.Context, r *models.Recipe) (string, error)
+	UpdateRecipe(ctx context.Context, r *models.Recipe) error
+	DeleteRecipe(ctx context.Context, id string) error
+	SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error)
 }
 
 type PostgresRecipeRepo struct {
@@ -57,7 +57,7 @@ func NewPostgresRecipeRepo(pool *pgxpool.Pool) *PostgresRecipeRepo {
 // LEFT JOIN, not INNER: author_id is ON DELETE SET NULL, so a recipe can
 // outlive its author. We still want to return the recipe, just with an empty
 // author block.
-func (pgRepo *PostgresRecipeRepo) GetAllRecipes(c *gin.Context) ([]models.RecipeResponse, error) {
+func (pgRepo *PostgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),
 				COALESCE(u.display_name, ''),
@@ -73,7 +73,7 @@ func (pgRepo *PostgresRecipeRepo) GetAllRecipes(c *gin.Context) ([]models.Recipe
 			LEFT JOIN "user" u ON u.id = r.author_id
 			ORDER BY r.created_at DESC`
 
-	rows, err := pgRepo.Pool.Query(c.Request.Context(), sql)
+	rows, err := pgRepo.Pool.Query(ctx, sql)
 	if err != nil {
 		return nil, fmt.Errorf("error querying recipes: %w", err)
 	}
@@ -104,7 +104,7 @@ func (pgRepo *PostgresRecipeRepo) GetAllRecipes(c *gin.Context) ([]models.Recipe
 	return recipes, nil
 }
 
-func (pgRepo *PostgresRecipeRepo) SearchRecipes(c *gin.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
 	sql := `SELECT id, title, 
 			COALESCE(preparation_time_min, 0),
 			COALESCE(image_url, '')
@@ -162,7 +162,7 @@ func (pgRepo *PostgresRecipeRepo) SearchRecipes(c *gin.Context, f models.SearchR
 }
 
 // GetRecipeById returns a single recipe by UUID.
-func (pgRepo *PostgresRecipeRepo) GetRecipeById(c *gin.Context, id string) (models.RecipeResponse, error) {
+func (pgRepo *PostgresRecipeRepo) GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),
 				COALESCE(u.display_name, ''),
@@ -179,7 +179,7 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeById(c *gin.Context, id string) (mode
 			WHERE r.id = $1`
 
 	var r models.RecipeResponse
-	err := pgRepo.Pool.QueryRow(c.Request.Context(), sql, id).Scan(
+	err := pgRepo.Pool.QueryRow(ctx, sql, id).Scan(
 		&r.Id,
 		&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
 		&r.Title, &r.Description,
@@ -200,7 +200,7 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeById(c *gin.Context, id string) (mode
 	return r, nil
 }
 
-func (pgRepo *PostgresRecipeRepo) CreateRecipe(c *gin.Context, r *models.Recipe) (string, error) {
+func (pgRepo *PostgresRecipeRepo) CreateRecipe(ctx context.Context, r *models.Recipe) (string, error) {
 	sql := `
 		INSERT INTO recipe (
 			author_id, title, description, preparation_time_min,
@@ -212,7 +212,7 @@ func (pgRepo *PostgresRecipeRepo) CreateRecipe(c *gin.Context, r *models.Recipe)
 
 	var newId string
 
-	err := pgRepo.Pool.QueryRow(c.Request.Context(), sql,
+	err := pgRepo.Pool.QueryRow(ctx, sql,
 		r.Author_id, r.Title, r.Description, r.Preparation_time_min,
 		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
 		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g,
@@ -224,7 +224,7 @@ func (pgRepo *PostgresRecipeRepo) CreateRecipe(c *gin.Context, r *models.Recipe)
 	return newId, nil
 }
 
-func (pgRepo *PostgresRecipeRepo) UpdateRecipe(c *gin.Context, r *models.Recipe) error {
+func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Recipe) error {
 	sql := `
 		UPDATE recipe
 		SET (
@@ -237,7 +237,7 @@ func (pgRepo *PostgresRecipeRepo) UpdateRecipe(c *gin.Context, r *models.Recipe)
 			updated_at = now()
 		WHERE id = $13`
 
-	res, err := pgRepo.Pool.Exec(c.Request.Context(), sql,
+	res, err := pgRepo.Pool.Exec(ctx, sql,
 		r.Title, r.Description, r.Preparation_time_min, r.Servings,
 		r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url, r.Calories,
 		r.Protein_g, r.Carbs_g, r.Fat_g,
@@ -253,9 +253,9 @@ func (pgRepo *PostgresRecipeRepo) UpdateRecipe(c *gin.Context, r *models.Recipe)
 	return nil
 }
 
-func (pgRepo *PostgresRecipeRepo) DeleteRecipe(c *gin.Context, id string) error {
+func (pgRepo *PostgresRecipeRepo) DeleteRecipe(ctx context.Context, id string) error {
 	sql := `DELETE FROM recipe WHERE id = $1`
-	res, err := pgRepo.Pool.Exec(c.Request.Context(), sql, id)
+	res, err := pgRepo.Pool.Exec(ctx, sql, id)
 	if err != nil {
 		return fmt.Errorf("repository.DeleteRecipe: %w", err)
 	}

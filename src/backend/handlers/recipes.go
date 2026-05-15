@@ -43,7 +43,7 @@ func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
 		return
 	}
 
-	recipe, err := h.Repo.GetRecipeById(c, id)
+	recipe, err := h.Repo.GetRecipeById(c.Request.Context(), id)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -96,7 +96,7 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	newRecipeId, err := h.Repo.CreateRecipe(c, &r)
+	newRecipeId, err := h.Repo.CreateRecipe(c.Request.Context(), &r)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -128,7 +128,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	original, err := h.Repo.GetRecipeById(c, recipeId)
+	original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeId)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -156,7 +156,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 	}
 
 	r.Id = recipeId
-	if err := h.Repo.UpdateRecipe(c, &r); err != nil {
+	if err := h.Repo.UpdateRecipe(c.Request.Context(), &r); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
@@ -181,7 +181,7 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 		return
 	}
 
-	original, err := h.Repo.GetRecipeById(c, recipeId)
+	original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeId)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -203,7 +203,7 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 		return
 	}
 
-	if err := h.Repo.DeleteRecipe(c, recipeId); err != nil {
+	if err := h.Repo.DeleteRecipe(c.Request.Context(), recipeId); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}

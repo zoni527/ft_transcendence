@@ -289,7 +289,7 @@ const Recipes = () => {
 
       <div className="mt-8 flex flex-col gap-6 sm:flex-row">
         {/* Desktop / tablet sidebar */}
-        <aside className="hidden w-50 shrink-0 rounded-md bg-gray-100/50 p-4 sm:block">
+        <aside className="hidden w-50 shrink-0 self-start rounded-md bg-gray-100/50 p-4 sm:block lg:sticky lg:top-6">
           <h2 className="mb-4 text-xl font-semibold">{t('common.filters')}</h2>
 
           <FiltersContent

@@ -287,7 +287,7 @@ FROM (VALUES
         'alice', 'Classic Tiramisu',
         E'Step 1: Whisk egg yolks and sugar together until pale and thick, then fold in mascarpone until smooth.\nStep 2: In a separate bowl, whip heavy cream to soft peaks and gently fold into the mascarpone mixture.\nStep 3: Combine strong espresso with a splash of dark rum or amaretto in a shallow dish.\nStep 4: Briefly dip ladyfingers into the coffee—just enough to soak but not disintegrate—and layer them in the base of a dish.\nStep 5: Spread half the cream over the biscuits, then repeat with a second layer of soaked ladyfingers and the remaining cream.\nStep 6: Dust heavily with high-quality cocoa powder and chill for at least six hours to set.',
         25, 6, 'medium', 'Italian', 'dessert',
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778440639/recipe-seed/tiramisu.jpg',
+        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778871260/recipe-seed/624338969_18106717054740715_5661273212455204253_n.webp',
         450, 8.0, 42.0, 28.0
     ),
     (

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import RecipeCard from '../components/RecipeCard';
 import StatusBox from '../components/StatusBox';
@@ -11,6 +11,7 @@ import { buttonBase } from '../styles/styles.tsx';
 
 const Recipes = () => {
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -86,9 +87,13 @@ const Recipes = () => {
       }
     };
 
-    void fetchRecipes().catch((err) =>
-      console.error('Error fetching recipes:', err),
-    );
+    void fetchRecipes().catch((err: unknown) => {
+      const message =
+        err instanceof Error ? err.message : t('error.genericError');
+
+      showNotification(message, 'error');
+      void navigate('/');
+    });
 
     return () => {
       cancelled = true;
@@ -102,6 +107,7 @@ const Recipes = () => {
     mealType,
     t,
     showNotification,
+    navigate,
   ]);
 
   // Sync URL

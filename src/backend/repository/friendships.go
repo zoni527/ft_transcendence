@@ -2,8 +2,14 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
+
 	"ft_transcendence/backend/models"
+
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // Friendship DB functions needed:
@@ -45,8 +51,41 @@ func GetFriendshipsForUser(userID string) ([]models.FriendshipListItem, error) {
 	return items, nil
 }
 
+// Inserts a pending row with the logged-in user as requester. PG errors map to
+// typed errors the handler turns into 400/404: the unique pair index catches
+// duplicates in either direction, the FK catches a deleted/unknown receiver,
+// and the no-self CHECK catches requester == receiver.
 func CreateFriendRequest(requesterID, receiverID string) error {
+	sql := `INSERT INTO friendship (requester_id, receiver_id, status)
+			VALUES ($1, $2, 'pending')`
+	_, err := Pool.Exec(context.Background(), sql, requesterID, receiverID)
+	if err != nil {
+		return friendshipPostgresErrorClassification("repository.CreateFriendRequest", err)
+	}
 	return nil
+}
+
+func friendshipPostgresErrorClassification(functionName string, err error) error {
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) {
+		return fmt.Errorf("%v: %w", functionName, err)
+	}
+	switch pgErr.Code {
+	case pgerrcode.UniqueViolation:
+		return &BadRequestError{"friendship already exists"}
+	case pgerrcode.ForeignKeyViolation:
+		return &NotFoundError{"receiver not found"}
+	case pgerrcode.CheckViolation:
+		if pgErr.ConstraintName == "friendship_no_self" {
+			return &BadRequestError{"cannot send a request to yourself"}
+		}
+		log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
+		return &BadRequestError{"invalid friendship data"}
+	case pgerrcode.InvalidTextRepresentation:
+		return &NotFoundError{"receiver not found"}
+	default:
+		return fmt.Errorf("%v: %w", functionName, err)
+	}
 }
 
 // requesterID is the user who sent the original request,

@@ -137,3 +137,9 @@ type FriendshipsResponse struct {
 	Sent     []FriendshipListItem `json:"sent"`
 	Incoming []FriendshipListItem `json:"incoming"`
 }
+
+// Body of POST /api/friendships. The requester is taken from the JWT, so the
+// client only sends the target user's id.
+type CreateFriendRequestBody struct {
+	Receiver_id string `json:"receiver_id" binding:"required"`
+}

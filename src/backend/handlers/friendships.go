@@ -13,7 +13,7 @@ import (
 )
 
 //done: GetFriendships:       GET    /api/friendships
-//TODO: CreateFriendRequest:  POST   /api/friendships
+//done: CreateFriendRequest:  POST   /api/friendships
 //done: AcceptFriendRequest:  PATCH  /api/friendships/:id
 //TODO: DeleteFriendship:     DELETE /api/friendships/:id
 
@@ -52,8 +52,40 @@ func GetFriendships(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, resp)
 }
 
+// POST /api/friendships — the requester is the logged-in user; the receiver
+// comes from the JSON body. Self-requests, unknown receivers, and duplicates
+// (in either direction) are rejected by the DB and surfaced as 400/404.
 func CreateFriendRequest(c *gin.Context) {
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	requesterID := c.GetString("userID")
+	if !authorization.IsValidUUID(requesterID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+
+	var body models.CreateFriendRequestBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+	if !authorization.IsValidUUID(body.Receiver_id) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "receiver not found"})
+		return
+	}
+	if body.Receiver_id == requesterID {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "cannot send a request to yourself"})
+		return
+	}
+
+	if err := repository.CreateFriendRequest(requesterID, body.Receiver_id); err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return
+		}
+		log.Printf("handlers.CreateFriendRequest: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, gin.H{"status": "pending"})
 }
 
 // PATCH /api/friendships/:id — :id is the requester's user ID (the friend

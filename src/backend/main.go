@@ -105,6 +105,7 @@ func main() {
 
 	// Friendships
 	router.GET("/api/friendships", middleware.Authentication(), handlers.GetFriendships)
+	router.POST("/api/friendships", middleware.Authentication(), handlers.CreateFriendRequest)
 	router.PATCH("/api/friendships/:id", middleware.Authentication(), handlers.AcceptFriendRequest)
 
 	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {

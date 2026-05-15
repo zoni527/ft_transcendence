@@ -27,7 +27,7 @@ func NewRecipeHandler(repo repository.RecipeRepository) *RecipeHandler {
 }
 
 func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
-	recipes, err := h.Repo.GetAllRecipes(c)
+	recipes, err := h.Repo.GetAllRecipes(c.Request.Context())
 	if err != nil {
 		log.Printf("handlers.GetAllRecipes: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

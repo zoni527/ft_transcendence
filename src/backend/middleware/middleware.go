@@ -3,11 +3,13 @@ package middleware
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
 func Authentication() gin.HandlerFunc {
@@ -103,5 +105,43 @@ func RequirePermission(permissions ...string) gin.HandlerFunc {
 		log.Printf("RequirePermission: missing perms for user %s", userID)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
+	}
+}
+
+func APIKeyAuthenticator() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		apiKey := c.GetHeader("X-API-Key")
+		if apiKey == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+		userID, err := authorization.ValidateAPIKey(apiKey)
+		if err != nil {
+			log.Printf("APIKeyAuthenticator: %v", err)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid api key"})
+			return
+		}
+		c.Set("userID", userID)
+		c.Set("apiKey", apiKey)
+		c.Next()
+	}
+}
+
+func RateLimiter(r rate.Limit, b int) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		identifier := getClientIdentifier(c, byApiKey)
+		mu.Lock()
+		cl, exists := clients[identifier]
+		if !exists {
+			cl = &client{limiter: rate.NewLimiter(r, b)}
+			clients[identifier] = cl
+		}
+		cl.lastSeen = time.Now()
+		mu.Unlock()
+		if !cl.limiter.Allow() {
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "rate limit exceeded"})
+			return
+		}
+		c.Next()
 	}
 }

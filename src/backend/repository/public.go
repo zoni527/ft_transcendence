@@ -18,6 +18,16 @@ func SaveAPIKey(userID, rawSecret string) error {
 	return nil
 }
 
-func GetAPIKey(userID string, apikey string) (string, error) {
-	return "", nil
+func GetAPIKeyHash(userID string) (string, error) {
+	sql := `SELECT secret_hash
+			FROM api_keys
+			WHERE user_id = $1`
+	var hash string
+	err := Pool.QueryRow(context.Background(), sql, userID).Scan(
+		&hash,
+	)
+	if err != nil {
+		return "", fmt.Errorf("GetAPIKeyHash: %w", err)
+	}
+	return hash, nil
 }

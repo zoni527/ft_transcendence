@@ -78,6 +78,7 @@ func main() {
 	router.GET("/api/users/search",
 		middleware.Authentication(),
 		handlers.SearchUser)
+	router.GET("/api/users/apikey", middleware.Authentication(), handlers.GetAPIKey)
 	router.GET("/api/users/:id", handlers.GetUserById)
 
 	router.POST("/api/users", handlers.CreateUser)

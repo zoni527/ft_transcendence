@@ -1,9 +1,13 @@
 package repository
 
+import (
+	"fmt"
+
+	"context"
+)
+
 func SaveAPIKey(userID, rawSecret string) error {
-
 	hashedSecret := hashToken(rawSecret)
-
 	sql := `INSERT INTO  api_keys(user_id, secret_hash, created_at)
 			VALUES ($1, $2, NOW())`
 
@@ -12,4 +16,8 @@ func SaveAPIKey(userID, rawSecret string) error {
 		return fmt.Errorf("SaveAPIKey: %w", err)
 	}
 	return nil
+}
+
+func GetAPIKey(userID string, apikey string) (string, error) {
+	return "", nil
 }

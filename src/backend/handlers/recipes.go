@@ -33,6 +33,7 @@ func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, recipes)
 }
 
@@ -52,6 +53,7 @@ func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, recipe)
 }
 
@@ -230,6 +232,7 @@ func (h *RecipeHandler) RecipeImageSignature(c *gin.Context) {
 		"allowed_formats": allowedFormats,
 	}
 	signature := integrations.GenerateCloudinarySignature(params)
+
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"signature":       signature,
 		"api_key":         integrations.APIKey(),

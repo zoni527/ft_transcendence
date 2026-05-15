@@ -9,7 +9,7 @@ import (
 // Friendship DB functions needed:
 //done: GetFriendshipsForUser: List all rows the logged-in user is in, bucketed by status
 //TODO: CreateFriendRequest:   Insert a new pending row, requester = me
-//TODO: AcceptFriendRequest:   Flip status from pending to accepted (only the receiver can do this)
+//done: AcceptFriendRequest:   Flip status from pending to accepted (only the receiver can do this)
 //TODO: DeleteFriendship:      Remove the row (covers cancel, reject, unfriend)
 
 // getting a list of everyone I have a "friendship" with, identifying who the other person is, and checking if I was the one who started the request.
@@ -51,7 +51,22 @@ func CreateFriendRequest(requesterID, receiverID string) error {
 
 // requesterID is the user who sent the original request,
 // receiverID is the logged-in user who is accepting it.
+// The WHERE clause pins receiver_id to the caller so a user can only flip
+// rows where someone else asked them; status = 'pending' makes the call
+// idempotent and prevents re-accepting an already-accepted row.
 func AcceptFriendRequest(requesterID, receiverID string) error {
+	sql := `UPDATE friendship
+			SET status = 'accepted'
+			WHERE requester_id = $1
+			  AND receiver_id = $2
+			  AND status = 'pending'`
+	res, err := Pool.Exec(context.Background(), sql, requesterID, receiverID)
+	if err != nil {
+		return fmt.Errorf("repository.AcceptFriendRequest: %w", err)
+	}
+	if res.RowsAffected() == 0 {
+		return &NotFoundError{"friend request not found"}
+	}
 	return nil
 }
 

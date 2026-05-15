@@ -672,16 +672,6 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if callerUserID == targetUserID {
-		token := c.GetString("token")
-		expDate := c.GetTime("expDate")
-		if err := authorization.AddTokenToBlacklist(token, expDate); err != nil {
-			log.Printf("handlers.DeleteUser blacklist: %v", err)
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-			return
-		}
-	}
-
 	if err := repository.DeleteUser(targetUserID); err != nil {
 		if errors.Is(err, repository.ErrLastAdmin) {
 			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
@@ -698,6 +688,11 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	if callerUserID == targetUserID {
+		token := c.GetString("token")
+		expDate := c.GetTime("expDate")
+		if err := authorization.AddTokenToBlacklist(token, expDate); err != nil {
+			log.Printf("handlers.DeleteUser blacklist: %v", err)
+		}
 		authorization.ClearAuthCookie(c)
 	}
 	c.Status(http.StatusNoContent)

@@ -34,7 +34,7 @@ func AddTokenToBlacklist(token string, expirationDate time.Time) error {
 
 func ClearAuthCookie(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("token", "", -1, "/", "", false, true)
+	c.SetCookie("token", "", -1, "/", "", true, true)
 }
 
 func RolesFromContext(c *gin.Context) (map[string]bool, bool) {

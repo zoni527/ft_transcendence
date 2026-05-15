@@ -8,7 +8,5 @@ COPY . .
 
 RUN npm install && npm cache clean --force && npm prune
 
-EXPOSE 5173
-
 ENTRYPOINT ["npm"]
 CMD ["run", "dev"]

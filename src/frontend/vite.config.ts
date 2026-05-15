@@ -8,7 +8,7 @@ export default defineConfig({
     host: true,
     port: 5173,
     hmr: {
-      clientPort: 8080,
+      clientPort: parseInt(process.env.NGINX_PORT_EXTERNAL || '8443', 10),
     },
     watch: {
       usePolling: true,

@@ -200,7 +200,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("token", token, 3600, "/", "", false, true)
+	c.SetCookie("token", token, 3600, "/", "", true, true)
 	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 
@@ -232,7 +232,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("token", token, 3600, "/", "", false, true)
+	c.SetCookie("token", token, 3600, "/", "", true, true)
 	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 

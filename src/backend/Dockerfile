@@ -11,5 +11,4 @@ RUN /usr/local/go/bin/go build -o /bin/backend
 
 FROM scratch
 COPY --from=build /bin/backend /bin/backend
-EXPOSE 8080
 ENTRYPOINT ["/bin/backend"]

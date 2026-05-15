@@ -1,6 +1,15 @@
 import type { TFunction } from 'i18next';
 import type { Recipe, User } from './types/types';
 
+export interface SearchRecipesParams {
+  query?: string;
+  page?: number;
+  mealType?: string;
+  date?: 'asc' | 'desc';
+  difficulty?: string;
+  cuisine?: string;
+}
+
 interface CreateRecipePayload {
   title: string;
   description: string;
@@ -194,6 +203,37 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
 // GET /api/recipes (get all recipes)
 export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`);
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  const data: unknown = await response.json();
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data as Recipe[];
+};
+
+// GET /api/recipes/search (get recipes from search)
+export const getRecipesSearch = async (
+  t: TFunction,
+  params: SearchRecipesParams = {},
+): Promise<Recipe[]> => {
+  const queryParams = new URLSearchParams();
+
+  if (params.query) queryParams.append('q', params.query);
+  if (params.page) queryParams.append('page', params.page.toString());
+  if (params.mealType) queryParams.append('meal_type', params.mealType);
+  if (params.date) queryParams.append('date', params.date);
+  if (params.difficulty) queryParams.append('difficulty', params.difficulty);
+  if (params.cuisine) queryParams.append('cuisine', params.cuisine);
+
+  const url = `${baseUrl}/recipes/search?${queryParams.toString()}`;
+
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));

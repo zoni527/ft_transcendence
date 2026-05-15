@@ -24,7 +24,7 @@ const App = () => {
           <div className="flex min-h-screen flex-col">
             <Banner />
             <div className="flex-1 p-4">
-              <div className="mx-auto max-w-5xl">
+              <div className="mx-auto max-w-7xl">
                 <Navbar />
                 <Routes>
                   <Route path="/" element={<Recipes />} />

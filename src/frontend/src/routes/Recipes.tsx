@@ -39,10 +39,6 @@ const Recipes = () => {
     searchParams.get('difficulty') || '',
   );
 
-  const [cuisine, setCuisine] = useState<string>(
-    searchParams.get('cuisine') || '',
-  );
-
   // Debounced search
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -67,7 +63,6 @@ const Recipes = () => {
           date: sortOrder,
           mealType,
           difficulty,
-          cuisine,
         };
 
         const data = await getRecipesSearch(t, params);
@@ -104,7 +99,6 @@ const Recipes = () => {
     page,
     searchQuery,
     sortOrder,
-    cuisine,
     difficulty,
     mealType,
     t,
@@ -122,7 +116,6 @@ const Recipes = () => {
 
     if (mealType) params.set('mealType', mealType);
     if (difficulty) params.set('difficulty', difficulty);
-    if (cuisine) params.set('cuisine', cuisine);
 
     const newSearch = params.toString();
 
@@ -135,7 +128,6 @@ const Recipes = () => {
     page,
     mealType,
     difficulty,
-    cuisine,
     searchParams,
     setSearchParams,
   ]);
@@ -191,21 +183,6 @@ const Recipes = () => {
             { label: 'Hard', value: 'hard' },
           ]}
         />
-
-        {/* Cuisine */}
-        <FilterGroup
-          label={t('recipeDetail.cuisine')}
-          value={cuisine}
-          onChange={setCuisine}
-          onResetPage={() => setPage(1)}
-          options={[
-            { label: 'All', value: '' },
-            { label: 'Italian', value: 'italian' },
-            { label: 'French', value: 'french' },
-            { label: 'Asian', value: 'asian' },
-            { label: 'Mexican', value: 'mexican' },
-          ]}
-        />
       </aside>
 
       {/* Recipe Grid */}
@@ -219,7 +196,7 @@ const Recipes = () => {
             className="text-red-600"
           />
         )}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {recipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}

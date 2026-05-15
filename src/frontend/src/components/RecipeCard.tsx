@@ -10,7 +10,6 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
   return (
     <Link
       to={`/recipes/${recipe.id}`}
-      state={{ recipe }}
       className={`${cardBase} ${cardHighlight} flex w-full flex-col`}
     >
       {/* Recipe Image */}

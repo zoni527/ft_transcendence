@@ -296,7 +296,7 @@ export const enTranslations = {
     welcome: 'Welcome',
     rightsReserved: 'RISE. All Rights Reserved.',
     noFile: 'No file chosen',
-    search: 'Search users...',
+    searchUser: 'Search users...',
   },
   error: {
     error: 'Error:',

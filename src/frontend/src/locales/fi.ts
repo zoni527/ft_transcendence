@@ -296,7 +296,7 @@ export const fiTranslations = {
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
     noFile: 'Tiedostoa ei valittu',
-    search: 'Hae käyttäjiä...',
+    searchUser: 'Hae käyttäjiä...',
   },
   error: {
     error: 'Virhe:',

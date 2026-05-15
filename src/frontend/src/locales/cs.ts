@@ -296,7 +296,7 @@ export const csTranslations = {
     welcome: 'Vítejte',
     rightsReserved: 'RISE. Všechna práva vyhrazena.',
     noFile: 'Žádný soubor nebyl vybrán',
-    search: 'Hledat uživatele...',
+    searchUser: 'Hledat uživatele...',
   },
   error: {
     error: 'Chyba:',

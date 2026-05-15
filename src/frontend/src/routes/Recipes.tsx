@@ -11,18 +11,103 @@ import { useNotification } from '../utils/NotifContext.ts';
 import type { Recipe } from '../types/types';
 import { buttonBase } from '../styles/styles.tsx';
 
+type FiltersContentProps = {
+  inputValue: string;
+  setInputValue: React.Dispatch<React.SetStateAction<string>>;
+
+  sortOrder: 'oldest' | 'newest';
+  setSortOrder: React.Dispatch<React.SetStateAction<'oldest' | 'newest'>>;
+
+  mealType: string;
+  setMealType: React.Dispatch<React.SetStateAction<string>>;
+
+  difficulty: string;
+  setDifficulty: React.Dispatch<React.SetStateAction<string>>;
+
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+
+  t: (key: string) => string;
+};
+
+const FiltersContent = ({
+  inputValue,
+  setInputValue,
+  sortOrder,
+  setSortOrder,
+  mealType,
+  setMealType,
+  difficulty,
+  setDifficulty,
+  setPage,
+  t,
+}: FiltersContentProps) => (
+  <>
+    {/* Search */}
+    <div className="mt-6 mb-4">
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        className="text-md block w-full rounded-full border border-gray-700 bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-800 focus:outline-none"
+        placeholder={t('common.searchRecipe')}
+      />
+    </div>
+
+    {/* Sort Order */}
+    <SortOrderFilter
+      value={sortOrder}
+      onChange={setSortOrder}
+      onResetPage={() => setPage(1)}
+    />
+
+    {/* Meal Type */}
+    <FilterGroup
+      label={t('meal.type')}
+      value={mealType}
+      onChange={setMealType}
+      onResetPage={() => setPage(1)}
+      options={[
+        { label: 'All', value: '' },
+        { label: 'Breakfast', value: 'breakfast' },
+        { label: 'Lunch', value: 'lunch' },
+        { label: 'Dinner', value: 'dinner' },
+        { label: 'Snack', value: 'snack' },
+      ]}
+    />
+
+    {/* Difficulty */}
+    <FilterGroup
+      label={t('difficulty.type')}
+      value={difficulty}
+      onChange={setDifficulty}
+      onResetPage={() => setPage(1)}
+      options={[
+        { label: 'All', value: '' },
+        { label: 'Easy', value: 'easy' },
+        { label: 'Medium', value: 'medium' },
+        { label: 'Hard', value: 'hard' },
+      ]}
+    />
+  </>
+);
+
 const Recipes = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
 
+  // Mobile filters
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
   // State
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+
   const [inputValue, setInputValue] = useState(searchQuery);
 
   const [sortOrder, setSortOrder] = useState<'oldest' | 'newest'>(
@@ -71,16 +156,20 @@ const Recipes = () => {
           setRecipes((prevRecipes) =>
             page === 1 ? data : [...prevRecipes, ...data],
           );
+
           setHasMore(data.length === 10);
         }
       } catch (err: unknown) {
         if (!cancelled) {
           const message =
             err instanceof Error ? err.message : t('error.genericError');
+
           showNotification(message, 'error');
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
@@ -89,6 +178,7 @@ const Recipes = () => {
         err instanceof Error ? err.message : t('error.genericError');
 
       showNotification(message, 'error');
+
       void navigate('/');
     });
 
@@ -110,17 +200,32 @@ const Recipes = () => {
   useEffect(() => {
     const params = new URLSearchParams();
 
-    if (searchQuery) params.set('q', searchQuery);
-    if (page !== 1) params.set('page', page.toString());
-    if (sortOrder !== 'newest') params.set('date', sortOrder);
+    if (searchQuery) {
+      params.set('q', searchQuery);
+    }
 
-    if (mealType) params.set('mealType', mealType);
-    if (difficulty) params.set('difficulty', difficulty);
+    if (page !== 1) {
+      params.set('page', page.toString());
+    }
+
+    if (sortOrder !== 'newest') {
+      params.set('date', sortOrder);
+    }
+
+    if (mealType) {
+      params.set('mealType', mealType);
+    }
+
+    if (difficulty) {
+      params.set('difficulty', difficulty);
+    }
 
     const newSearch = params.toString();
 
     if (newSearch !== searchParams.toString()) {
-      setSearchParams(params, { replace: true });
+      setSearchParams(params, {
+        replace: true,
+      });
     }
   }, [
     searchQuery,
@@ -133,88 +238,107 @@ const Recipes = () => {
   ]);
 
   return (
-    <div className="mt-8 flex gap-6">
-      <aside className="w-50 shrink-0 rounded-md bg-gray-100/50 p-4">
-        <h2 className="mb-4 text-xl font-semibold">{t('common.filters')}</h2>
-
-        {/* Search */}
-        <div className="mt-6 mb-4">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            className={`text-md block w-full rounded-full border border-gray-700 bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-800 focus:outline-none`}
-            placeholder={t('common.searchRecipe')}
-          />
-        </div>
-
-        {/* Sort Order */}
-        <SortOrderFilter
-          value={sortOrder}
-          onChange={setSortOrder}
-          onResetPage={() => setPage(1)}
-        />
-
-        {/* Meal Type */}
-        <FilterGroup
-          label={t('meal.type')}
-          value={mealType}
-          onChange={setMealType}
-          onResetPage={() => setPage(1)}
-          options={[
-            { label: 'All', value: '' },
-            { label: 'Breakfast', value: 'breakfast' },
-            { label: 'Lunch', value: 'lunch' },
-            { label: 'Dinner', value: 'dinner' },
-            { label: 'Snack', value: 'snack' },
-          ]}
-        />
-
-        {/* Difficulty */}
-        <FilterGroup
-          label={t('difficulty.type')}
-          value={difficulty}
-          onChange={setDifficulty}
-          onResetPage={() => setPage(1)}
-          options={[
-            { label: 'All', value: '' },
-            { label: 'Easy', value: 'easy' },
-            { label: 'Medium', value: 'medium' },
-            { label: 'Hard', value: 'hard' },
-          ]}
-        />
-      </aside>
-
-      {/* Recipe Grid */}
-      <div className="flex-1">
-        {loading && page === 1 && (
-          <StatusBox message={t('common.loading')} className="text-black" />
-        )}
-        {!loading && recipes.length === 0 && (
-          <StatusBox
-            message={t('error.recipesNotFound')}
-            className="text-red-600"
-          />
-        )}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
-
-        {/* Load more... button */}
-        {hasMore && !loading && (
-          <div className="mt-12 text-center">
-            <button
-              onClick={() => setPage((prev) => prev + 1)}
-              className={`${buttonBase} rounded-full border-3 border-orange-700 hover:cursor-pointer hover:border-orange-800`}
-            >
-              {t('common.loadMore')}
-            </button>
-          </div>
-        )}
+    <>
+      {/* Mobile filters button */}
+      <div className="mt-6 mb-4 sm:hidden">
+        <button
+          onClick={() => setMobileFiltersOpen(true)}
+          className={`inline-flex items-center justify-center rounded-lg bg-gray-100 px-4 py-2 text-xl font-semibold shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]`}
+        >
+          {t('common.filters')}
+        </button>
       </div>
-    </div>
+
+      {/* Mobile filters drawer */}
+      {mobileFiltersOpen && (
+        <div className="fixed inset-0 z-50 sm:hidden">
+          {/* Backdrop */}
+          <button
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+
+          {/* Drawer */}
+          <div className="absolute top-0 left-0 h-full w-50 overflow-y-auto bg-gray-100 p-4 shadow-lg">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold">{t('common.filters')}</h2>
+
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            <FiltersContent
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+              mealType={mealType}
+              setMealType={setMealType}
+              difficulty={difficulty}
+              setDifficulty={setDifficulty}
+              setPage={setPage}
+              t={t}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="mt-8 flex flex-col gap-6 sm:flex-row">
+        {/* Desktop / tablet sidebar */}
+        <aside className="hidden w-50 shrink-0 rounded-md bg-gray-100/50 p-4 sm:block">
+          <h2 className="mb-4 text-xl font-semibold">{t('common.filters')}</h2>
+
+          <FiltersContent
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            mealType={mealType}
+            setMealType={setMealType}
+            difficulty={difficulty}
+            setDifficulty={setDifficulty}
+            setPage={setPage}
+            t={t}
+          />
+        </aside>
+
+        {/* Recipe Grid */}
+        <div className="flex-1">
+          {loading && page === 1 && (
+            <StatusBox message={t('common.loading')} className="text-black" />
+          )}
+
+          {!loading && recipes.length === 0 && (
+            <StatusBox
+              message={t('error.recipesNotFound')}
+              className="text-red-600"
+            />
+          )}
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {recipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            ))}
+          </div>
+
+          {/* Load more */}
+          {hasMore && !loading && (
+            <div className="mt-12 text-center">
+              <button
+                onClick={() => setPage((prev) => prev + 1)}
+                className={`${buttonBase} rounded-full border-3 border-orange-700 hover:cursor-pointer hover:border-orange-800`}
+              >
+                {t('common.loadMore')}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 

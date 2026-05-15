@@ -16,9 +16,10 @@ func GenerateAPIKey(userID string) (string, string, error) {
 
 	rawApiKey := fmt.Sprintf("%s.%s", userID, randomSecret)
 
-	return rawApiKey, hashedSecret, nil
+	return rawApiKey, randomSecret, nil
 }
 
-func ValidateAPIKey(userID, key string) error {
+func ValidateAPIKey(key string) (userID string, err error) {
 
+	return "", nil
 }

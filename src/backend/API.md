@@ -652,7 +652,7 @@ Delete a recipe. Cascades: removes its favourites.
 **Response** `204 No Content`
 
 **Errors:**
-| Status    | When                                            | 
+| Status    | When                                            |
 |-----------|-------------------------------------------------|
 | 401       | Unauthorized — missing or invalid JWT           |
 | 403       | Forbidden — not the author and lacks permission |

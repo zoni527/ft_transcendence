@@ -7,6 +7,7 @@ import { getRecipesSearch } from '../api';
 import type { SearchRecipesParams } from '../api';
 import { useNotification } from '../utils/NotifContext.ts';
 import type { Recipe } from '../types/types';
+import { buttonBase } from '../styles/styles.tsx';
 
 const Recipes = () => {
   const { showNotification } = useNotification();
@@ -26,6 +27,18 @@ const Recipes = () => {
   );
 
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+
+  const [mealType, setMealType] = useState<string>(
+    searchParams.get('mealType') || '',
+  );
+
+  const [difficulty, setDifficulty] = useState<string>(
+    searchParams.get('difficulty') || '',
+  );
+
+  const [cuisine, setCuisine] = useState<string>(
+    searchParams.get('cuisine') || '',
+  );
 
   // Debounced search
   useEffect(() => {
@@ -49,6 +62,9 @@ const Recipes = () => {
           page,
           query: searchQuery,
           date: sortOrder,
+          mealType,
+          difficulty,
+          cuisine,
         };
 
         const data = await getRecipesSearch(t, params);
@@ -77,7 +93,16 @@ const Recipes = () => {
     return () => {
       cancelled = true;
     };
-  }, [page, searchQuery, sortOrder, t, showNotification]);
+  }, [
+    page,
+    searchQuery,
+    sortOrder,
+    cuisine,
+    difficulty,
+    mealType,
+    t,
+    showNotification,
+  ]);
 
   // Sync URL
   useEffect(() => {
@@ -87,12 +112,25 @@ const Recipes = () => {
     if (page !== 1) params.set('page', page.toString());
     if (sortOrder !== 'newest') params.set('date', sortOrder);
 
+    if (mealType) params.set('mealType', mealType);
+    if (difficulty) params.set('difficulty', difficulty);
+    if (cuisine) params.set('cuisine', cuisine);
+
     const newSearch = params.toString();
 
     if (newSearch !== searchParams.toString()) {
       setSearchParams(params, { replace: true });
     }
-  }, [searchQuery, sortOrder, page, searchParams, setSearchParams]);
+  }, [
+    searchQuery,
+    sortOrder,
+    page,
+    mealType,
+    difficulty,
+    cuisine,
+    searchParams,
+    setSearchParams,
+  ]);
 
   return (
     <div className="mt-8 flex gap-6">
@@ -148,6 +186,82 @@ const Recipes = () => {
             </button>
           </div>
         </div>
+
+        {/* Meal Type */}
+        <div className="mt-12">
+          <label className="mb-2 block font-semibold">{t('meal.type')}</label>
+
+          <div className="flex flex-col gap-1">
+            {['', 'breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
+              <button
+                key={type}
+                onClick={() => {
+                  setMealType(type);
+                  setPage(1);
+                }}
+                className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
+                  mealType === type
+                    ? 'bg-orange-800/10 font-bold text-[#C04D31]'
+                    : 'text-gray-700'
+                }`}
+              >
+                {type === '' ? 'All' : type}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Difficulty */}
+        <div className="mt-12">
+          <label className="mb-2 block font-semibold">
+            {t('difficulty.type')}
+          </label>
+
+          <div className="flex flex-col gap-1">
+            {['', 'easy', 'medium', 'hard'].map((level) => (
+              <button
+                key={level}
+                onClick={() => {
+                  setDifficulty(level);
+                  setPage(1);
+                }}
+                className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
+                  difficulty === level
+                    ? 'bg-orange-800/10 font-bold text-[#C04D31]'
+                    : 'text-gray-700'
+                }`}
+              >
+                {level === '' ? 'All' : level}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Cuisine */}
+        <div className="mt-12">
+          <label className="mb-2 block font-semibold">
+            {t('recipeDetail.cuisine')}
+          </label>
+
+          <div className="flex flex-col gap-1">
+            {['', 'italian', 'french', 'asian', 'mexican'].map((c) => (
+              <button
+                key={c}
+                onClick={() => {
+                  setCuisine(c);
+                  setPage(1);
+                }}
+                className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
+                  cuisine === c
+                    ? 'bg-orange-800/10 font-bold text-[#C04D31]'
+                    : 'text-gray-700'
+                }`}
+              >
+                {c === '' ? 'All' : c}
+              </button>
+            ))}
+          </div>
+        </div>
       </aside>
 
       <div className="flex-1">
@@ -167,10 +281,10 @@ const Recipes = () => {
         </div>
 
         {hasMore && !loading && (
-          <div className="mt-6 text-center">
+          <div className="mt-12 text-center">
             <button
               onClick={() => setPage((prev) => prev + 1)}
-              className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              className={`${buttonBase} rounded-full border-3 border-orange-700 hover:cursor-pointer hover:border-orange-800`}
             >
               {t('common.loadMore')}
             </button>

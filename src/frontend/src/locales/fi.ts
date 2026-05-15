@@ -294,6 +294,7 @@ export const fiTranslations = {
     sortBy: 'Järjestä',
     newest: 'Uusin ensin',
     oldest: 'Vanhin ensin',
+    loadMore: 'Lisää reseptejä...',
   },
   error: {
     error: 'Virhe:',

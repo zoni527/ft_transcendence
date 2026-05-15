@@ -294,6 +294,7 @@ export const csTranslations = {
     sortBy: 'Seřadit podle',
     newest: 'Nejnovější první',
     oldest: 'Nejstarší první',
+    loadMore: 'Další recepty...',
   },
   error: {
     error: 'Chyba:',

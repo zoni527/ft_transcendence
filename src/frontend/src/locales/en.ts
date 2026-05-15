@@ -294,6 +294,7 @@ export const enTranslations = {
     sortBy: 'Sort by',
     newest: 'Newest first',
     oldest: 'Oldest first',
+    loadMore: 'More recipes...',
   },
   error: {
     error: 'Error:',

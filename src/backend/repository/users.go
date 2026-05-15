@@ -442,10 +442,42 @@ func MarkOffline(userId string) error {
 	return nil
 }
 
-func DeleteUser(userId string) error {
-	sql := `DELETE FROM "user" WHERE id = $1`
+var ErrLastAdmin = errors.New("cannot delete the last admin")
 
-	res, err := Pool.Exec(context.Background(), sql, userId)
+func DeleteUser(userId string) error {
+	ctx := context.Background()
+	tx, err := Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx, `
+		SELECT 1 FROM user_role ur
+		JOIN role r ON ur.role_id = r.id
+		WHERE r.name = 'admin'
+		ORDER BY ur.user_id
+		FOR UPDATE`); err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+
+	var isLast bool
+	if err := tx.QueryRow(ctx, `
+		SELECT
+			EXISTS(SELECT 1 FROM user_role ur
+			       JOIN role r ON ur.role_id = r.id
+			       WHERE ur.user_id = $1 AND r.name = 'admin')
+			AND
+			(SELECT COUNT(*) FROM user_role ur
+			 JOIN role r ON ur.role_id = r.id
+			 WHERE r.name = 'admin') = 1`, userId).Scan(&isLast); err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+	if isLast {
+		return ErrLastAdmin
+	}
+
+	res, err := tx.Exec(ctx, `DELETE FROM "user" WHERE id = $1`, userId)
 	if err != nil {
 		return fmt.Errorf("repository.DeleteUser: %w", err)
 	}
@@ -453,5 +485,8 @@ func DeleteUser(userId string) error {
 		return &NotFoundError{"user not found"}
 	}
 
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
 	return nil
 }

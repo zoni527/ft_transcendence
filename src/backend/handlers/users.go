@@ -672,18 +672,11 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	isLastAdmin, err := repository.IsLastAdmin(targetUserID)
-	if err != nil {
-		log.Printf("handlers.DeleteUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
-	if isLastAdmin {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
-		return
-	}
-
 	if err := repository.DeleteUser(targetUserID); err != nil {
+		if errors.Is(err, repository.ErrLastAdmin) {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
+			return
+		}
 		var nf *repository.NotFoundError
 		if errors.As(err, &nf) {
 			c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})

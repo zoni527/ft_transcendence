@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import FilterGroup from '../components/FilterGroup.tsx';
 import RecipeCard from '../components/RecipeCard';
+import SortOrderFilter from '../components/SortOrderFilter.tsx';
 import StatusBox from '../components/StatusBox';
 import { getRecipesSearch } from '../api';
 import type { SearchRecipesParams } from '../api';
@@ -155,121 +157,58 @@ const Recipes = () => {
         </div>
 
         {/* Sort Order */}
-        <div>
-          <label className="text-md mt-12 mb-2 block font-semibold">
-            {t('common.sortBy')}
-          </label>
-
-          <div className="flex flex-col gap-1">
-            <button
-              type="button"
-              onClick={() => {
-                setSortOrder('newest');
-                setPage(1);
-              }}
-              className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
-                sortOrder === 'newest'
-                  ? 'bg-orange-800/10 font-bold text-[#C04D31]'
-                  : 'text-gray-700'
-              }`}
-            >
-              {t('common.newest')}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSortOrder('oldest');
-                setPage(1);
-              }}
-              className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
-                sortOrder === 'newest'
-                  ? 'text-gray-700'
-                  : 'bg-orange-800/10 font-bold text-[#C04D31]'
-              }`}
-            >
-              {t('common.oldest')}
-            </button>
-          </div>
-        </div>
+        <SortOrderFilter
+          value={sortOrder}
+          onChange={setSortOrder}
+          onResetPage={() => setPage(1)}
+        />
 
         {/* Meal Type */}
-        <div className="mt-12">
-          <label className="mb-2 block font-semibold">{t('meal.type')}</label>
-
-          <div className="flex flex-col gap-1">
-            {['', 'breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
-              <button
-                key={type}
-                onClick={() => {
-                  setMealType(type);
-                  setPage(1);
-                }}
-                className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
-                  mealType === type
-                    ? 'bg-orange-800/10 font-bold text-[#C04D31]'
-                    : 'text-gray-700'
-                }`}
-              >
-                {type === '' ? 'All' : type}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FilterGroup
+          label={t('meal.type')}
+          value={mealType}
+          onChange={setMealType}
+          onResetPage={() => setPage(1)}
+          options={[
+            { label: 'All', value: '' },
+            { label: 'Breakfast', value: 'breakfast' },
+            { label: 'Lunch', value: 'lunch' },
+            { label: 'Dinner', value: 'dinner' },
+            { label: 'Snack', value: 'snack' },
+          ]}
+        />
 
         {/* Difficulty */}
-        <div className="mt-12">
-          <label className="mb-2 block font-semibold">
-            {t('difficulty.type')}
-          </label>
-
-          <div className="flex flex-col gap-1">
-            {['', 'easy', 'medium', 'hard'].map((level) => (
-              <button
-                key={level}
-                onClick={() => {
-                  setDifficulty(level);
-                  setPage(1);
-                }}
-                className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
-                  difficulty === level
-                    ? 'bg-orange-800/10 font-bold text-[#C04D31]'
-                    : 'text-gray-700'
-                }`}
-              >
-                {level === '' ? 'All' : level}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FilterGroup
+          label={t('difficulty.type')}
+          value={difficulty}
+          onChange={setDifficulty}
+          onResetPage={() => setPage(1)}
+          options={[
+            { label: 'All', value: '' },
+            { label: 'Easy', value: 'easy' },
+            { label: 'Medium', value: 'medium' },
+            { label: 'Hard', value: 'hard' },
+          ]}
+        />
 
         {/* Cuisine */}
-        <div className="mt-12">
-          <label className="mb-2 block font-semibold">
-            {t('recipeDetail.cuisine')}
-          </label>
-
-          <div className="flex flex-col gap-1">
-            {['', 'italian', 'french', 'asian', 'mexican'].map((c) => (
-              <button
-                key={c}
-                onClick={() => {
-                  setCuisine(c);
-                  setPage(1);
-                }}
-                className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
-                  cuisine === c
-                    ? 'bg-orange-800/10 font-bold text-[#C04D31]'
-                    : 'text-gray-700'
-                }`}
-              >
-                {c === '' ? 'All' : c}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FilterGroup
+          label={t('recipeDetail.cuisine')}
+          value={cuisine}
+          onChange={setCuisine}
+          onResetPage={() => setPage(1)}
+          options={[
+            { label: 'All', value: '' },
+            { label: 'Italian', value: 'italian' },
+            { label: 'French', value: 'french' },
+            { label: 'Asian', value: 'asian' },
+            { label: 'Mexican', value: 'mexican' },
+          ]}
+        />
       </aside>
 
+      {/* Recipe Grid */}
       <div className="flex-1">
         {loading && page === 1 && (
           <StatusBox message={t('common.loading')} className="text-black" />
@@ -286,6 +225,7 @@ const Recipes = () => {
           ))}
         </div>
 
+        {/* Load more... button */}
         {hasMore && !loading && (
           <div className="mt-12 text-center">
             <button

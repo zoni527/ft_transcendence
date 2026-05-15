@@ -172,7 +172,7 @@ Validates the user by reading the `token` cookie, validating the JWT, checking t
 - `token` — the raw JWT
 - `expDate` — token expiration time
 
-**Returns:** 
+**Returns:**
 | Status                           | When                                          |
 |----------------------------------|-----------------------------------------------|
 | 401 `{"error":"unauthorized"}`   | No `token` cookie                             |
@@ -229,14 +229,14 @@ func UpdateRecipe(c *gin.Context) {
     userID := c.GetString("userID")
     roleSet, _ := authorization.RolesFromContext(c)
     permSet, _ := authorization.PermsFromContext(c)
-    
-    original, err := repository.GetRecipeById(recipeID)
-    
+
+    original, err := h.Repo.GetRecipeById(recipeID)
+
     if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.Id) {
         c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
         return
     }
-    
+
     // ... update the recipe
 }
 ```

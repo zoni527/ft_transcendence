@@ -4,6 +4,7 @@ services:
     container_name: cert_generator
     build: ./cert_generator
     image: transcendence_cert_generator:dev_1.0
+    pull_policy: build
     volumes:
       - ../certs:/certs
     user: root

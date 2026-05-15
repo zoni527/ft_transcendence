@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
 import EditRecipeModal from '../modals/EditRecipe.tsx';
@@ -17,8 +17,7 @@ const RecipeDetail = () => {
   const { user, hasRole } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { state } = useLocation() as { state?: { recipe?: Recipe } };
-  const [recipe, setRecipe] = useState<Recipe | null>(state?.recipe ?? null);
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
   const [isEditRecipeOpen, setIsEditRecipeOpen] = useState(false);
   const { t } = useTranslation();

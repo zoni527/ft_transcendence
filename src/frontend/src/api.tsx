@@ -5,7 +5,7 @@ export interface SearchRecipesParams {
   query?: string;
   page?: number;
   mealType?: string;
-  date?: 'asc' | 'desc';
+  date?: 'oldest' | 'newest';
   difficulty?: string;
   cuisine?: string;
 }

@@ -1,7 +1,7 @@
 -- Seed data for testing
 -- Runs automatically on first DB init (after 001_schema.sql)
 --
--- Scale: 25 named users, 25 recipes (one per unique title), ~50 friendships.
+-- Scale: 25 named users, 25 recipes (one per unique title), 49 friendships.
 -- Only named seed rows are inserted (no templated/generated bulk).
 
 -- =====================
@@ -310,17 +310,74 @@ JOIN "user" u ON u.display_name = r.author_dn;
 
 -- =====================
 -- FRIENDSHIPS
--- Five explicit pairs: 3 accepted, 2 pending so the UI can exercise both.
+-- 49 pairs across all 25 seeded users: 32 accepted, 17 pending.
+-- alice has multiple accepted friends plus both outgoing and incoming pending
+-- requests so the dashboard exercises every bucket of GET /api/friendships.
 -- =====================
 
 INSERT INTO friendship (requester_id, receiver_id, status)
 SELECT u1.id, u2.id, v.status
 FROM (VALUES
-    ('alice',     'bobby',     'accepted'),
-    ('alice',     'charlie',   'accepted'),
-    ('bobby',     'wonder_di', 'pending'),
-    ('charlie',   'evee',      'accepted'),
-    ('wonder_di', 'evee',      'pending')
+    -- Alice (admin): rich friend graph with sent + incoming pending
+    ('alice',       'bobby',        'accepted'),
+    ('alice',       'charlie',      'accepted'),
+    ('alice',       'wonder_di',    'accepted'),
+    ('alice',       'iron_man',     'accepted'),
+    ('alice',       'super_man',    'accepted'),
+    ('spider_m',    'alice',        'accepted'),
+    ('web_head',    'alice',        'accepted'),
+    ('alice',       'evee',         'pending'),
+    ('alice',       'grid_runner',  'pending'),
+    ('alice',       'wonder_woman', 'pending'),
+    ('prof_x',      'alice',        'pending'),
+    ('dark_knight', 'alice',        'pending'),
+
+    -- Bobby (chef)
+    ('bobby',       'charlie',      'accepted'),
+    ('bobby',       'x23',          'accepted'),
+    ('bobby',       'iron_man',     'accepted'),
+    ('bobby',       'tekken_nina',  'accepted'),
+    ('bobby',       'wonder_di',    'pending'),
+    ('super_man',   'bobby',        'pending'),
+
+    -- Charlie (chef)
+    ('charlie',     'evee',         'accepted'),
+    ('charlie',     'spider_m',     'accepted'),
+    ('iron_man',    'charlie',      'accepted'),
+    ('charlie',     'wonder_di',    'pending'),
+
+    -- Diana Prince / wonder_di (moderator)
+    ('wonder_di',   'x23',          'accepted'),
+    ('wonder_di',   'aquaman',      'accepted'),
+    ('prof_x',      'wonder_di',    'accepted'),
+    ('wonder_di',   'evee',         'pending'),
+    ('scarlet_w',   'wonder_di',    'pending'),
+
+    -- Evee
+    ('evee',        'spider_m',     'accepted'),
+    ('evee',        'p_dameron',    'accepted'),
+    ('iron_man',    'evee',         'pending'),
+    ('evee',        'no_fate',      'pending'),
+
+    -- Wider network so every seeded user has at least one friendship
+    ('grid_runner', 'x23',          'accepted'),
+    ('spider_m',    'web_head',     'accepted'),
+    ('p_dameron',   'tekken_nina',  'accepted'),
+    ('mister_f',    'no_fate',      'accepted'),
+    ('mister_f',    'prof_x',       'accepted'),
+    ('dr_doom',     'sea_witch',    'accepted'),
+    ('prof_x',      'wonder_girl',  'accepted'),
+    ('titanium_z',  'wonder_girl',  'accepted'),
+    ('aquaman',     'dark_knight',  'accepted'),
+    ('dark_knight', 'super_man',    'accepted'),
+    ('super_man',   'wonder_woman', 'accepted'),
+    ('wonder_girl', 'wonder_woman', 'accepted'),
+    ('no_fate',     'q_fabray',     'accepted'),
+    ('p_dameron',   'q_fabray',     'pending'),
+    ('iron_man',    'dr_doom',      'pending'),
+    ('dr_doom',     'scarlet_w',    'pending'),
+    ('aquaman',     'titanium_z',   'pending'),
+    ('spider_m',    'wonder_girl',  'pending')
 ) AS v(requester, receiver, status)
 JOIN "user" u1 ON u1.display_name = v.requester
 JOIN "user" u2 ON u2.display_name = v.receiver;

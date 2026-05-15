@@ -194,7 +194,7 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeById(ctx context.Context, id string) 
 	}
 
 	if err != nil {
-		return models.RecipeResponse{}, fmt.Errorf("repository.GetRecipeById: %w", err)
+		return models.RecipeResponse{}, fmt.Errorf("GetRecipeById: %w", err)
 	}
 
 	return r, nil

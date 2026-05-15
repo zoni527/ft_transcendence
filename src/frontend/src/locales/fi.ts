@@ -289,6 +289,11 @@ export const fiTranslations = {
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
     noFile: 'Tiedostoa ei valittu',
+    filters: 'Suodattimet',
+    searchRecipe: 'Etsi reseptejä...',
+    sortBy: 'Järjestä',
+    newest: 'Uusin ensin',
+    oldest: 'Vanhin ensin',
   },
   error: {
     error: 'Virhe:',

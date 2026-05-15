@@ -289,6 +289,11 @@ export const csTranslations = {
     welcome: 'Vítejte',
     rightsReserved: 'RISE. Všechna práva vyhrazena.',
     noFile: 'Žádný soubor nebyl vybrán',
+    filters: 'Filtry',
+    searchRecipe: 'Hledat recepty...',
+    sortBy: 'Seřadit podle',
+    newest: 'Nejnovější první',
+    oldest: 'Nejstarší první',
   },
   error: {
     error: 'Chyba:',

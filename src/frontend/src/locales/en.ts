@@ -289,6 +289,11 @@ export const enTranslations = {
     welcome: 'Welcome',
     rightsReserved: 'RISE. All Rights Reserved.',
     noFile: 'No file chosen',
+    filters: 'Filters',
+    searchRecipe: 'Search recipes...',
+    sortBy: 'Sort by',
+    newest: 'Newest first',
+    oldest: 'Oldest first',
   },
   error: {
     error: 'Error:',

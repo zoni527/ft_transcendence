@@ -15,14 +15,25 @@ import StatusBox from '../components/StatusBox';
 import SubmitButton from '../components/SubmitButton';
 import SubsectionButton from '../components/SubsectionButton';
 import UserStatus from '../components/UserStatus';
-import { getUserbyId, deleteUser, getFriendships } from '../api';
+import {
+  getUserbyId,
+  deleteUser,
+  getFriendships,
+  removeFriend,
+  cancelFriendRequest,
+  acceptFriendRequest,
+  rejectFriendRequest,
+} from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User, FriendshipListItem } from '../types/types';
+import type { FriendAction } from '../components/FriendField';
 import { cardBase } from '../styles/styles';
 
 type FriendshipWithStatus = FriendshipListItem & {
   status: 'accepted' | 'incoming' | 'outgoing';
 };
+
+type FriendshipSection = 'accepted' | 'incoming' | 'outgoing';
 
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -60,6 +71,52 @@ const Dashboard = () => {
         | 'outgoing') || 'accepted'
     );
   });
+
+  const friendshipActions: Record<FriendshipSection, FriendAction[]> = {
+    accepted: [
+      {
+        label: 'Remove',
+        onClick: async (id) => {
+          await removeFriend(id);
+
+          setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+        },
+      },
+    ],
+
+    outgoing: [
+      {
+        label: 'Cancel',
+        onClick: async (id) => {
+          await cancelFriendRequest(id);
+
+          setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+        },
+      },
+    ],
+
+    incoming: [
+      {
+        label: 'Accept',
+        onClick: async (id) => {
+          await acceptFriendRequest(id, t);
+
+          setFriendshipUsers((prev) =>
+            prev.map((u) => (u.id === id ? { ...u, status: 'accepted' } : u)),
+          );
+        },
+      },
+
+      {
+        label: 'Reject',
+        onClick: async (id) => {
+          await rejectFriendRequest(id);
+
+          setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+        },
+      },
+    ],
+  };
 
   useEffect(() => {
     localStorage.setItem('dashboardActiveSection', activeSection);
@@ -383,21 +440,13 @@ const Dashboard = () => {
             ) : (
               friendshipUsers
                 .filter((u) => u.status === activeSubsection)
-                .sort((a, b) =>
-                  sortBy === 'name'
-                    ? a.display_name.localeCompare(b.display_name)
-                    : a.display_name.localeCompare(b.display_name),
-                )
+                .sort((a, b) => a.display_name.localeCompare(b.display_name))
                 .map((listedUser) => (
                   <FriendField
                     key={listedUser.id}
                     user={listedUser}
                     subsection={activeSubsection}
-                    onDelete={(id) =>
-                      setFriendshipUsers((prev) =>
-                        prev.filter((u) => u.id !== id),
-                      )
-                    }
+                    actions={friendshipActions[activeSubsection]}
                     onClick={() => {
                       setActiveSection('profile');
                       void navigate(`/users/${listedUser.id}`);

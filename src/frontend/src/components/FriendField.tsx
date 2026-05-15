@@ -3,17 +3,23 @@ import SubmitButton from './SubmitButton';
 import UserStatus from './UserStatus';
 import type { FriendshipListItem, AcceptedFriend } from '../types/types';
 
+export interface FriendAction {
+  label: string;
+  onClick: (id: string) => void | Promise<void>;
+  variant?: 'primary' | 'danger';
+}
+
 interface FriendFieldProps {
   user: FriendshipListItem | AcceptedFriend;
   subsection: string;
-  onDelete: (id: string) => void;
+  actions: FriendAction[];
   onClick?: () => void;
 }
 
 const FriendField = ({
   user,
   subsection,
-  onDelete,
+  actions,
   onClick,
 }: FriendFieldProps) => {
   const [loading] = useState(false);
@@ -25,12 +31,10 @@ const FriendField = ({
     >
       {/* Left side */}
       <div className="flex min-w-0 flex-col gap-2 md:flex-row md:items-center md:gap-6">
-        {/* Name */}
         <div className="w-38 shrink-0 truncate text-xl font-semibold text-gray-700 sm:w-60">
           {user.name}
         </div>
 
-        {/* Username */}
         <div className="w-38 shrink-0 truncate text-xl font-semibold text-gray-700 sm:w-60">
           {user.display_name}
         </div>
@@ -41,16 +45,20 @@ const FriendField = ({
         {subsection === 'accepted' && 'is_online' in user && (
           <UserStatus isOnline={user.is_online} />
         )}
-        <SubmitButton
-          className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-          isLoading={loading}
-          defaultText="Placeholder"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(user.id);
-          }}
-          type="button"
-        />
+
+        {actions.map((action) => (
+          <SubmitButton
+            key={action.label}
+            className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
+            isLoading={loading}
+            defaultText={action.label}
+            onClick={(e) => {
+              e.stopPropagation();
+              void action.onClick(user.id);
+            }}
+            type="button"
+          />
+        ))}
       </div>
     </div>
   );

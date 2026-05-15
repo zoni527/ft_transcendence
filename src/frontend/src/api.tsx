@@ -684,6 +684,96 @@ export const getFriendships = async (
   return data;
 };
 
+// GET /api/friendships (remove a friendship)
+export const removeFriend = async (
+  t: TFunction,
+): Promise<FriendshipsResponse> => {
+  const response = await fetch(`${baseUrl}/friendships`);
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  if (!isFriendshipsResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// GET /api/friendships (cancel a friend request)
+export const cancelFriendRequest = async (
+  t: TFunction,
+): Promise<FriendshipsResponse> => {
+  const response = await fetch(`${baseUrl}/friendships`);
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  if (!isFriendshipsResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// PATCH /api/friendships/:id (accept a friend request)
+export const acceptFriendRequest = async (id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/friendships/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+};
+
+// GET /api/friendships (reject a friend request)
+export const rejectFriendRequest = async (
+  t: TFunction,
+): Promise<FriendshipsResponse> => {
+  const response = await fetch(`${baseUrl}/friendships`);
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  if (!isFriendshipsResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
 // PUT /api/recipes/:id (edit a recipe)
 export const putUpdateRecipe = async (
   payload: UpdateRecipePayload,

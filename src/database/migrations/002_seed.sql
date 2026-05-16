@@ -100,14 +100,22 @@ WHERE r.name = 'user'
 -- by newlines (frontend renames the UI label to "How to cook"). Strings use
 -- the E'...' escape syntax so \n is interpreted as a real newline.
 -- =====================
+-- created_at / updated_at are randomized across the last 60 / 30 days so the
+-- sort-by-newest and sort-by-oldest filters return a meaningful order on
+-- seeded data instead of a tie. updated_at is always >= created_at.
 INSERT INTO recipe (author_id, title, description, preparation_time_min, servings,
-                    difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
+                    difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g,
+                    created_at, updated_at)
 SELECT
     u.id,
     r.title, r.description, r.prep_time, r.servings, r.difficulty,
     r.cuisine, r.meal_type, r.image_url,
-    r.calories, r.protein_g, r.carbs_g, r.fat_g
-FROM (VALUES
+    r.calories, r.protein_g, r.carbs_g, r.fat_g,
+    r.created_at,
+    r.created_at + (random() * (now() - r.created_at)) AS updated_at
+FROM (
+    SELECT *, now() - (random() * interval '60 days') AS created_at
+    FROM (VALUES
     (
         'alice', 'Pasta Carbonara',
         E'Step 1: Bring a large pot of well-salted water to the boil and cook spaghetti until al dente.\nStep 2: While the pasta cooks, render diced pancetta in a dry pan over medium heat until crisp, then take the pan off the heat.\nStep 3: Whisk egg yolks in a bowl with finely grated pecorino and plenty of cracked black pepper.\nStep 4: Drain the pasta, reserving a cup of the starchy cooking water.\nStep 5: Toss the hot pasta into the pancetta pan, then off the heat add the egg mixture and a splash of pasta water.\nStep 6: Stir quickly so the eggs turn glossy rather than scrambled, and serve immediately with extra pecorino on top.',
@@ -304,8 +312,9 @@ FROM (VALUES
         'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778440764/recipe-seed/berry-pavlova.webp',
         310, 4.0, 52.0, 10.0
     )
-) AS r(author_dn, title, description, prep_time, servings, difficulty,
-       cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
+    ) AS v(author_dn, title, description, prep_time, servings, difficulty,
+           cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
+) AS r
 JOIN "user" u ON u.display_name = r.author_dn;
 
 -- =====================

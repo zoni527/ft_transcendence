@@ -20,6 +20,10 @@ export const csTranslations = {
     userDeleteSuccess: 'Uživatel byl úspěšně smazán',
     editRecipeSuccess: 'Recept byl úspěšně upraven',
     updateUserSuccess: 'Profil uživatele byl aktualizován',
+    friendRemoved: 'Přítel odstraněn',
+    friendRequestCancelled: 'Žádost zrušena',
+    friendRequestAccepted: 'Žádost přijata',
+    friendRequestRejected: 'Žádost odmítnuta',
   },
   info: {
     name: 'Ostatní uživatelé nevidí vaše celé jméno',

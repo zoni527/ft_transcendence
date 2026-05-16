@@ -72,14 +72,28 @@ const Dashboard = () => {
     );
   });
 
+  const handleFriendshipError = (err: unknown) => {
+    const message =
+      err instanceof Error ? err.message : t('error.genericError');
+
+    showNotification(message, 'error');
+  };
+
+  // Individual friendship actions
   const friendshipActions: Record<FriendshipSection, FriendAction[]> = {
     accepted: [
       {
         label: 'Remove',
         onClick: async (id) => {
-          await removeFriend(id);
+          try {
+            await removeFriend(id);
 
-          setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+            setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+
+            showNotification(t('notification.friendRemoved'), 'success');
+          } catch (err: unknown) {
+            handleFriendshipError(err);
+          }
         },
       },
     ],
@@ -88,9 +102,18 @@ const Dashboard = () => {
       {
         label: 'Cancel',
         onClick: async (id) => {
-          await cancelFriendRequest(id);
+          try {
+            await cancelFriendRequest(id);
 
-          setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+            setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+
+            showNotification(
+              t('notification.friendRequestCancelled'),
+              'success',
+            );
+          } catch (err: unknown) {
+            handleFriendshipError(err);
+          }
         },
       },
     ],
@@ -99,25 +122,44 @@ const Dashboard = () => {
       {
         label: 'Accept',
         onClick: async (id) => {
-          await acceptFriendRequest(id, t);
+          try {
+            await acceptFriendRequest(id, t);
 
-          setFriendshipUsers((prev) =>
-            prev.map((u) => (u.id === id ? { ...u, status: 'accepted' } : u)),
-          );
+            setFriendshipUsers((prev) =>
+              prev.map((u) => (u.id === id ? { ...u, status: 'accepted' } : u)),
+            );
+
+            showNotification(
+              t('notification.friendRequestAccepted'),
+              'success',
+            );
+          } catch (err: unknown) {
+            handleFriendshipError(err);
+          }
         },
       },
 
       {
         label: 'Reject',
         onClick: async (id) => {
-          await rejectFriendRequest(id);
+          try {
+            await rejectFriendRequest(id);
 
-          setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+            setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+
+            showNotification(
+              t('notification.friendRequestRejected'),
+              'success',
+            );
+          } catch (err: unknown) {
+            handleFriendshipError(err);
+          }
         },
       },
     ],
   };
 
+  // Local storage for active tabs and subtabs
   useEffect(() => {
     localStorage.setItem('dashboardActiveSection', activeSection);
   }, [activeSection]);
@@ -126,46 +168,58 @@ const Dashboard = () => {
     localStorage.setItem('dashboardActiveSubsection', activeSubsection);
   }, [activeSubsection]);
 
+  // Fetch all friends
   useEffect(() => {
     if (authLoading) return;
+    if (activeSection !== 'friends') return;
+    if (!authUser) return;
 
     let cancelled = false;
 
-    const fetchData = async () => {
-      if (!authUser) {
-        setLoading(false);
-        return;
-      }
-
+    const fetchFriendships = async () => {
       try {
+        setLoading(true);
+
         const data = await getFriendships(t);
 
         if (cancelled) return;
 
         const combinedFriends = [
-          ...data.friends.map((u) => ({ ...u, status: 'accepted' as const })),
-          ...data.sent.map((u) => ({ ...u, status: 'outgoing' as const })),
-          ...data.incoming.map((u) => ({ ...u, status: 'incoming' as const })),
+          ...data.friends.map((u) => ({
+            ...u,
+            status: 'accepted' as const,
+          })),
+          ...data.sent.map((u) => ({
+            ...u,
+            status: 'outgoing' as const,
+          })),
+          ...data.incoming.map((u) => ({
+            ...u,
+            status: 'incoming' as const,
+          })),
         ];
 
         setFriendshipUsers(combinedFriends);
       } catch (err: unknown) {
         if (cancelled) return;
+
         const message =
           err instanceof Error ? err.message : t('error.genericError');
+
         showNotification(message, 'error');
       } finally {
         if (!cancelled) setLoading(false);
       }
     };
 
-    void fetchData();
+    void fetchFriendships();
 
     return () => {
       cancelled = true;
     };
-  }, [authLoading, authUser, t, showNotification]);
+  }, [activeSection, authLoading, authUser, t, showNotification]);
 
+  // Delete user profile
   const handleDelete = (id?: string) => {
     if (loading) return;
     if (!id) {
@@ -189,6 +243,7 @@ const Dashboard = () => {
       .finally(() => setLoading(false));
   };
 
+  // Fetch profile details by UserId
   useEffect(() => {
     if (!id && authLoading) return;
 

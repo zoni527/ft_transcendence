@@ -20,6 +20,10 @@ export const fiTranslations = {
     userDeleteSuccess: 'Käyttäjä poistettu',
     editRecipeSuccess: 'Resepti päivitetty',
     updateUserSuccess: 'Käyttäjäprofiili päivitetty',
+    friendRemoved: 'Ystävä poistettu',
+    friendRequestCancelled: 'Pyyntö peruttu',
+    friendRequestAccepted: 'Pyyntö hyväksytty',
+    friendRequestRejected: 'Pyyntö hylätty',
   },
   info: {
     name: 'Ei näy muille käyttäjille',

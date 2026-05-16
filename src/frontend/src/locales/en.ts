@@ -20,6 +20,10 @@ export const enTranslations = {
     userDeleteSuccess: 'User deleted successfully',
     editRecipeSuccess: 'Recipe edited successfully',
     updateUserSuccess: 'User profile updated',
+    friendRemoved: 'Friend removed',
+    friendRequestCancelled: 'Request canceled',
+    friendRequestAccepted: 'Request accepted',
+    friendRequestRejected: 'Request rejected',
   },
   info: {
     name: "Other users can't see your full name",

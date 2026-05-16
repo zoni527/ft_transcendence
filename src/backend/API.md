@@ -709,6 +709,121 @@ Get all recipes a user has favourited.
 
 ---
 
+## Friendships
+
+A friendship is a single row in the `friendship` table with `requester_id`, `receiver_id`, and `status` (`pending` or `accepted`). The pair is unique in both directions: if A has already sent a request to B, B cannot send one back — they accept the existing one instead.
+
+### GET /api/friendships
+
+List everyone the logged-in user has a friendship row with, bucketed by status.
+
+**Requires:** Valid JWT in `token` cookie.
+
+**Response** `200 OK`
+```json
+{
+  "friends": [
+    {
+      "id": "uuid",
+      "display_name": "jane_cooks",
+      "name": "Jane",
+      "is_online": true
+    }
+  ],
+  "sent": [
+    {
+      "id": "uuid",
+      "display_name": "bob_bakes",
+      "name": "Bob"
+    }
+  ],
+  "incoming": [
+    {
+      "id": "uuid",
+      "display_name": "alice_eats",
+      "name": "Alice"
+    }
+  ]
+}
+```
+
+**Notes:**
+- `friends` — accepted on either side. Includes `is_online` (true if `last_seen` is within the last 60 seconds).
+- `sent` — pending requests the logged-in user sent. `is_online` is omitted.
+- `incoming` — pending requests sent *to* the logged-in user. `is_online` is omitted.
+- The other user's id is always returned as `id` regardless of which side of the row they are on.
+
+**Errors:**
+| Status    | When                                  |
+|-----------|---------------------------------------|
+| 401       | Unauthorized — missing or invalid JWT |
+| 500       | Internal server error                 |
+
+---
+
+### POST /api/friendships
+
+Send a friend request. The requester is the logged-in user; only the receiver's id is sent in the body.
+
+**Requires:** Valid JWT in `token` cookie.
+
+**Request body:**
+```json
+{
+  "receiver_id": "uuid"
+}
+```
+
+**Response** `201 Created`
+```json
+{
+  "status": "pending"
+}
+```
+
+**Notes:**
+- The receiver becomes friends only after they call `PATCH /api/friendships/:id`.
+- Duplicates are rejected in either direction — if B already sent A a request, A cannot send one back. The frontend should call `PATCH` to accept instead.
+
+**Errors:**
+| Status    | When                                                    |
+|-----------|---------------------------------------------------------|
+| 400       | Missing `receiver_id`, self-request, or already exists  |
+| 401       | Unauthorized — missing or invalid JWT                   |
+| 404       | Receiver not found (unknown id or malformed UUID)       |
+| 500       | Internal server error                                   |
+
+---
+
+### PATCH /api/friendships/:id
+
+Accept an incoming friend request. `:id` is the **requester's** user id (the user who originally sent the pending request); the receiver is the logged-in user.
+
+**Requires:** Valid JWT in `token` cookie.
+
+**Body:** none
+
+**Response** `200 OK`
+```json
+{
+  "status": "accepted"
+}
+```
+
+**Notes:**
+- Only the receiver can flip a request to accepted — the SQL pins `receiver_id` to the caller, so users cannot accept their own outgoing requests.
+- Idempotent on already-accepted rows: a second call returns `404` because the `WHERE status = 'pending'` filter no longer matches.
+
+**Errors:**
+| Status    | When                                                  |
+|-----------|-------------------------------------------------------|
+| 400       | `:id` equals the caller's id (cannot accept own)      |
+| 401       | Unauthorized — missing or invalid JWT                 |
+| 404       | No pending request from `:id` to the caller           |
+| 500       | Internal server error                                 |
+
+---
+
 ## Implementation Status
 
 | Endpoint                          | Status    |
@@ -734,3 +849,7 @@ Get all recipes a user has favourited.
 | POST /api/recipes/:id/favourite   | TODO      |
 | DELETE /api/recipes/:id/favourite | TODO      |
 | GET /api/users/:id/favourites     | TODO      |
+| GET /api/friendships              | done      |
+| POST /api/friendships             | done      |
+| PATCH /api/friendships/:id        | done      |
+| DELETE /api/friendships/:id       | TODO      |

@@ -380,6 +380,26 @@ func SearchUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, users)
 }
 
+func GetAPIKey(c *gin.Context) {
+	userID := c.GetString("userID")
+	if !authorization.IsValidUUID(userID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	apiKey, randomSecret, err := authorization.GenerateAPIKey(userID)
+	if err != nil {
+		log.Printf("GetAPIKey error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if err := repository.SaveAPIKey(userID, randomSecret); err != nil {
+		log.Printf("GetApiKey error: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, apiKey)
+}
+
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.
 func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error {
 	if req.Email != nil {

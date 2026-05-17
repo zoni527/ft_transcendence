@@ -435,6 +435,5 @@ func identifyAndRespondToUserError(c *gin.Context, err error) bool {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
 		return true
 	}
-
 	return false
 }

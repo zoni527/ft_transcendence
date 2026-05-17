@@ -2,9 +2,8 @@ package services
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
-	"ft_transcendence/backend/authorization"
 	"ft_transcendence/backend/models"
 )
 
@@ -15,6 +14,8 @@ type RecipeRepo interface {
 	UpdateRecipe(ctx context.Context, r *models.Recipe) error
 	DeleteRecipe(ctx context.Context, id string) error
 }
+
+var ErrForbidden = errors.New("forbidden")
 
 type recipeService struct {
 	repo RecipeRepo
@@ -29,37 +30,33 @@ func (s *recipeService) ListPublicRecipes(ctx context.Context) ([]models.RecipeR
 }
 
 func (s *recipeService) GetPublicRecipe(ctx context.Context, id string) (models.RecipeResponse, error) {
-	if !authorization.IsValidUUID(id) {
-		return models.RecipeResponse{}, fmt.Errorf("recipe not found")
-	}
 	return s.repo.GetRecipeById(ctx, id)
 }
 
 func (s *recipeService) CreateRecipe(ctx context.Context, actorID string, in models.Recipe) (string, error) {
-	if !authorization.IsValidUUID(actorID) {
-		return "", fmt.Errorf("unauthorized")
-	}
 	in.Author_id = actorID
 	return s.repo.CreateRecipe(ctx, &in)
 }
 
 func (s *recipeService) UpdateRecipe(ctx context.Context, actorID, recipeID string, in models.Recipe) error {
-	if !authorization.IsValidUUID(actorID) {
-		return fmt.Errorf("unauthorized")
-	}
-	if !authorization.IsValidUUID(recipeID) {
-		return fmt.Errorf("recipe not found")
-	}
 	in.Id = recipeID
+	recipe, err := s.repo.GetRecipeById(ctx, recipeID)
+	if err != nil {
+		return err
+	}
+	if recipe.Author.Id != actorID {
+		return ErrForbidden
+	}
 	return s.repo.UpdateRecipe(ctx, &in)
 }
 
 func (s *recipeService) DeleteRecipe(ctx context.Context, actorID, recipeID string) error {
-	if !authorization.IsValidUUID(actorID) {
-		return fmt.Errorf("unauthorized")
+	recipe, err := s.repo.GetRecipeById(ctx, recipeID)
+	if err != nil {
+		return err
 	}
-	if !authorization.IsValidUUID(recipeID) {
-		return fmt.Errorf("recipe not found")
+	if recipe.Author.Id != actorID {
+		return ErrForbidden
 	}
 	return s.repo.DeleteRecipe(ctx, recipeID)
 }

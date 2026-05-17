@@ -92,10 +92,10 @@ func friendshipPostgresErrorClassification(functionName string, err error) error
 }
 
 // requesterID is the user who sent the original request
-// receiverID is the logged-in user who is accepting it
+// receiverID is the logged in user who is accepting it
 // The WHERE clause pins receiver_id to the caller so a user can only flip
 // rows where someone else asked them; status = 'pending' makes the call
-// idempotent and prevents re-accepting an already-accepted row
+// idempotent and prevents re accepting an already-accepted row
 func AcceptFriendRequest(requesterID, receiverID string) error {
 	sql := `UPDATE friendship
 			SET status = 'accepted'
@@ -150,7 +150,7 @@ func DeleteFriendRequest(callerID, otherID string) error {
 
 // Deletes an accepted row between the two users (unfriend). Either side may
 // call it. The status = 'accepted' filter prevents this from accidentally
-// removing a pending request — those are deleted via DeleteFriendRequest.
+// removing a pending request, those are deleted via DeleteFriendRequest.
 func DeleteFriendship(callerID, otherID string) error {
 	sql := `DELETE FROM friendship
 			WHERE status = 'accepted'

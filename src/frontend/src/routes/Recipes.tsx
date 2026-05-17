@@ -153,19 +153,18 @@ const Recipes = () => {
         const data = await getRecipesSearch(t, params);
 
         if (!cancelled) {
-          setRecipes((prevRecipes) =>
-            page === 1 ? data : [...prevRecipes, ...data],
-          );
+          setRecipes((prev) => (page === 1 ? data : [...prev, ...data]));
 
           setHasMore(data.length === 12);
         }
       } catch (err: unknown) {
-        if (!cancelled) {
-          const message =
-            err instanceof Error ? err.message : t('error.genericError');
+        if (cancelled) return;
 
-          showNotification(message, 'error');
-        }
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+        void navigate('/');
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -173,14 +172,7 @@ const Recipes = () => {
       }
     };
 
-    void fetchRecipes().catch((err: unknown) => {
-      const message =
-        err instanceof Error ? err.message : t('error.genericError');
-
-      showNotification(message, 'error');
-
-      void navigate('/');
-    });
+    void fetchRecipes();
 
     return () => {
       cancelled = true;
@@ -237,7 +229,7 @@ const Recipes = () => {
     setSearchParams,
   ]);
 
-  // Pagination infinte scroll
+  // Pagination infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -262,6 +254,7 @@ const Recipes = () => {
       if (currentLoader) {
         observer.unobserve(currentLoader);
       }
+      observer.disconnect();
     };
   }, [hasMore, loading]);
 
@@ -287,7 +280,7 @@ const Recipes = () => {
           />
 
           {/* Drawer */}
-          <div className="absolute top-0 left-0 h-full w-50 overflow-y-auto bg-gray-100 p-4 shadow-lg">
+          <div className="absolute top-0 left-0 h-full w-48 overflow-y-auto bg-gray-100 p-4 shadow-lg">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-semibold">{t('common.filters')}</h2>
 

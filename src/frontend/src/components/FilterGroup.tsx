@@ -32,6 +32,7 @@ const FilterGroup = ({
           <button
             key={opt.value}
             onClick={() => handleClick(opt.value)}
+            type="button"
             className={`text-md w-full rounded-lg px-4 py-2 text-left transition hover:cursor-pointer ${
               value === opt.value
                 ? 'bg-orange-800/10 font-bold text-[#C04D31]'

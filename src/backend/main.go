@@ -13,6 +13,7 @@ import (
 	"ft_transcendence/backend/integrations"
 	"ft_transcendence/backend/middleware"
 	"ft_transcendence/backend/repository"
+	"ft_transcendence/backend/services"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -92,6 +93,7 @@ func main() {
 
 	// Recipes
 	router.GET("/api/recipes", recipeHandler.GetAllRecipes)
+	
 	router.GET("/api/recipes/image-signature",
 		middleware.Authentication(),
 		middleware.RequirePermission(authorization.PermCreateRecipe),
@@ -123,15 +125,18 @@ func main() {
 	router.DELETE("/api/friendships/:id", middleware.Authentication(), handlers.DeleteFriendship)
 
 	/*--------------Public API endpoints------------*/
+	recipeSvc := services.NewRecipeService(pgRepo)
+	publicRecipeHandler := handlers.NewPublicRecipeHandler(recipeSvc)
+
 	publicAPI := router.Group("/api/v1")
 	publicAPI.Use(middleware.APIKeyAuthenticator())
 	publicAPI.Use(middleware.RateLimiter(1, 5))
 	{
-		publicAPI.GET("/recipes", handlers.GetAllRecipes)
-		publicAPI.GET("/recipes/:id", handlers.GetRecipeById)
-		publicAPI.POST("/recipes", handlers.CreateRecipe)
-		publicAPI.PUT("/recipes/:id", handlers.UpdateRecipe)
-		publicAPI.DELETE("/recipes/:id", handlers.DeleteRecipe)
+		publicAPI.GET("/recipes", publicRecipeHandler.GetAllRecipes)
+		publicAPI.GET("/recipes/:id", publicRecipeHandler.GetRecipeById)
+		// publicAPI.POST("/recipes", handlers.CreateRecipe)
+		// publicAPI.PUT("/recipes/:id", handlers.UpdateRecipe)
+		// publicAPI.DELETE("/recipes/:id", handlers.DeleteRecipe)
 	}
 
 	/* ---------------------------------------------------------------------- */

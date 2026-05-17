@@ -15,7 +15,7 @@ import (
 //done: GetFriendships:       GET    /api/friendships
 //done: CreateFriendRequest:  POST   /api/friendships
 //done: AcceptFriendRequest:  PATCH  /api/friendships/:id
-//TODO: DeleteFriendship:     DELETE /api/friendships/:id
+//done: DeleteFriendship:     DELETE /api/friendships/:id  (dispatches pending vs accepted)
 
 func GetFriendships(c *gin.Context) {
 	userID := c.GetString("userID")
@@ -119,6 +119,55 @@ func AcceptFriendRequest(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"status": "accepted"})
 }
 
+// DELETE /api/friendships/:id (:id is the other user). One endpoint covers
+// three product actions: cancel an outgoing request, deny an incoming
+// request, and unfriend. The handler looks up the row's status and dispatches
+// to the matching repo function so the SQL keeps the pending/accepted states separated.
 func DeleteFriendship(c *gin.Context) {
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
+	callerID := c.GetString("userID")
+	if !authorization.IsValidUUID(callerID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+
+	otherID := c.Param("id")
+	if !authorization.IsValidUUID(otherID) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "friendship not found"})
+		return
+	}
+	if otherID == callerID {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "cannot delete a friendship with yourself"})
+		return
+	}
+
+	status, err := repository.GetFriendshipStatus(callerID, otherID)
+	if err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return
+		}
+		log.Printf("handlers.DeleteFriendship: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	switch status {
+	case "pending":
+		err = repository.DeleteFriendRequest(callerID, otherID)
+	case "accepted":
+		err = repository.DeleteFriendship(callerID, otherID)
+	default:
+		log.Printf("handlers.DeleteFriendship: unexpected status %q", status)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	if err != nil {
+		if identifyAndRespondToUserError(c, err) {
+			return
+		}
+		log.Printf("handlers.DeleteFriendship: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"status": "deleted"})
 }

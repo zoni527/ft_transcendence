@@ -107,6 +107,7 @@ func main() {
 	router.GET("/api/friendships", middleware.Authentication(), handlers.GetFriendships)
 	router.POST("/api/friendships", middleware.Authentication(), handlers.CreateFriendRequest)
 	router.PATCH("/api/friendships/:id", middleware.Authentication(), handlers.AcceptFriendRequest)
+	router.DELETE("/api/friendships/:id", middleware.Authentication(), handlers.DeleteFriendship)
 
 	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {
 		log.Fatal("Server failed to start:", err)

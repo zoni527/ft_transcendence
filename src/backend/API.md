@@ -824,6 +824,40 @@ Accept an incoming friend request. `:id` is the **requester's** user id (the use
 
 ---
 
+### DELETE /api/friendships/:id
+
+Remove the friendship row between the logged-in user and `:id`. One endpoint covers three product actions; the server decides based on the row's current status:
+
+- **Cancel** an outgoing request — caller is the requester on a `pending` row.
+- **Deny** an incoming request — caller is the receiver on a `pending` row.
+- **Unfriend** — row is `accepted`; either side may call.
+
+**Requires:** Valid JWT in `token` cookie.
+
+**Body:** none
+
+**Response** `200 OK`
+```json
+{
+  "status": "deleted"
+}
+```
+
+**Notes:**
+- The pair is symmetric: the SQL matches the row regardless of which side the caller is on, so the frontend never needs to know who originally sent the request.
+- Internally the handler reads the row's status and dispatches to one of two repository functions (`DeleteFriendRequest` for `pending`, `DeleteFriendship` for `accepted`). This keeps the two states strictly separated so a stale UI cannot accidentally unfriend an accepted pair by hitting the cancel path or vice versa.
+- After deletion either user may send a fresh request — there is no cooldown.
+
+**Errors:**
+| Status    | When                                                  |
+|-----------|-------------------------------------------------------|
+| 400       | `:id` equals the caller's id                          |
+| 401       | Unauthorized — missing or invalid JWT                 |
+| 404       | No friendship row between caller and `:id`            |
+| 500       | Internal server error                                 |
+
+---
+
 ## Implementation Status
 
 | Endpoint                          | Status    |
@@ -852,4 +886,4 @@ Accept an incoming friend request. `:id` is the **requester's** user id (the use
 | GET /api/friendships              | done      |
 | POST /api/friendships             | done      |
 | PATCH /api/friendships/:id        | done      |
-| DELETE /api/friendships/:id       | TODO      |
+| DELETE /api/friendships/:id       | done      |

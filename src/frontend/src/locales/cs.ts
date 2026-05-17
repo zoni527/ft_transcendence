@@ -285,6 +285,7 @@ export const csTranslations = {
   },
   common: {
     bannerTitle: 'Recepty, které stojí za probuzení',
+    all: 'Vše',
     loading: 'Načítání...',
     welcome: 'Vítejte',
     rightsReserved: 'RISE. Všechna práva vyhrazena.',

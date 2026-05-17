@@ -285,6 +285,7 @@ export const enTranslations = {
   },
   common: {
     bannerTitle: 'Recipes worth rising for',
+    all: 'All',
     loading: 'Loading...',
     welcome: 'Welcome',
     rightsReserved: 'RISE. All Rights Reserved.',

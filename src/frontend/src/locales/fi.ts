@@ -285,6 +285,7 @@ export const fiTranslations = {
   },
   common: {
     bannerTitle: 'Reseptejä, joita varten kannattaa herätä',
+    all: 'Kaikki',
     loading: 'Ladataan...',
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',

@@ -66,11 +66,11 @@ const FiltersContent = ({
       onChange={setMealType}
       onResetPage={() => setPage(1)}
       options={[
-        { label: 'All', value: '' },
-        { label: 'Breakfast', value: 'breakfast' },
-        { label: 'Lunch', value: 'lunch' },
-        { label: 'Dinner', value: 'dinner' },
-        { label: 'Snack', value: 'snack' },
+        { label: t('common.all'), value: '' },
+        { label: t('meal.type_breakfast'), value: 'breakfast' },
+        { label: t('meal.type_lunch'), value: 'lunch' },
+        { label: t('meal.type_dinner'), value: 'dinner' },
+        { label: t('meal.type_snack'), value: 'snack' },
       ]}
     />
 
@@ -81,10 +81,10 @@ const FiltersContent = ({
       onChange={setDifficulty}
       onResetPage={() => setPage(1)}
       options={[
-        { label: 'All', value: '' },
-        { label: 'Easy', value: 'easy' },
-        { label: 'Medium', value: 'medium' },
-        { label: 'Hard', value: 'hard' },
+        { label: t('common.all'), value: '' },
+        { label: t('difficulty.type_easy'), value: 'easy' },
+        { label: t('difficulty.type_medium'), value: 'medium' },
+        { label: t('difficulty.type_hard'), value: 'hard' },
       ]}
     />
   </>

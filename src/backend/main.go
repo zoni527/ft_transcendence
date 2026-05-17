@@ -134,9 +134,9 @@ func main() {
 	{
 		publicAPI.GET("/recipes", publicRecipeHandler.GetAllRecipes)
 		publicAPI.GET("/recipes/:id", publicRecipeHandler.GetRecipeById)
-		// publicAPI.POST("/recipes", handlers.CreateRecipe)
-		// publicAPI.PUT("/recipes/:id", handlers.UpdateRecipe)
-		// publicAPI.DELETE("/recipes/:id", handlers.DeleteRecipe)
+		publicAPI.POST("/recipes", publicRecipeHandler.CreateRecipe)
+		publicAPI.PUT("/recipes/:id", publicRecipeHandler.UpdateRecipe)
+		publicAPI.DELETE("/recipes/:id", publicRecipeHandler.DeleteRecipe)
 	}
 
 	/* ---------------------------------------------------------------------- */

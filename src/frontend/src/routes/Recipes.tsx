@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import FilterGroup from '../components/FilterGroup.tsx';
@@ -9,7 +9,6 @@ import { getRecipesSearch } from '../api';
 import type { SearchRecipesParams } from '../api';
 import { useNotification } from '../utils/NotifContext.ts';
 import type { Recipe } from '../types/types';
-import { buttonBase } from '../styles/styles.tsx';
 
 type FiltersContentProps = {
   inputValue: string;
@@ -95,6 +94,7 @@ const Recipes = () => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -157,7 +157,7 @@ const Recipes = () => {
             page === 1 ? data : [...prevRecipes, ...data],
           );
 
-          setHasMore(data.length === 10);
+          setHasMore(data.length === 12);
         }
       } catch (err: unknown) {
         if (!cancelled) {
@@ -237,6 +237,34 @@ const Recipes = () => {
     setSearchParams,
   ]);
 
+  // Pagination infinte scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+
+        if (first.isIntersecting && hasMore && !loading) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      {
+        threshold: 1,
+      },
+    );
+
+    const currentLoader = loaderRef.current;
+
+    if (currentLoader) {
+      observer.observe(currentLoader);
+    }
+
+    return () => {
+      if (currentLoader) {
+        observer.unobserve(currentLoader);
+      }
+    };
+  }, [hasMore, loading]);
+
   return (
     <>
       {/* Mobile filters button */}
@@ -289,7 +317,7 @@ const Recipes = () => {
 
       <div className="mt-8 flex flex-col gap-6 sm:flex-row">
         {/* Desktop / tablet sidebar */}
-        <aside className="hidden w-50 shrink-0 self-start rounded-md bg-gray-100/50 p-4 sm:block lg:sticky lg:top-6">
+        <aside className="hidden w-50 shrink-0 self-start rounded-md bg-gray-100/50 p-4 sm:sticky sm:top-6 sm:block">
           <h2 className="mb-4 text-xl font-semibold">{t('common.filters')}</h2>
 
           <FiltersContent
@@ -325,15 +353,15 @@ const Recipes = () => {
             ))}
           </div>
 
-          {/* Load more */}
-          {hasMore && !loading && (
-            <div className="mt-12 text-center">
-              <button
-                onClick={() => setPage((prev) => prev + 1)}
-                className={`${buttonBase} rounded-full border-3 border-orange-700 hover:cursor-pointer hover:border-orange-800`}
-              >
-                {t('common.loadMore')}
-              </button>
+          {/* Infinite scroll trigger */}
+          {hasMore && (
+            <div ref={loaderRef} className="flex justify-center py-10">
+              {loading && (
+                <StatusBox
+                  message={t('common.loading')}
+                  className="text-black"
+                />
+              )}
             </div>
           )}
         </div>

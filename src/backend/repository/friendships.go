@@ -61,7 +61,7 @@ func GetFriendshipsForUser(userID string) ([]models.FriendshipListItem, error) {
 func CreateFriendRequest(requesterID, receiverID string) error {
 	sql := `INSERT INTO friendship (requester_id, receiver_id, status)
 			VALUES ($1, $2, 'pending')`
-	_, err := Pool.Exec(context.Background(), sql, requesterID, receiverID)
+	_, err := Pool.Exec(context.Background(), sql, requesterID, receiverID) //TODO:maybe this need to change to context Request as Zoni said?
 	if err != nil {
 		return friendshipPostgresErrorClassification("repository.CreateFriendRequest", err)
 	}

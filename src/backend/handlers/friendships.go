@@ -52,9 +52,7 @@ func GetFriendships(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, resp)
 }
 
-// POST /api/friendships — the requester is the logged-in user; the receiver
-// comes from the JSON body. Self-requests, unknown receivers, and duplicates
-// (in either direction) are rejected by the DB and surfaced as 400/404.
+// POST /api/friendships
 func CreateFriendRequest(c *gin.Context) {
 	requesterID := c.GetString("userID")
 	if !authorization.IsValidUUID(requesterID) {
@@ -89,7 +87,7 @@ func CreateFriendRequest(c *gin.Context) {
 }
 
 // PATCH /api/friendships/:id — :id is the requester's user ID (the friend
-// who sent me the pending request). The receiver is the logged-in user.
+// who sent me the pending request)
 func AcceptFriendRequest(c *gin.Context) {
 	receiverID := c.GetString("userID")
 	if !authorization.IsValidUUID(receiverID) {
@@ -121,8 +119,7 @@ func AcceptFriendRequest(c *gin.Context) {
 
 // DELETE /api/friendships/:id (:id is the other user). One endpoint covers
 // three product actions: cancel an outgoing request, deny an incoming
-// request, and unfriend. The handler looks up the row's status and dispatches
-// to the matching repo function so the SQL keeps the pending/accepted states separated.
+// request, and unfriend.
 func DeleteFriendship(c *gin.Context) {
 	callerID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerID) {

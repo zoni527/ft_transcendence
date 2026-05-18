@@ -100,15 +100,9 @@ func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.Se
 		args = append(args, "%"+f.Query+"%")
 		pCount++
 	}
-
 	if f.Cuisine != "" {
 		sql += fmt.Sprintf(" AND cuisine = $%d", pCount)
 		args = append(args, f.Cuisine)
-		pCount++
-	}
-	if f.Difficulty != "" {
-		sql += fmt.Sprintf(" AND difficulty = $%d", pCount)
-		args = append(args, f.Difficulty)
 		pCount++
 	}
 	if f.MealType != "" {

@@ -79,12 +79,11 @@ type RecipeResponse struct {
 }
 
 type SearchRecipeFilters struct {
-	Query      string `form:"q"`
-	Page       int    `form:"page"`
-	MealType   string `form:"meal_type"`
-	Date       string `form:"date"`
-	Difficulty string `form:"difficulty"`
-	Cuisine    string `form:"cuisine"`
+	Query    string `form:"q"`
+	Page     int    `form:"page"`
+	MealType string `form:"meal_type"`
+	Date     string `form:"date"`
+	Cuisine  string `form:"cuisine"`
 }
 
 type SearchRecipeResponse struct {

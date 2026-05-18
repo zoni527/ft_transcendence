@@ -47,15 +47,15 @@ SQL:
 SELECT * FROM recipe
 ```
 
-Description: Fetch a paginated list of recipes. This endpoint can accept common query parameters to filter, sort, and paginate results (e.g., `cuisine`, `meal_type`, `difficulty`, `sort`, `order`, `page`, `limit`).
+Description: Fetch all recipes.
 
-Response `200 OK` — array of recipe objects (see `API.md` Recipes section for the full response shape). (to be decided if do this or just list all existing recipes)
+**Response** `200 OK` - returns an array of recipe objects. See `API.md` Recipes section for the full response shape 
 
 **Errors:**
-| Status    | When                  |
-|-----------|-----------------------|
-| 400       | Invalid query params  |
-| 500       | Internal server error |
+| Status | When                |
+|--------|---------------------|
+| 429    | Rate limit exceeded |
+| 500    | Server error        |
 
 ---
 
@@ -89,7 +89,23 @@ INSERT INTO recipe (title, description, ...) VALUES (...) RETURNING id
 
 Description: Create a new recipe.
 
-Request body: JSON object with recipe fields (title, description, preparation_time_min, servings, difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g, ...).
+**Request body:**
+```json
+{
+  "title": "Pasta Carbonara",
+  "description": "Classic Italian pasta",
+  "preparation_time_min": 20,
+  "servings": 4,
+  "difficulty": "medium",
+  "cuisine": "italian",
+  "meal_type": "dinner",
+  "image_url": "/images/carbonara.jpg",
+  "calories": 550,
+  "protein_g": 25.0,
+  "carbs_g": 60.0,
+  "fat_g": 22.0
+}
+```
 
 Response `201 Created` — returns the created recipe's `id`.
 
@@ -112,9 +128,25 @@ UPDATE recipe SET title = $1, description = $2, ... WHERE id = $N
 
 Description: Update an existing recipe
 
-Request body: JSON object with fields to update. Partial updates are supported; omitted fields remain unchanged.
+**Request body:**
+```json
+{
+  "title": "Pasta Carbonara",
+  "description": "Classic Italian pasta",
+  "preparation_time_min": 20,
+  "servings": 4,
+  "difficulty": "medium",
+  "cuisine": "italian",
+  "meal_type": "dinner",
+  "image_url": "/images/carbonara.jpg",
+  "calories": 550,
+  "protein_g": 25.0,
+  "carbs_g": 60.0,
+  "fat_g": 22.0
+}
+```
 
-Response `200 OK` — returns the updated recipe's id or full object (implementation-defined).
+Response `200 OK` — returns the updated recipe's `id`.
 
 **Errors:**
 | Status    | When                    |
@@ -135,7 +167,7 @@ SQL:
 DELETE FROM recipe WHERE id = $1
 ```
 
-Description: Permanently remove a recipe. Requires `X-API-Key` with `delete_recipe` scope or appropriate authenticated permissions.
+Description: Permanently remove a recipe.
 
 Response `204 No Content` on success.
 
@@ -146,11 +178,6 @@ Response `204 No Content` on success.
 | 403       | Forbidden               |
 
 ---
-
-## Notes on Scopes & Key Management
-
-- Keys should be issued with scopes such as `read_recipes`, `create_recipe`, `edit_recipe`, and `delete_recipe` so you can enforce least privilege.
-- Admin or management endpoints for issuing/revoking keys should be internal (not part of this public doc).
 
 ## Documentation and Discoverability
 

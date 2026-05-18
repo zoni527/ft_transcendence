@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -24,14 +25,21 @@ const genericInternalErrorMsg = "internal server error"
 const unauthorizedErrorMsg = "unauthorized"
 const displayNameVersionLimit = 1000
 
-func RandomStateToken() string {
+func RandomStateToken() (string, error) {
 	b := make([]byte, 32)
-	rand.Read(b)
-	return base64.URLEncoding.EncodeToString(b)
+	if _, err := rand.Read(b); err != nil {
+		log.Printf("unexpected random state generation error: %v", err)
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }
 
 func GoogleLogin(c *gin.Context) {
-	randomState := RandomStateToken()
+	randomState, err := RandomStateToken()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server errror"})
+		return
+	}
 
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("oauth_state", randomState, 600, "/", "", true, true)
@@ -140,7 +148,7 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 		postfix := strconv.Itoa(i)
 		params.Display_name = stem + postfix
 	}
-	return user, nil
+	return models.User{}, fmt.Errorf("all display name versions already in use")
 }
 
 func reportError(c *gin.Context, statusCode int, msg string) {

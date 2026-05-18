@@ -231,6 +231,10 @@ func GetUserById(id string) (models.User, error) {
 
 // Helper function for fetching user credentials by a unique field
 func getUserCredentialsBy(field, value string) (models.User, error) {
+	if !(field == "email" || field == "display_name") {
+		return models.User{}, fmt.Errorf("invalid query field")
+	}
+
 	sql := fmt.Sprintf(`
 		SELECT id, email, password_hash
 		FROM "user"

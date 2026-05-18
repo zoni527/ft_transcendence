@@ -76,11 +76,11 @@ Description: Fetch all recipes.
 
 **Response** `200 OK` - returns an array of recipe objects. See `API.md` Recipes section for the full response shape 
 
-**Errors:**
-| Status | When                |
-|--------|---------------------|
-| 429    | Rate limit exceeded |
-| 500    | Server error        |
+| Status | When                                      |
+|--------|-------------------------------------------|
+| 401    | Missing or invalid `X-API-Key` header     |
+| 429    | Rate limit exceeded                       |
+| 500    | Server error                              |
 
 ---
 
@@ -212,9 +212,9 @@ This `PUBLIC_API.md` file serves as the public documentation for third-party int
 
 | Endpoint                     | Status  |
 |------------------------------|---------|
-| `GET /api/v1/recipes`        | planned |
-| `GET /api/v1/recipes/:id`    | planned |
-| `POST /api/v1/recipes`       | planned |
-| `PUT /api/v1/recipes/:id`    | planned |
-| `DELETE /api/v1/recipes/:id` | planned |
+| `GET /api/v1/recipes`        | done    |
+| `GET /api/v1/recipes/:id`    | done    |
+| `POST /api/v1/recipes`       | done    |
+| `PUT /api/v1/recipes/:id`    | done    |
+| `DELETE /api/v1/recipes/:id` | done    |
 

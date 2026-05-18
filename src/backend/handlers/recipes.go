@@ -217,11 +217,6 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (h *RecipeHandler) UploadRecipeImage(c *gin.Context) {
-	// TODO: call repository.UploadRecipeImage()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
-}
-
 func (h *RecipeHandler) RecipeImageSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	folder := "recipes"

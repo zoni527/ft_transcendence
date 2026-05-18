@@ -3,6 +3,7 @@ package authorization
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/hex"
 	"fmt"
 	"ft_transcendence/backend/repository"
@@ -38,7 +39,7 @@ func ValidateAPIKey(key string) (userID string, err error) {
 	sum := sha256.Sum256([]byte(secret))
 	providedHash := hex.EncodeToString(sum[:])
 
-	if providedHash != storedHash {
+	if subtle.ConstantTimeCompare([]byte(providedHash), []byte(storedHash)) != 1 {
 		return "", fmt.Errorf("provided hash does not match")
 	}
 

@@ -60,6 +60,59 @@ func (repo *MockRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRe
 }
 
 // =============
+// GetAllRecipes
+// =============
+
+var getAllRecipesTests = []struct {
+	name           string
+	mockSetup      func(repo *MockRecipeRepo)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name: "Success",
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockGetAllRecipes = func(ctx context.Context) ([]models.RecipeResponse, error) {
+				return []models.RecipeResponse{{Title: "Success"}}, nil
+			}
+		},
+		expectedStatus: 200,
+		expectedBody:   `"title": "Success"`,
+	},
+	{
+		name: "Error",
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockGetAllRecipes = func(ctx context.Context) ([]models.RecipeResponse, error) {
+				return nil, errors.New("error")
+			}
+		},
+		expectedStatus: 500,
+		expectedBody:   `"error": "internal server error"`,
+	},
+}
+
+func TestGetAllRecipes_TableDriven(t *testing.T) {
+	for _, tt := range getAllRecipesTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockRecipeRepo{}
+			tt.mockSetup(mockRepo)
+
+			recipeHandler := NewRecipeHandler(mockRepo)
+			w, c := setupTestContext("GET", "/api/recipes", nil)
+
+			recipeHandler.GetAllRecipes(c)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}
+
+// =============
 // GetRecipeById
 // =============
 

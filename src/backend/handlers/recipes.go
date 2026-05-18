@@ -73,7 +73,7 @@ func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
 	}
 	offset := (f.Page - 1) * limitInt
 
-	recipes, err := h.Repo.SearchRecipes(c, f, limitInt, offset)
+	recipes, err := h.Repo.SearchRecipes(c.Request.Context(), f, limitInt, offset)
 	if err != nil {
 		log.Printf("handlers.SearchRecipes: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

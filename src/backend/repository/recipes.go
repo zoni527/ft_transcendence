@@ -136,7 +136,7 @@ func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.Se
 	sql += fmt.Sprintf(" ORDER BY created_at %s LIMIT $%d OFFSET $%d", sortOrder, pCount, pCount+1)
 	args = append(args, limit, offset)
 
-	rows, err := pgRepo.Pool.Query(c.Request.Context(), sql, args...)
+	rows, err := pgRepo.Pool.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}

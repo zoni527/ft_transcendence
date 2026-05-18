@@ -330,6 +330,7 @@ type MockRecipeRepo struct {
 	MockCreateRecipe  func(ctx context.Context, r *models.Recipe) (string, error)
 	MockUpdateRecipe  func(ctx context.Context, r *models.Recipe) error
 	MockDeleteRecipe  func(ctx context.Context, id string) error
+	MockSearchRecipes func(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error)
 }
 
 func (repo *MockRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error) {
@@ -361,6 +362,12 @@ func (repo *MockRecipeRepo) DeleteRecipe(ctx context.Context, id string) error {
 		return repo.MockDeleteRecipe(ctx, id)
 	}
 	return nil
+}
+func (repo *MockRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+	if repo.MockSearchRecipes != nil {
+		return repo.MockSearchRecipes(ctx, f, limit, offset)
+	}
+	return nil, nil
 }
 
 // =============

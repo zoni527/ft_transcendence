@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import SubmitButton from './SubmitButton';
 import UserStatus from './UserStatus';
 import type { FriendshipListItem, AcceptedFriend } from '../types/types';
@@ -13,6 +12,7 @@ interface FriendFieldProps {
   user: FriendshipListItem | AcceptedFriend;
   subsection: string;
   actions: FriendAction[];
+  isLoading: boolean;
   onClick?: () => void;
 }
 
@@ -21,9 +21,8 @@ const FriendField = ({
   subsection,
   actions,
   onClick,
+  isLoading,
 }: FriendFieldProps) => {
-  const [loading] = useState(false);
-
   return (
     <div
       className="flex items-center justify-between border-b border-gray-300 pt-4 pb-4 pl-2 hover:cursor-pointer hover:bg-gray-100"
@@ -50,7 +49,7 @@ const FriendField = ({
           <SubmitButton
             key={action.label}
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-            isLoading={loading}
+            isLoading={isLoading}
             defaultText={action.label}
             onClick={(e) => {
               e.stopPropagation();

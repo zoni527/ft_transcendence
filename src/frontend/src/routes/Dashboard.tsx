@@ -19,10 +19,8 @@ import {
   getUserbyId,
   deleteUser,
   getFriendships,
-  removeFriend,
-  cancelFriendRequest,
-  acceptFriendRequest,
-  rejectFriendRequest,
+  acceptFriend,
+  deleteFriend,
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User, FriendshipListItem } from '../types/types';
@@ -42,6 +40,7 @@ const Dashboard = () => {
     FriendshipWithStatus[]
   >([]);
   const [loading, setLoading] = useState(false);
+  const [friendLoadingIds, setFriendLoadingIds] = useState<string[]>([]);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -86,13 +85,17 @@ const Dashboard = () => {
         label: 'Remove',
         onClick: async (id) => {
           try {
-            await removeFriend(id);
+            setFriendLoadingIds((prev) => [...prev, id]);
+
+            await deleteFriend(id, t);
 
             setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
 
             showNotification(t('notification.friendRemoved'), 'success');
           } catch (err: unknown) {
             handleFriendshipError(err);
+          } finally {
+            setFriendLoadingIds((prev) => prev.filter((x) => x !== id));
           }
         },
       },
@@ -103,7 +106,9 @@ const Dashboard = () => {
         label: 'Cancel',
         onClick: async (id) => {
           try {
-            await cancelFriendRequest(id);
+            setFriendLoadingIds((prev) => [...prev, id]);
+
+            await deleteFriend(id, t);
 
             setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
 
@@ -113,6 +118,8 @@ const Dashboard = () => {
             );
           } catch (err: unknown) {
             handleFriendshipError(err);
+          } finally {
+            setFriendLoadingIds((prev) => prev.filter((x) => x !== id));
           }
         },
       },
@@ -123,7 +130,9 @@ const Dashboard = () => {
         label: 'Accept',
         onClick: async (id) => {
           try {
-            await acceptFriendRequest(id, t);
+            setFriendLoadingIds((prev) => [...prev, id]);
+
+            await acceptFriend(id, t);
 
             setFriendshipUsers((prev) =>
               prev.map((u) => (u.id === id ? { ...u, status: 'accepted' } : u)),
@@ -135,6 +144,8 @@ const Dashboard = () => {
             );
           } catch (err: unknown) {
             handleFriendshipError(err);
+          } finally {
+            setFriendLoadingIds((prev) => prev.filter((x) => x !== id));
           }
         },
       },
@@ -143,7 +154,9 @@ const Dashboard = () => {
         label: 'Reject',
         onClick: async (id) => {
           try {
-            await rejectFriendRequest(id);
+            setFriendLoadingIds((prev) => [...prev, id]);
+
+            await deleteFriend(id, t);
 
             setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
 
@@ -153,6 +166,8 @@ const Dashboard = () => {
             );
           } catch (err: unknown) {
             handleFriendshipError(err);
+          } finally {
+            setFriendLoadingIds((prev) => prev.filter((x) => x !== id));
           }
         },
       },
@@ -502,6 +517,7 @@ const Dashboard = () => {
                     user={listedUser}
                     subsection={activeSubsection}
                     actions={friendshipActions[activeSubsection]}
+                    isLoading={friendLoadingIds.includes(listedUser.id)}
                     onClick={() => {
                       setActiveSection('profile');
                       void navigate(`/users/${listedUser.id}`);

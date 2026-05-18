@@ -45,6 +45,9 @@ func getClientIdentifier(c *gin.Context, mode identifierMode) string {
 		if apiKey := c.GetString("apiKey"); apiKey != "" {
 			return "key:" + apiKey
 		}
+		if apiKey := c.GetHeader("X-API-Key"); apiKey != "" {
+			return "key:" + apiKey
+		}
 	case byUserID:
 		if userID := c.GetString("userID"); userID != "" {
 			return "user:" + userID

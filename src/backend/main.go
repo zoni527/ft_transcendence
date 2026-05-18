@@ -129,8 +129,8 @@ func main() {
 	publicRecipeHandler := handlers.NewPublicRecipeHandler(recipeSvc)
 
 	publicAPI := router.Group("/api/v1")
-	publicAPI.Use(middleware.APIKeyAuthenticator())
 	publicAPI.Use(middleware.RateLimiter(1, 5))
+	publicAPI.Use(middleware.APIKeyAuthenticator())
 	{
 		publicAPI.GET("/recipes", publicRecipeHandler.GetAllRecipes)
 		publicAPI.GET("/recipes/:id", publicRecipeHandler.GetRecipeById)

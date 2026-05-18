@@ -380,7 +380,7 @@ func SearchUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, users)
 }
 
-func GetAPIKey(c *gin.Context) {
+func GenerateAPIKey(c *gin.Context) {
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -388,15 +388,18 @@ func GetAPIKey(c *gin.Context) {
 	}
 	apiKey, randomSecret, err := authorization.GenerateAPIKey(userID)
 	if err != nil {
-		log.Printf("GetAPIKey error: %v", err)
+		log.Printf("GenerateAPIKey error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	if err := repository.SaveAPIKey(userID, randomSecret); err != nil {
-		log.Printf("GetApiKey error: %v", err)
+		log.Printf("GenerateApiKey error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+	c.Header("Cache-Control", "no-store, private")
+	c.Header("Pragma", "no-cache")
+	c.Header("Expires", "0")
 	c.IndentedJSON(http.StatusCreated, apiKey)
 }
 

@@ -9,7 +9,11 @@ import (
 func SaveAPIKey(userID, rawSecret string) error {
 	hashedSecret := hashToken(rawSecret)
 	sql := `INSERT INTO  api_keys(user_id, secret_hash, created_at)
-			VALUES ($1, $2, NOW())`
+			VALUES ($1, $2, NOW())
+			ON CONFLICT (user_id)
+			DO UPDATE SET
+				secret_hash = EXCLUDED.secret_hash,
+				created_at = NOW()`
 
 	_, err := Pool.Exec(context.Background(), sql, userID, hashedSecret)
 	if err != nil {

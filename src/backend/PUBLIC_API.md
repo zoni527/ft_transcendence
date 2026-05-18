@@ -17,9 +17,34 @@ X-API-Key: your_public_api_key_here
 ```
 
 Notes:
-- API keys are issued per-client and can be revoked.
+- Clients must use a valid API key.
 - Sensitive operations (creating/updating/deleting) require a valid API key.
 - For additional protection, clients should call the API over HTTPS in production.
+
+### Getting an API key
+
+Public API keys are issued to authenticated users through:
+
+- `POST /api/users/apikey`
+
+Requirements:
+
+- Caller must be logged in (valid JWT cookie from `/api/users/login`).
+
+Example flow:
+
+1. Authenticate with `POST /api/users/login`.
+2. Call `POST /api/users/apikey`.
+3. Store the returned API key securely and send it in `X-API-Key` for `/api/v1/*` requests.
+
+Response:
+
+- `201 Created` with the raw API key string in the response body.
+
+### Rotation and revocation
+
+- One API key is stored per user.
+- This implementation provides issuance via `POST /api/users/apikey`.
 
 ## Rate Limiting
 

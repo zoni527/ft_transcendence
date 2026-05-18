@@ -131,6 +131,7 @@ type UpdateUserParams struct {
 
 type UserSearchResult struct {
 	Id           string `json:"id"`
+	Name         string `json:"name"`
 	Display_name string `json:"display_name"`
 }
 

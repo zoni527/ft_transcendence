@@ -88,7 +88,7 @@ func GetEffectivePermissionsByUser(userId string) (map[string]bool, map[string]b
 
 func SearchUsersByUsername(username string) ([]models.UserSearchResult, error) {
 	searchTerm := "%" + username + "%"
-	sql := `SELECT id, display_name
+	sql := `SELECT id, name, display_name
 		    FROM "user"
 		    WHERE display_name ILIKE $1
 			LIMIT 10`
@@ -103,6 +103,7 @@ func SearchUsersByUsername(username string) ([]models.UserSearchResult, error) {
 		var u models.UserSearchResult
 		err := rows.Scan(
 			&u.Id,
+			&u.Name,
 			&u.Display_name,
 		)
 		if err != nil {

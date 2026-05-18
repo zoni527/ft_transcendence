@@ -339,9 +339,14 @@ const Dashboard = () => {
       {isAddFriendOpen && (
         <AddFriendModal
           onClose={() => setIsAddFriendOpen(false)}
-          onSelectUser={() => {
-            setIsAddFriendOpen(false);
-            setActiveSection('profile');
+          onSelectUser={(user) => {
+            setFriendshipUsers((prev) => [
+              ...prev,
+              {
+                ...user,
+                status: 'outgoing',
+              },
+            ]);
           }}
         />
       )}

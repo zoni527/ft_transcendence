@@ -84,6 +84,7 @@ interface FriendshipsResponse {
 
 export interface getSearchResponse {
   id: string;
+  name: string;
   display_name: string;
 }
 

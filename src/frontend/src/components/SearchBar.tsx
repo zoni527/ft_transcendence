@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SearchField from './SearchField.tsx';
 import { useAuth } from '../utils/AuthContext';
@@ -9,31 +8,27 @@ import { useNotification } from '../utils/NotifContext.ts';
 
 type SearchBarProps = {
   onClose: () => void;
-  onSelectUser: () => void;
+  onSelectUser: (user: getSearchResponse) => void;
 };
 
 const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
   const { showNotification } = useNotification();
-  const navigate = useNavigate();
   const { loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
   const [results, setResults] = useState<getSearchResponse[]>([]);
 
-  const handleSelectUser = (id: string) => {
+  const handleSelectUser = (user: getSearchResponse) => {
     if (authLoading || loading) return;
-    if (!id) {
-      showNotification(t('error.genericError'), 'error');
-      return;
-    }
 
     setLoading(true);
 
-    sendFriendship(id, t)
+    sendFriendship(user.id, t)
       .then(() => {
         showNotification(t('notification.friendRequestSent'), 'success');
-        void navigate('/me');
+
+        onSelectUser(user);
       })
       .catch((err: unknown) => {
         const message =
@@ -45,7 +40,6 @@ const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
         setLoading(false);
         setResults([]);
         onClose();
-        onSelectUser();
       });
   };
 
@@ -74,7 +68,7 @@ const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
             {results.map((user) => (
               <li
                 key={user.id}
-                onClick={() => handleSelectUser(user.id)}
+                onClick={() => handleSelectUser(user)}
                 className="cursor-pointer border-b border-gray-300 px-4 py-2 text-gray-800 last:border-b-0 hover:bg-gray-100"
               >
                 {user.display_name}

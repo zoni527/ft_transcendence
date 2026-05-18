@@ -684,58 +684,8 @@ export const getFriendships = async (
   return data;
 };
 
-// GET /api/friendships (remove a friendship)
-export const removeFriend = async (
-  t: TFunction,
-): Promise<FriendshipsResponse> => {
-  const response = await fetch(`${baseUrl}/friendships`);
-
-  let data: unknown = null;
-
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
-
-  if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
-  }
-
-  if (!isFriendshipsResponse(data)) {
-    throw new Error(t('error.invalidResponse'));
-  }
-
-  return data;
-};
-
-// GET /api/friendships (cancel a friend request)
-export const cancelFriendRequest = async (
-  t: TFunction,
-): Promise<FriendshipsResponse> => {
-  const response = await fetch(`${baseUrl}/friendships`);
-
-  let data: unknown = null;
-
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
-
-  if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
-  }
-
-  if (!isFriendshipsResponse(data)) {
-    throw new Error(t('error.invalidResponse'));
-  }
-
-  return data;
-};
-
 // PATCH /api/friendships/:id (accept a friend request)
-export const acceptFriendRequest = async (id: string, t: TFunction) => {
+export const acceptFriend = async (id: string, t: TFunction) => {
   const response = await fetch(`${baseUrl}/friendships/${id}`, {
     method: 'PATCH',
     headers: {
@@ -749,29 +699,19 @@ export const acceptFriendRequest = async (id: string, t: TFunction) => {
   }
 };
 
-// GET /api/friendships (reject a friend request)
-export const rejectFriendRequest = async (
-  t: TFunction,
-): Promise<FriendshipsResponse> => {
-  const response = await fetch(`${baseUrl}/friendships`);
-
-  let data: unknown = null;
-
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
+// DELETE /api/friendships/:id (delete / reject / cancel friend relationship)
+export const deleteFriend = async (id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/friendships/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
 
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));
   }
-
-  if (!isFriendshipsResponse(data)) {
-    throw new Error(t('error.invalidResponse'));
-  }
-
-  return data;
 };
 
 // PUT /api/recipes/:id (edit a recipe)

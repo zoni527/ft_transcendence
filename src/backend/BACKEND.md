@@ -230,7 +230,7 @@ func UpdateRecipe(c *gin.Context) {
     roleSet, _ := authorization.RolesFromContext(c)
     permSet, _ := authorization.PermsFromContext(c)
 
-    original, err := h.Repo.GetRecipeById(recipeID)
+    original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeID)
 
     if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.Id) {
         c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})

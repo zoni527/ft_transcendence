@@ -33,29 +33,29 @@ func (s *recipeService) GetPublicRecipe(ctx context.Context, id string) (models.
 	return s.repo.GetRecipeById(ctx, id)
 }
 
-func (s *recipeService) CreateRecipe(ctx context.Context, actorID string, in models.Recipe) (string, error) {
-	in.Author_id = actorID
+func (s *recipeService) CreateRecipe(ctx context.Context, userID string, in models.Recipe) (string, error) {
+	in.Author_id = userID
 	return s.repo.CreateRecipe(ctx, &in)
 }
 
-func (s *recipeService) UpdateRecipe(ctx context.Context, actorID, recipeID string, in models.Recipe) error {
+func (s *recipeService) UpdateRecipe(ctx context.Context, userID, recipeID string, in models.Recipe) error {
 	in.Id = recipeID
 	recipe, err := s.repo.GetRecipeById(ctx, recipeID)
 	if err != nil {
 		return err
 	}
-	if recipe.Author.Id != actorID {
+	if recipe.Author.Id != userID {
 		return ErrForbidden
 	}
 	return s.repo.UpdateRecipe(ctx, &in)
 }
 
-func (s *recipeService) DeleteRecipe(ctx context.Context, actorID, recipeID string) error {
+func (s *recipeService) DeleteRecipe(ctx context.Context, userID, recipeID string) error {
 	recipe, err := s.repo.GetRecipeById(ctx, recipeID)
 	if err != nil {
 		return err
 	}
-	if recipe.Author.Id != actorID {
+	if recipe.Author.Id != userID {
 		return ErrForbidden
 	}
 	return s.repo.DeleteRecipe(ctx, recipeID)

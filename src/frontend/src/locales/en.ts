@@ -27,6 +27,7 @@ export const enTranslations = {
     friendRequestCancelled: 'Request canceled',
     friendRequestAccepted: 'Request accepted',
     friendRequestRejected: 'Request rejected',
+    friendRequestSent: 'Request sent',
   },
   info: {
     name: "Other users can't see your full name",

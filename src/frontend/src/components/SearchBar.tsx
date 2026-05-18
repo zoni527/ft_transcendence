@@ -32,7 +32,7 @@ const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
 
     sendFriendship(id, t)
       .then(() => {
-        showNotification(t('notification.recipeDeleteSuccess'), 'success');
+        showNotification(t('notification.friendRequestSent'), 'success');
         void navigate('/me');
       })
       .catch((err: unknown) => {

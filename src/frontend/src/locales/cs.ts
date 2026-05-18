@@ -27,6 +27,7 @@ export const csTranslations = {
     friendRequestCancelled: 'Žádost zrušena',
     friendRequestAccepted: 'Žádost přijata',
     friendRequestRejected: 'Žádost odmítnuta',
+    friendRequestSent: 'Žádost odeslána',
   },
   info: {
     name: 'Ostatní uživatelé nevidí vaše celé jméno',

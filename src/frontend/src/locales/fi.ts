@@ -27,6 +27,7 @@ export const fiTranslations = {
     friendRequestCancelled: 'Pyyntö peruttu',
     friendRequestAccepted: 'Pyyntö hyväksytty',
     friendRequestRejected: 'Pyyntö hylätty',
+    friendRequestSent: 'Pyyntö lähetetty',
   },
   info: {
     name: 'Ei näy muille käyttäjille',

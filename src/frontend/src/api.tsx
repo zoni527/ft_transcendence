@@ -685,14 +685,14 @@ export const getFriendships = async (
 };
 
 // POST /api/friendships/ (send a friend request)
-export const sendFriendship = async (requester_id: string, t: TFunction) => {
-  const response = await fetch(`${baseUrl}/friendships/`, {
+export const sendFriendship = async (receiver_id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/friendships`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify(requester_id),
+    body: JSON.stringify({ receiver_id }),
   });
 
   if (!response.ok) {

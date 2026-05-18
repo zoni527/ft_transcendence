@@ -82,7 +82,7 @@ const Dashboard = () => {
   const friendshipActions: Record<FriendshipSection, FriendAction[]> = {
     accepted: [
       {
-        label: 'Remove',
+        label: t('nav.remove'),
         onClick: async (id) => {
           try {
             setFriendLoadingIds((prev) => [...prev, id]);
@@ -103,7 +103,7 @@ const Dashboard = () => {
 
     outgoing: [
       {
-        label: 'Cancel',
+        label: t('nav.cancel'),
         onClick: async (id) => {
           try {
             setFriendLoadingIds((prev) => [...prev, id]);
@@ -127,7 +127,7 @@ const Dashboard = () => {
 
     incoming: [
       {
-        label: 'Accept',
+        label: t('nav.accept'),
         onClick: async (id) => {
           try {
             setFriendLoadingIds((prev) => [...prev, id]);
@@ -151,7 +151,7 @@ const Dashboard = () => {
       },
 
       {
-        label: 'Reject',
+        label: t('nav.reject'),
         onClick: async (id) => {
           try {
             setFriendLoadingIds((prev) => [...prev, id]);
@@ -369,7 +369,7 @@ const Dashboard = () => {
           {activeSection === 'friends' && (
             <div className="mb-4 flex justify-center gap-3 sm:gap-12 md:gap-24">
               <SubsectionButton
-                label={t('nav.accepted')}
+                label={t('nav.friends')}
                 subsection="accepted"
                 activeSubsection={activeSubsection}
                 setActiveSubsection={setActiveSubsection}

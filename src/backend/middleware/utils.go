@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"sync"
 	"time"
 
@@ -42,11 +44,13 @@ func init() {
 func getClientIdentifier(c *gin.Context, mode identifierMode) string {
 	switch mode {
 	case byApiKey:
-		if apiKey := c.GetString("apiKey"); apiKey != "" {
-			return "key:" + apiKey
+		apiKey := c.GetString("apiKey")
+		if apiKey == "" {
+			apiKey = c.GetHeader("X-API-Key")
 		}
-		if apiKey := c.GetHeader("X-API-Key"); apiKey != "" {
-			return "key:" + apiKey
+		if apiKey != "" {
+			h := sha256.Sum256([]byte(apiKey))
+			return "hashKey:" + hex.EncodeToString(h[:])
 		}
 	case byUserID:
 		if userID := c.GetString("userID"); userID != "" {

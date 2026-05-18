@@ -1,13 +1,5 @@
 package handlers
 
-// Recipe handlers needed:
-// [done] GetAllRecipes     — GET /api/recipes
-// [done] GetRecipeById     — GET /api/recipes/:id
-// [done] CreateRecipe      — POST /api/recipes (validate + call CreateRecipe)
-// [done] UpdateRecipe      — PUT /api/recipes/:id
-// [done] DeleteRecipe      — DELETE /api/recipes/:id
-// [TODO] UploadRecipeImage — POST /api/recipes/:id/image (multipart upload)
-
 import (
 	"errors"
 	"fmt"
@@ -53,6 +45,31 @@ func GetRecipeById(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, recipe)
+}
+
+func SearchRecipes(c *gin.Context) {
+	var f models.SearchRecipeFilters
+
+	if err := c.ShouldBindQuery(&f); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+
+	f.Query = strings.TrimSpace(f.Query)
+	const limitInt = 12
+
+	if f.Page <= 0 {
+		f.Page = 1
+	}
+	offset := (f.Page - 1) * limitInt
+
+	recipes, err := repository.SearchRecipes(f, limitInt, offset)
+	if err != nil {
+		log.Printf("handlers.SearchRecipes: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, recipes)
 }
 
 func CreateRecipe(c *gin.Context) {
@@ -188,11 +205,6 @@ func DeleteRecipe(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
-}
-
-func UploadRecipeImage(c *gin.Context) {
-	// TODO: call repository.UploadRecipeImage()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
 }
 
 func RecipeImageSignature(c *gin.Context) {

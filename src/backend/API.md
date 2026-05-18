@@ -509,7 +509,6 @@ Search recipes by title with optional filters.
 | q          | string    | Search term (matches recipe title, case-insensitive)          |
 | page       | int       | Page number for pagination (default: 1)                       |
 | meal_type  | string    | Filter by meal type (breakfast/lunch/dinner/snack)            |
-| difficulty | string    | Filter by difficulty (easy/medium/hard)                       |
 | cuisine    | string    | Filter by cuisine (exact match, e.g. "italian")               |
 | date       | string    | Sort order: "oldest" (ASC) or "newest" (DESC, default)        |
 
@@ -526,7 +525,7 @@ Search recipes by title with optional filters.
 ```
 
 **Notes:**
-- Returns a paginated list with 10 results per page
+- Returns a paginated list with 12 results per page
 - If page ≤ 0, defaults to page 1
 - All filters are optional
 

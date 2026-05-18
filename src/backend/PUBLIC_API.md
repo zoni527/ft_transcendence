@@ -48,9 +48,9 @@ Response:
 
 ## Rate Limiting
 
-Requests are rate-limited per API key. If the limit is exceeded, the server responds with `429 Too Many Requests`
+Requests are rate-limited per API key. If the limit is exceeded, the server responds with `429 Too Many Requests`.
 
-The exact window size and quota are configurable; the default should be conservative for public usage.
+The rate-limit window and quota are enforced by the server implementation as a fixed policy.
 
 ## Endpoint Summary
 

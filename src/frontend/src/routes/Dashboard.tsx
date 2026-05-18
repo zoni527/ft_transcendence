@@ -259,34 +259,58 @@ const Dashboard = () => {
   };
 
   // Fetch profile details by UserId
+  const resolvedUserId = id ?? authUser?.id;
+
   useEffect(() => {
-    if (!id && authLoading) return;
+    if (authLoading) return;
+    if (!resolvedUserId) return;
+
+    let cancelled = false;
 
     const fetchUser = async () => {
       setLoading(true);
 
       try {
-        if (!id) {
-          if (!authUser) return;
-          setUserData(authUser);
+        let data: User;
+
+        if (id) {
+          data = await getUserbyId(id, t);
         } else {
-          const data = await getUserbyId(id, t);
+          if (!authUser) return;
+          data = authUser;
+        }
+
+        if (!cancelled) {
           setUserData(data);
         }
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+        setUserData(null);
+        void navigate('/');
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    void fetchUser().catch((err: unknown) => {
-      const message =
-        err instanceof Error ? err.message : t('error.genericError');
+    void fetchUser();
 
-      showNotification(message, 'error');
-      setUserData(null);
-      void navigate('/');
-    });
-  }, [id, authUser, authLoading, t, showNotification, navigate]);
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    resolvedUserId,
+    authLoading,
+    id,
+    authUser,
+    t,
+    showNotification,
+    navigate,
+  ]);
 
   if ((!id && authLoading) || loading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;

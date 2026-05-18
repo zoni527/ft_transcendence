@@ -124,6 +124,18 @@ const Recipes = () => {
     searchParams.get('difficulty') || '',
   );
 
+  // Reset
+  const didReset = useRef(false);
+
+  const resetFilters = () => {
+    setSearchQuery('');
+    setInputValue('');
+    setSortOrder('newest');
+    setMealType('');
+    setDifficulty('');
+    setPage(1);
+  };
+
   // Debounced search
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -133,6 +145,22 @@ const Recipes = () => {
 
     return () => clearTimeout(timeout);
   }, [inputValue]);
+
+  // Reset filters on reload
+  useEffect(() => {
+    const reset = searchParams.get('reset');
+
+    if (reset === '1' && !didReset.current) {
+      didReset.current = true;
+
+      resetFilters();
+      setSearchParams({}, { replace: true });
+    }
+
+    if (!reset) {
+      didReset.current = false;
+    }
+  }, [searchParams, setSearchParams]);
 
   // Fetch recipes
   useEffect(() => {

@@ -39,7 +39,7 @@ func ValidateAPIKey(key string) (userID string, err error) {
 	providedHash := hex.EncodeToString(sum[:])
 
 	if providedHash != storedHash {
-		return "", fmt.Errorf("provided hash do not match")
+		return "", fmt.Errorf("provided hash does not match")
 	}
 
 	return userID, nil

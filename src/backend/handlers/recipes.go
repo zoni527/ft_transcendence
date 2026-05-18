@@ -56,7 +56,7 @@ func SearchRecipes(c *gin.Context) {
 	}
 
 	f.Query = strings.TrimSpace(f.Query)
-	const limitInt = 10
+	const limitInt = 12
 
 	if f.Page <= 0 {
 		f.Page = 1

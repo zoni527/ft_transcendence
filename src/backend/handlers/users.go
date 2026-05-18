@@ -357,11 +357,6 @@ func UpdateUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, user)
 }
 
-func DeleteUser(c *gin.Context) {
-	// TODO: call repository.DeleteUser()
-	c.IndentedJSON(http.StatusNotImplemented, gin.H{"error": "not implemented yet"})
-}
-
 func SearchUser(c *gin.Context) {
 	query := c.Query("q")
 	query = strings.TrimSpace(query)
@@ -648,6 +643,57 @@ func Heartbeat(c *gin.Context) {
 		log.Printf("Heartbeat error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
+func DeleteUser(c *gin.Context) {
+	targetUserID := c.Param("id")
+	if !authorization.IsValidUUID(targetUserID) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	callerUserID := c.GetString("userID")
+	if !authorization.IsValidUUID(callerUserID) {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		return
+	}
+
+	roleSet, ok := authorization.RolesFromContext(c)
+	if !ok {
+		log.Printf("handlers.DeleteUser: data missing from context")
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	if !authorization.CanDeleteUser(roleSet, callerUserID, targetUserID) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		return
+	}
+
+	if err := repository.DeleteUser(targetUserID); err != nil {
+		if errors.Is(err, repository.ErrLastAdmin) {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
+			return
+		}
+		var nf *repository.NotFoundError
+		if errors.As(err, &nf) {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
+			return
+		}
+		log.Printf("handlers.DeleteUser: %v", err)
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	if callerUserID == targetUserID {
+		token := c.GetString("token")
+		expDate := c.GetTime("expDate")
+		if err := authorization.AddTokenToBlacklist(token, expDate); err != nil {
+			log.Printf("handlers.DeleteUser blacklist: %v", err)
+		}
+		authorization.ClearAuthCookie(c)
 	}
 	c.Status(http.StatusNoContent)
 }

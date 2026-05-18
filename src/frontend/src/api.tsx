@@ -176,6 +176,8 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
       return t('error.badRequest');
     case 401:
       return t('error.unauthorized');
+    case 403:
+      return t('error.forbidden');
     case 404:
       return t('error.notFound');
     case 409:

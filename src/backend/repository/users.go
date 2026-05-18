@@ -7,7 +7,7 @@ package repository
 
 // [done] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
 // [done] UpdateUser        — PUT /api/users/:id (self-update + admin update)
-// [TODO] DeleteUser        — DELETE /api/users/:id
+// [done] DeleteUser        — DELETE /api/users/:id
 // [TODO] SearchUsers       — GET /api/users/search?q=
 // [TODO] Add pagination (?page=1&limit=20) to GetAllUsers
 
@@ -438,6 +438,55 @@ func MarkOffline(userId string) error {
 	}
 	if commandTag.RowsAffected() == 0 {
 		return fmt.Errorf("MarkOffline: %w", pgx.ErrNoRows)
+	}
+	return nil
+}
+
+var ErrLastAdmin = errors.New("cannot delete the last admin")
+
+func DeleteUser(userId string) error {
+	ctx := context.Background()
+	tx, err := Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx, `
+		SELECT 1 FROM user_role ur
+		JOIN role r ON ur.role_id = r.id
+		WHERE r.name = 'admin'
+		ORDER BY ur.user_id
+		FOR UPDATE`); err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+
+	var isLast bool
+	if err := tx.QueryRow(ctx, `
+		SELECT
+			EXISTS(SELECT 1 FROM user_role ur
+			       JOIN role r ON ur.role_id = r.id
+			       WHERE ur.user_id = $1 AND r.name = 'admin')
+			AND
+			(SELECT COUNT(*) FROM user_role ur
+			 JOIN role r ON ur.role_id = r.id
+			 WHERE r.name = 'admin') = 1`, userId).Scan(&isLast); err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+	if isLast {
+		return ErrLastAdmin
+	}
+
+	res, err := tx.Exec(ctx, `DELETE FROM "user" WHERE id = $1`, userId)
+	if err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
+	}
+	if res.RowsAffected() == 0 {
+		return &NotFoundError{"user not found"}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("repository.DeleteUser: %w", err)
 	}
 	return nil
 }

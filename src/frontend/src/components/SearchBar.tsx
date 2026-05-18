@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SearchField from './SearchField.tsx';
 import { useAuth } from '../utils/AuthContext';
-import { getSearch } from '../api.tsx';
+import { getSearch, sendFriendship } from '../api.tsx';
 import type { getSearchResponse } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 
@@ -15,16 +15,38 @@ type SearchBarProps = {
 const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
-  const { loading } = useAuth();
+  const { loading: authLoading } = useAuth();
+  const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
   const [results, setResults] = useState<getSearchResponse[]>([]);
 
   const handleSelectUser = (id: string) => {
-    setResults([]);
-    onClose();
-    onSelectUser();
-    void navigate(`/users/${id}`);
+    if (authLoading || loading) return;
+    if (!id) {
+      showNotification(t('error.genericError'), 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    sendFriendship(id, t)
+      .then(() => {
+        showNotification(t('notification.recipeDeleteSuccess'), 'success');
+        void navigate('/me');
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : t('error.genericError');
+
+        showNotification(message, 'error');
+      })
+      .finally(() => {
+        setLoading(false);
+        setResults([]);
+        onClose();
+        onSelectUser();
+      });
   };
 
   const handleSearch = (query: string) => {

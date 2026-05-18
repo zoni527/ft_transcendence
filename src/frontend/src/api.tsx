@@ -684,6 +684,22 @@ export const getFriendships = async (
   return data;
 };
 
+// POST /api/friendships/ (send a friend request)
+export const sendFriendship = async (requester_id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/friendships/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(requester_id),
+  });
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+};
+
 // PATCH /api/friendships/:id (accept a friend request)
 export const acceptFriend = async (id: string, t: TFunction) => {
   const response = await fetch(`${baseUrl}/friendships/${id}`, {

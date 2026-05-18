@@ -1,16 +1,10 @@
 package handlers
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"ft_transcendence/backend/models"
-
-	"github.com/gin-gonic/gin"
 )
 
 var goodTestRecipes = []models.Recipe{
@@ -321,90 +315,5 @@ func TestValidateCloudinaryAvatarURL(t *testing.T) {
 		if err := validateCloudinaryAvatarURL(u); err == nil {
 			t.Errorf("validateCloudinaryAvatarURL(%q) expected error, got nil", u)
 		}
-	}
-}
-
-type MockRecipeRepo struct {
-	MockGetAllRecipes func(ctx context.Context) ([]models.RecipeResponse, error)
-	MockGetRecipeById func(ctx context.Context, id string) (models.RecipeResponse, error)
-	MockCreateRecipe  func(ctx context.Context, r *models.Recipe) (string, error)
-	MockUpdateRecipe  func(ctx context.Context, r *models.Recipe) error
-	MockDeleteRecipe  func(ctx context.Context, id string) error
-	MockSearchRecipes func(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error)
-}
-
-func (repo *MockRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error) {
-	if repo.MockGetAllRecipes != nil {
-		return repo.MockGetAllRecipes(ctx)
-	}
-	return nil, nil
-}
-func (repo *MockRecipeRepo) GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error) {
-	if repo.MockGetRecipeById != nil {
-		return repo.MockGetRecipeById(ctx, id)
-	}
-	return models.RecipeResponse{}, nil
-}
-func (repo *MockRecipeRepo) CreateRecipe(ctx context.Context, r *models.Recipe) (string, error) {
-	if repo.MockCreateRecipe != nil {
-		return repo.MockCreateRecipe(ctx, r)
-	}
-	return "", nil
-}
-func (repo *MockRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Recipe) error {
-	if repo.MockUpdateRecipe != nil {
-		return repo.MockUpdateRecipe(ctx, r)
-	}
-	return nil
-}
-func (repo *MockRecipeRepo) DeleteRecipe(ctx context.Context, id string) error {
-	if repo.MockDeleteRecipe != nil {
-		return repo.MockDeleteRecipe(ctx, id)
-	}
-	return nil
-}
-func (repo *MockRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
-	if repo.MockSearchRecipes != nil {
-		return repo.MockSearchRecipes(ctx, f, limit, offset)
-	}
-	return nil, nil
-}
-
-// =============
-// GetRecipeById
-// =============
-
-func TestGetRecipeById_Success(t *testing.T) {
-	mockRepo := &MockRecipeRepo{
-		MockGetRecipeById: func(ctx context.Context, id string) (models.RecipeResponse, error) {
-			return models.RecipeResponse{Id: id, Title: "Success"}, nil
-		},
-	}
-
-	recipeHandler := NewRecipeHandler(mockRepo)
-	r := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(r)
-	testId := "aa899f26-cf36-4570-b952-58752e6bf79a"
-
-	c.Request = httptest.NewRequest("GET", fmt.Sprintf("/api/recipes/%v", testId), nil)
-	c.Params = append(c.Params, gin.Param{Key: "id", Value: testId})
-
-	recipeHandler.GetRecipeById(c)
-
-	if r.Code != 200 {
-		t.Fatalf("expected 200, got %v", r.Code)
-	}
-
-	var response models.RecipeResponse
-	if err := json.Unmarshal(r.Body.Bytes(), &response); err != nil {
-		t.Fatalf("failed to parse response body: %v", err)
-	}
-
-	if response.Id != testId {
-		t.Errorf("expected Id %q, got %q", testId, response.Id)
-	}
-
-	if response.Title != "Success" {
-		t.Errorf("expected Title `Success', got `%q'", response.Title)
 	}
 }

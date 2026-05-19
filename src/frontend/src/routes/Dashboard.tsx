@@ -36,6 +36,7 @@ type FriendshipSection = 'accepted' | 'incoming' | 'outgoing';
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
   const [userData, setUserData] = useState<User | null>(null);
+  const [userFetched, setUserFetched] = useState(false);
   const [friendshipUsers, setFriendshipUsers] = useState<
     FriendshipWithStatus[]
   >([]);
@@ -269,6 +270,7 @@ const Dashboard = () => {
 
     const fetchUser = async () => {
       setLoading(true);
+      setUserFetched(false);
 
       try {
         let data: User;
@@ -293,6 +295,7 @@ const Dashboard = () => {
       } finally {
         if (!cancelled) {
           setLoading(false);
+          setUserFetched(true);
         }
       }
     };
@@ -316,10 +319,19 @@ const Dashboard = () => {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
-  if (!userData) {
+  if (!id && !authUser) {
+    void navigate('/login');
+    return null;
+  }
+
+  if (userFetched && !userData) {
     return (
       <StatusBox message={t('error.userNotFound')} className="text-red-600" />
     );
+  }
+
+  if (!userData) {
+    return null;
   }
 
   const isSelf = !id || authUser?.id === userData.id;

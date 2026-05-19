@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { inputFieldBase } from '../styles/styles';
 
 type SearchFieldProps = {
   placeholder?: string;
@@ -23,7 +22,7 @@ const SearchField = ({ placeholder, onSearch }: SearchFieldProps) => {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder || t('common.searchUser')}
-        className={`${inputFieldBase} rounded-full shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]`}
+        className="text-md block w-full rounded-full border border-gray-700 bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-800 focus:outline-none"
       />
     </form>
   );

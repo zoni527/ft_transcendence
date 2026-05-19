@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchField from './SearchField.tsx';
-import { useAuth } from '../utils/AuthContext';
+import { useAuth } from '../utils/AuthContext.ts';
 import { getSearch, sendFriendship } from '../api.tsx';
 import type { getSearchResponse } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 
-type SearchBarProps = {
+type SearchBlockProps = {
   onClose: () => void;
   onSelectUser: (user: getSearchResponse) => void;
 };
 
-const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
+const SearchBlock = ({ onClose, onSelectUser }: SearchBlockProps) => {
   const { showNotification } = useNotification();
   const { loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -62,8 +62,8 @@ const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
     <div className="relative w-full">
       <SearchField onSearch={handleSearch} />
 
-      <div className="mt-8 max-h-46 overflow-y-auto rounded-md border border-gray-300 bg-white shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]">
-        {results.length > 0 ? (
+      {results.length > 0 ? (
+        <div className="mt-8 max-h-46 overflow-y-auto rounded-md border border-gray-300 bg-white shadow-[0px_0px_5px_0px_rgba(0,0,0,0.2)]">
           <ul>
             {results.map((user) => (
               <li
@@ -75,14 +75,14 @@ const SearchBar = ({ onClose, onSelectUser }: SearchBarProps) => {
               </li>
             ))}
           </ul>
-        ) : (
-          <div className="px-4 py-3 text-sm text-gray-400">
-            {t('dashboard.noResults')}
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="text-md mt-10 px-3 text-gray-400">
+          {t('dashboard.noResults')}
+        </div>
+      )}
     </div>
   );
 };
 
-export default SearchBar;
+export default SearchBlock;

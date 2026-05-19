@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormHeader from '../components/FormHeader.tsx';
-import SearchBar from '../components/SearchBar.tsx';
+import SearchBlock from '../components/SearchBlock.tsx';
 import type { getSearchResponse } from '../api.tsx';
 import { cardBase } from '../styles/styles.tsx';
 
@@ -53,7 +53,7 @@ const AddFriendModal = ({ onClose, onSelectUser }: AddFriendModalProps) => {
         {/* Search bar */}
         <div className="flex justify-center">
           <div className="w-full max-w-md">
-            <SearchBar onClose={onClose} onSelectUser={onSelectUser} />
+            <SearchBlock onClose={onClose} onSelectUser={onSelectUser} />
           </div>
         </div>
       </div>

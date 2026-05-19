@@ -79,6 +79,23 @@ const Dashboard = () => {
     showNotification(message, 'error');
   };
 
+  const mapFriendships = (
+    data: Awaited<ReturnType<typeof getFriendships>>,
+  ): FriendshipWithStatus[] => [
+    ...data.friends.map((u) => ({
+      ...u,
+      status: 'accepted' as const,
+    })),
+    ...data.sent.map((u) => ({
+      ...u,
+      status: 'outgoing' as const,
+    })),
+    ...data.incoming.map((u) => ({
+      ...u,
+      status: 'incoming' as const,
+    })),
+  ];
+
   // Individual friendship actions
   const friendshipActions: Record<FriendshipSection, FriendAction[]> = {
     accepted: [
@@ -135,9 +152,9 @@ const Dashboard = () => {
 
             await acceptFriend(id, t);
 
-            setFriendshipUsers((prev) =>
-              prev.map((u) => (u.id === id ? { ...u, status: 'accepted' } : u)),
-            );
+            const data = await getFriendships(t);
+
+            setFriendshipUsers(mapFriendships(data));
 
             showNotification(
               t('notification.friendRequestAccepted'),
@@ -200,22 +217,7 @@ const Dashboard = () => {
 
         if (cancelled) return;
 
-        const combinedFriends = [
-          ...data.friends.map((u) => ({
-            ...u,
-            status: 'accepted' as const,
-          })),
-          ...data.sent.map((u) => ({
-            ...u,
-            status: 'outgoing' as const,
-          })),
-          ...data.incoming.map((u) => ({
-            ...u,
-            status: 'incoming' as const,
-          })),
-        ];
-
-        setFriendshipUsers(combinedFriends);
+        setFriendshipUsers(mapFriendships(data));
       } catch (err: unknown) {
         if (cancelled) return;
 

@@ -40,7 +40,9 @@ const Dashboard = () => {
   const [friendshipUsers, setFriendshipUsers] = useState<
     FriendshipWithStatus[]
   >([]);
-  const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [friendsLoading, setFriendsLoading] = useState(false);
+  const [userActionLoading, setUserActionLoading] = useState(false);
   const [friendLoadingIds, setFriendLoadingIds] = useState<string[]>([]);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
@@ -211,7 +213,7 @@ const Dashboard = () => {
 
     const fetchFriendships = async () => {
       try {
-        setLoading(true);
+        setFriendsLoading(true);
 
         const data = await getFriendships(t);
 
@@ -226,7 +228,7 @@ const Dashboard = () => {
 
         showNotification(message, 'error');
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setFriendsLoading(false);
       }
     };
 
@@ -239,13 +241,12 @@ const Dashboard = () => {
 
   // Delete user profile
   const handleDelete = (id?: string) => {
-    if (loading) return;
     if (!id) {
       showNotification(t('error.genericError'), 'error');
       return;
     }
 
-    setLoading(true);
+    setUserActionLoading(true);
 
     deleteUser(id, t)
       .then(() => {
@@ -258,7 +259,7 @@ const Dashboard = () => {
           err instanceof Error ? err.message : t('error.genericError');
         showNotification(message, 'error');
       })
-      .finally(() => setLoading(false));
+      .finally(() => setUserActionLoading(false));
   };
 
   // Fetch profile details by UserId
@@ -271,7 +272,7 @@ const Dashboard = () => {
     let cancelled = false;
 
     const fetchUser = async () => {
-      setLoading(true);
+      setPageLoading(true);
       setUserFetched(false);
 
       try {
@@ -296,7 +297,7 @@ const Dashboard = () => {
         void navigate('/');
       } finally {
         if (!cancelled) {
-          setLoading(false);
+          setPageLoading(false);
           setUserFetched(true);
         }
       }
@@ -317,7 +318,7 @@ const Dashboard = () => {
     navigate,
   ]);
 
-  if ((!id && authLoading) || loading) {
+  if ((!id && authLoading) || pageLoading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
@@ -409,7 +410,9 @@ const Dashboard = () => {
 
         {/* Sub-Tabs */}
         <div className="border-b">
-          {activeSection === 'friends' && (
+          {activeSection === 'friends' && friendsLoading ? (
+            <StatusBox message={t('common.loading')} className="text-black" />
+          ) : (
             <div className="mb-4 flex justify-center gap-3 sm:gap-12 md:gap-24">
               <SubsectionButton
                 label={t('nav.friends')}
@@ -530,7 +533,7 @@ const Dashboard = () => {
 
                     <SubmitButton
                       className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-                      isLoading={loading}
+                      isLoading={userActionLoading}
                       defaultText={t('dashboard.submit')}
                       onClick={() => handleDelete(userData.id)}
                       type="button"

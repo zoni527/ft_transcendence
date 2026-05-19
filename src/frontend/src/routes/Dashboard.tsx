@@ -157,7 +157,9 @@ const Dashboard = () => {
               <div className="flex-1">
                 <DataField
                   label={t('dashboard.roles')}
-                  value={userData.roles.join(', ')}
+                  value={userData.roles
+                    .map((role) => t(`roles.${role}`))
+                    .join(', ')}
                 />
               </div>
               <button className="rounded p-2" title={t('info.roles')}>

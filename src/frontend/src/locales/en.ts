@@ -49,6 +49,12 @@ export const enTranslations = {
     editUser: 'Edit profile',
     submit: 'Delete profile',
   },
+  roles: {
+    user: 'user',
+    cher: 'chef',
+    moderator: 'moderator',
+    admin: 'admin',
+  },
   adminPanel: {
     header: 'Admin panel',
     users: 'User database',
@@ -313,9 +319,9 @@ export const enTranslations = {
     conflict: 'Duplicate username or email',
     rateLimit: 'Too many requests — rate limit exceeded',
     serverError: 'An internal server error occurred, please try again later',
-    authError: 'Signup succeeded but automatic login failed, please log in',
+    authError: 'Signup succeeded but automatic login failed',
     invalidFileType: 'Invalid file type',
     fileTooLarge: 'File too large',
-    forbidden: 'Permission Denied: No permissions to perform this action.',
+    forbidden: 'No permissions to perform this action',
   },
 };

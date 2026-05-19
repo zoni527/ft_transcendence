@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
 import { validateImageFile } from '../utils/utils';
+import type { UpdateUserPayload } from '../api';
 import type { User } from '../types/types';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 
@@ -58,7 +59,8 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const { login, user: authUser } = useAuth();
+  const { login, user: authUser, hasRole } = useAuth();
+  const [roles, setRoles] = useState<string[] | null>(user.roles ?? null);
 
   // Controlled input states
   const [fullName, setFullName] = useState(user.name);
@@ -120,17 +122,19 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
 
       const id = user.id;
 
-      const updatedUser = await putUpdateUser(
-        {
-          email: result.data.email,
-          password: result.data.password == '' ? null : result.data.password,
-          name: result.data.fullName,
-          display_name: result.data.username,
-          avatar_url,
-        },
-        id,
-        t,
-      );
+      const payload: UpdateUserPayload = {
+        email: result.data.email,
+        password: result.data.password === '' ? null : result.data.password,
+        name: result.data.fullName,
+        display_name: result.data.username,
+        avatar_url,
+      };
+
+      if (hasRole(['admin']) && roles !== null) {
+        payload.roles = roles;
+      }
+
+      const updatedUser = await putUpdateUser(payload, id, t);
 
       if (authUser?.id === updatedUser.id) {
         login(updatedUser);
@@ -190,6 +194,34 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
+
+          <div>
+            <label className="mb-1 block font-medium">
+              {t('dashboard.roles')}
+            </label>
+            <div className="mt-1 flex flex-col gap-2">
+              {['user', 'cher', 'moderator', 'admin'].map((roleKey) => (
+                <label key={roleKey} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value={roleKey}
+                    checked={roles?.includes(roleKey) ?? false}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setRoles((prev) => [...(prev ?? []), roleKey]);
+                      } else {
+                        setRoles((prev) =>
+                          (prev ?? []).filter((r) => r !== roleKey),
+                        );
+                      }
+                    }}
+                    className="form-checkbox h-4 w-4 text-orange-600"
+                  />
+                  <span className="text-sm">{t(`roles.${roleKey}`)}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <InputField
             id="email"

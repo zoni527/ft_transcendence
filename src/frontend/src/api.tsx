@@ -62,12 +62,13 @@ interface SignupPayload {
   display_name: string;
 }
 
-interface UpdateUserPayload {
+export interface UpdateUserPayload {
   email: string | null;
   password: string | null;
   name: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  roles?: string[] | null;
 }
 
 interface LoginSignupResponse {

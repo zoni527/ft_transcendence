@@ -241,6 +241,7 @@ const Dashboard = () => {
 
   // Delete user profile
   const handleDelete = (id?: string) => {
+    if (userActionLoading) return;
     if (!id) {
       showNotification(t('error.genericError'), 'error');
       return;
@@ -410,32 +411,33 @@ const Dashboard = () => {
 
         {/* Sub-Tabs */}
         <div className="border-b">
-          {activeSection === 'friends' && friendsLoading ? (
-            <StatusBox message={t('common.loading')} className="text-black" />
-          ) : (
-            <div className="mb-4 flex justify-center gap-3 sm:gap-12 md:gap-24">
-              <SubsectionButton
-                label={t('nav.friends')}
-                subsection="accepted"
-                activeSubsection={activeSubsection}
-                setActiveSubsection={setActiveSubsection}
-              />
+          {activeSection === 'friends' &&
+            (friendsLoading ? (
+              <StatusBox message={t('common.loading')} className="text-black" />
+            ) : (
+              <div className="mb-4 flex justify-center gap-3 sm:gap-12 md:gap-24">
+                <SubsectionButton
+                  label={t('nav.friends')}
+                  subsection="accepted"
+                  activeSubsection={activeSubsection}
+                  setActiveSubsection={setActiveSubsection}
+                />
 
-              <SubsectionButton
-                label={t('nav.incoming')}
-                subsection="incoming"
-                activeSubsection={activeSubsection}
-                setActiveSubsection={setActiveSubsection}
-              />
+                <SubsectionButton
+                  label={t('nav.incoming')}
+                  subsection="incoming"
+                  activeSubsection={activeSubsection}
+                  setActiveSubsection={setActiveSubsection}
+                />
 
-              <SubsectionButton
-                label={t('nav.outgoing')}
-                subsection="outgoing"
-                activeSubsection={activeSubsection}
-                setActiveSubsection={setActiveSubsection}
-              />
-            </div>
-          )}
+                <SubsectionButton
+                  label={t('nav.outgoing')}
+                  subsection="outgoing"
+                  activeSubsection={activeSubsection}
+                  setActiveSubsection={setActiveSubsection}
+                />
+              </div>
+            ))}
         </div>
 
         {/* Sort Controls */}
@@ -556,7 +558,10 @@ const Dashboard = () => {
             ) : (
               friendshipUsers
                 .filter((u) => u.status === activeSubsection)
-                .sort((a, b) => a.display_name.localeCompare(b.display_name))
+                .sort((a, b) => {
+                  const sortField = sortBy === 'name' ? 'name' : 'display_name';
+                  return a[sortField].localeCompare(b[sortField]);
+                })
                 .map((listedUser) => (
                   <FriendField
                     key={listedUser.id}

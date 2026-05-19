@@ -82,7 +82,7 @@ interface FriendshipsResponse {
   incoming: FriendshipListItem[];
 }
 
-export interface getSearchResponse {
+export interface GetSearchResponse {
   id: string;
   name: string;
   display_name: string;
@@ -130,8 +130,8 @@ function isSessionResponse(data: unknown): data is SessionResponse {
   return typeof obj.authenticated === 'boolean' && isUserResponse(obj.user);
 }
 
-// Validation for getSearchResponse
-function isGetSearchResponse(data: unknown): data is getSearchResponse[] {
+// Validation for GetSearchResponse
+function isGetSearchResponse(data: unknown): data is GetSearchResponse[] {
   if (!Array.isArray(data)) {
     return false;
   }
@@ -418,7 +418,7 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
 export const getSearch = async (
   query: string,
   t: TFunction,
-): Promise<getSearchResponse[]> => {
+): Promise<GetSearchResponse[]> => {
   const response = await fetch(`${baseUrl}/users/search?q=${query}`, {
     method: 'GET',
     credentials: 'include',

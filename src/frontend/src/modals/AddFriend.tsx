@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormHeader from '../components/FormHeader.tsx';
 import SearchBlock from '../components/SearchBlock.tsx';
-import type { getSearchResponse } from '../api.tsx';
+import type { GetSearchResponse } from '../api.tsx';
 import { cardBase } from '../styles/styles.tsx';
 
 type AddFriendModalProps = {
   onClose: () => void;
-  onSelectUser: (user: getSearchResponse) => void;
+  onSelectUser: (user: GetSearchResponse) => void;
 };
 
 const AddFriendModal = ({ onClose, onSelectUser }: AddFriendModalProps) => {

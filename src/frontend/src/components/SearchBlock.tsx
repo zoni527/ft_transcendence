@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import SearchField from './SearchField.tsx';
 import { useAuth } from '../utils/AuthContext.ts';
 import { getSearch, sendFriendship } from '../api.tsx';
-import type { getSearchResponse } from '../api.tsx';
+import type { GetSearchResponse } from '../api.tsx';
 import { useNotification } from '../utils/NotifContext.ts';
 
 type SearchBlockProps = {
   onClose: () => void;
-  onSelectUser: (user: getSearchResponse) => void;
+  onSelectUser: (user: GetSearchResponse) => void;
 };
 
 const SearchBlock = ({ onClose, onSelectUser }: SearchBlockProps) => {
@@ -17,9 +17,9 @@ const SearchBlock = ({ onClose, onSelectUser }: SearchBlockProps) => {
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
-  const [results, setResults] = useState<getSearchResponse[]>([]);
+  const [results, setResults] = useState<GetSearchResponse[]>([]);
 
-  const handleSelectUser = (user: getSearchResponse) => {
+  const handleSelectUser = (user: GetSearchResponse) => {
     if (authLoading || loading) return;
 
     setLoading(true);

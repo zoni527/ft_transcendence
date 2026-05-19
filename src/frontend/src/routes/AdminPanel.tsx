@@ -36,8 +36,11 @@ const AdminPanel = () => {
     localStorage.setItem('adminActiveSection', activeSection);
   }, [activeSection]);
 
+  // Fetches recipes and users
   useEffect(() => {
     if (authLoading) return;
+
+    let cancelled = false;
 
     const fetchData = async () => {
       if (!user) {
@@ -49,8 +52,6 @@ const AdminPanel = () => {
         setLoading(false);
         return;
       }
-
-      let cancelled = false;
 
       try {
         const [usersData, recipesData] = await Promise.all([
@@ -74,13 +75,13 @@ const AdminPanel = () => {
       } finally {
         if (!cancelled) setLoading(false);
       }
-
-      return () => {
-        cancelled = true;
-      };
     };
 
     void fetchData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [authLoading, user, hasRole, t, showNotification]);
 
   const sortedUsers = useMemo(() => {

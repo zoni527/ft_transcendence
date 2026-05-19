@@ -73,7 +73,7 @@ const RecipeDetail = () => {
     );
   }
 
-  const isSelf = recipe.author.display_name === user?.id;
+  const isSelf = recipe.author.id === user?.id;
 
   return (
     <>

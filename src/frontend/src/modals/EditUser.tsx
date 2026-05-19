@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
+import RolesCheckboxes from '../components/RolesCheckboxes';
 import SubmitButton from '../components/SubmitButton';
 import {
   putUpdateUser,
@@ -154,6 +155,8 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
     }
   };
 
+  const isSelf = authUser?.id === user.id;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
@@ -195,33 +198,9 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             onChange={(e) => setUsername(e.target.value)}
           />
 
-          <div>
-            <label className="mb-1 block font-medium">
-              {t('dashboard.roles')}
-            </label>
-            <div className="mt-1 flex flex-col gap-2">
-              {['user', 'cher', 'moderator', 'admin'].map((roleKey) => (
-                <label key={roleKey} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    value={roleKey}
-                    checked={roles?.includes(roleKey) ?? false}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setRoles((prev) => [...(prev ?? []), roleKey]);
-                      } else {
-                        setRoles((prev) =>
-                          (prev ?? []).filter((r) => r !== roleKey),
-                        );
-                      }
-                    }}
-                    className="form-checkbox h-4 w-4 text-orange-600"
-                  />
-                  <span className="text-sm">{t(`roles.${roleKey}`)}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          {hasRole(['admin']) && !isSelf && (
+            <RolesCheckboxes roles={roles} onChange={setRoles} />
+          )}
 
           <InputField
             id="email"

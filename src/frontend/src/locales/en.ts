@@ -51,7 +51,7 @@ export const enTranslations = {
   },
   roles: {
     user: 'user',
-    cher: 'chef',
+    chef: 'chef',
     moderator: 'moderator',
     admin: 'admin',
   },

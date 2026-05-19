@@ -51,7 +51,7 @@ export const csTranslations = {
   },
   roles: {
     user: 'uživatel',
-    cher: 'kuchař',
+    chef: 'kuchař',
     moderator: 'moderátor',
     admin: 'správce',
   },

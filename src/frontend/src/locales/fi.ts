@@ -51,7 +51,7 @@ export const fiTranslations = {
   },
   roles: {
     user: 'käyttäjä',
-    cher: 'kokki',
+    chef: 'kokki',
     moderator: 'moderaattori',
     admin: 'ylläpitäjä',
   },

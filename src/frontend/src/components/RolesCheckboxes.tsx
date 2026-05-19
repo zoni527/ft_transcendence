@@ -32,9 +32,9 @@ const RolesCheckboxes = ({
               value={roleKey}
               checked={roles?.includes(roleKey) ?? false}
               onChange={(e) => handleCheckboxChange(roleKey, e.target.checked)}
-              className="form-checkbox h-4 w-4 text-orange-600"
+              className="form-checkbox h-4 w-4 accent-orange-700"
             />
-            <span className="text-sm">{t(`roles.${roleKey}`)}</span>
+            <span className="text-md">{t(`roles.${roleKey}`)}</span>
           </label>
         ))}
       </div>

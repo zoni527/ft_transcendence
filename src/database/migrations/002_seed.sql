@@ -42,6 +42,7 @@ INSERT INTO "user" (email, password_hash, name, display_name) VALUES
 
 INSERT INTO role (name, description) VALUES
     ('admin',     'Full access — manage users, recipes, roles, and site settings'),
+    ('developer', 'Can request apikey to have CRUD permissions on their own content'),
     ('moderator', 'Can review, edit, and delete recipes'),
     ('chef',      'Can create recipes'),
     ('user',      'Default role — can browse and favourite');
@@ -82,6 +83,7 @@ SELECT u.id, r.id
 FROM "user" u, role r
 WHERE (r.name = 'admin'     AND u.display_name = 'alice')
    OR (r.name = 'moderator' AND u.display_name = 'wonder_di')
+   OR (r.name = 'developer' AND u.display_name = 'evee')
    OR (r.name = 'chef'      AND u.display_name IN ('bobby', 'charlie'));
 
 -- Everyone without an explicit role above falls back to 'user'.

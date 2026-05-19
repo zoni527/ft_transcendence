@@ -57,8 +57,7 @@ type RecipeAuthor struct {
 }
 
 // RecipeResponse is the read shape returned by GET /api/recipes and
-// GET /api/recipes/:id. It carries the author as a nested object instead of a
-// raw author_id.
+// GET /api/recipes/:id. It carries the author as a nested object
 type RecipeResponse struct {
 	Id                   string       `json:"id"`
 	Author               RecipeAuthor `json:"author"`
@@ -133,4 +132,29 @@ type UpdateUserParams struct {
 type UserSearchResult struct {
 	Id           string `json:"id"`
 	Display_name string `json:"display_name"`
+}
+
+// Is_online is a pointer so it can be omitted from the JSON for pending rows
+// (sent/incoming buckets) and only appear on accepted/friends.
+type FriendshipListItem struct {
+	Status       string    `json:"-"                    db:"status"`
+	SentByMe     bool      `json:"-"                    db:"sent_by_me"`
+	Last_seen    time.Time `json:"-"                    db:"last_seen"`
+	Id           string    `json:"id"                   db:"id"`
+	Display_name string    `json:"display_name"         db:"display_name"`
+	Name         string    `json:"name"                 db:"name"`
+	Is_online    *bool     `json:"is_online,omitempty"`
+}
+
+// this is the body of GET /api/friendships.
+type FriendshipsResponse struct {
+	Friends  []FriendshipListItem `json:"friends"`
+	Sent     []FriendshipListItem `json:"sent"`
+	Incoming []FriendshipListItem `json:"incoming"`
+}
+
+// Body of POST /api/friendships. The requester is taken from the JWT, so the
+// client only sends the target user's id.
+type CreateFriendRequestBody struct {
+	Receiver_id string `json:"receiver_id" binding:"required"`
 }

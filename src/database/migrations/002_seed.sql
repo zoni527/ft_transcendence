@@ -1,7 +1,7 @@
 -- Seed data for testing
 -- Runs automatically on first DB init (after 001_schema.sql)
 --
--- Scale: 25 named users, 25 recipes (one per unique title), ~50 friendships.
+-- Scale: 25 named users, 25 recipes (one per unique title), 49 friendships.
 -- Only named seed rows are inserted (no templated/generated bulk).
 
 -- =====================
@@ -100,14 +100,22 @@ WHERE r.name = 'user'
 -- by newlines (frontend renames the UI label to "How to cook"). Strings use
 -- the E'...' escape syntax so \n is interpreted as a real newline.
 -- =====================
+-- created_at / updated_at are randomized across the last 60 / 30 days so the
+-- sort-by-newest and sort-by-oldest filters return a meaningful order on
+-- seeded data instead of a tie. updated_at is always >= created_at.
 INSERT INTO recipe (author_id, title, description, preparation_time_min, servings,
-                    difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
+                    difficulty, cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g,
+                    created_at, updated_at)
 SELECT
     u.id,
     r.title, r.description, r.prep_time, r.servings, r.difficulty,
     r.cuisine, r.meal_type, r.image_url,
-    r.calories, r.protein_g, r.carbs_g, r.fat_g
-FROM (VALUES
+    r.calories, r.protein_g, r.carbs_g, r.fat_g,
+    r.created_at,
+    r.created_at + (random() * (now() - r.created_at)) AS updated_at
+FROM (
+    SELECT *, now() - (random() * interval '60 days') AS created_at
+    FROM (VALUES
     (
         'alice', 'Pasta Carbonara',
         E'Step 1: Bring a large pot of well-salted water to the boil and cook spaghetti until al dente.\nStep 2: While the pasta cooks, render diced pancetta in a dry pan over medium heat until crisp, then take the pan off the heat.\nStep 3: Whisk egg yolks in a bowl with finely grated pecorino and plenty of cracked black pepper.\nStep 4: Drain the pasta, reserving a cup of the starchy cooking water.\nStep 5: Toss the hot pasta into the pancetta pan, then off the heat add the egg mixture and a splash of pasta water.\nStep 6: Stir quickly so the eggs turn glossy rather than scrambled, and serve immediately with extra pecorino on top.',
@@ -287,7 +295,7 @@ FROM (VALUES
         'alice', 'Classic Tiramisu',
         E'Step 1: Whisk egg yolks and sugar together until pale and thick, then fold in mascarpone until smooth.\nStep 2: In a separate bowl, whip heavy cream to soft peaks and gently fold into the mascarpone mixture.\nStep 3: Combine strong espresso with a splash of dark rum or amaretto in a shallow dish.\nStep 4: Briefly dip ladyfingers into the coffee—just enough to soak but not disintegrate—and layer them in the base of a dish.\nStep 5: Spread half the cream over the biscuits, then repeat with a second layer of soaked ladyfingers and the remaining cream.\nStep 6: Dust heavily with high-quality cocoa powder and chill for at least six hours to set.',
         25, 6, 'medium', 'Italian', 'dessert',
-        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778440639/recipe-seed/tiramisu.jpg',
+        'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778871260/recipe-seed/624338969_18106717054740715_5661273212455204253_n.webp',
         450, 8.0, 42.0, 28.0
     ),
     (
@@ -304,23 +312,81 @@ FROM (VALUES
         'https://res.cloudinary.com/dhuk7trpf/image/upload/v1778440764/recipe-seed/berry-pavlova.webp',
         310, 4.0, 52.0, 10.0
     )
-) AS r(author_dn, title, description, prep_time, servings, difficulty,
-       cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
+    ) AS v(author_dn, title, description, prep_time, servings, difficulty,
+           cuisine, meal_type, image_url, calories, protein_g, carbs_g, fat_g)
+) AS r
 JOIN "user" u ON u.display_name = r.author_dn;
 
 -- =====================
 -- FRIENDSHIPS
--- Five explicit pairs: 3 accepted, 2 pending so the UI can exercise both.
+-- 49 pairs across all 25 seeded users: 32 accepted, 17 pending.
+-- alice has multiple accepted friends plus both outgoing and incoming pending
+-- requests so the dashboard exercises every bucket of GET /api/friendships.
 -- =====================
 
 INSERT INTO friendship (requester_id, receiver_id, status)
 SELECT u1.id, u2.id, v.status
 FROM (VALUES
-    ('alice',     'bobby',     'accepted'),
-    ('alice',     'charlie',   'accepted'),
-    ('bobby',     'wonder_di', 'pending'),
-    ('charlie',   'evee',      'accepted'),
-    ('wonder_di', 'evee',      'pending')
+    -- Alice (admin): rich friend graph with sent + incoming pending
+    ('alice',       'bobby',        'accepted'),
+    ('alice',       'charlie',      'accepted'),
+    ('alice',       'wonder_di',    'accepted'),
+    ('alice',       'iron_man',     'accepted'),
+    ('alice',       'super_man',    'accepted'),
+    ('spider_m',    'alice',        'accepted'),
+    ('web_head',    'alice',        'accepted'),
+    ('alice',       'evee',         'pending'),
+    ('alice',       'grid_runner',  'pending'),
+    ('alice',       'wonder_woman', 'pending'),
+    ('prof_x',      'alice',        'pending'),
+    ('dark_knight', 'alice',        'pending'),
+
+    -- Bobby (chef)
+    ('bobby',       'charlie',      'accepted'),
+    ('bobby',       'x23',          'accepted'),
+    ('bobby',       'iron_man',     'accepted'),
+    ('bobby',       'tekken_nina',  'accepted'),
+    ('bobby',       'wonder_di',    'pending'),
+    ('super_man',   'bobby',        'pending'),
+
+    -- Charlie (chef)
+    ('charlie',     'evee',         'accepted'),
+    ('charlie',     'spider_m',     'accepted'),
+    ('iron_man',    'charlie',      'accepted'),
+    ('charlie',     'wonder_di',    'pending'),
+
+    -- Diana Prince / wonder_di (moderator)
+    ('wonder_di',   'x23',          'accepted'),
+    ('wonder_di',   'aquaman',      'accepted'),
+    ('prof_x',      'wonder_di',    'accepted'),
+    ('wonder_di',   'evee',         'pending'),
+    ('scarlet_w',   'wonder_di',    'pending'),
+
+    -- Evee
+    ('evee',        'spider_m',     'accepted'),
+    ('evee',        'p_dameron',    'accepted'),
+    ('iron_man',    'evee',         'pending'),
+    ('evee',        'no_fate',      'pending'),
+
+    -- Wider network so every seeded user has at least one friendship
+    ('grid_runner', 'x23',          'accepted'),
+    ('spider_m',    'web_head',     'accepted'),
+    ('p_dameron',   'tekken_nina',  'accepted'),
+    ('mister_f',    'no_fate',      'accepted'),
+    ('mister_f',    'prof_x',       'accepted'),
+    ('dr_doom',     'sea_witch',    'accepted'),
+    ('prof_x',      'wonder_girl',  'accepted'),
+    ('titanium_z',  'wonder_girl',  'accepted'),
+    ('aquaman',     'dark_knight',  'accepted'),
+    ('dark_knight', 'super_man',    'accepted'),
+    ('super_man',   'wonder_woman', 'accepted'),
+    ('wonder_girl', 'wonder_woman', 'accepted'),
+    ('no_fate',     'q_fabray',     'accepted'),
+    ('p_dameron',   'q_fabray',     'pending'),
+    ('iron_man',    'dr_doom',      'pending'),
+    ('dr_doom',     'scarlet_w',    'pending'),
+    ('aquaman',     'titanium_z',   'pending'),
+    ('spider_m',    'wonder_girl',  'pending')
 ) AS v(requester, receiver, status)
 JOIN "user" u1 ON u1.display_name = v.requester
 JOIN "user" u2 ON u2.display_name = v.receiver;

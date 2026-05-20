@@ -92,6 +92,7 @@ func GoogleCallback(c *gin.Context) {
 		}
 		log.Printf("getOrCreateGoogleUser: %v", err)
 		reportError(c, http.StatusInternalServerError, genericInternalErrorMsg)
+		return
 	}
 
 	jwt, err := authorization.GenerateJWTToken(u.Id)

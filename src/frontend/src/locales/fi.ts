@@ -211,6 +211,8 @@ export const fiTranslations = {
     password: 'Salasana',
     passwordPlace: 'Syötä salasana',
     submit: 'Jatka',
+    google: 'Kirjaudu Googlella',
+    or: 'TAI',
   },
   signup: {
     header: 'Rekisteröidy',

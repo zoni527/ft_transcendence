@@ -156,7 +156,7 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 	}
 
 	for i := range displayNameVersionLimit {
-		_, err := repository.GetCredentialsByDisplayName(params.Display_name)
+		_, err := repository.GetUserCredentialsByDisplayName(params.Display_name)
 		if err == pgx.ErrNoRows {
 			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.Display_name)
 			if err != nil {

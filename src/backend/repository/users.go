@@ -261,7 +261,7 @@ func GetUserCredentialsByEmail(email string) (models.User, error) {
 }
 
 // Returns a single user's credentials by display_name
-func GetCredentialsByDisplayName(displayName string) (models.User, error) {
+func GetUserCredentialsByDisplayName(displayName string) (models.User, error) {
 	return getUserCredentialsBy("display_name", displayName)
 }
 

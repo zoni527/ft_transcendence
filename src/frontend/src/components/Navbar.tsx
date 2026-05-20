@@ -38,7 +38,7 @@ const Navbar = () => {
       <div className="relative flex items-center">
         {/* Left (Desktop only) */}
         <div className="hidden text-xl font-semibold md:flex">
-          <NavButton path="/" className={navLeftBase}>
+          <NavButton path="/?reset=1" className={navLeftBase}>
             {t('nav.recipes')}
           </NavButton>
         </div>

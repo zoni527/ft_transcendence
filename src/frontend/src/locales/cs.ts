@@ -285,10 +285,17 @@ export const csTranslations = {
   },
   common: {
     bannerTitle: 'Recepty, které stojí za probuzení',
+    all: 'Vše',
     loading: 'Načítání...',
     welcome: 'Vítejte',
     rightsReserved: 'RISE. Všechna práva vyhrazena.',
     noFile: 'Žádný soubor nebyl vybrán',
+    filters: 'Filtry',
+    searchRecipe: 'Hledat recepty...',
+    sortBy: 'Seřadit podle',
+    newest: 'Nejnovější první',
+    oldest: 'Nejstarší první',
+    loadMore: 'Další recepty...',
   },
   error: {
     error: 'Chyba:',

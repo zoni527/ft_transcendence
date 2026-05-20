@@ -285,10 +285,17 @@ export const fiTranslations = {
   },
   common: {
     bannerTitle: 'Reseptejä, joita varten kannattaa herätä',
+    all: 'Kaikki',
     loading: 'Ladataan...',
     welcome: 'Tervetuloa',
     rightsReserved: 'RISE. Kaikki oikeudet pidätetään.',
     noFile: 'Tiedostoa ei valittu',
+    filters: 'Suodattimet',
+    searchRecipe: 'Etsi reseptejä...',
+    sortBy: 'Järjestä',
+    newest: 'Uusin ensin',
+    oldest: 'Vanhin ensin',
+    loadMore: 'Lisää reseptejä...',
   },
   error: {
     error: 'Virhe:',

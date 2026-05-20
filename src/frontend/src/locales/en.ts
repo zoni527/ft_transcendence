@@ -285,10 +285,17 @@ export const enTranslations = {
   },
   common: {
     bannerTitle: 'Recipes worth rising for',
+    all: 'All',
     loading: 'Loading...',
     welcome: 'Welcome',
     rightsReserved: 'RISE. All Rights Reserved.',
     noFile: 'No file chosen',
+    filters: 'Filters',
+    searchRecipe: 'Search recipes...',
+    sortBy: 'Sort by',
+    newest: 'Newest first',
+    oldest: 'Oldest first',
+    loadMore: 'More recipes...',
   },
   error: {
     error: 'Error:',

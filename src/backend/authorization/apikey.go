@@ -26,7 +26,7 @@ func GenerateAPIKey(userID string) (string, string, error) {
 
 func ValidateAPIKey(key string) (userID string, err error) {
 	parts := strings.Split(key, ".")
-	if len(parts) != 2 {
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
 		return "", fmt.Errorf("invalid api key format")
 	}
 

@@ -1,9 +1,10 @@
 package integrations
 
 import (
+	"os"
+
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"os"
 )
 
 var GoogleOAuthConfig *oauth2.Config

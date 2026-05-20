@@ -86,8 +86,13 @@ func GoogleCallback(c *gin.Context) {
 	u, err := getOrCreateGoogleUser(&gu)
 	if err != nil {
 		var eu *errorUnauthorized
+		var eb *errorBadRequest
 		if errors.As(err, &eu) {
 			reportError(c, http.StatusUnauthorized, eu.Error())
+			return
+		}
+		if errors.As(err, &eb) {
+			reportError(c, http.StatusBadRequest, eu.Error())
 			return
 		}
 		log.Printf("getOrCreateGoogleUser: %v", err)
@@ -112,6 +117,14 @@ type errorUnauthorized struct {
 }
 
 func (e *errorUnauthorized) Error() string {
+	return e.msg
+}
+
+type errorBadRequest struct {
+	msg string
+}
+
+func (e *errorBadRequest) Error() string {
 	return e.msg
 }
 
@@ -145,6 +158,10 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 	for i := range displayNameVersionLimit {
 		_, err := repository.GetCredentialsByDisplayName(params.Display_name)
 		if err == pgx.ErrNoRows {
+			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.Display_name)
+			if err != nil {
+				return models.User{}, &errorBadRequest{"bad email/name/display name value"}
+			}
 			return repository.CreateUser(params)
 		} else if err != nil {
 			return models.User{}, err

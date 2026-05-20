@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { cardBase, inputFieldBase, inputLabelText } from '../styles/styles';
 
 type RolesCheckboxesProps = {
   roles: string[] | null;
@@ -14,17 +15,26 @@ const RolesCheckboxes = ({
   const { t } = useTranslation();
 
   const handleCheckboxChange = (roleKey: string, checked: boolean) => {
+    const currentRoles = roles ?? [];
+
     if (checked) {
-      onChange([...(roles ?? []), roleKey]);
-    } else {
-      onChange((roles ?? []).filter((r) => r !== roleKey));
+      if (!currentRoles.includes(roleKey)) {
+        onChange([...currentRoles, roleKey]);
+      }
+      return;
     }
+
+    if (currentRoles.length === 1) {
+      return;
+    }
+
+    onChange(currentRoles.filter((r) => r !== roleKey));
   };
 
   return (
     <div>
-      <label className="mb-1 block font-medium">{t('dashboard.roles')}</label>
-      <div className="mt-1 flex flex-col gap-2">
+      <label className={`${inputLabelText}`}>{t('dashboard.roles')}</label>
+      <div className={`${cardBase} ${inputFieldBase} mt-1 flex flex-col gap-2`}>
         {availableRoles.map((roleKey) => (
           <label key={roleKey} className="flex items-center gap-2">
             <input

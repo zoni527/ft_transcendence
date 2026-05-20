@@ -131,7 +131,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
         avatar_url,
       };
 
-      if (hasRole(['admin']) && roles !== null) {
+      if (hasRole(['admin']) && !isSelf && roles !== null) {
         payload.roles = roles;
       }
 

@@ -130,7 +130,11 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 	}
 
 	// New user
-	stem := gu.Email[:strings.IndexByte(gu.Email, '@')]
+	at := strings.IndexByte(gu.Email, '@')
+	if at <= 0 {
+		return models.User{}, fmt.Errorf("invalid google user email")
+	}
+	stem := gu.Email[:at]
 	params := models.CreateUserParams{
 		Email:           gu.Email,
 		Password_hashed: googleOAuthLockedPassword,

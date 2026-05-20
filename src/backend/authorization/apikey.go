@@ -6,8 +6,9 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 	"fmt"
-	"ft_transcendence/backend/repository"
 	"strings"
+
+	"ft_transcendence/backend/repository"
 )
 
 func GenerateAPIKey(userID string) (string, string, error) {

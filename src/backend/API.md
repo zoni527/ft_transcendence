@@ -4,7 +4,7 @@ Base URL: `https://localhost:8443`
 
 ## Authentication
 
-The API uses **JWT tokens** stored in an HttpOnly cookie. When you call `/api/users/login` successfully, the server sets a `token` cookie containing the JWT. All subsequent authenticated requests automatically include this cookie.
+The API uses **JWT tokens** stored in an HttpOnly cookie. When you call `/api/auth/login` successfully, the server sets a `token` cookie containing the JWT. All subsequent authenticated requests automatically include this cookie.
 
 **Token lifespan:** 1 hour. After expiration, login again.
 
@@ -247,7 +247,7 @@ On self-delete the caller's JWT is added to the token blacklist and the auth coo
 
 ---
 
-### POST /api/users/login
+### POST /api/auth/login
 
 Authenticate a user and receive a JWT token.
 
@@ -278,7 +278,7 @@ Sets a `token` cookie with JWT. The cookie can be marked Secure once the API is 
 
 ---
 
-### POST /api/users/logout
+### POST /api/auth/logout
 
 Log out the current authenticated user. Clears the authentication cookie.
 
@@ -350,7 +350,7 @@ Update the current user's `last_seen` timestamp. Used by the frontend to drive t
 
 ---
 
-### GET /api/users/session
+### GET /api/auth/session
 
 Check whether the current browser session is authenticated.
 
@@ -875,26 +875,26 @@ Remove the friendship row between the logged-in user and `:id`. One endpoint cov
 | Endpoint                          | Status    |
 |-----------------------------------|-----------|
 | GET /api/users                    | done      |
-| GET /api/users/:id                | done      |
-| POST /api/users/login             | done      |
-| POST /api/users/logout            | done      |
 | GET /api/users/me                 | done      |
-| GET /api/users/session            | done      |
-| PUT /api/users/me/heartbeat       | done      |
+| GET /api/users/avatar             | done      |
+| GET /api/users/search?q=          | done      |
+| GET /api/users/:id                | done      |
 | POST /api/users                   | done      |
+| PUT /api/users/me/heartbeat       | done      |
 | PUT /api/users/:id                | done      |
 | DELETE /api/users/:id             | done      |
-| GET /api/users/search?q=          | done      |
 | GET /api/recipes                  | done      |
-| GET /api/recipes/:id              | done      |
-| GET /api/recipes/search           | done      |
 | GET /api/recipes/image-signature  | done      |
+| GET /api/recipes/search           | done      |
+| GET /api/recipes/:id              | done      |
 | POST /api/recipes                 | TODO      |
 | PUT /api/recipes/:id              | TODO      |
 | DELETE /api/recipes/:id           | done      |
-| POST /api/recipes/:id/favourite   | TODO      |
-| DELETE /api/recipes/:id/favourite | TODO      |
-| GET /api/users/:id/favourites     | TODO      |
+| GET /api/auth/session             | done      |
+| GET /api/auth/google/login        | done      |
+| GET /api/auth/google/callback     | done      |
+| POST /api/auth/login              | done      |
+| POST /api/auth/logout             | done      |
 | GET /api/friendships              | done      |
 | POST /api/friendships             | done      |
 | PATCH /api/friendships/:id        | done      |

@@ -69,7 +69,6 @@ func main() {
 	// Users
 	router.GET("/api/users", handlers.GetUsers)
 	router.GET("/api/users/me", middleware.Authentication(), handlers.GetMe)
-	router.GET("/api/users/session", handlers.GetSession)
 	router.GET("/api/users/avatar",
 		middleware.Authentication(),
 		handlers.UserAvatarSignature)
@@ -79,17 +78,13 @@ func main() {
 	router.GET("/api/users/:id", handlers.GetUserById)
 
 	router.POST("/api/users", handlers.CreateUser)
-	router.POST("/api/users/login", handlers.LoginUser)
-	router.POST("/api/users/logout", middleware.Authentication(), handlers.LogoutUser)
 
+	router.PUT("/api/users/me/heartbeat", // Heartbeat - update server state
+		middleware.Authentication(),
+		handlers.Heartbeat)
 	router.PUT("/api/users/:id", middleware.Authentication(), handlers.UpdateUser)
 
 	router.DELETE("/api/users/:id", middleware.Authentication(), handlers.DeleteUser)
-
-	// Heartbeat - update server state
-	router.PUT("/api/users/me/heartbeat",
-		middleware.Authentication(),
-		handlers.Heartbeat)
 
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)
@@ -121,13 +116,13 @@ func main() {
 	router.POST("/api/auth/login", handlers.LoginUser)
 	router.POST("/api/auth/logout", middleware.Authentication(), handlers.LogoutUser)
 
-	/* ---------------------------------------------------------------------- */
-
 	// Friendships
 	router.GET("/api/friendships", middleware.Authentication(), handlers.GetFriendships)
 	router.POST("/api/friendships", middleware.Authentication(), handlers.CreateFriendRequest)
 	router.PATCH("/api/friendships/:id", middleware.Authentication(), handlers.AcceptFriendRequest)
 	router.DELETE("/api/friendships/:id", middleware.Authentication(), handlers.DeleteFriendship)
+
+	/* ---------------------------------------------------------------------- */
 
 	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {
 		log.Fatal("Server failed to start:", err)

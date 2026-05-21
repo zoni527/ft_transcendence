@@ -53,7 +53,7 @@ const Login = () => {
     } else {
       setLoading(true);
 
-      // POST /api/users/login (user login)
+      // POST /api/auth/login (user login)
       postLogin(
         {
           email: result.data.email,

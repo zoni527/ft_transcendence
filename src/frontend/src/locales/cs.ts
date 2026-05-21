@@ -49,6 +49,12 @@ export const csTranslations = {
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
   },
+  roles: {
+    user: 'uživatel',
+    chef: 'kuchař',
+    moderator: 'moderátor',
+    admin: 'správce',
+  },
   adminPanel: {
     header: 'Administrátorský panel',
     users: 'Databáze uživatelů',
@@ -307,17 +313,15 @@ export const csTranslations = {
     recipesNotFound: 'Nebyly nalezeny žádné recepty',
     genericError: 'Došlo k chybě, zkuste to prosím později',
     invalidResponse: 'Neplatná odpověď databáze',
-    badRequest:
-      'Chybný požadavek, zkontrolujte, zda jsou všechna data správně vyplněná',
+    badRequest: 'Chybný požadavek, zkontrolujte, zda jsou data správná',
     unauthorized: 'Nemáte oprávnění k provedení této akce',
     notFound: 'Požadovaný zdroj nebyl nalezen',
     conflict: 'Duplicitní uživatelské jméno nebo e-mail',
     rateLimit: 'Příliš mnoho požadavků — překročen limit rychlosti',
     serverError: 'Došlo k interní chybě serveru, zkuste to prosím později',
-    authError:
-      'Registrace byla úspěšná, ale automatické přihlášení selhalo, přihlaste se prosím ručně',
+    authError: 'Registrace byla úspěšná, ale automatické přihlášení selhalo',
     invalidFileType: 'Neplatný typ souboru',
     fileTooLarge: 'Soubor je příliš velký',
-    forbidden: 'Přístup odepřen: Chybí potřebná oprávnění.',
+    forbidden: 'Chybí potřebná oprávnění.',
   },
 };

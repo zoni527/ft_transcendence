@@ -49,6 +49,12 @@ export const fiTranslations = {
     editUser: 'Muokkaa profiilia',
     submit: 'Poista profiili',
   },
+  roles: {
+    user: 'käyttäjä',
+    chef: 'kokki',
+    moderator: 'moderaattori',
+    admin: 'ylläpitäjä',
+  },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
     users: 'Käyttäjätietokanta',
@@ -313,10 +319,9 @@ export const fiTranslations = {
     conflict: 'Käyttäjänimi tai sähköpostiosoite on jo käytössä',
     rateLimit: 'Liian monta pyyntöä — nopeusrajoitus ylitetty',
     serverError: 'Sisäinen palvelinvirhe, yritä myöhemmin uudelleen',
-    authError:
-      'Rekisteröinti onnistui, mutta automaattinen kirjautuminen epäonnistui, kirjaudu sisään manuaalisesti',
+    authError: 'Rekisteröinti onnistui, mutta kirjautuminen epäonnistui',
     invalidFileType: 'Virheellinen tiedostotyyppi',
     fileTooLarge: 'Tiedosto on liian suuri',
-    forbidden: 'Ei käyttöoikeutta: Toiminto on estetty.',
+    forbidden: 'Ei käyttöoikeutta',
   },
 };

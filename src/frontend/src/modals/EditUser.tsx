@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 import { z } from 'zod';
 import FormHeader from '../components/FormHeader';
 import InputField from '../components/InputField';
+import RolesCheckboxes from '../components/RolesCheckboxes';
 import SubmitButton from '../components/SubmitButton';
 import {
   putUpdateUser,
@@ -13,6 +14,7 @@ import {
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
 import { validateImageFile } from '../utils/utils';
+import type { UpdateUserPayload } from '../api';
 import type { User } from '../types/types';
 import { cardBase, uploadButtonBase } from '../styles/styles';
 
@@ -58,7 +60,8 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const { login, user: authUser } = useAuth();
+  const { login, user: authUser, hasRole } = useAuth();
+  const [roles, setRoles] = useState<string[] | null>(user.roles ?? null);
 
   // Controlled input states
   const [fullName, setFullName] = useState(user.name);
@@ -120,17 +123,19 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
 
       const id = user.id;
 
-      const updatedUser = await putUpdateUser(
-        {
-          email: result.data.email,
-          password: result.data.password == '' ? null : result.data.password,
-          name: result.data.fullName,
-          display_name: result.data.username,
-          avatar_url,
-        },
-        id,
-        t,
-      );
+      const payload: UpdateUserPayload = {
+        email: result.data.email,
+        password: result.data.password === '' ? null : result.data.password,
+        name: result.data.fullName,
+        display_name: result.data.username,
+        avatar_url,
+      };
+
+      if (hasRole(['admin']) && !isSelf && roles !== null) {
+        payload.roles = roles;
+      }
+
+      const updatedUser = await putUpdateUser(payload, id, t);
 
       if (authUser?.id === updatedUser.id) {
         login(updatedUser);
@@ -149,6 +154,8 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
       setLoading(false);
     }
   };
+
+  const isSelf = authUser?.id === user.id;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -190,6 +197,10 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
+
+          {hasRole(['admin']) && !isSelf && (
+            <RolesCheckboxes roles={roles} onChange={setRoles} />
+          )}
 
           <InputField
             id="email"

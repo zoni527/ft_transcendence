@@ -143,7 +143,11 @@ function isGetSearchResponse(data: unknown): data is GetSearchResponse[] {
 
     const obj = item as Record<string, unknown>;
 
-    return typeof obj.id === 'string' && typeof obj.display_name === 'string';
+    return (
+      typeof obj.id === 'string' &&
+      typeof obj.name === 'string' &&
+      typeof obj.display_name === 'string'
+    );
   });
 }
 
@@ -163,6 +167,7 @@ function isUserResponse(data: unknown): data is User {
     typeof obj.avatar_url === 'string' &&
     typeof obj.created_at === 'string' &&
     typeof obj.updated_at === 'string' &&
+    typeof obj.is_online === 'boolean' &&
     Array.isArray(obj.roles) &&
     obj.roles.every((role) => typeof role === 'string')
   );
@@ -414,15 +419,19 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
   return data.user;
 };
 
-// GET /api/users/:id (get a user by ID)
+// GET /api/users/search?q= (searches for users)
 export const getSearch = async (
   query: string,
   t: TFunction,
 ): Promise<GetSearchResponse[]> => {
-  const response = await fetch(`${baseUrl}/users/search?q=${query}`, {
-    method: 'GET',
-    credentials: 'include',
-  });
+  const searchParams = new URLSearchParams({ q: query });
+  const response = await fetch(
+    `${baseUrl}/users/search?${searchParams.toString()}`,
+    {
+      method: 'GET',
+      credentials: 'include',
+    },
+  );
 
   let data: unknown = null;
 
@@ -664,7 +673,9 @@ export const putUpdateUser = async (
 export const getFriendships = async (
   t: TFunction,
 ): Promise<FriendshipsResponse> => {
-  const response = await fetch(`${baseUrl}/friendships`);
+  const response = await fetch(`${baseUrl}/friendships`, {
+    credentials: 'include',
+  });
 
   let data: unknown = null;
 

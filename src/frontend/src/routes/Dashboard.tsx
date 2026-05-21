@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
 import AddFriendModal from '../modals/AddFriend';
@@ -324,8 +324,7 @@ const Dashboard = () => {
   }
 
   if (!id && !authUser) {
-    void navigate('/login');
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   if (userFetched && !userData) {

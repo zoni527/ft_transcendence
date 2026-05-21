@@ -215,7 +215,6 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
-	c.Writer.WriteHeaderNow()
 }
 
 func (h *RecipeHandler) RecipeImageSignature(c *gin.Context) {

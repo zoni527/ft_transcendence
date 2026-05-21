@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"io"
 	"net/http/httptest"
 	"os"
 	"strings"
@@ -105,9 +104,16 @@ func TestGetAllRecipes_TableDriven(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			recipeHandler := NewRecipeHandler(mockRepo)
-			w, c := setupTestContext("GET", "/api/recipes", nil)
+			router := gin.New()
+			router.GET("/api/recipes", recipeHandler.GetAllRecipes)
+			req := httptest.NewRequest(
+				"GET",
+				"/api/recipes",
+				nil,
+			)
+			w := httptest.NewRecorder()
 
-			recipeHandler.GetAllRecipes(c)
+			router.ServeHTTP(w, req)
 
 			if w.Code != tt.expectedStatus {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
@@ -168,10 +174,16 @@ func TestGetRecipeById_TableDriven(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			recipeHandler := NewRecipeHandler(mockRepo)
-			w, c := setupTestContext("GET", "/api/recipes/"+tt.recipeId, nil)
-			c.Params = append(c.Params, gin.Param{Key: "id", Value: tt.recipeId})
+			router := gin.New()
+			router.GET("/api/recipes/:id", recipeHandler.GetRecipeById)
+			req := httptest.NewRequest(
+				"GET",
+				"/api/recipes/"+tt.recipeId,
+				nil,
+			)
+			w := httptest.NewRecorder()
 
-			recipeHandler.GetRecipeById(c)
+			router.ServeHTTP(w, req)
 
 			if w.Code != tt.expectedStatus {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
@@ -225,9 +237,16 @@ func TestSearchRecipes_TableDriven(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			recipeHandler := NewRecipeHandler(mockRepo)
-			w, c := setupTestContext("GET", "/api/recipes/search"+tt.queryString, nil)
+			router := gin.New()
+			router.GET("/api/recipes/search", recipeHandler.SearchRecipes)
+			req := httptest.NewRequest(
+				"GET",
+				"/api/recipes/search"+tt.queryString,
+				nil,
+			)
+			w := httptest.NewRecorder()
 
-			recipeHandler.SearchRecipes(c)
+			router.ServeHTTP(w, req)
 
 			if w.Code != tt.expectedStatus {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
@@ -292,14 +311,24 @@ func TestCreateRecipe_TableDriven(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			recipeHandler := NewRecipeHandler(mockRepo)
+			router := gin.New()
+			router.Use(func(c *gin.Context) {
+				if tt.userID != "" {
+					c.Set("userID", tt.userID)
+				}
+				c.Next()
+			})
+			router.POST("/api/recipes", recipeHandler.CreateRecipe)
 			bodyReader := strings.NewReader(tt.requestBody)
-			w, c := setupTestContext("POST", "/api/recipes", bodyReader)
+			req := httptest.NewRequest(
+				"POST",
+				"/api/recipes",
+				bodyReader,
+			)
+			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
 
-			if tt.userID != "" {
-				c.Set("userID", tt.userID)
-			}
-
-			recipeHandler.CreateRecipe(c)
+			router.ServeHTTP(w, req)
 
 			if w.Code != tt.expectedStatus {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
@@ -364,22 +393,30 @@ func TestUpdateRecipe_TableDriven(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			recipeHandler := NewRecipeHandler(mockRepo)
+			router := gin.New()
+			router.Use(func(c *gin.Context) {
+				if tt.userID != "" {
+					c.Set("userID", tt.userID)
+				}
+				c.Set("userPerms", map[string]bool{
+					"edit_recipe": true,
+				})
+				c.Set("userRoles", map[string]bool{
+					"user": true,
+				})
+				c.Next()
+			})
+			router.PUT("/api/recipes/:id", recipeHandler.UpdateRecipe)
 			bodyReader := strings.NewReader(tt.requestBody)
-			w, c := setupTestContext("PUT", "/api/recipes/"+tt.recipeID, bodyReader)
+			req := httptest.NewRequest(
+				"PUT",
+				"/api/recipes/"+tt.recipeID,
+				bodyReader,
+			)
+			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
 
-			c.Params = append(c.Params, gin.Param{Key: "id", Value: tt.recipeID})
-			if tt.userID != "" {
-				c.Set("userID", tt.userID)
-			}
-
-			c.Set("userPerms", map[string]bool{
-				"edit_recipe": true,
-			})
-			c.Set("userRoles", map[string]bool{
-				"user": true,
-			})
-
-			recipeHandler.UpdateRecipe(c)
+			router.ServeHTTP(w, req)
 
 			if w.Code != tt.expectedStatus {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
@@ -446,23 +483,29 @@ func TestDeleteRecipe_TableDriven(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			recipeHandler := NewRecipeHandler(mockRepo)
-			w, c := setupTestContext("DELETE", "/api/recipes/"+tt.recipeID, nil)
-
-			c.Params = append(c.Params, gin.Param{Key: "id", Value: tt.recipeID})
-			if tt.userID != "" {
-				c.Set("userID", tt.userID)
-			}
-
-			c.Set("userPerms", map[string]bool{
-				"delete_recipe": true,
+			router := gin.New()
+			router.Use(func(c *gin.Context) {
+				if tt.userID != "" {
+					c.Set("userID", tt.userID)
+				}
+				c.Set("userPerms", map[string]bool{
+					"delete_recipe": true,
+				})
+				c.Set("userRoles", map[string]bool{
+					"user": true,
+				})
+				c.Next()
 			})
-			c.Set("userRoles", map[string]bool{
-				"user": true,
-			})
+			router.DELETE("/api/recipes/:id", recipeHandler.DeleteRecipe)
+			req := httptest.NewRequest(
+				"DELETE",
+				"/api/recipes/"+tt.recipeID,
+				nil,
+			)
+			w := httptest.NewRecorder()
 
-			recipeHandler.DeleteRecipe(c)
+			router.ServeHTTP(w, req)
 
-			t.Logf("status=%d body=%s", w.Code, w.Body.String())
 			if w.Code != tt.expectedStatus {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
 			}
@@ -471,13 +514,4 @@ func TestDeleteRecipe_TableDriven(t *testing.T) {
 			}
 		})
 	}
-}
-
-/* -------------------------------------------------------------------------- */
-
-func setupTestContext(method, path string, body io.Reader) (*httptest.ResponseRecorder, *gin.Context) {
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Request = httptest.NewRequest(method, path, body)
-	return w, c
 }

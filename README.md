@@ -1,4 +1,4 @@
-*This project has been create as part of the 42 curriculum by bgazur, lsurco-t, hiennguy, jvarila.*
+*This project has been created as part of the 42 curriculum by bgazur, lsurco-t, hiennguy, jvarila.*
 # ft_transcendence
 A recipe sharing platform, full-stack web dev project
 ## Description
@@ -52,9 +52,9 @@ GitHub Project for Kanban board
 ## Database Schema
 To be written
 ## Features List
-- Friending
 - Posting
 - Browsing
+- Friends
 - Profile management
 ## Modules
 ### Web

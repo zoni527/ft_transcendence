@@ -8,6 +8,7 @@ mkdir -p ${CERTS_DIR}
 
 CERT_FILES="\
 ${CERTS_DIR}/ca.crt\
+${CERTS_DIR}/ca.key\
 ${CERTS_DIR}/reverse_proxy.crt\
 ${CERTS_DIR}/reverse_proxy.key\
 ${CERTS_DIR}/backend.crt\
@@ -102,6 +103,5 @@ chmod 600 ${CERTS_DIR}/reverse_proxy.key
 chmod 600 ${CERTS_DIR}/backend.key
 chmod 600 ${CERTS_DIR}/postgres.key
 chown 70:70 ${CERTS_DIR}/postgres.key || true
-rm ${CERTS_DIR}/ca.key
 
 echo "Certificates generated"

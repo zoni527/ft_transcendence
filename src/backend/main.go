@@ -21,6 +21,8 @@ import (
 func main() {
 	log.Println("ft_transcendence")
 
+	/* INITIALIZATION ------------------------------------------------------- */
+
 	err := repository.ConnectPool()
 	if err != nil {
 		log.Fatal("Database connection failed:", err)
@@ -34,9 +36,9 @@ func main() {
 		log.Fatal("config load failed:", err)
 	}
 	authorization.InitJWTSecret(cfg.JWTSecret)
+	integrations.InitGoogleOAuth()
 	integrations.InitCloudinary(cfg)
 
-	// Port from environment
 	nginxPort := os.Getenv("NGINX_PORT_EXTERNAL")
 	for _, d := range nginxPort {
 		if !unicode.IsDigit(d) {
@@ -62,52 +64,65 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	/* ROUTES --------------------------------------------------------------- */
+
 	// Users
 	router.GET("/api/users", handlers.GetUsers)
-	router.GET("/api/users/:id", handlers.GetUserById)
-	router.POST("/api/users", handlers.CreateUser)
-	router.PUT("/api/users/:id", middleware.Authentication(), handlers.UpdateUser)
+	router.GET("/api/users/me", middleware.Authentication(), handlers.GetMe)
 	router.GET("/api/users/avatar",
 		middleware.Authentication(),
 		handlers.UserAvatarSignature)
-	router.DELETE("/api/users/:id", middleware.Authentication(), handlers.DeleteUser)
 	router.GET("/api/users/search",
 		middleware.Authentication(),
 		handlers.SearchUser)
-	router.POST("/api/users/login", handlers.LoginUser)
-	router.GET("/api/users/session", handlers.GetSession)
-	router.POST("/api/users/logout", middleware.Authentication(), handlers.LogoutUser)
-	router.GET("/api/users/me", middleware.Authentication(), handlers.GetMe)
+	router.GET("/api/users/:id", handlers.GetUserById)
 
-	//heartbeat - update server state
-	router.PUT("/api/users/me/heartbeat",
+	router.POST("/api/users", handlers.CreateUser)
+
+	router.PUT("/api/users/me/heartbeat", // Heartbeat - update server state
 		middleware.Authentication(),
 		handlers.Heartbeat)
+	router.PUT("/api/users/:id", middleware.Authentication(), handlers.UpdateUser)
+
+	router.DELETE("/api/users/:id", middleware.Authentication(), handlers.DeleteUser)
 
 	// Recipes
 	router.GET("/api/recipes", handlers.GetAllRecipes)
-	router.GET("/api/recipes/:id", handlers.GetRecipeById)
-	router.POST("/api/recipes",
-		middleware.Authentication(),
-		middleware.RequirePermission(authorization.PermCreateRecipe),
-		handlers.CreateRecipe)
 	router.GET("/api/recipes/image-signature",
 		middleware.Authentication(),
 		middleware.RequirePermission(authorization.PermCreateRecipe),
 		handlers.RecipeImageSignature)
+	router.GET("/api/recipes/search", handlers.SearchRecipes)
+	router.GET("/api/recipes/:id", handlers.GetRecipeById)
+
+	router.POST("/api/recipes",
+		middleware.Authentication(),
+		middleware.RequirePermission(authorization.PermCreateRecipe),
+		handlers.CreateRecipe)
+
 	router.PUT("/api/recipes/:id",
 		middleware.Authentication(),
 		handlers.UpdateRecipe)
+
 	router.DELETE("/api/recipes/:id",
 		middleware.Authentication(),
 		handlers.DeleteRecipe)
-	router.GET("/api/recipes/search", handlers.SearchRecipes)
+
+	// Authentication
+	router.GET("/api/auth/session", handlers.GetSession)
+	router.GET("/api/auth/google/login", handlers.GoogleLogin)
+	router.GET("/api/auth/google/callback", handlers.GoogleCallback)
+
+	router.POST("/api/auth/login", handlers.LoginUser)
+	router.POST("/api/auth/logout", middleware.Authentication(), handlers.LogoutUser)
 
 	// Friendships
 	router.GET("/api/friendships", middleware.Authentication(), handlers.GetFriendships)
 	router.POST("/api/friendships", middleware.Authentication(), handlers.CreateFriendRequest)
 	router.PATCH("/api/friendships/:id", middleware.Authentication(), handlers.AcceptFriendRequest)
 	router.DELETE("/api/friendships/:id", middleware.Authentication(), handlers.DeleteFriendship)
+
+	/* ---------------------------------------------------------------------- */
 
 	if err := router.RunTLS(":8443", "/certs/backend.crt", "/certs/backend.key"); err != nil {
 		log.Fatal("Server failed to start:", err)

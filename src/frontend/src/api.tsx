@@ -390,9 +390,9 @@ export const postCreateRecipe = async (
   return data;
 };
 
-// GET /api/users/session (session authentication)
+// GET /api/auth/session (session authentication)
 export const getSession = async (t: TFunction): Promise<User | null> => {
-  const response = await fetch(`${baseUrl}/users/session`, {
+  const response = await fetch(`${baseUrl}/auth/session`, {
     method: 'GET',
     credentials: 'include',
   });
@@ -540,9 +540,9 @@ export const deleteUser = async (id: string, t: TFunction) => {
   }
 };
 
-// POST /api/users/login (user login)
+// POST /api/auth/login (user login)
 export const postLogin = async (payload: LoginPayload, t: TFunction) => {
-  const response = await fetch(`${baseUrl}/users/login`, {
+  const response = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -569,9 +569,9 @@ export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   }
 };
 
-// POST /api/users/logout (user logout)
+// POST /api/auth/logout (user logout)
 export const postLogout = async (t: TFunction) => {
-  const response = await fetch(`${baseUrl}/users/logout`, {
+  const response = await fetch(`${baseUrl}/auth/logout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

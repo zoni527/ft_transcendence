@@ -229,14 +229,19 @@ func GetUserById(id string) (models.User, error) {
 	return u, nil
 }
 
-// GetUserCredentialsByEmail returns a single user credentials by email
-func GetUserCredentialsByEmail(email string) (models.User, error) {
-	sql := `SELECT id, email, password_hash
-			FROM "user"
-			WHERE email = $1`
+// Helper function for fetching user credentials by a unique field
+func getUserCredentialsBy(field, value string) (models.User, error) {
+	if !(field == "email" || field == "display_name") {
+		return models.User{}, fmt.Errorf("invalid query field")
+	}
+
+	sql := fmt.Sprintf(`
+		SELECT id, email, password_hash
+		FROM "user"
+		WHERE %v = $1`, field)
 
 	var u models.User
-	err := Pool.QueryRow(context.Background(), sql, email).Scan(
+	err := Pool.QueryRow(context.Background(), sql, value).Scan(
 		&u.Id,
 		&u.Email,
 		&u.Password_hash,
@@ -245,9 +250,19 @@ func GetUserCredentialsByEmail(email string) (models.User, error) {
 		return models.User{}, pgx.ErrNoRows
 	}
 	if err != nil {
-		return models.User{}, fmt.Errorf("error getting user by email: %w", err)
+		return models.User{}, fmt.Errorf("error getting user by %v: %w", field, err)
 	}
 	return u, nil
+}
+
+// Returns a single user's credentials by email
+func GetUserCredentialsByEmail(email string) (models.User, error) {
+	return getUserCredentialsBy("email", email)
+}
+
+// Returns a single user's credentials by display_name
+func GetUserCredentialsByDisplayName(displayName string) (models.User, error) {
+	return getUserCredentialsBy("display_name", displayName)
 }
 
 var ErrUserAlreadyExists = errors.New("user already exists")

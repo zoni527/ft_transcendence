@@ -57,7 +57,7 @@ Current cookie behavior in this project:
 
 ## Login and signup flow
 
-1. User signs up (`POST /api/users`) or logs in (`POST /api/users/login`).
+1. User signs up (`POST /api/users`) or logs in (`POST /api/auth/login`).
 2. Backend validates input/credentials.
 3. Backend creates JWT.
 4. Backend sends JWT in `token` cookie.

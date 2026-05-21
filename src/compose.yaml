@@ -65,6 +65,9 @@ services:
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_KEY: ${CLOUDINARY_KEY}
       NGINX_PORT_EXTERNAL: ${NGINX_PORT_EXTERNAL:-8443}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URL: ${GOOGLE_REDIRECT_URL}
     volumes:
       - ../certs/backend.key:/certs/backend.key:ro
       - ../certs/backend.crt:/certs/backend.crt:ro

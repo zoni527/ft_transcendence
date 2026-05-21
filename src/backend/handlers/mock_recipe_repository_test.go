@@ -5,10 +5,12 @@ import (
 	"errors"
 	"io"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
 	"ft_transcendence/backend/models"
+	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
 )
@@ -57,6 +59,11 @@ func (repo *MockRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRe
 		return repo.MockSearchRecipes(ctx, f, limit, offset)
 	}
 	return nil, nil
+}
+
+func TestMain(m *testing.M) {
+	gin.SetMode(gin.TestMode)
+	os.Exit(m.Run())
 }
 
 // =============
@@ -175,6 +182,298 @@ func TestGetRecipeById_TableDriven(t *testing.T) {
 		})
 	}
 }
+
+// =============
+// SearchRecipes
+// =============
+
+var searchRecipesTests = []struct {
+	name           string
+	queryString    string
+	mockSetup      func(repo *MockRecipeRepo)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name:        "Success with Filters",
+		queryString: "?query=Pasta&difficulty=easy&meal_type=dinner&page=1",
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockSearchRecipes = func(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+				return []models.SearchRecipeResponse{{Title: "Pasta Night"}}, nil
+			}
+		},
+		expectedStatus: 200,
+		expectedBody:   `"title": "Pasta Night"`,
+	},
+	{
+		name:        "Database Error",
+		queryString: "?query=Pasta",
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockSearchRecipes = func(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+				return nil, errors.New("search index failure")
+			}
+		},
+		expectedStatus: 500,
+		expectedBody:   `"error": "internal server error"`,
+	},
+}
+
+func TestSearchRecipes_TableDriven(t *testing.T) {
+	for _, tt := range searchRecipesTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockRecipeRepo{}
+			tt.mockSetup(mockRepo)
+
+			recipeHandler := NewRecipeHandler(mockRepo)
+			w, c := setupTestContext("GET", "/api/recipes/search"+tt.queryString, nil)
+
+			recipeHandler.SearchRecipes(c)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}
+
+// =============
+// CreateRecipe
+// =============
+
+var createRecipeTests = []struct {
+	name           string
+	userID         string
+	requestBody    string
+	mockSetup      func(repo *MockRecipeRepo)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name:        "Success",
+		userID:      "00000000-0000-0000-0000-000000000001",
+		requestBody: `{"title":"Valid Title","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockCreateRecipe = func(ctx context.Context, r *models.Recipe) (string, error) {
+				return "new-recipe-uuid", nil
+			}
+		},
+		expectedStatus: 201,
+		expectedBody:   `"id": "new-recipe-uuid"`,
+	},
+	{
+		name:           "Validation Failure - Title Too Short",
+		userID:         "00000000-0000-0000-0000-000000000001",
+		requestBody:    `{"title":"No","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
+		mockSetup:      func(repo *MockRecipeRepo) {},
+		expectedStatus: 400,
+		expectedBody:   `title: too short`,
+	},
+	{
+		name:        "Repository Bad Request Error (Foreign Key / Constraint)",
+		userID:      "00000000-0000-0000-0000-000000000001",
+		requestBody: `{"title":"Valid Title","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockCreateRecipe = func(ctx context.Context, r *models.Recipe) (string, error) {
+				return "", &repository.BadRequestError{Msg: "invalid author id"}
+			}
+		},
+		expectedStatus: 400,
+		expectedBody:   `"error": "invalid author id"`,
+	},
+}
+
+func TestCreateRecipe_TableDriven(t *testing.T) {
+	for _, tt := range createRecipeTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockRecipeRepo{}
+			tt.mockSetup(mockRepo)
+
+			recipeHandler := NewRecipeHandler(mockRepo)
+			bodyReader := strings.NewReader(tt.requestBody)
+			w, c := setupTestContext("POST", "/api/recipes", bodyReader)
+
+			if tt.userID != "" {
+				c.Set("userID", tt.userID)
+			}
+
+			recipeHandler.CreateRecipe(c)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}
+
+// =============
+// UpdateRecipe
+// =============
+
+var updateRecipeTests = []struct {
+	name           string
+	recipeID       string
+	userID         string
+	requestBody    string
+	mockSetup      func(repo *MockRecipeRepo)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name:        "Success",
+		recipeID:    "aa899f26-cf36-4570-b952-58752e6bf79a",
+		userID:      "00000000-0000-0000-0000-000000000001",
+		requestBody: `{"title":"Updated Title","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+				resp := models.RecipeResponse{}
+				resp.Author.Id = "00000000-0000-0000-0000-000000000001"
+				return resp, nil
+			}
+			repo.MockUpdateRecipe = func(ctx context.Context, r *models.Recipe) error {
+				return nil
+			}
+		},
+		expectedStatus: 200,
+		expectedBody:   `"id": "aa899f26-cf36-4570-b952-58752e6bf79a"`,
+	},
+	{
+		name:        "Target Recipe Not Found",
+		recipeID:    "aa899f26-cf36-4570-b952-58752e6bf79a",
+		userID:      "00000000-0000-0000-0000-000000000001",
+		requestBody: `{"title":"Updated Title","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+				return models.RecipeResponse{}, &repository.NotFoundError{Msg: "recipe not found"}
+			}
+		},
+		expectedStatus: 404,
+		expectedBody:   `"error": "recipe not found"`,
+	},
+}
+
+func TestUpdateRecipe_TableDriven(t *testing.T) {
+	for _, tt := range updateRecipeTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockRecipeRepo{}
+			tt.mockSetup(mockRepo)
+
+			recipeHandler := NewRecipeHandler(mockRepo)
+			bodyReader := strings.NewReader(tt.requestBody)
+			w, c := setupTestContext("PUT", "/api/recipes/"+tt.recipeID, bodyReader)
+
+			c.Params = append(c.Params, gin.Param{Key: "id", Value: tt.recipeID})
+			if tt.userID != "" {
+				c.Set("userID", tt.userID)
+			}
+
+			c.Set("userPerms", map[string]bool{
+				"edit_recipe": true,
+			})
+			c.Set("userRoles", map[string]bool{
+				"user": true,
+			})
+
+			recipeHandler.UpdateRecipe(c)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}
+
+// =============
+// DeleteRecipe
+// =============
+
+var deleteRecipeTests = []struct {
+	name           string
+	recipeID       string
+	userID         string
+	mockSetup      func(repo *MockRecipeRepo)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name:     "Success",
+		recipeID: "aa899f26-cf36-4570-b952-58752e6bf79a",
+		userID:   "00000000-0000-0000-0000-000000000001",
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+				resp := models.RecipeResponse{}
+				resp.Author.Id = "00000000-0000-0000-0000-000000000001"
+				return resp, nil
+			}
+			repo.MockDeleteRecipe = func(ctx context.Context, id string) error {
+				return nil
+			}
+		},
+		expectedStatus: 204,
+		expectedBody:   "",
+	},
+	{
+		name:     "Internal DB Failure During Delete Execution",
+		recipeID: "aa899f26-cf36-4570-b952-58752e6bf79a",
+		userID:   "00000000-0000-0000-0000-000000000001",
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+				resp := models.RecipeResponse{}
+				resp.Author.Id = "00000000-0000-0000-0000-000000000001"
+				return resp, nil
+			}
+			repo.MockDeleteRecipe = func(ctx context.Context, id string) error {
+				return errors.New("deadlock encountered row locking table")
+			}
+		},
+		expectedStatus: 500,
+		expectedBody:   `"error": "internal server error"`,
+	},
+}
+
+func TestDeleteRecipe_TableDriven(t *testing.T) {
+	for _, tt := range deleteRecipeTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockRecipeRepo{}
+			tt.mockSetup(mockRepo)
+
+			recipeHandler := NewRecipeHandler(mockRepo)
+			w, c := setupTestContext("DELETE", "/api/recipes/"+tt.recipeID, nil)
+
+			c.Params = append(c.Params, gin.Param{Key: "id", Value: tt.recipeID})
+			if tt.userID != "" {
+				c.Set("userID", tt.userID)
+			}
+
+			c.Set("userPerms", map[string]bool{
+				"delete_recipe": true,
+			})
+			c.Set("userRoles", map[string]bool{
+				"user": true,
+			})
+
+			recipeHandler.DeleteRecipe(c)
+
+			t.Logf("status=%d body=%s", w.Code, w.Body.String())
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if tt.expectedBody != "" && !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}
+
+/* -------------------------------------------------------------------------- */
 
 func setupTestContext(method, path string, body io.Reader) (*httptest.ResponseRecorder, *gin.Context) {
 	w := httptest.NewRecorder()

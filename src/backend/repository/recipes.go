@@ -270,19 +270,19 @@ func (pgRepo *PostgresRecipeRepo) DeleteRecipe(ctx context.Context, id string) e
 // helper functions
 
 type BadRequestError struct {
-	msg string
+	Msg string
 }
 
 func (e *BadRequestError) Error() string {
-	return e.msg
+	return e.Msg
 }
 
 type NotFoundError struct {
-	msg string
+	Msg string
 }
 
 func (e *NotFoundError) Error() string {
-	return e.msg
+	return e.Msg
 }
 
 func recipePostgresErrorClassification(functionName string, err error) error {

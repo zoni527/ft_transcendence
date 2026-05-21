@@ -12,12 +12,14 @@ interface AdminRecipeFieldProps {
   recipe: Recipe;
   onDelete: (id: string) => void;
   onUpdate: (recipe: Recipe) => void;
+  onClick?: () => void;
 }
 
 const AdminRecipeField = ({
   recipe,
   onDelete,
   onUpdate,
+  onClick,
 }: AdminRecipeFieldProps) => {
   const [isRecipeEditOpen, setIsRecipeEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,7 +58,10 @@ const AdminRecipeField = ({
           onSave={onUpdate}
         />
       )}
-      <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+      <div
+        className="flex items-center justify-between border-b border-gray-300 pt-4 pb-4 pl-2 hover:cursor-pointer hover:bg-gray-100"
+        onClick={onClick}
+      >
         {/* Recipe name */}
         <div className="flex-1 text-xl font-semibold text-gray-700">
           {recipe.title}
@@ -67,7 +72,10 @@ const AdminRecipeField = ({
           {/* Edit recipe */}
           <ModalButton
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
-            onClick={() => setIsRecipeEditOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsRecipeEditOpen(true);
+            }}
             text={t('adminPanel.edit')}
             disabled={!hasRole(['admin'])}
           />
@@ -77,7 +85,10 @@ const AdminRecipeField = ({
             className="w-full rounded-xl border-2 border-slate-600 hover:border-slate-950 md:w-auto"
             isLoading={loading}
             defaultText={t('adminPanel.delete')}
-            onClick={() => handleDelete(recipe.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(recipe.id);
+            }}
             type="button"
             disabled={!hasRole(['admin'])}
           />

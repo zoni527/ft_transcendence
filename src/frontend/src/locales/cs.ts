@@ -2,6 +2,13 @@ export const csTranslations = {
   nav: {
     recipes: 'Recepty',
     dashboard: 'Profil',
+    friends: 'Přátelé',
+    incoming: 'Příchozí',
+    outgoing: 'Odchozí',
+    accept: 'Přijmout',
+    reject: 'Odmítnout',
+    remove: 'Odstranit',
+    cancel: 'Zrušit',
     signup: 'Registrovat se',
     login: 'Přihlásit se',
     logout: 'Odhlásit se',
@@ -16,6 +23,11 @@ export const csTranslations = {
     userDeleteSuccess: 'Uživatel byl úspěšně smazán',
     editRecipeSuccess: 'Recept byl úspěšně upraven',
     updateUserSuccess: 'Profil uživatele byl aktualizován',
+    friendRemoved: 'Přítel odstraněn',
+    friendRequestCancelled: 'Žádost zrušena',
+    friendRequestAccepted: 'Žádost přijata',
+    friendRequestRejected: 'Žádost odmítnuta',
+    friendRequestSent: 'Žádost odeslána',
   },
   info: {
     name: 'Ostatní uživatelé nevidí vaše celé jméno',
@@ -48,12 +60,18 @@ export const csTranslations = {
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
+    addFriend: 'Přidat přítele',
+    noResults: 'Žádné výsledky...',
+    noEntries: 'Zatím zde není nikdo k zobrazení!',
   },
   roles: {
     user: 'uživatel',
     chef: 'kuchař',
     moderator: 'moderátor',
     admin: 'správce',
+  },
+  friends: {
+    header: 'Přátelé',
   },
   adminPanel: {
     header: 'Administrátorský panel',
@@ -302,6 +320,7 @@ export const csTranslations = {
     newest: 'Nejnovější první',
     oldest: 'Nejstarší první',
     loadMore: 'Další recepty...',
+    searchUser: 'Hledat uživatele...',
   },
   error: {
     error: 'Chyba:',

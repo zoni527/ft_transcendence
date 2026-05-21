@@ -1,5 +1,10 @@
 import type { TFunction } from 'i18next';
-import type { Recipe, User } from './types/types';
+import type {
+  Recipe,
+  User,
+  FriendshipListItem,
+  AcceptedFriend,
+} from './types/types';
 
 export interface SearchRecipesParams {
   query?: string;
@@ -71,6 +76,18 @@ export interface UpdateUserPayload {
   roles?: string[] | null;
 }
 
+interface FriendshipsResponse {
+  friends: AcceptedFriend[];
+  sent: FriendshipListItem[];
+  incoming: FriendshipListItem[];
+}
+
+export interface GetSearchResponse {
+  id: string;
+  name: string;
+  display_name: string;
+}
+
 interface LoginSignupResponse {
   id: string;
   email: string;
@@ -113,6 +130,27 @@ function isSessionResponse(data: unknown): data is SessionResponse {
   return typeof obj.authenticated === 'boolean' && isUserResponse(obj.user);
 }
 
+// Validation for GetSearchResponse
+function isGetSearchResponse(data: unknown): data is GetSearchResponse[] {
+  if (!Array.isArray(data)) {
+    return false;
+  }
+
+  return data.every((item) => {
+    if (typeof item !== 'object' || item === null) {
+      return false;
+    }
+
+    const obj = item as Record<string, unknown>;
+
+    return (
+      typeof obj.id === 'string' &&
+      typeof obj.name === 'string' &&
+      typeof obj.display_name === 'string'
+    );
+  });
+}
+
 // Validation for UserResponse
 function isUserResponse(data: unknown): data is User {
   if (typeof data !== 'object' || data === null) {
@@ -129,8 +167,45 @@ function isUserResponse(data: unknown): data is User {
     typeof obj.avatar_url === 'string' &&
     typeof obj.created_at === 'string' &&
     typeof obj.updated_at === 'string' &&
+    typeof obj.is_online === 'boolean' &&
     Array.isArray(obj.roles) &&
     obj.roles.every((role) => typeof role === 'string')
+  );
+}
+
+// Validation for FriendshipListItem
+function isFriendshipListItem(data: unknown): data is FriendshipListItem {
+  if (typeof data !== 'object' || data === null) return false;
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.display_name === 'string' &&
+    typeof obj.name === 'string'
+  );
+}
+
+// Validation for OnlineFriend
+function isAcceptedFriend(data: unknown): data is AcceptedFriend {
+  if (!isFriendshipListItem(data)) return false;
+
+  const obj = data as unknown as Record<string, unknown>;
+  return typeof obj.is_online === 'boolean';
+}
+
+// Validation for Friendships
+function isFriendshipsResponse(data: unknown): data is FriendshipsResponse {
+  if (typeof data !== 'object' || data === null) return false;
+  const obj = data as Record<string, unknown>;
+
+  return (
+    Array.isArray(obj.friends) &&
+    obj.friends.every(isAcceptedFriend) &&
+    Array.isArray(obj.sent) &&
+    obj.sent.every(isFriendshipListItem) &&
+    Array.isArray(obj.incoming) &&
+    obj.incoming.every(isFriendshipListItem)
   );
 }
 
@@ -344,6 +419,40 @@ export const getSession = async (t: TFunction): Promise<User | null> => {
   return data.user;
 };
 
+// GET /api/users/search?q= (searches for users)
+export const getSearch = async (
+  query: string,
+  t: TFunction,
+): Promise<GetSearchResponse[]> => {
+  const searchParams = new URLSearchParams({ q: query });
+  const response = await fetch(
+    `${baseUrl}/users/search?${searchParams.toString()}`,
+    {
+      method: 'GET',
+      credentials: 'include',
+    },
+  );
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+
+  if (!isGetSearchResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
 // GET /api/users (get all users)
 export const getUsers = async (t: TFunction): Promise<User[]> => {
   const response = await fetch(`${baseUrl}/users`);
@@ -509,6 +618,22 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   }
 };
 
+// PUT /api/users/me/heartbeat
+export const putHeartbeat = async (t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/me/heartbeat`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorMessage = getTranslatedErrorMessage(response.status, t);
+    throw new Error(errorMessage);
+  }
+};
+
 // PUT /api/users/:id (user update)
 export const putUpdateUser = async (
   payload: UpdateUserPayload,
@@ -542,6 +667,79 @@ export const putUpdateUser = async (
   }
 
   return data;
+};
+
+// GET /api/friendships (get all friendships)
+export const getFriendships = async (
+  t: TFunction,
+): Promise<FriendshipsResponse> => {
+  const response = await fetch(`${baseUrl}/friendships`, {
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  if (!isFriendshipsResponse(data)) {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
+// POST /api/friendships/ (send a friend request)
+export const sendFriendship = async (receiver_id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/friendships`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ receiver_id }),
+  });
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+};
+
+// PATCH /api/friendships/:id (accept a friend request)
+export const acceptFriend = async (id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/friendships/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+};
+
+// DELETE /api/friendships/:id (delete / reject / cancel friend relationship)
+export const deleteFriend = async (id: string, t: TFunction) => {
+  const response = await fetch(`${baseUrl}/friendships/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
 };
 
 // PUT /api/recipes/:id (edit a recipe)

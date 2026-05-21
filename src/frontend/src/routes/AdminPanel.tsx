@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AdminUserField from '../components/AdminUserField.tsx';
 import AdminRecipeField from '../components/AdminRecipeField.tsx';
+import SectionButton from '../components/SectionButton.tsx';
+import SortButtons from '../components/SortButtons.tsx';
 import StatusBox from '../components/StatusBox';
+import UserStatus from '../components/UserStatus.tsx';
 import { useAuth } from '../utils/AuthContext';
 import { getUsers, getRecipes } from '../api';
 import { useNotification } from '../utils/NotifContext.ts';
@@ -15,40 +19,65 @@ const AdminPanel = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState<'users' | 'recipes'>(
-    'users',
-  );
-  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
+  const [activeSection, setActiveSection] = useState<'users' | 'recipes'>(
+    () => {
+      return (
+        (localStorage.getItem('adminActiveSection') as 'users' | 'recipes') ||
+        'recipes'
+      );
+    },
+  );
+
+  useEffect(() => {
+    localStorage.setItem('adminActiveSection', activeSection);
+  }, [activeSection]);
+
+  // Fetches recipes and users
   useEffect(() => {
     if (authLoading) return;
-    if (!user) return;
-    if (!hasRole(['admin'])) return;
 
     let cancelled = false;
 
-    Promise.all([getUsers(t), getRecipes(t)])
-      .then(([usersData, recipesData]) => {
+    const fetchData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      if (!hasRole(['admin'])) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const [usersData, recipesData] = await Promise.all([
+          getUsers(t),
+          getRecipes(t),
+        ]);
+
         if (cancelled) return;
 
-        setUsers(usersData);
-
+        setUsers([...usersData].sort((a, b) => a.name.localeCompare(b.name)));
         setRecipes(
           [...recipesData].sort((a, b) => a.title.localeCompare(b.title)),
         );
-      })
-      .catch((err: unknown) => {
+      } catch (err: unknown) {
         if (cancelled) return;
 
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
         showNotification(message, 'error');
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    };
+
+    void fetchData();
 
     return () => {
       cancelled = true;
@@ -82,91 +111,65 @@ const AdminPanel = () => {
   return (
     <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
       {/* Avatar */}
-      <div className="mb-8 flex flex-col items-center gap-4 md:absolute md:top-8 md:right-8 md:mb-0 md:items-end">
+      <div className="relative mb-8 flex flex-col items-center gap-4 md:absolute md:top-8 md:right-12 md:mb-0 md:items-end">
         <img
           src={user.avatar_url}
           alt={`${user.name}'s avatar`}
-          className="h-28 w-28 rounded-full border-2 border-gray-300"
+          className="h-28 w-28 rounded-full border-2 border-slate-600"
         />
       </div>
+
+      {/* Online/Offline Indicator */}
+      <UserStatus
+        isOnline={user.is_online}
+        className={'absolute top-8 right-8'}
+      />
 
       {/* Header */}
       <h1 className="text-center text-3xl font-bold text-[#C04D31] md:text-left">
         {t('adminPanel.header')}
       </h1>
 
-      {/* Section Tabs */}
-      <div className="mt-16 flex flex-col gap-4 border-b pb-2 md:mt-28 md:flex-row md:gap-8">
-        <button
-          onClick={() => setActiveSection('users')}
-          className={`text-2xl font-bold transition-colors hover:cursor-pointer ${
-            activeSection === 'users'
-              ? 'text-[#C04D31]'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          {t('adminPanel.users')}
-        </button>
+      {/* Tabs */}
+      <div className="mt-16 border-b pb-2 md:mt-20">
+        <div className="mb-4 flex justify-center gap-8 md:gap-24">
+          <SectionButton
+            label={t('adminPanel.recipes')}
+            section="recipes"
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
 
-        <button
-          onClick={() => setActiveSection('recipes')}
-          className={`text-2xl font-bold transition-colors hover:cursor-pointer ${
-            activeSection === 'recipes'
-              ? 'text-[#C04D31]'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          {t('adminPanel.recipes')}
-        </button>
+          <SectionButton
+            label={t('adminPanel.users')}
+            section="users"
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
+        </div>
       </div>
 
       {/* Sort Controls */}
       {activeSection === 'users' && (
-        <div className="mt-6 flex w-full justify-center md:justify-start">
-          <div className="flex flex-col items-center gap-3 md:flex-row md:items-start md:gap-6">
-            <button
-              onClick={() => setSortBy('name')}
-              className={`text-lg font-bold transition-colors hover:cursor-pointer md:w-64 md:text-left ${
-                sortBy === 'name'
-                  ? 'text-[#C04D31]'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t('adminPanel.sortFullName')}
-            </button>
-
-            <button
-              onClick={() => setSortBy('username')}
-              className={`text-lg font-bold transition-colors hover:cursor-pointer md:w-64 md:text-left ${
-                sortBy === 'username'
-                  ? 'text-[#C04D31]'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t('adminPanel.sortUsername')}
-            </button>
-          </div>
-        </div>
+        <SortButtons
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          options={[
+            {
+              value: 'name',
+              label: t('adminPanel.sortFullName'),
+            },
+            {
+              value: 'username',
+              label: t('adminPanel.sortUsername'),
+            },
+          ]}
+        />
       )}
 
       {/* Content */}
-      <div className="mt-10 flex flex-col gap-4">
-        {activeSection === 'users' &&
-          sortedUsers.map((listedUser) => (
-            <AdminUserField
-              key={listedUser.id}
-              user={listedUser}
-              onDelete={(id) =>
-                setUsers((prev) => prev.filter((u) => u.id !== id))
-              }
-              onUpdate={(updatedUser) =>
-                setUsers((prev) =>
-                  prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
-                )
-              }
-            />
-          ))}
-
+      <div className="mt-12 flex flex-col">
+        {/* Recipes */}
         {activeSection === 'recipes' &&
           recipes.map((recipe) => (
             <AdminRecipeField
@@ -184,6 +187,29 @@ const AdminPanel = () => {
                   ].sort((a, b) => a.title.localeCompare(b.title)),
                 )
               }
+              onClick={() => {
+                void navigate(`/recipes/${recipe.id}`);
+              }}
+            />
+          ))}
+
+        {/* Users */}
+        {activeSection === 'users' &&
+          sortedUsers.map((listedUser) => (
+            <AdminUserField
+              key={listedUser.id}
+              user={listedUser}
+              onDelete={(id) =>
+                setUsers((prev) => prev.filter((u) => u.id !== id))
+              }
+              onUpdate={(updatedUser) =>
+                setUsers((prev) =>
+                  prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
+                )
+              }
+              onClick={() => {
+                void navigate(`/users/${listedUser.id}`);
+              }}
             />
           ))}
       </div>

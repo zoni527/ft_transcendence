@@ -1,7 +1,14 @@
 export const fiTranslations = {
   nav: {
     recipes: 'Reseptit',
-    dashboard: 'Käyttäjäprofiili',
+    dashboard: 'Profiili',
+    friends: 'Ystävät',
+    incoming: 'Saapuvat',
+    outgoing: 'Lähtevät',
+    accept: 'Hyväksy',
+    reject: 'Hylkää',
+    remove: 'Poista',
+    cancel: 'Peruuta',
     signup: 'Rekisteröidy',
     login: 'Kirjaudu sisään',
     logout: 'Kirjaudu ulos',
@@ -16,6 +23,11 @@ export const fiTranslations = {
     userDeleteSuccess: 'Käyttäjä poistettu',
     editRecipeSuccess: 'Resepti päivitetty',
     updateUserSuccess: 'Käyttäjäprofiili päivitetty',
+    friendRemoved: 'Ystävä poistettu',
+    friendRequestCancelled: 'Pyyntö peruttu',
+    friendRequestAccepted: 'Pyyntö hyväksytty',
+    friendRequestRejected: 'Pyyntö hylätty',
+    friendRequestSent: 'Pyyntö lähetetty',
   },
   info: {
     name: 'Ei näy muille käyttäjille',
@@ -48,6 +60,9 @@ export const fiTranslations = {
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
     submit: 'Poista profiili',
+    addFriend: 'Lisää kaveri',
+    noResults: 'Ei tuloksia...',
+    noEntries: 'Täällä ei ole vielä ketään näytettäväksi!',
   },
   roles: {
     user: 'käyttäjä',
@@ -55,10 +70,13 @@ export const fiTranslations = {
     moderator: 'moderaattori',
     admin: 'ylläpitäjä',
   },
+  friends: {
+    header: 'Ystävät',
+  },
   adminPanel: {
     header: 'Ylläpitäjän paneeli',
-    users: 'Käyttäjätietokanta',
-    recipes: 'Reseptitietokanta',
+    users: 'Käyttäjät',
+    recipes: 'Reseptit',
     edit: 'Muokkaa',
     delete: 'Poista',
     sortFullName: 'A-Z: Koko nimi',
@@ -302,6 +320,7 @@ export const fiTranslations = {
     newest: 'Uusin ensin',
     oldest: 'Vanhin ensin',
     loadMore: 'Lisää reseptejä...',
+    searchUser: 'Hae käyttäjiä...',
   },
   error: {
     error: 'Virhe:',

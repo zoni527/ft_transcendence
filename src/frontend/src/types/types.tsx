@@ -1,6 +1,10 @@
 export interface Recipe {
   id: string;
-  author_id: string;
+  author: {
+    id: string;
+    display_name: string;
+    avatar_url: string;
+  };
   title: string;
   description: string;
   preparation_time_min: number;
@@ -26,6 +30,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   roles: string[];
+  is_online: boolean;
 }
 
 export type AuthContextType = {
@@ -35,3 +40,13 @@ export type AuthContextType = {
   loading: boolean;
   hasRole: (roles: string[]) => boolean;
 };
+
+export interface FriendshipListItem {
+  id: string;
+  display_name: string;
+  name: string;
+}
+
+export interface AcceptedFriend extends FriendshipListItem {
+  is_online: boolean;
+}

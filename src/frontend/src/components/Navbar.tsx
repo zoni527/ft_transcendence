@@ -11,7 +11,6 @@ import { cardBase, buttonBase, navLeftBase } from '../styles/styles';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const { user, logout, hasRole, loading } = useAuth();
@@ -61,7 +60,7 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {!user && !loading ? (
+          {loading ? null : !user ? (
             <NavButton
               path="/signup"
               className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}
@@ -77,7 +76,7 @@ const Navbar = () => {
             </NavButton>
           )}
 
-          {!user && !loading ? (
+          {loading ? null : !user ? (
             <NavButton
               path="/login"
               className={`${buttonBase} rounded-full border-3 border-orange-700 hover:border-orange-800`}
@@ -141,7 +140,6 @@ const Navbar = () => {
               {t('nav.dashboard')}
             </NavButton>
           )}
-
           {!user ? (
             <NavButton
               path="/login"
@@ -163,7 +161,6 @@ const Navbar = () => {
               {t('nav.logout')}
             </NavButton>
           )}
-
           <LangDropdown />
         </div>
       )}

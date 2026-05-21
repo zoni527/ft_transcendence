@@ -136,11 +136,12 @@ from [authorization/recipe.go](authorization/recipe.go):
 Pattern:
 
 ```go
-// inside handler
-recipe, err := h.Repo.GetRecipeById(recipeID)
-if err != nil {
-    // ... 404 if not found, 500 otherwise
-    return
+func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
+    // ...
+    recipe, err := h.Repo.GetRecipeById(c.Request.Context(), id)
+    if err != nil {
+        // ... 404 if not found, 500 otherwise
+        return
 }
 
 userID := c.GetString("userID")

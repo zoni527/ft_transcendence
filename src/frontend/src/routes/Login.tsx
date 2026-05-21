@@ -82,7 +82,7 @@ const Login = () => {
 
   // Google auth
   const handleGoogleLogin = () => {
-    window.location.href = 'https://localhost:8443/api/auth/google/login';
+    window.location.href = '/api/auth/google/login';
   };
 
   return (

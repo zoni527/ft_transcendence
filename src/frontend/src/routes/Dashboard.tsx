@@ -377,10 +377,12 @@ const Dashboard = () => {
         </div>
 
         {/* Online/Offline Indicator */}
-        <UserStatus
-          isOnline={userData.is_online}
-          className={'absolute top-8 right-8'}
-        />
+        {authUser && (
+          <UserStatus
+            isOnline={userData.is_online}
+            className={'absolute top-8 right-8'}
+          />
+        )}
 
         {/* Header */}
         <h1 className="text-center text-3xl font-bold text-[#C04D31] md:text-left">

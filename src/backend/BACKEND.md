@@ -172,7 +172,7 @@ Validates the user by reading the `token` cookie, validating the JWT, checking t
 - `token` — the raw JWT
 - `expDate` — token expiration time
 
-**Returns:** 
+**Returns:**
 | Status                           | When                                          |
 |----------------------------------|-----------------------------------------------|
 | 401 `{"error":"unauthorized"}`   | No `token` cookie                             |
@@ -225,18 +225,24 @@ Helper functions for role and permission checks inside handlers:
 For "edit your own thing" endpoints, handlers check authorship first:
 
 ```go
-func UpdateRecipe(c *gin.Context) {
+func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
     userID := c.GetString("userID")
+    // error handling...
+    recipeId := c.Param("id")
+    // error handling and JSON binding...
+
+    original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeID)
+    // error handling ...
+
     roleSet, _ := authorization.RolesFromContext(c)
     permSet, _ := authorization.PermsFromContext(c)
-    
-    original, err := repository.GetRecipeById(recipeID)
-    
+    // error handling...
+
     if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.Id) {
         c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
         return
     }
-    
+
     // ... update the recipe
 }
 ```

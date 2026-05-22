@@ -49,7 +49,7 @@ func main() {
 		nginxPort = "8443"
 	}
 	portNum, err := strconv.Atoi(nginxPort)
-	if err != nil || (portNum < 1 || portNum > 1<<16-1) {
+	if err != nil || (portNum < 1 || portNum > (1<<16)-1) {
 		log.Fatal("Bad nginx port:", nginxPort)
 	}
 
@@ -63,6 +63,9 @@ func main() {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	}))
+
+	pgRepo := repository.NewPostgresRecipeRepo(repository.Pool)
+	recipeHandler := handlers.NewRecipeHandler(pgRepo)
 
 	/* ROUTES --------------------------------------------------------------- */
 
@@ -87,26 +90,22 @@ func main() {
 	router.DELETE("/api/users/:id", middleware.Authentication(), handlers.DeleteUser)
 
 	// Recipes
-	router.GET("/api/recipes", handlers.GetAllRecipes)
+	router.GET("/api/recipes", recipeHandler.GetAllRecipes)
 	router.GET("/api/recipes/image-signature",
 		middleware.Authentication(),
 		middleware.RequirePermission(authorization.PermCreateRecipe),
-		handlers.RecipeImageSignature)
-	router.GET("/api/recipes/search", handlers.SearchRecipes)
-	router.GET("/api/recipes/:id", handlers.GetRecipeById)
+		recipeHandler.RecipeImageSignature)
+	router.GET("/api/recipes/search", recipeHandler.SearchRecipes)
+	router.GET("/api/recipes/:id", recipeHandler.GetRecipeById)
 
 	router.POST("/api/recipes",
 		middleware.Authentication(),
 		middleware.RequirePermission(authorization.PermCreateRecipe),
-		handlers.CreateRecipe)
+		recipeHandler.CreateRecipe)
 
-	router.PUT("/api/recipes/:id",
-		middleware.Authentication(),
-		handlers.UpdateRecipe)
+	router.PUT("/api/recipes/:id", middleware.Authentication(), recipeHandler.UpdateRecipe)
 
-	router.DELETE("/api/recipes/:id",
-		middleware.Authentication(),
-		handlers.DeleteRecipe)
+	router.DELETE("/api/recipes/:id", middleware.Authentication(), recipeHandler.DeleteRecipe)
 
 	// Authentication
 	router.GET("/api/auth/session", handlers.GetSession)

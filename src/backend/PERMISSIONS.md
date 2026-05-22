@@ -76,7 +76,7 @@ Two middlewares run before any protected route:
 - `RequireRoles()` or `RequirePermission()` — "do you have the required roles/permissions?" (authorization)
 
 These stack because they answer **different** questions: one identifies
-the user, the other checks what they can do. You need `Authentication()` 
+the user, the other checks what they can do. You need `Authentication()`
 before any other middleware.
 
 If both pass, the handler runs. Some handlers do an extra check of their
@@ -90,7 +90,7 @@ in the code today.
 
 ### Authentication()
 
-Reads the `token` cookie, validates the JWT, checks the token blacklist, and stores user data on the Gin 
+Reads the `token` cookie, validates the JWT, checks the token blacklist, and stores user data on the Gin
 context: `userID`, `userRoles`, `userPerms`, `token`, `expDate`.
 
 | Status                           | When                                           |
@@ -101,7 +101,7 @@ context: `userID`, `userRoles`, `userPerms`, `token`, `expDate`.
 
 ### RequireRoles()
 
-Checks if the user has at least one of the required roles. 
+Checks if the user has at least one of the required roles.
 Must come after `Authentication()`. Returns `403 Forbidden` on failure.
 
 ```go
@@ -114,7 +114,7 @@ router.POST("/api/recipes",
 ### RequirePermission()
 
 Checks if the user has at least one of the required permissions.
-Must come after `Authentication()`. Admin users automatically 
+Must come after `Authentication()`. Admin users automatically
 pass all permission checks. Returns `403 Forbidden` on failure.
 
 ```go
@@ -136,11 +136,12 @@ from [authorization/recipe.go](authorization/recipe.go):
 Pattern:
 
 ```go
-// inside handler
-recipe, err := repository.GetRecipeById(recipeID)
-if err != nil {
-    // ... 404 if not found, 500 otherwise
-    return
+func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
+    // ...
+    recipe, err := h.Repo.GetRecipeById(c.Request.Context(), id)
+    if err != nil {
+        // ... 404 if not found, 500 otherwise
+        return
 }
 
 userID := c.GetString("userID")

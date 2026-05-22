@@ -18,24 +18,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAllRecipes(c *gin.Context) {
-	recipes, err := repository.GetAllRecipes()
+type RecipeHandler struct {
+	Repo repository.RecipeRepository
+}
+
+func NewRecipeHandler(repo repository.RecipeRepository) *RecipeHandler {
+	return &RecipeHandler{Repo: repo}
+}
+
+func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
+	recipes, err := h.Repo.GetAllRecipes(c.Request.Context())
 	if err != nil {
 		log.Printf("handlers.GetAllRecipes: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, recipes)
 }
 
-func GetRecipeById(c *gin.Context) {
+func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
-	recipe, err := repository.GetRecipeById(id)
+	recipe, err := h.Repo.GetRecipeById(c.Request.Context(), id)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -44,10 +53,11 @@ func GetRecipeById(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, recipe)
 }
 
-func SearchRecipes(c *gin.Context) {
+func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
 	var f models.SearchRecipeFilters
 
 	if err := c.ShouldBindQuery(&f); err != nil {
@@ -63,7 +73,7 @@ func SearchRecipes(c *gin.Context) {
 	}
 	offset := (f.Page - 1) * limitInt
 
-	recipes, err := repository.SearchRecipes(f, limitInt, offset)
+	recipes, err := h.Repo.SearchRecipes(c.Request.Context(), f, limitInt, offset)
 	if err != nil {
 		log.Printf("handlers.SearchRecipes: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -72,7 +82,7 @@ func SearchRecipes(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, recipes)
 }
 
-func CreateRecipe(c *gin.Context) {
+func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 	var r models.Recipe
 	if err := c.ShouldBindJSON(&r); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
@@ -88,7 +98,7 @@ func CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	newRecipeId, err := repository.CreateRecipe(&r)
+	newRecipeId, err := h.Repo.CreateRecipe(c.Request.Context(), &r)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -101,7 +111,7 @@ func CreateRecipe(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, gin.H{"id": newRecipeId})
 }
 
-func UpdateRecipe(c *gin.Context) {
+func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 	userId := c.GetString("userID")
 	if !authorization.IsValidUUID(userId) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -120,7 +130,7 @@ func UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	original, err := repository.GetRecipeById(recipeId)
+	original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeId)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -148,7 +158,7 @@ func UpdateRecipe(c *gin.Context) {
 	}
 
 	r.Id = recipeId
-	if err := repository.UpdateRecipe(&r); err != nil {
+	if err := h.Repo.UpdateRecipe(c.Request.Context(), &r); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
@@ -160,7 +170,7 @@ func UpdateRecipe(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"id": recipeId})
 }
 
-func DeleteRecipe(c *gin.Context) {
+func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 	userId := c.GetString("userID")
 	if !authorization.IsValidUUID(userId) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -173,7 +183,7 @@ func DeleteRecipe(c *gin.Context) {
 		return
 	}
 
-	original, err := repository.GetRecipeById(recipeId)
+	original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeId)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -195,7 +205,7 @@ func DeleteRecipe(c *gin.Context) {
 		return
 	}
 
-	if err := repository.DeleteRecipe(recipeId); err != nil {
+	if err := h.Repo.DeleteRecipe(c.Request.Context(), recipeId); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
@@ -207,7 +217,7 @@ func DeleteRecipe(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func RecipeImageSignature(c *gin.Context) {
+func (h *RecipeHandler) RecipeImageSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	folder := "recipes"
 	allowedFormats := "jpg, jpeg, png, webp"
@@ -217,6 +227,7 @@ func RecipeImageSignature(c *gin.Context) {
 		"allowed_formats": allowedFormats,
 	}
 	signature := integrations.GenerateCloudinarySignature(params)
+
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"signature":       signature,
 		"api_key":         integrations.APIKey(),

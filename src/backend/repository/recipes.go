@@ -23,7 +23,25 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type RecipeRepository interface {
+	GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error)
+	GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error)
+	CreateRecipe(ctx context.Context, r *models.Recipe) (string, error)
+	UpdateRecipe(ctx context.Context, r *models.Recipe) error
+	DeleteRecipe(ctx context.Context, id string) error
+	SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error)
+}
+
+type PostgresRecipeRepo struct {
+	Pool *pgxpool.Pool
+}
+
+func NewPostgresRecipeRepo(pool *pgxpool.Pool) *PostgresRecipeRepo {
+	return &PostgresRecipeRepo{Pool: pool}
+}
 
 // GetAllRecipes returns all recipes.
 // COALESCE(column, fallback) — if column is NULL, use the fallback value instead.
@@ -39,7 +57,7 @@ import (
 // LEFT JOIN, not INNER: author_id is ON DELETE SET NULL, so a recipe can
 // outlive its author. We still want to return the recipe, just with an empty
 // author block.
-func GetAllRecipes() ([]models.RecipeResponse, error) {
+func (pgRepo *PostgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),
 				COALESCE(u.display_name, ''),
@@ -55,7 +73,7 @@ func GetAllRecipes() ([]models.RecipeResponse, error) {
 			LEFT JOIN "user" u ON u.id = r.author_id
 			ORDER BY r.created_at DESC`
 
-	rows, err := Pool.Query(context.Background(), sql)
+	rows, err := pgRepo.Pool.Query(ctx, sql)
 	if err != nil {
 		return nil, fmt.Errorf("error querying recipes: %w", err)
 	}
@@ -86,7 +104,7 @@ func GetAllRecipes() ([]models.RecipeResponse, error) {
 	return recipes, nil
 }
 
-func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
 	sql := `SELECT id, title, 
 			COALESCE(preparation_time_min, 0),
 			COALESCE(image_url, '')
@@ -118,7 +136,7 @@ func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.Se
 	sql += fmt.Sprintf(" ORDER BY created_at %s LIMIT $%d OFFSET $%d", sortOrder, pCount, pCount+1)
 	args = append(args, limit, offset)
 
-	rows, err := Pool.Query(context.Background(), sql, args...)
+	rows, err := pgRepo.Pool.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +162,7 @@ func SearchRecipes(f models.SearchRecipeFilters, limit, offset int) ([]models.Se
 }
 
 // GetRecipeById returns a single recipe by UUID.
-func GetRecipeById(id string) (models.RecipeResponse, error) {
+func (pgRepo *PostgresRecipeRepo) GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),
 				COALESCE(u.display_name, ''),
@@ -161,7 +179,7 @@ func GetRecipeById(id string) (models.RecipeResponse, error) {
 			WHERE r.id = $1`
 
 	var r models.RecipeResponse
-	err := Pool.QueryRow(context.Background(), sql, id).Scan(
+	err := pgRepo.Pool.QueryRow(ctx, sql, id).Scan(
 		&r.Id,
 		&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
 		&r.Title, &r.Description,
@@ -176,13 +194,13 @@ func GetRecipeById(id string) (models.RecipeResponse, error) {
 	}
 
 	if err != nil {
-		return models.RecipeResponse{}, fmt.Errorf("repository.GetRecipeById: %w", err)
+		return models.RecipeResponse{}, fmt.Errorf("GetRecipeById: %w", err)
 	}
 
 	return r, nil
 }
 
-func CreateRecipe(r *models.Recipe) (string, error) {
+func (pgRepo *PostgresRecipeRepo) CreateRecipe(ctx context.Context, r *models.Recipe) (string, error) {
 	sql := `
 		INSERT INTO recipe (
 			author_id, title, description, preparation_time_min,
@@ -194,7 +212,7 @@ func CreateRecipe(r *models.Recipe) (string, error) {
 
 	var newId string
 
-	err := Pool.QueryRow(context.Background(), sql,
+	err := pgRepo.Pool.QueryRow(ctx, sql,
 		r.Author_id, r.Title, r.Description, r.Preparation_time_min,
 		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
 		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g,
@@ -206,7 +224,7 @@ func CreateRecipe(r *models.Recipe) (string, error) {
 	return newId, nil
 }
 
-func UpdateRecipe(r *models.Recipe) error {
+func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Recipe) error {
 	sql := `
 		UPDATE recipe
 		SET (
@@ -219,7 +237,7 @@ func UpdateRecipe(r *models.Recipe) error {
 			updated_at = now()
 		WHERE id = $13`
 
-	res, err := Pool.Exec(context.Background(), sql,
+	res, err := pgRepo.Pool.Exec(ctx, sql,
 		r.Title, r.Description, r.Preparation_time_min, r.Servings,
 		r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url, r.Calories,
 		r.Protein_g, r.Carbs_g, r.Fat_g,
@@ -235,9 +253,9 @@ func UpdateRecipe(r *models.Recipe) error {
 	return nil
 }
 
-func DeleteRecipe(id string) error {
+func (pgRepo *PostgresRecipeRepo) DeleteRecipe(ctx context.Context, id string) error {
 	sql := `DELETE FROM recipe WHERE id = $1`
-	res, err := Pool.Exec(context.Background(), sql, id)
+	res, err := pgRepo.Pool.Exec(ctx, sql, id)
 	if err != nil {
 		return fmt.Errorf("repository.DeleteRecipe: %w", err)
 	}
@@ -252,19 +270,19 @@ func DeleteRecipe(id string) error {
 // helper functions
 
 type BadRequestError struct {
-	msg string
+	Msg string
 }
 
 func (e *BadRequestError) Error() string {
-	return e.msg
+	return e.Msg
 }
 
 type NotFoundError struct {
-	msg string
+	Msg string
 }
 
 func (e *NotFoundError) Error() string {
-	return e.msg
+	return e.Msg
 }
 
 func recipePostgresErrorClassification(functionName string, err error) error {

@@ -36,6 +36,7 @@ export const csTranslations = {
     email: 'Váš registrační e-mail',
     roles: 'Pokročilé role umožňují více funkcí',
     insufficientPermissions: 'Nedostatečná oprávnění',
+    generateApi: 'Vygenerovat API klíč',
   },
   recipeDetail: {
     description: 'Postup přípravy',
@@ -56,7 +57,7 @@ export const csTranslations = {
     username: 'Uživatelské jméno',
     email: 'E-mail',
     roles: 'Role',
-    dev: 'Veřejný API klíč (pouze pro vývojáře)',
+    dev: 'Veřejný API klíč',
     generate: 'Generovat',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',

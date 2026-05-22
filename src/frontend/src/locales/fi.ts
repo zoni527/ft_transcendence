@@ -36,6 +36,7 @@ export const fiTranslations = {
     email: 'Rekisteröintisähköpostisi',
     roles: 'Laajennetut roolit mahdollistavat enemmän toimintoja',
     insufficientPermissions: 'Riittämättömät käyttöoikeudet',
+    generateApi: 'Luo API-avain',
   },
   recipeDetail: {
     description: 'Valmistusvaiheet',
@@ -56,7 +57,7 @@ export const fiTranslations = {
     username: 'Käyttäjätunnus',
     email: 'Sähköposti',
     roles: 'Roolit',
-    dev: 'Julkinen API-avain (vain kehittäjille)',
+    dev: 'Julkinen API-avain',
     generate: 'Luo',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',

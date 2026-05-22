@@ -36,6 +36,7 @@ export const enTranslations = {
     email: 'Your registration email',
     roles: 'Advanced roles allow more functionality',
     insufficientPermissions: 'Insufficient permissions',
+    generateApi: 'Generate API key',
   },
   recipeDetail: {
     description: 'Preparation steps',
@@ -56,7 +57,7 @@ export const enTranslations = {
     username: 'Username',
     email: 'E-mail',
     roles: 'Roles',
-    dev: 'Public API key (developer only)',
+    dev: 'Public API key',
     generate: 'Generate',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',

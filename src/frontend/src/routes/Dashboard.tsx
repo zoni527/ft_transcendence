@@ -545,7 +545,7 @@ const Dashboard = () => {
 
                   <button
                     className="text-md inline-flex items-center justify-center rounded-lg border-2 border-gray-500 bg-white px-2 py-1 whitespace-nowrap text-gray-500 hover:cursor-pointer hover:border-orange-800 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    title="Generate API key"
+                    title={t('info.generateApi')}
                     type="button"
                     onClick={() => void handleGenerateAPI()}
                     disabled={apiLoading}

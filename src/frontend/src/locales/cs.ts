@@ -211,6 +211,8 @@ export const csTranslations = {
     password: 'Heslo',
     passwordPlace: 'Zadejte své heslo',
     submit: 'Pokračovat',
+    google: 'Přihlásit se pomocí Google',
+    or: 'NEBO',
   },
   signup: {
     header: 'Registrovat se',

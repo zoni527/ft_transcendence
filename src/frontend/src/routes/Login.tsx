@@ -29,6 +29,7 @@ const Login = () => {
   const { t } = useTranslation();
   const { login } = useAuth();
 
+  // Normal login
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -67,7 +68,7 @@ const Login = () => {
           login(user);
 
           showNotification(t('notification.loginSuccess'), 'success');
-          void navigate('/me');
+          void navigate('/');
         })
         .catch((err: unknown) => {
           const message =
@@ -77,6 +78,11 @@ const Login = () => {
         })
         .finally(() => setLoading(false));
     }
+  };
+
+  // Google auth
+  const handleGoogleLogin = () => {
+    window.location.href = '/api/auth/google/login';
   };
 
   return (
@@ -110,6 +116,26 @@ const Login = () => {
             className="rounded-full border-3 border-orange-700 hover:border-orange-800"
             isLoading={loading}
             defaultText={t('login.submit')}
+          />
+        </div>
+
+        {/* Divider */}
+        <div className="my-6 flex items-center">
+          <hr className="grow border-t border-gray-300" />
+          <span className="mx-4 font-medium text-gray-500">
+            {t('login.or')}
+          </span>
+          <hr className="grow border-t border-gray-300" />
+        </div>
+
+        {/* Google Button */}
+        <div className="mt-4 flex justify-center">
+          <SubmitButton
+            type="button"
+            onClick={handleGoogleLogin}
+            isLoading={false}
+            defaultText={t('login.google')}
+            className="rounded-full border-3 border-orange-700 hover:border-orange-800"
           />
         </div>
       </form>

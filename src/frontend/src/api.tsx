@@ -82,10 +82,6 @@ interface FriendshipsResponse {
   incoming: FriendshipListItem[];
 }
 
-interface ApiKeyResponse {
-  apiKey: string;
-}
-
 export interface GetSearchResponse {
   id: string;
   name: string;
@@ -211,14 +207,6 @@ function isFriendshipsResponse(data: unknown): data is FriendshipsResponse {
     Array.isArray(obj.incoming) &&
     obj.incoming.every(isFriendshipListItem)
   );
-}
-
-// Validation for generateApiKey
-function isGenerateApiKeyResponse(data: unknown): data is ApiKeyResponse {
-  if (typeof data !== 'object' || data === null) return false;
-  const obj = data as Record<string, unknown>;
-
-  return typeof obj.apiKey === 'string';
 }
 
 // Validation for LoginSignupResponse
@@ -764,21 +752,11 @@ export const generateApiKey = async (t: TFunction) => {
     credentials: 'include',
   });
 
-  let data: unknown = null;
-
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
-
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));
   }
 
-  if (!isGenerateApiKeyResponse(data)) {
-    throw new Error(t('error.invalidResponse'));
-  }
+  const data = (await response.json()) as string;
 
   return data;
 };

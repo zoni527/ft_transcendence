@@ -79,10 +79,13 @@ func main() {
 	router.GET("/api/users/search",
 		middleware.Authentication(),
 		handlers.SearchUser)
-	router.GET("/api/users/apikey", middleware.Authentication(), handlers.GenerateAPIKey)
 	router.GET("/api/users/:id", handlers.GetUserById)
 
 	router.POST("/api/users", handlers.CreateUser)
+	router.POST("/api/users/apikey",
+		middleware.Authentication(),
+		middleware.RequireRoles(authorization.RoleDeveloper),
+		handlers.GenerateAPIKey)
 
 	router.PUT("/api/users/me/heartbeat", // Heartbeat - update server state
 		middleware.Authentication(),

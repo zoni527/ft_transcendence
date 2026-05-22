@@ -12,6 +12,8 @@ import (
 	"golang.org/x/time/rate"
 )
 
+var APIKeyRateLimit = rate.Every(time.Hour) // One hour time
+
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie("token")

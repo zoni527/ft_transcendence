@@ -32,6 +32,9 @@ func ValidateAPIKey(key string) (userID string, err error) {
 
 	userID = parts[0]
 	secret := parts[1]
+	if !IsValidUUID(userID) {
+		return "", fmt.Errorf("invalid api key format")
+	}
 	storedHash, err := repository.GetAPIKeyHash(userID)
 	if err != nil {
 		return "", err

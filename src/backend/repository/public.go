@@ -8,7 +8,7 @@ import (
 
 func SaveAPIKey(userID, rawSecret string) error {
 	hashedSecret := hashToken(rawSecret)
-	sql := `INSERT INTO  api_keys(user_id, secret_hash, created_at)
+	sql := `INSERT INTO api_keys(user_id, secret_hash, created_at)
 			VALUES ($1, $2, NOW())
 			ON CONFLICT (user_id)
 			DO UPDATE SET

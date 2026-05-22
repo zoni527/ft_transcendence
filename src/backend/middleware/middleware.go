@@ -12,7 +12,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-var APIKeyRateLimit = rate.Every(time.Hour) // One hour time
+var APIKeyRateLimit = rate.Every(time.Hour) // API key generation limit: 1 request/hour
 
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {

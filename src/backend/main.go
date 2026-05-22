@@ -79,7 +79,7 @@ func main() {
 	router.GET("/api/users/search",
 		middleware.Authentication(),
 		handlers.SearchUser)
-	router.GET("/api/users/apikey", middleware.Authentication(), handlers.GetAPIKey)
+	router.GET("/api/users/apikey", middleware.Authentication(), handlers.GenerateAPIKey)
 	router.GET("/api/users/:id", handlers.GetUserById)
 
 	router.POST("/api/users", handlers.CreateUser)
@@ -93,7 +93,7 @@ func main() {
 
 	// Recipes
 	router.GET("/api/recipes", recipeHandler.GetAllRecipes)
-	
+
 	router.GET("/api/recipes/image-signature",
 		middleware.Authentication(),
 		middleware.RequirePermission(authorization.PermCreateRecipe),

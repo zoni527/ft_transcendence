@@ -69,6 +69,7 @@ export const csTranslations = {
     user: 'uživatel',
     chef: 'kuchař',
     moderator: 'moderátor',
+    developer: 'vývojář',
     admin: 'správce',
   },
   friends: {

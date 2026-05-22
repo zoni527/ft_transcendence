@@ -69,6 +69,7 @@ export const enTranslations = {
     user: 'user',
     chef: 'chef',
     moderator: 'moderator',
+    developer: 'developer',
     admin: 'admin',
   },
   friends: {

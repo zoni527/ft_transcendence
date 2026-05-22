@@ -69,6 +69,7 @@ export const fiTranslations = {
     user: 'käyttäjä',
     chef: 'kokki',
     moderator: 'moderaattori',
+    developer: 'kehittäjä',
     admin: 'ylläpitäjä',
   },
   friends: {

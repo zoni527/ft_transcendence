@@ -97,10 +97,12 @@ Description: Fetch the full details for a single recipe by `id`.
 Response `200 OK` — recipe object.
 
 **Errors:**
-| Status    | When                  |
-|-----------|-----------------------|
-| 404       | Recipe not found      |
-| 500       | Internal server error |
+| Status    | When                        |
+|-----------|-----------------------------|
+| 401       | Missing or invalid API key  |
+| 404       | Recipe not found            |
+| 429       | Rate limit exceeded         |
+| 500       | Internal server error       |
 
 ---
 

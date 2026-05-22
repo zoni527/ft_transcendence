@@ -21,6 +21,7 @@ import {
   getFriendships,
   acceptFriend,
   deleteFriend,
+  generateApiKey,
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User, FriendshipListItem } from '../types/types';
@@ -36,6 +37,7 @@ type FriendshipSection = 'accepted' | 'incoming' | 'outgoing';
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
   const [userData, setUserData] = useState<User | null>(null);
+  const [apiKey, setApiKey] = useState('');
   const [userFetched, setUserFetched] = useState(false);
   const [friendshipUsers, setFriendshipUsers] = useState<
     FriendshipWithStatus[]
@@ -44,6 +46,7 @@ const Dashboard = () => {
   const [friendsLoading, setFriendsLoading] = useState(false);
   const [userActionLoading, setUserActionLoading] = useState(false);
   const [friendLoadingIds, setFriendLoadingIds] = useState<string[]>([]);
+  const [apiLoading, setApiLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -319,6 +322,28 @@ const Dashboard = () => {
     navigate,
   ]);
 
+  // Generate an API key
+  const handleGenerateAPI = async () => {
+    if (apiLoading) return;
+
+    setApiLoading(true);
+
+    try {
+      const data = await generateApiKey(t);
+
+      setApiKey(data.apiKey);
+
+      showNotification(t('notification.apiKeyGenerated'), 'success');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : t('error.genericError');
+
+      showNotification(message, 'error');
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
   if ((!id && authLoading) || pageLoading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
@@ -509,6 +534,22 @@ const Dashboard = () => {
                 </div>
                 <button className="rounded p-2" title={t('info.roles')}>
                   <InfoIcon />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                <div className="flex-1">
+                  <DataField label={t('dashboard.dev')} value={apiKey} />
+                </div>
+
+                <button
+                  className="text-md inline-flex items-center justify-center rounded-lg border-2 border-gray-500 bg-white px-2 py-1 whitespace-nowrap text-gray-500 hover:cursor-pointer hover:border-orange-800 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  title="Generate API key"
+                  type="button"
+                  onClick={() => void handleGenerateAPI()}
+                  disabled={apiLoading}
+                >
+                  {apiLoading ? t('common.loading') : t('dashboard.generate')}
                 </button>
               </div>
 

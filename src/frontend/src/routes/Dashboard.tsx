@@ -331,7 +331,7 @@ const Dashboard = () => {
     try {
       const data = await generateApiKey(t);
 
-      setApiKey(data.apiKey);
+      setApiKey(data);
 
       showNotification(t('notification.apiKeyGenerated'), 'success');
     } catch (err: unknown) {
@@ -537,21 +537,23 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between border-b border-gray-300 pb-4">
-                <div className="flex-1">
-                  <DataField label={t('dashboard.dev')} value={apiKey} />
-                </div>
+              {hasRole(['developer']) && (
+                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                  <div className="flex-1">
+                    <DataField label={t('dashboard.dev')} value={apiKey} />
+                  </div>
 
-                <button
-                  className="text-md inline-flex items-center justify-center rounded-lg border-2 border-gray-500 bg-white px-2 py-1 whitespace-nowrap text-gray-500 hover:cursor-pointer hover:border-orange-800 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  title="Generate API key"
-                  type="button"
-                  onClick={() => void handleGenerateAPI()}
-                  disabled={apiLoading}
-                >
-                  {apiLoading ? t('common.loading') : t('dashboard.generate')}
-                </button>
-              </div>
+                  <button
+                    className="text-md inline-flex items-center justify-center rounded-lg border-2 border-gray-500 bg-white px-2 py-1 whitespace-nowrap text-gray-500 hover:cursor-pointer hover:border-orange-800 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    title="Generate API key"
+                    type="button"
+                    onClick={() => void handleGenerateAPI()}
+                    disabled={apiLoading}
+                  >
+                    {apiLoading ? t('common.loading') : t('dashboard.generate')}
+                  </button>
+                </div>
+              )}
 
               {/* Bottom buttons */}
               <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">

@@ -50,7 +50,20 @@ CREATE TABLE token_blacklist (
 );
 
 CREATE INDEX idx_token_blacklist_expiration_date
-     ON token_blacklist (expiration_date);
+    ON token_blacklist (expiration_date);
+
+-- =====================
+-- PUBLIC API
+-- =====================
+
+CREATE TABLE api_keys (
+    user_id         UUID PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
+    secret_hash     VARCHAR(64) NOT NULL CHECK (char_length(secret_hash) = 64),
+    created_at      TIMESTAMP DEFAULT now()
+);
+
+CREATE INDEX idx_api_keys_secret_hash
+    ON api_keys (secret_hash);
 
 -- =====================
 -- RECIPE

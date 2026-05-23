@@ -3,6 +3,7 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
 import AddFriendModal from '../modals/AddFriend';
+import ApiKeyModal from '../modals/ApiKeyModal';
 import CreateRecipeModal from '../modals/CreateRecipe';
 import DataField from '../components/DataField';
 import EditUserModal from '../modals/EditUser';
@@ -37,7 +38,8 @@ type FriendshipSection = 'accepted' | 'incoming' | 'outgoing';
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
   const [userData, setUserData] = useState<User | null>(null);
-  const [apiKey, setApiKey] = useState('');
+  const [generatedApiKey, setGeneratedApiKey] = useState('');
+  const [isApiModalOpen, setIsApiModalOpen] = useState(false);
   const [userFetched, setUserFetched] = useState(false);
   const [friendshipUsers, setFriendshipUsers] = useState<
     FriendshipWithStatus[]
@@ -331,7 +333,8 @@ const Dashboard = () => {
     try {
       const data = await generateApiKey(t);
 
-      setApiKey(data);
+      setGeneratedApiKey(data);
+      setIsApiModalOpen(true);
 
       showNotification(t('notification.apiKeyGenerated'), 'success');
     } catch (err: unknown) {
@@ -388,6 +391,12 @@ const Dashboard = () => {
               },
             ]);
           }}
+        />
+      )}
+      {isApiModalOpen && (
+        <ApiKeyModal
+          apiKey={generatedApiKey}
+          onClose={() => setIsApiModalOpen(false)}
         />
       )}
 
@@ -537,14 +546,14 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {hasRole(['developer']) && (
+              {hasRole(['developer']) && isSelf && (
                 <div className="flex items-center justify-between border-b border-gray-300 pb-4">
                   <div className="flex-1">
-                    <DataField label={t('dashboard.dev')} value={apiKey} />
+                    <DataField label={t('dashboard.dev')} value={''} />
                   </div>
 
                   <button
-                    className="text-md inline-flex items-center justify-center rounded-lg border-2 border-gray-500 bg-white px-2 py-1 whitespace-nowrap text-gray-500 hover:cursor-pointer hover:border-orange-800 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="text-md inline-flex items-center justify-center rounded-lg border-2 border-gray-500 bg-white px-2 py-1 text-gray-500 hover:cursor-pointer hover:border-orange-800 hover:text-gray-700"
                     title={t('info.generateApi')}
                     type="button"
                     onClick={() => void handleGenerateAPI()}

@@ -58,6 +58,8 @@ export const enTranslations = {
     email: 'E-mail',
     roles: 'Roles',
     dev: 'Public API key',
+    devWarning:
+      'Warning: Only 1 key can be generated per 1 hour, save this generated key!',
     generate: 'Generate',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
@@ -326,6 +328,8 @@ export const enTranslations = {
     oldest: 'Oldest first',
     loadMore: 'More recipes...',
     searchUser: 'Search users...',
+    copy: 'Copy to clipboard',
+    copied: 'Copied!',
   },
   error: {
     error: 'Error:',

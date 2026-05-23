@@ -58,6 +58,8 @@ export const fiTranslations = {
     email: 'Sähköposti',
     roles: 'Roolit',
     dev: 'Julkinen API-avain',
+    devWarning:
+      'Varoitus: Voit luoda vain 1 avaimen tunnissa. Tallenna tämä avain!',
     generate: 'Luo',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
@@ -326,6 +328,8 @@ export const fiTranslations = {
     oldest: 'Vanhin ensin',
     loadMore: 'Lisää reseptejä...',
     searchUser: 'Hae käyttäjiä...',
+    copy: 'Kopioi leikepöydälle',
+    copied: 'Kopioitu!',
   },
   error: {
     error: 'Virhe:',

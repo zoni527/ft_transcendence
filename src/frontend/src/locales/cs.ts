@@ -58,6 +58,8 @@ export const csTranslations = {
     email: 'E-mail',
     roles: 'Role',
     dev: 'Veřejný API klíč',
+    devWarning:
+      'Upozornění: Lze vygenerovat pouze 1 klíč za hodinu. Uložte si tento klíč!',
     generate: 'Generovat',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
@@ -326,6 +328,8 @@ export const csTranslations = {
     oldest: 'Nejstarší první',
     loadMore: 'Další recepty...',
     searchUser: 'Hledat uživatele...',
+    copy: 'Kopírovat do schránky',
+    copied: 'Zkopírováno!',
   },
   error: {
     error: 'Chyba:',

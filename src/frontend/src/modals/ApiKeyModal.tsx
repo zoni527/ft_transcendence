@@ -44,9 +44,7 @@ const ApiKeyModal = ({ apiKey, onClose }: ApiKeyModalProps) => {
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Modal content */}
-      <div
-        className={`${cardBase} relative z-10 h-96 w-full max-w-xl overflow-visible p-8`}
-      >
+      <div className={`${cardBase} relative z-10 w-full max-w-xl p-8`}>
         {/* Close button */}
         <button
           onClick={onClose}

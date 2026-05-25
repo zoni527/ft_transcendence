@@ -91,14 +91,13 @@ PostgreSQL with UUID primary keys. The schema is initialised on first container 
 | Table              | Purpose                                                                                                                           |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
 | `user`             | User accounts: email, password hash, display name, avatar, `last_seen` timestamp for online status                                |
-| `role`             | Role definitions: `admin`, `moderator`, `chef`, `user`                                                                            |
+| `role`             | Role definitions: `admin`, `moderator`, `chef`, `developer`, `user`                                                               |
 | `permission`       | Permission definitions: `create_recipe`, `edit_recipe`, `delete_recipe`, `manage_users`, `manage_roles`, `moderate_content`       |
 | `user_role`        | Many-to-many link between users and roles                                                                                         |
 | `role_permission`  | Many-to-many link between roles and permissions                                                                                   |
 | `token_blacklist`  | Hashes of revoked JWTs, retained until natural expiry                                                                             |
 | `api_keys`         | One hashed API key per user for the public API module                                                                             |
 | `recipe`           | Recipe content, nutrition, image URL, and author (set to `NULL` if the author deletes their account)                              |
-| `recipe_favourite` | Many-to-many link between users and favourited recipes                                                                            |
 | `friendship`       | Directed friend requests with status `pending` or `accepted`, with a unique pair index that blocks duplicates in either direction |
 
 See [src/database/DATABASE.md](src/database/DATABASE.md) for design decisions,
@@ -114,7 +113,7 @@ the rationale behind UUIDs, constraint details, and the local dev workflow
 - **Roles and permissions:** `admin`, `moderator`, `chef`, and `user`, with role-based access enforced on both backend routes and frontend views
 - **Friends:** send, accept, deny, cancel, and unfriend, with separate dashboard buckets for accepted / sent / incoming
 - **Online presence:** heartbeat keeps `last_seen` fresh and exposes `is_online` on accepted friends
-- **Public API:** dedicated `/api/public/*` routes for recipes, gated by a per-user API key with hashing and rate limiting
+- **Public API:** dedicated `/api/public/*` routes for recipes, gated by a per-user API key with hashing and rate limiting (required role: `developer`)
 - **Admin panel:** user management UI for assigning roles and reviewing accounts
 - **Notification system:** pop-ups appear for events triggered
 
@@ -127,11 +126,11 @@ The ft_transcendence subject requires a minimum of 14 points.
 - **Minor:** Use a frontend framework (React + Vite)
 - **Minor:** Use a backend framework (Gin)
 - **Major:** A public API to interact with the database, with a secured API key, rate limiting, documentation, and at least 5 endpoints
-- **Minor:** Implement advanced search functionality with filters, sorting, and pagination.
-- **Minor:** Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components).
-- **Minor:** A complete notification system for all creation, update, and deletion actions.
+- **Minor:** Implement advanced search functionality with filters, sorting, and pagination
+- **Minor:** Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components)
+- **Minor:** A complete notification system for all creation, update, and deletion actions
 
-Count: 6 points.
+Count: 7 points.
 
 ### User Management
 
@@ -139,20 +138,20 @@ Count: 6 points.
 - **Minor:** Implement remote authentication with OAuth 2.0
 - **Major:** Advanced permission system — `admin`, `moderator`, `chef`, `user` roles, CRUD, enforced on both backend routes and frontend views
 
-Count: 11 points.
+Count: 12 points.
 
 ### Accessibility and Internationalization
 
 - **Minor:** Support for multiple languages (at least 3 languages).
 - **Minor:** Support for additional browsers.
 
-Count: 13
+Count: 14
 
 ### Data and Analytics @TODO
 
 - **Minor:** GDPR compliance features.
 
-Count: 14
+Count: 15
 
 ### Module of choice @TODO
 

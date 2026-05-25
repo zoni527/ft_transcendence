@@ -752,11 +752,21 @@ export const generateApiKey = async (t: TFunction) => {
     credentials: 'include',
   });
 
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));
   }
 
-  const data = (await response.json()) as string;
+  if (typeof data !== 'string') {
+    throw new Error(t('error.invalidResponse'));
+  }
 
   return data;
 };

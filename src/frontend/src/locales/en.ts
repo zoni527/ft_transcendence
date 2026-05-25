@@ -57,7 +57,7 @@ export const enTranslations = {
     username: 'Username',
     email: 'E-mail',
     roles: 'Roles',
-    dev: 'Public API key',
+    dev: 'API key',
     devWarning:
       'Warning: Only 1 key can be generated per 1 hour, save this generated key!',
     generate: 'Generate',
@@ -351,5 +351,6 @@ export const enTranslations = {
     invalidFileType: 'Invalid file type',
     fileTooLarge: 'File too large',
     forbidden: 'No permissions to perform this action',
+    copyFailed: 'Copy to clipboard failed',
   },
 };

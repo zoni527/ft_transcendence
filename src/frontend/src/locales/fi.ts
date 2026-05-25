@@ -57,7 +57,7 @@ export const fiTranslations = {
     username: 'Käyttäjätunnus',
     email: 'Sähköposti',
     roles: 'Roolit',
-    dev: 'Julkinen API-avain',
+    dev: 'API-avain',
     devWarning:
       'Varoitus: Voit luoda vain 1 avaimen tunnissa. Tallenna tämä avain!',
     generate: 'Luo',
@@ -351,5 +351,6 @@ export const fiTranslations = {
     invalidFileType: 'Virheellinen tiedostotyyppi',
     fileTooLarge: 'Tiedosto on liian suuri',
     forbidden: 'Ei käyttöoikeutta',
+    copyFailed: 'Kopiointi leikepöydälle epäonnistui',
   },
 };

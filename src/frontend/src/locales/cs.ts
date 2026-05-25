@@ -57,7 +57,7 @@ export const csTranslations = {
     username: 'Uživatelské jméno',
     email: 'E-mail',
     roles: 'Role',
-    dev: 'Veřejný API klíč',
+    dev: 'API klíč',
     devWarning:
       'Upozornění: Lze vygenerovat pouze 1 klíč za hodinu. Uložte si tento klíč!',
     generate: 'Generovat',
@@ -351,5 +351,6 @@ export const csTranslations = {
     invalidFileType: 'Neplatný typ souboru',
     fileTooLarge: 'Soubor je příliš velký',
     forbidden: 'Chybí potřebná oprávnění.',
+    copyFailed: 'Kopírování do schránky se nezdařilo',
   },
 };

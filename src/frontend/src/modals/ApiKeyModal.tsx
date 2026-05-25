@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormHeader from '../components/FormHeader';
+import { useNotification } from '../utils/NotifContext.ts';
 import { cardBase } from '../styles/styles';
 
 interface ApiKeyModalProps {
@@ -9,22 +10,36 @@ interface ApiKeyModalProps {
 }
 
 const ApiKeyModal = ({ apiKey, onClose }: ApiKeyModalProps) => {
+  const { showNotification } = useNotification();
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
+  const timeoutRef = useRef<number | null>(null);
 
   // Handle copy
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(apiKey);
-    setCopied(true);
+    try {
+      await navigator.clipboard.writeText(apiKey);
+      setCopied(true);
 
-    setTimeout(() => setCopied(false), 1500);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = window.setTimeout(() => {
+        setCopied(false);
+        timeoutRef.current = null;
+      }, 1500);
+    } catch {
+      showNotification(t('error.copyFailed'), 'error');
+      setCopied(false);
+    }
   };
 
-  // Disable background scroll
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = 'auto';
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, []);
 

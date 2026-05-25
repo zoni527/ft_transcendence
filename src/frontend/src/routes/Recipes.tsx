@@ -164,7 +164,7 @@ const Recipes = () => {
 
   // Fetch recipes
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     const fetchRecipes = async () => {
       setLoading(true);
@@ -178,15 +178,15 @@ const Recipes = () => {
           difficulty,
         };
 
-        const data = await getRecipesSearch(t, params);
+        const data = await getRecipesSearch(t, params, controller.signal);
 
-        if (!cancelled) {
-          setRecipes((prev) => (page === 1 ? data : [...prev, ...data]));
+        if (controller.signal.aborted) return;
 
-          setHasMore(data.length === 12);
-        }
+        setRecipes((prev) => (page === 1 ? data : [...prev, ...data]));
+
+        setHasMore(data.length === 12);
       } catch (err: unknown) {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         const message =
           err instanceof Error ? err.message : t('error.genericError');
@@ -194,7 +194,7 @@ const Recipes = () => {
         showNotification(message, 'error');
         void navigate('/');
       } finally {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
@@ -203,7 +203,7 @@ const Recipes = () => {
     void fetchRecipes();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [
     page,

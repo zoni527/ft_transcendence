@@ -38,11 +38,11 @@ const AdminPanel = () => {
 
   // Fetches recipes and users
   useEffect(() => {
-    if (authLoading) return;
-
-    let cancelled = false;
+    const controller = new AbortController();
 
     const fetchData = async () => {
+      if (authLoading) return;
+
       if (!user) {
         setLoading(false);
         return;
@@ -55,32 +55,34 @@ const AdminPanel = () => {
 
       try {
         const [usersData, recipesData] = await Promise.all([
-          getUsers(t),
-          getRecipes(t),
+          getUsers(t, controller.signal),
+          getRecipes(t, controller.signal),
         ]);
 
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         setUsers([...usersData].sort((a, b) => a.name.localeCompare(b.name)));
         setRecipes(
           [...recipesData].sort((a, b) => a.title.localeCompare(b.title)),
         );
       } catch (err: unknown) {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
         showNotification(message, 'error');
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     void fetchData();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [authLoading, user, hasRole, t, showNotification]);
 

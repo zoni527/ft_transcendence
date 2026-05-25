@@ -210,37 +210,39 @@ const Dashboard = () => {
 
   // Fetch all friends
   useEffect(() => {
-    if (authLoading) return;
-    if (activeSection !== 'friends') return;
-    if (!authUser) return;
-
-    let cancelled = false;
+    const controller = new AbortController();
 
     const fetchFriendships = async () => {
+      if (authLoading) return;
+      if (activeSection !== 'friends') return;
+      if (!authUser) return;
+
       try {
         setFriendsLoading(true);
 
-        const data = await getFriendships(t);
+        const data = await getFriendships(t, controller.signal);
 
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         setFriendshipUsers(mapFriendships(data));
       } catch (err: unknown) {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
         showNotification(message, 'error');
       } finally {
-        if (!cancelled) setFriendsLoading(false);
+        if (!controller.signal.aborted) {
+          setFriendsLoading(false);
+        }
       }
     };
 
     void fetchFriendships();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [activeSection, authLoading, authUser, t, showNotification]);
 
@@ -272,12 +274,12 @@ const Dashboard = () => {
   const resolvedUserId = id ?? authUser?.id;
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!resolvedUserId) return;
-
-    let cancelled = false;
+    const controller = new AbortController();
 
     const fetchUser = async () => {
+      if (authLoading) return;
+      if (!resolvedUserId) return;
+
       setPageLoading(true);
       setUserFetched(false);
 
@@ -285,16 +287,18 @@ const Dashboard = () => {
         let data: User;
 
         if (id) {
-          data = await getUserbyId(id, t);
+          data = await getUserbyId(id, t, controller.signal);
         } else {
           if (!authUser) return;
           data = authUser;
         }
 
-        if (!cancelled) {
-          setUserData(data);
-        }
+        if (controller.signal.aborted) return;
+
+        setUserData(data);
       } catch (err: unknown) {
+        if (controller.signal.aborted) return;
+
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
@@ -302,7 +306,7 @@ const Dashboard = () => {
         setUserData(null);
         void navigate('/');
       } finally {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setPageLoading(false);
           setUserFetched(true);
         }
@@ -312,7 +316,7 @@ const Dashboard = () => {
     void fetchUser();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [
     resolvedUserId,

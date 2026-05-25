@@ -98,13 +98,7 @@ const AdminPanel = () => {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
 
-  if (!user) {
-    return (
-      <StatusBox message={t('error.userNotFound')} className="text-red-600" />
-    );
-  }
-
-  if (!hasRole(['admin'])) {
+  if (!hasRole(['admin']) || !user) {
     return (
       <StatusBox message={t('error.accessDenied')} className="text-red-600" />
     );

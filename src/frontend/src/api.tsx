@@ -332,8 +332,9 @@ export const getRecipesSearch = async (
 export const getRecipeById = async (
   id: string,
   t: TFunction,
+  signal?: AbortSignal,
 ): Promise<Recipe> => {
-  const response = await fetch(`${baseUrl}/recipes/${id}`);
+  const response = await fetch(`${baseUrl}/recipes/${id}`, { signal });
 
   if (!response.ok) {
     const errorMessage = getTranslatedErrorMessage(response.status, t);

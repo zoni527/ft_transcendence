@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DataField from '../components/DataField';
@@ -22,23 +22,41 @@ const RecipeDetail = () => {
   const [isEditRecipeOpen, setIsEditRecipeOpen] = useState(false);
   const { t } = useTranslation();
 
-  const fetchRecipe: () => void = useCallback(() => {
-    if (!id) return;
+  useEffect(() => {
+    const controller = new AbortController();
 
-    getRecipeById(id, t)
-      .then((fetchedRecipe) => setRecipe(fetchedRecipe))
-      .catch((err: unknown) => {
+    const fetchRecipe = async () => {
+      if (!id) return;
+
+      setLoading(true);
+
+      try {
+        const fetchedRecipe = await getRecipeById(id, t, controller.signal);
+
+        if (controller.signal.aborted) return;
+
+        setRecipe(fetchedRecipe);
+      } catch (err: unknown) {
+        if (controller.signal.aborted) return;
+
         const message =
           err instanceof Error ? err.message : t('error.genericError');
+
         showNotification(message, 'error');
         void navigate('/');
-      });
-  }, [id, t, showNotification, navigate]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
 
-  useEffect(() => {
-    if (!id) return;
-    if (!recipe || recipe.id !== id) fetchRecipe();
-  }, [id, recipe, fetchRecipe]);
+    void fetchRecipe();
+
+    return () => {
+      controller.abort();
+    };
+  }, [id, t, showNotification, navigate]);
 
   const handleDelete = (id?: string) => {
     if (loading) return;

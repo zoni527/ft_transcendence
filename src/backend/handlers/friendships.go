@@ -12,11 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//done: GetFriendships:       GET    /api/friendships
-//done: CreateFriendRequest:  POST   /api/friendships
-//done: AcceptFriendRequest:  PATCH  /api/friendships/:id
-//done: DeleteFriendship:     DELETE /api/friendships/:id  (dispatches pending vs accepted)
-
 func GetFriendships(c *gin.Context) {
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {

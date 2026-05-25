@@ -13,15 +13,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-// Friendship DB functions:
-//done: GetFriendshipsForUser: List all rows the logged-in user is in, bucketed by status
-//done: CreateFriendRequest:   Insert a new pending row, requester = me
-//done: AcceptFriendRequest:   Flip status from pending to accepted (only the receiver can do this)
-//done: GetFriendshipStatus:   Read the status of the row between two users (handler dispatch)
-//done: DeleteFriendRequest:   Remove a pending row (covers cancel + deny, either side may call)
-//done: DeleteFriendship:      Remove an accepted row (unfriend, either side may call)
-
-// getting a list of everyone I have a "friendship" with, identifying who the other person is, and checking if I was the one who started the request.
+// Gets a list of everyone the user has a "friendship" with, identifying who the other person is,
+// and checking if the user was the one who started the request.
 func GetFriendshipsForUser(userID string) ([]models.FriendshipListItem, error) {
 	sql := `SELECT f.status, (f.requester_id = $1) AS sent_by_me, u.last_seen,
 			u.id, u.display_name, COALESCE(u.name, '') AS name

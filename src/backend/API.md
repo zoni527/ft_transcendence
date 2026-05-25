@@ -60,8 +60,8 @@ Get all users.
 **Query parameters (optional):**
 | Param | Type  | Description                                       |
 |-------|-------|---------------------------------------------------|
-| page  | int   | Page number for pagination (default: 1) — TODO    |
-| limit | int   | Results per page (default: 20) — TODO             |
+| page  | int   | Page number for pagination (default: 1)           |
+| limit | int   | Results per page (default: 12)                    |
 
 **Response** `200 OK`
 ```json
@@ -423,10 +423,10 @@ Get all recipes.
 | cuisine       | string    | Filter by cuisine (e.g. "italian")                            |
 | meal_type     | string    | Filter by meal type (breakfast/lunch/dinner/snack)            |
 | difficulty    | string    | Filter by difficulty (easy/medium/hard)                       |
-| sort          | string    | Sort by field (e.g. "created_at", "title", "calories") — TODO |
-| order         | string    | Sort order: "asc" or "desc" (default: "desc") — TODO          |
-| page          | int       | Page number for pagination (default: 1) — TODO                |
-| limit         | int       | Results per page (default: 20) — TODO                         |
+| sort          | string    | Sort by field (e.g. "created_at", "title", "calories")        |
+| order         | string    | Sort order: "asc" or "desc" (default: "desc")                 |
+| page          | int       | Page number for pagination (default: 1)                       |
+| limit         | int       | Results per page (default: 12)                                |
 
 **Response** `200 OK`
 ```json
@@ -889,8 +889,8 @@ The frontend passes the intended UI action as a query parameter: `?action=cancel
 | GET /api/recipes/image-signature  | done      |
 | GET /api/recipes/search           | done      |
 | GET /api/recipes/:id              | done      |
-| POST /api/recipes                 | TODO      |
-| PUT /api/recipes/:id              | TODO      |
+| POST /api/recipes                 | done      |
+| PUT /api/recipes/:id              | done      |
 | DELETE /api/recipes/:id           | done      |
 | GET /api/auth/session             | done      |
 | GET /api/auth/google/login        | done      |

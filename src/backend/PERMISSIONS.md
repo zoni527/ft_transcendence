@@ -64,7 +64,7 @@ Two patterns the table doesn't show:
 - **Authorship overrides.** A chef can edit and delete their *own* recipes
   even though `edit_recipe` and `delete_recipe` are not in their role. The
   handler checks `recipe.author_id == current_user.id` and short-circuits
-  the role check. See the TODO note in [002_seed.sql:45](../database/migrations/002_seed.sql#L45).
+  the role check.
 - **Public reads.** Browsing recipes needs no permission. Auth
   middleware is not attached to public GET routes.
 

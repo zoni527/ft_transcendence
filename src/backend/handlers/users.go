@@ -1,13 +1,5 @@
 package handlers
 
-// User handlers needed:
-// [done] GetUsers      — GET /api/users
-// [done] GetUserById   — GET /api/users/:id
-// [done] CreateUser    — POST /api/users (validate + hash password + call CreateUser)
-// [done] UpdateUser   — PUT /api/users/:id (self-update + admin update)
-// [TODO] DeleteUser    — DELETE /api/users/:id
-// [done] SearchUsers   — GET /api/users/search?q=
-
 import (
 	"errors"
 	"fmt"

@@ -1,16 +1,5 @@
 package repository
 
-// Users DB functions needed:
-// [done] GetRolesByUserId  — helper for attaching roles
-// [done] GetAllUsers       — GET /api/users
-// [done] GetUserById       — GET /api/users/:id
-
-// [done] CreateUser        — POST /api/users (transaction: insert user + assign default role. good time to learn about db transaction)
-// [done] UpdateUser        — PUT /api/users/:id (self-update + admin update)
-// [done] DeleteUser        — DELETE /api/users/:id
-// [TODO] SearchUsers       — GET /api/users/search?q=
-// [TODO] Add pagination (?page=1&limit=20) to GetAllUsers
-
 import (
 	"context"
 	"crypto/sha256"

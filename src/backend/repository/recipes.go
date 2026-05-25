@@ -1,16 +1,5 @@
 package repository
 
-// Recipe repository functions needed:
-// [done] GetAllRecipes     — GET /api/recipes
-// [done] GetRecipeById     — GET /api/recipes/:id
-// [done] SearchRecipes     — GET /api/recipes/search
-// [done] CreateRecipe      — POST /api/recipes (currently inserts the recipe row only)
-// [done] UpdateRecipe      — PUT /api/recipes/:id
-// [done] DeleteRecipe      — DELETE /api/recipes/:id
-// [TODO] Add GET /api/users/:id/recipes so authors can see their own recipes
-// [TODO] Add sorting (?sort=created_at&order=desc) to GetAllRecipes
-// [TODO] Add pagination (?page=1&limit=20) to GetAllRecipes
-
 import (
 	"context"
 	"errors"

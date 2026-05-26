@@ -18,6 +18,8 @@ const SearchField = ({ placeholder, onSearch }: SearchFieldProps) => {
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-2">
       <input
+        id="user-search"
+        name="search"
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}

@@ -106,6 +106,7 @@ const Signup = () => {
           label={t('signup.name')}
           type="text"
           placeholder={t('signup.namePlace')}
+          autoComplete="name"
         />
 
         {/* Username */}
@@ -115,6 +116,7 @@ const Signup = () => {
           label={t('signup.username')}
           type="text"
           placeholder={t('signup.usernamePlace')}
+          autoComplete="username"
         />
 
         {/* Email */}
@@ -124,6 +126,7 @@ const Signup = () => {
           label={t('signup.email')}
           type="email"
           placeholder={t('signup.emailPlace')}
+          autoComplete="email"
         />
 
         {/* Password */}
@@ -133,6 +136,7 @@ const Signup = () => {
           label={t('signup.password')}
           type="password"
           placeholder={t('signup.passwordPlace')}
+          autoComplete="new-password"
         />
 
         {/* Confirm Password */}
@@ -142,6 +146,7 @@ const Signup = () => {
           label={t('signup.rePassword')}
           type="password"
           placeholder={t('signup.rePasswordPlace')}
+          autoComplete="new-password"
         />
 
         {/* Submit Button */}

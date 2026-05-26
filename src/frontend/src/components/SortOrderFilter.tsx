@@ -22,9 +22,9 @@ const SortOrderFilter = ({
 
   return (
     <div>
-      <label className="text-md mt-12 mb-2 block font-semibold">
+      <p className="text-md mt-12 mb-2 block font-semibold">
         {t('common.sortBy')}
-      </label>
+      </p>
 
       <div className="flex flex-col gap-1">
         <button

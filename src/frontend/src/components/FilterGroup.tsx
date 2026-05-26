@@ -25,7 +25,7 @@ const FilterGroup = ({
 
   return (
     <div className="mt-12">
-      <label className="mb-2 block font-semibold">{label}</label>
+      <p className="mb-2 block font-semibold">{label}</p>
 
       <div className="flex flex-col gap-1">
         {options.map((opt) => (

@@ -186,6 +186,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             placeholder={t('signup.namePlace')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            autoComplete="name"
           />
 
           <InputField
@@ -196,6 +197,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             placeholder={t('signup.usernamePlace')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
           />
 
           {hasRole(['admin']) && !isSelf && (
@@ -210,6 +212,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             placeholder={t('signup.emailPlace')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
           />
 
           {isSelf && (
@@ -221,6 +224,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
               placeholder={t('signup.passwordPlace')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
             />
           )}
 
@@ -233,6 +237,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
               placeholder={t('signup.rePasswordPlace')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
             />
           )}
 

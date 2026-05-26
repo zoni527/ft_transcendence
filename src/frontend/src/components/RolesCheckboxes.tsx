@@ -32,23 +32,24 @@ const RolesCheckboxes = ({
   };
 
   return (
-    <div>
-      <label className={`${inputLabelText}`}>{t('dashboard.roles')}</label>
-      <div className={`${cardBase} ${inputFieldBase} mt-1 flex flex-col gap-2`}>
-        {availableRoles.map((roleKey) => (
-          <label key={roleKey} className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              value={roleKey}
-              checked={roles?.includes(roleKey) ?? false}
-              onChange={(e) => handleCheckboxChange(roleKey, e.target.checked)}
-              className="form-checkbox h-4 w-4 accent-orange-700"
-            />
-            <span className="text-md">{t(`roles.${roleKey}`)}</span>
-          </label>
-        ))}
-      </div>
-    </div>
+    <fieldset
+      className={`${cardBase} ${inputFieldBase} mt-1 flex flex-col gap-2`}
+    >
+      <legend className={inputLabelText}>{t('dashboard.roles')}</legend>
+
+      {availableRoles.map((roleKey) => (
+        <label key={roleKey} className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            value={roleKey}
+            checked={roles?.includes(roleKey) ?? false}
+            onChange={(e) => handleCheckboxChange(roleKey, e.target.checked)}
+            className="form-checkbox h-4 w-4 accent-orange-700"
+          />
+          <span className="text-md">{t(`roles.${roleKey}`)}</span>
+        </label>
+      ))}
+    </fieldset>
   );
 };
 

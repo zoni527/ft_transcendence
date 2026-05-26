@@ -99,6 +99,7 @@ const Login = () => {
           label={t('login.email')}
           type="email"
           placeholder={t('login.emailPlace')}
+          autoComplete="email"
         />
 
         {/* Password */}
@@ -108,6 +109,7 @@ const Login = () => {
           label={t('login.password')}
           type="password"
           placeholder={t('login.passwordPlace')}
+          autoComplete="current-password"
         />
 
         {/* Submit Button */}

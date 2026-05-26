@@ -43,7 +43,13 @@ const FiltersContent = ({
   <>
     {/* Search */}
     <div className="mt-6 mb-4">
+      <label htmlFor="recipe-search" className="sr-only">
+        {t('common.searchRecipe')}
+      </label>
+
       <input
+        id="recipe-search"
+        name="recipeSearch"
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}

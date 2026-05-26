@@ -742,6 +742,35 @@ export const deleteFriend = async (id: string, t: TFunction) => {
   }
 };
 
+// POST /api/users/apikey
+export const generateApiKey = async (t: TFunction) => {
+  const response = await fetch(`${baseUrl}/users/apikey`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(getTranslatedErrorMessage(response.status, t));
+  }
+
+  if (typeof data !== 'string') {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data;
+};
+
 // PUT /api/recipes/:id (edit a recipe)
 export const putUpdateRecipe = async (
   payload: UpdateRecipePayload,

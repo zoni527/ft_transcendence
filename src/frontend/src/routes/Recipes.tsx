@@ -377,7 +377,7 @@ const Recipes = () => {
           {/* Infinite scroll trigger */}
           {hasMore && (
             <div ref={loaderRef} className="flex justify-center py-10">
-              {loading && (
+              {loading && recipes.length > 0 && (
                 <StatusBox
                   message={t('common.loading')}
                   className="text-black"

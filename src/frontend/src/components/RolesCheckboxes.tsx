@@ -10,7 +10,7 @@ type RolesCheckboxesProps = {
 const RolesCheckboxes = ({
   roles,
   onChange,
-  availableRoles = ['user', 'chef', 'moderator', 'admin'],
+  availableRoles = ['user', 'chef', 'moderator', 'admin', 'developer'],
 }: RolesCheckboxesProps) => {
   const { t } = useTranslation();
 

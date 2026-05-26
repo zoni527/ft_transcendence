@@ -3,6 +3,7 @@ import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
 import AddFriendModal from '../modals/AddFriend';
+import ApiKeyModal from '../modals/ApiKeyModal';
 import CreateRecipeModal from '../modals/CreateRecipe';
 import DataField from '../components/DataField';
 import EditUserModal from '../modals/EditUser';
@@ -21,6 +22,7 @@ import {
   getFriendships,
   acceptFriend,
   deleteFriend,
+  generateApiKey,
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import type { User, FriendshipListItem } from '../types/types';
@@ -36,6 +38,8 @@ type FriendshipSection = 'accepted' | 'incoming' | 'outgoing';
 const Dashboard = () => {
   const { id } = useParams<{ id: string }>();
   const [userData, setUserData] = useState<User | null>(null);
+  const [generatedApiKey, setGeneratedApiKey] = useState('');
+  const [isApiModalOpen, setIsApiModalOpen] = useState(false);
   const [userFetched, setUserFetched] = useState(false);
   const [friendshipUsers, setFriendshipUsers] = useState<
     FriendshipWithStatus[]
@@ -44,6 +48,7 @@ const Dashboard = () => {
   const [friendsLoading, setFriendsLoading] = useState(false);
   const [userActionLoading, setUserActionLoading] = useState(false);
   const [friendLoadingIds, setFriendLoadingIds] = useState<string[]>([]);
+  const [apiLoading, setApiLoading] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
   const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -319,6 +324,29 @@ const Dashboard = () => {
     navigate,
   ]);
 
+  // Generate an API key
+  const handleGenerateAPI = async () => {
+    if (apiLoading) return;
+
+    setApiLoading(true);
+
+    try {
+      const data = await generateApiKey(t);
+
+      setGeneratedApiKey(data);
+      setIsApiModalOpen(true);
+
+      showNotification(t('notification.apiKeyGenerated'), 'success');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : t('error.genericError');
+
+      showNotification(message, 'error');
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
   if ((!id && authLoading) || pageLoading) {
     return <StatusBox message={t('common.loading')} className="text-black" />;
   }
@@ -365,6 +393,12 @@ const Dashboard = () => {
           }}
         />
       )}
+      {isApiModalOpen && (
+        <ApiKeyModal
+          apiKey={generatedApiKey}
+          onClose={() => setIsApiModalOpen(false)}
+        />
+      )}
 
       <div className={`${cardBase} relative mt-8 p-8 wrap-anywhere`}>
         {/* Avatar */}
@@ -377,10 +411,12 @@ const Dashboard = () => {
         </div>
 
         {/* Online/Offline Indicator */}
-        <UserStatus
-          isOnline={userData.is_online}
-          className={'absolute top-8 right-8'}
-        />
+        {authUser && (
+          <UserStatus
+            isOnline={userData.is_online}
+            className={'absolute top-8 right-8'}
+          />
+        )}
 
         {/* Header */}
         <h1 className="text-center text-3xl font-bold text-[#C04D31] md:text-left">
@@ -509,6 +545,24 @@ const Dashboard = () => {
                   <InfoIcon />
                 </button>
               </div>
+
+              {hasRole(['developer']) && isSelf && (
+                <div className="flex items-center justify-between border-b border-gray-300 pb-4">
+                  <div className="flex-1">
+                    <DataField label={t('dashboard.dev')} value={''} />
+                  </div>
+
+                  <button
+                    className="text-md inline-flex items-center justify-center rounded-lg border-2 border-gray-500 bg-white px-2 py-1 text-gray-500 hover:cursor-pointer hover:border-orange-800 hover:text-gray-700"
+                    title={t('info.generateApi')}
+                    type="button"
+                    onClick={() => void handleGenerateAPI()}
+                    disabled={apiLoading}
+                  >
+                    {apiLoading ? t('common.loading') : t('dashboard.generate')}
+                  </button>
+                </div>
+              )}
 
               {/* Bottom buttons */}
               <div className="mt-16 flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">

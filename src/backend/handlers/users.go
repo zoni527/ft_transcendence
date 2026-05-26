@@ -559,6 +559,7 @@ func validateRoles(roles []string) error {
 		"user":      true,
 		"chef":      true,
 		"moderator": true,
+		"developer": true,
 		"admin":     true,
 	}
 

@@ -28,6 +28,7 @@ export const enTranslations = {
     friendRequestAccepted: 'Request accepted',
     friendRequestRejected: 'Request rejected',
     friendRequestSent: 'Request sent',
+    apiKeyGenerated: 'API key generated',
   },
   info: {
     name: "Other users can't see your full name",
@@ -35,6 +36,7 @@ export const enTranslations = {
     email: 'Your registration email',
     roles: 'Advanced roles allow more functionality',
     insufficientPermissions: 'Insufficient permissions',
+    generateApi: 'Generate API key',
   },
   recipeDetail: {
     description: 'Preparation steps',
@@ -54,9 +56,11 @@ export const enTranslations = {
     name: 'Full name',
     username: 'Username',
     email: 'E-mail',
-    createdAt: 'Created at',
-    updatedAt: 'Updated at',
     roles: 'Roles',
+    dev: 'API key',
+    devWarning:
+      'Warning: Only 1 key can be generated per 1 hour, save this generated key!',
+    generate: 'Generate',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
     submit: 'Delete profile',
@@ -68,6 +72,7 @@ export const enTranslations = {
     user: 'user',
     chef: 'chef',
     moderator: 'moderator',
+    developer: 'developer',
     admin: 'admin',
   },
   friends: {
@@ -323,6 +328,8 @@ export const enTranslations = {
     oldest: 'Oldest first',
     loadMore: 'More recipes...',
     searchUser: 'Search users...',
+    copy: 'Copy to clipboard',
+    copied: 'Copied!',
   },
   error: {
     error: 'Error:',
@@ -344,5 +351,6 @@ export const enTranslations = {
     invalidFileType: 'Invalid file type',
     fileTooLarge: 'File too large',
     forbidden: 'No permissions to perform this action',
+    copyFailed: 'Copy to clipboard failed',
   },
 };

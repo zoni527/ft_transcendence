@@ -28,6 +28,7 @@ export const fiTranslations = {
     friendRequestAccepted: 'Pyyntö hyväksytty',
     friendRequestRejected: 'Pyyntö hylätty',
     friendRequestSent: 'Pyyntö lähetetty',
+    apiKeyGenerated: 'API-avain luotu',
   },
   info: {
     name: 'Ei näy muille käyttäjille',
@@ -35,6 +36,7 @@ export const fiTranslations = {
     email: 'Rekisteröintisähköpostisi',
     roles: 'Laajennetut roolit mahdollistavat enemmän toimintoja',
     insufficientPermissions: 'Riittämättömät käyttöoikeudet',
+    generateApi: 'Luo API-avain',
   },
   recipeDetail: {
     description: 'Valmistusvaiheet',
@@ -54,9 +56,11 @@ export const fiTranslations = {
     name: 'Koko nimi',
     username: 'Käyttäjätunnus',
     email: 'Sähköposti',
-    createdAt: 'Luotu',
-    updatedAt: 'Päivitetty',
     roles: 'Roolit',
+    dev: 'API-avain',
+    devWarning:
+      'Varoitus: Voit luoda vain 1:n avaimen tunnissa. Tallenna tämä avain!',
+    generate: 'Luo',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
     submit: 'Poista profiili',
@@ -68,6 +72,7 @@ export const fiTranslations = {
     user: 'käyttäjä',
     chef: 'kokki',
     moderator: 'moderaattori',
+    developer: 'kehittäjä',
     admin: 'ylläpitäjä',
   },
   friends: {
@@ -323,6 +328,8 @@ export const fiTranslations = {
     oldest: 'Vanhin ensin',
     loadMore: 'Lisää reseptejä...',
     searchUser: 'Hae käyttäjiä...',
+    copy: 'Kopioi leikepöydälle',
+    copied: 'Kopioitu!',
   },
   error: {
     error: 'Virhe:',
@@ -344,5 +351,6 @@ export const fiTranslations = {
     invalidFileType: 'Virheellinen tiedostotyyppi',
     fileTooLarge: 'Tiedosto on liian suuri',
     forbidden: 'Ei käyttöoikeutta',
+    copyFailed: 'Kopiointi leikepöydälle epäonnistui',
   },
 };

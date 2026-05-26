@@ -28,6 +28,7 @@ export const csTranslations = {
     friendRequestAccepted: 'Žádost přijata',
     friendRequestRejected: 'Žádost odmítnuta',
     friendRequestSent: 'Žádost odeslána',
+    apiKeyGenerated: 'API klíč byl vygenerován',
   },
   info: {
     name: 'Ostatní uživatelé nevidí vaše celé jméno',
@@ -35,6 +36,7 @@ export const csTranslations = {
     email: 'Váš registrační e-mail',
     roles: 'Pokročilé role umožňují více funkcí',
     insufficientPermissions: 'Nedostatečná oprávnění',
+    generateApi: 'Vygenerovat API klíč',
   },
   recipeDetail: {
     description: 'Postup přípravy',
@@ -54,9 +56,11 @@ export const csTranslations = {
     name: 'Celé jméno',
     username: 'Uživatelské jméno',
     email: 'E-mail',
-    createdAt: 'Vytvořeno',
-    updatedAt: 'Aktualizováno',
     roles: 'Role',
+    dev: 'API klíč',
+    devWarning:
+      'Upozornění: Lze vygenerovat pouze 1 klíč za hodinu. Uložte si tento klíč!',
+    generate: 'Generovat',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',
     submit: 'Smazat profil',
@@ -68,6 +72,7 @@ export const csTranslations = {
     user: 'uživatel',
     chef: 'kuchař',
     moderator: 'moderátor',
+    developer: 'vývojář',
     admin: 'správce',
   },
   friends: {
@@ -323,6 +328,8 @@ export const csTranslations = {
     oldest: 'Nejstarší první',
     loadMore: 'Další recepty...',
     searchUser: 'Hledat uživatele...',
+    copy: 'Kopírovat do schránky',
+    copied: 'Zkopírováno!',
   },
   error: {
     error: 'Chyba:',
@@ -344,5 +351,6 @@ export const csTranslations = {
     invalidFileType: 'Neplatný typ souboru',
     fileTooLarge: 'Soubor je příliš velký',
     forbidden: 'Chybí potřebná oprávnění.',
+    copyFailed: 'Kopírování do schránky se nezdařilo',
   },
 };

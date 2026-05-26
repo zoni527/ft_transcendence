@@ -212,25 +212,29 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <InputField
-            id="password"
-            name="password"
-            label={t('signup.password')}
-            type="password"
-            placeholder={t('signup.passwordPlace')}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {isSelf && (
+            <InputField
+              id="password"
+              name="password"
+              label={t('signup.password')}
+              type="password"
+              placeholder={t('signup.passwordPlace')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          )}
 
-          <InputField
-            id="confirmPassword"
-            name="confirmPassword"
-            label={t('signup.rePassword')}
-            type="password"
-            placeholder={t('signup.rePasswordPlace')}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+          {isSelf && (
+            <InputField
+              id="confirmPassword"
+              name="confirmPassword"
+              label={t('signup.rePassword')}
+              type="password"
+              placeholder={t('signup.rePasswordPlace')}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          )}
 
           {/* Image Upload */}
           <div className="mt-12 flex items-center gap-3">

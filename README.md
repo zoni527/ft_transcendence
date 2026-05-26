@@ -28,7 +28,7 @@ as getting familiar with SQL using PostgreSQL as our database.
 1. Download the repository using the Git CLI or GUI
 
 ```sh
-git clone https://github.com/Kiiskii/ft_transcendence.git && cd ./ft_transcendence
+git clone https://github.com/zoni527/ft_transcendence.git && cd ./ft_transcendence
 ```
 
 2. Set up a `.env` file, and place it in the src folder (`src/.env.example` provided as a starting point)

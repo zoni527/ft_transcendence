@@ -79,6 +79,13 @@ const Dashboard = () => {
     );
   });
 
+  // Refresh Friendships
+  const refreshFriendships = async (signal?: AbortSignal) => {
+    const data = await getFriendships(t, signal);
+    setFriendshipUsers(mapFriendships(data));
+  };
+
+  // Handle Friendship errors
   const handleFriendshipError = (err: unknown) => {
     const message =
       err instanceof Error ? err.message : t('error.genericError');
@@ -86,6 +93,7 @@ const Dashboard = () => {
     showNotification(message, 'error');
   };
 
+  // Map Friendships
   const mapFriendships = (
     data: Awaited<ReturnType<typeof getFriendships>>,
   ): FriendshipWithStatus[] => [
@@ -113,8 +121,7 @@ const Dashboard = () => {
             setFriendLoadingIds((prev) => [...prev, id]);
 
             await deleteFriend(id, t);
-
-            setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+            await refreshFriendships();
 
             showNotification(t('notification.friendRemoved'), 'success');
           } catch (err: unknown) {
@@ -134,8 +141,7 @@ const Dashboard = () => {
             setFriendLoadingIds((prev) => [...prev, id]);
 
             await deleteFriend(id, t);
-
-            setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+            await refreshFriendships();
 
             showNotification(
               t('notification.friendRequestCancelled'),
@@ -158,10 +164,7 @@ const Dashboard = () => {
             setFriendLoadingIds((prev) => [...prev, id]);
 
             await acceptFriend(id, t);
-
-            const data = await getFriendships(t);
-
-            setFriendshipUsers(mapFriendships(data));
+            await refreshFriendships();
 
             showNotification(
               t('notification.friendRequestAccepted'),
@@ -182,8 +185,7 @@ const Dashboard = () => {
             setFriendLoadingIds((prev) => [...prev, id]);
 
             await deleteFriend(id, t);
-
-            setFriendshipUsers((prev) => prev.filter((u) => u.id !== id));
+            await refreshFriendships();
 
             showNotification(
               t('notification.friendRequestRejected'),

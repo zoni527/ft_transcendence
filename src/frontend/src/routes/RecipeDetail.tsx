@@ -122,7 +122,7 @@ const RecipeDetail = () => {
             {t('recipeDetail.description')}
           </span>
 
-          <ul className="list-disc space-y-2 pl-5 text-xl font-medium text-gray-800">
+          <ul className="mt-4 list-disc space-y-4 pl-5 text-xl font-medium text-gray-800">
             {recipe.description.split('\n').map((line, i) => (
               <li key={i}>{line}</li>
             ))}

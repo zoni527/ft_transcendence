@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -83,7 +84,7 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	u, err := getOrCreateGoogleUser(&gu)
+	u, err := getOrCreateGoogleUser(c, &gu)
 	if err != nil {
 		var eu *errorUnauthorized
 		var eb *errorBadRequest
@@ -128,8 +129,8 @@ func (e *errorBadRequest) Error() string {
 	return e.msg
 }
 
-func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
-	user, err := repository.GetUserCredentialsByEmail(gu.Email)
+func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.User, error) {
+	user, err := repository.GetUserCredentialsByEmail(ctx, gu.Email)
 	if err != nil && err != pgx.ErrNoRows {
 		return models.User{}, err
 	}
@@ -156,13 +157,13 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 	}
 
 	for i := range displayNameVersionLimit {
-		_, err := repository.GetUserCredentialsByDisplayName(params.Display_name)
+		_, err := repository.GetUserCredentialsByDisplayName(ctx, params.Display_name)
 		if err == pgx.ErrNoRows {
 			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.Display_name)
 			if err != nil {
 				return models.User{}, &errorBadRequest{"bad email/name/display name value"}
 			}
-			return repository.CreateUser(params)
+			return repository.CreateUser(ctx, params)
 		} else if err != nil {
 			return models.User{}, err
 		}

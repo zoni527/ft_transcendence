@@ -31,7 +31,7 @@ func markOnline(user *models.User) {
 }
 
 func GetUsers(c *gin.Context) {
-	users, err := repository.GetAllUsers()
+	users, err := repository.GetAllUsers(c.Request.Context())
 	if err != nil {
 		log.Printf("GetUsers: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -50,7 +50,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	user, err := repository.GetUserById(id)
+	user, err := repository.GetUserById(c.Request.Context(), id)
 	if err == pgx.ErrNoRows {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -70,7 +70,7 @@ func GetMe(c *gin.Context) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-	user, err := repository.GetUserById(userID)
+	user, err := repository.GetUserById(c.Request.Context(), userID)
 	if err == pgx.ErrNoRows {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -118,7 +118,7 @@ func GetSession(c *gin.Context) {
 		return
 	}
 
-	blacklisted, err := authorization.IsTokenBlacklisted(token)
+	blacklisted, err := authorization.IsTokenBlacklisted(c.Request.Context(), token)
 	if err != nil {
 		log.Printf("GetSession blacklist check: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -130,7 +130,7 @@ func GetSession(c *gin.Context) {
 		return
 	}
 
-	user, err := repository.GetUserById(claims.Subject)
+	user, err := repository.GetUserById(c.Request.Context(), claims.Subject)
 	if err == pgx.ErrNoRows {
 		authorization.ClearAuthCookie(c)
 		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
@@ -175,7 +175,7 @@ func CreateUser(c *gin.Context) {
 		Name:            req.Name,
 		Display_name:    req.Display_name,
 	}
-	data, err := repository.CreateUser(userParams)
+	data, err := repository.CreateUser(c.Request.Context(), userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
@@ -203,7 +203,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
-	data, err := repository.GetUserCredentialsByEmail(req.Email)
+	data, err := repository.GetUserCredentialsByEmail(c.Request.Context(), req.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
@@ -223,7 +223,7 @@ func LoginUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	if err := repository.UpdateLastSeen(data.Id); err != nil {
+	if err := repository.UpdateLastSeen(c.Request.Context(), data.Id); err != nil {
 		log.Printf("LoginUser UpdateLastSeen: %v", err)
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
@@ -234,7 +234,7 @@ func LoginUser(c *gin.Context) {
 func LogoutUser(c *gin.Context) {
 	token := c.GetString("token")
 	expDate := c.GetTime("expDate")
-	if err := authorization.AddTokenToBlacklist(token, expDate); err != nil {
+	if err := authorization.AddTokenToBlacklist(c.Request.Context(), token, expDate); err != nil {
 		log.Printf("LogoutUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
@@ -242,7 +242,7 @@ func LogoutUser(c *gin.Context) {
 
 	userID := c.GetString("userID")
 	if userID != "" {
-		if err := repository.MarkOffline(userID); err != nil {
+		if err := repository.MarkOffline(c.Request.Context(), userID); err != nil {
 			log.Printf("LogoutUser MarkOffline: %v", err)
 		}
 	}
@@ -334,7 +334,7 @@ func UpdateUser(c *gin.Context) {
 		Avatar_url:      req.Avatar_url,
 		Roles:           req.Roles,
 	}
-	user, err := repository.UpdateUser(targetUserID, userParams)
+	user, err := repository.UpdateUser(c.Request.Context(), targetUserID, userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
 			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
@@ -363,7 +363,7 @@ func SearchUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
 		return
 	}
-	users, err := repository.SearchUsersByUsername(query)
+	users, err := repository.SearchUsersByUsername(c.Request.Context(), query)
 	if err != nil {
 		log.Printf("SearchUser: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -384,7 +384,7 @@ func GenerateAPIKey(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	if err := repository.SaveAPIKey(userID, randomSecret); err != nil {
+	if err := repository.SaveAPIKey(c.Request.Context(), userID, randomSecret); err != nil {
 		log.Printf("GenerateApiKey error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
@@ -658,7 +658,7 @@ func Heartbeat(c *gin.Context) {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-	if err := repository.UpdateLastSeen(userID); err != nil {
+	if err := repository.UpdateLastSeen(c.Request.Context(), userID); err != nil {
 		log.Printf("Heartbeat: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
@@ -691,7 +691,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := repository.DeleteUser(targetUserID); err != nil {
+	if err := repository.DeleteUser(c.Request.Context(), targetUserID); err != nil {
 		if errors.Is(err, repository.ErrLastAdmin) {
 			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
 			return
@@ -709,7 +709,7 @@ func DeleteUser(c *gin.Context) {
 	if callerUserID == targetUserID {
 		token := c.GetString("token")
 		expDate := c.GetTime("expDate")
-		if err := authorization.AddTokenToBlacklist(token, expDate); err != nil {
+		if err := authorization.AddTokenToBlacklist(c.Request.Context(), token, expDate); err != nil {
 			log.Printf("handlers.DeleteUser blacklist: %v", err)
 		}
 		authorization.ClearAuthCookie(c)

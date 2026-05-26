@@ -1,6 +1,7 @@
 package authorization
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -17,16 +18,16 @@ func IsValidUUID(s string) bool {
 	return uuidRegex.MatchString(s)
 }
 
-func IsTokenBlacklisted(token string) (bool, error) {
-	exist, err := repository.GetTokenBlacklisted(token)
+func IsTokenBlacklisted(ctx context.Context, token string) (bool, error) {
+	exist, err := repository.GetTokenBlacklisted(ctx, token)
 	if err != nil {
 		return false, fmt.Errorf("IsTokenBlacklisted: %w", err)
 	}
 	return exist, nil
 }
 
-func AddTokenToBlacklist(token string, expirationDate time.Time) error {
-	if err := repository.AddTokenToBlacklist(token, expirationDate); err != nil {
+func AddTokenToBlacklist(ctx context.Context, token string, expirationDate time.Time) error {
+	if err := repository.AddTokenToBlacklist(ctx, token, expirationDate); err != nil {
 		return fmt.Errorf("AddTokenToBlacklist: %w", err)
 	}
 	return nil

@@ -19,7 +19,7 @@ func GetFriendships(c *gin.Context) {
 		return
 	}
 
-	rows, err := repository.GetFriendshipsForUser(userID)
+	rows, err := repository.GetFriendshipsForUser(c.Request.Context(), userID)
 	if err != nil {
 		log.Printf("GetFriendships error: %v", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -69,7 +69,7 @@ func CreateFriendRequest(c *gin.Context) {
 		return
 	}
 
-	if err := repository.CreateFriendRequest(requesterID, body.Receiver_id); err != nil {
+	if err := repository.CreateFriendRequest(c.Request.Context(), requesterID, body.Receiver_id); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
@@ -100,7 +100,7 @@ func AcceptFriendRequest(c *gin.Context) {
 		return
 	}
 
-	if err := repository.AcceptFriendRequest(requesterID, receiverID); err != nil {
+	if err := repository.AcceptFriendRequest(c.Request.Context(), requesterID, receiverID); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
@@ -132,7 +132,7 @@ func DeleteFriendship(c *gin.Context) {
 		return
 	}
 
-	status, err := repository.GetFriendshipStatus(callerID, otherID)
+	status, err := repository.GetFriendshipStatus(c.Request.Context(), callerID, otherID)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return

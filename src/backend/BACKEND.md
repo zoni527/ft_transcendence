@@ -70,10 +70,10 @@ The database does the searching — Go just asks and receives. No for-loop neede
 Use `Pool.Query()` to get multiple rows, then loop through them with `rows.Next()` and `rows.Scan()`.
 
 ```go
-func GetAllUsers() ([]user, error) {
+func GetAllUsers(ctx context.Context) ([]user, error) {
 
     //Pool.Query() returns a pgx.Rows object point to the result set of db.
-    rows, err := Pool.Query(context.Background(),
+    rows, err := Pool.Query(ctx,
         `SELECT id, email, display_name, created_at FROM "user"`)
     if err != nil {
         return nil, err
@@ -104,9 +104,9 @@ func GetAllUsers() ([]user, error) {
 Use `Pool.QueryRow()` when you expect one result (e.g. find by ID).
 
 ```go
-func GetUserByID(id string) (user, error) {
+func GetUserByID(ctx context.Context, id string) (user, error) {
     var u user
-    err := Pool.QueryRow(context.Background(),
+    err := Pool.QueryRow(ctx,
         `SELECT id, email, display_name, created_at FROM "user" WHERE id = $1`, id,
     ).Scan(&u.Id, &u.Email, &u.Display_name, &u.Created_at)
     if err != nil {
@@ -125,8 +125,8 @@ func GetUserByID(id string) (user, error) {
 Use `Pool.Exec()` for INSERT/UPDATE/DELETE, or `QueryRow()` if you want the inserted row back.
 
 ```go
-func CreateUser(u user) (user, error) {
-    err := Pool.QueryRow(context.Background(),
+func CreateUser(ctx context.Context, u user) (user, error) {
+    err := Pool.QueryRow(ctx,
         `INSERT INTO "user" (email, password_hash, display_name)
          VALUES ($1, $2, $3)
          RETURNING id, created_at`,

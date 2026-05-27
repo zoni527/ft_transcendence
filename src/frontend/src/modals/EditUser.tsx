@@ -113,10 +113,18 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
     const coreChanged =
       JSON.stringify(originalData) !== JSON.stringify(currentData);
 
+    const originalRoles = user.roles ?? [];
+    const currentRoles = roles ?? [];
+
+    const rolesChanged =
+      JSON.stringify([...originalRoles].sort()) !==
+      JSON.stringify([...currentRoles].sort());
+
     const passwordChanged = password.trim().length > 0;
     const avatarChanged = imageFile !== null;
 
-    const hasChanges = coreChanged || passwordChanged || avatarChanged;
+    const hasChanges =
+      coreChanged || passwordChanged || avatarChanged || rolesChanged;
 
     if (!hasChanges) {
       showNotification(t('notification.noChanges'), 'info');

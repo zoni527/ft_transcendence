@@ -20,7 +20,7 @@ const Notification = ({ message, onClose, variant }: NotificationProps) => {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, [onClose, message, variant]);
 
   return (
     <div

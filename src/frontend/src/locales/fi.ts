@@ -341,7 +341,7 @@ export const fiTranslations = {
     recipesNotFound: 'Reseptejä ei löytynyt',
     genericError: 'Tapahtui virhe, yritä myöhemmin uudelleen',
     invalidResponse: 'Virheellinen tietokannan vastaus',
-    badRequest: 'Virheellinen pyyntö, tarkista syötteesi',
+    badRequest: 'Virheellinen pyyntö',
     unauthorized: 'Sinulla ei ole oikeuksia suorittaa tätä toimintoa',
     notFound: 'Haettua resurssia ei löydy',
     conflict: 'Käyttäjänimi tai sähköpostiosoite on jo käytössä',

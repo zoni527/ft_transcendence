@@ -341,7 +341,7 @@ export const enTranslations = {
     recipesNotFound: 'No recipes found',
     genericError: 'An error occurred, please try again later',
     invalidResponse: 'Invalid database response',
-    badRequest: 'Invalid request, please check your input',
+    badRequest: 'Invalid request',
     unauthorized: 'You are not authorized to perform this action',
     notFound: 'The requested resource could not be found',
     conflict: 'Duplicate username or email',

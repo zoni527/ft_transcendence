@@ -341,7 +341,7 @@ export const csTranslations = {
     recipesNotFound: 'Nebyly nalezeny žádné recepty',
     genericError: 'Došlo k chybě, zkuste to prosím později',
     invalidResponse: 'Neplatná odpověď databáze',
-    badRequest: 'Chybný požadavek, zkontrolujte, zda jsou data správná',
+    badRequest: 'Chybný požadavek',
     unauthorized: 'Nemáte oprávnění k provedení této akce',
     notFound: 'Požadovaný zdroj nebyl nalezen',
     conflict: 'Duplicitní uživatelské jméno nebo e-mail',

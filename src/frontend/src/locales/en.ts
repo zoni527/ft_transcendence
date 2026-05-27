@@ -352,5 +352,6 @@ export const enTranslations = {
     fileTooLarge: 'File too large',
     forbidden: 'No permissions to perform this action',
     copyFailed: 'Copy to clipboard failed',
+    pageNotFound: '404 - Page not found',
   },
 };

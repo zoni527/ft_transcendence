@@ -352,5 +352,6 @@ export const csTranslations = {
     fileTooLarge: 'Soubor je příliš velký',
     forbidden: 'Chybí potřebná oprávnění.',
     copyFailed: 'Kopírování do schránky se nezdařilo',
+    pageNotFound: '404 - Stránka nenalezena',
   },
 };

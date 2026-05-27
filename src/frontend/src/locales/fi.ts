@@ -352,5 +352,6 @@ export const fiTranslations = {
     fileTooLarge: 'Tiedosto on liian suuri',
     forbidden: 'Ei käyttöoikeutta',
     copyFailed: 'Kopiointi leikepöydälle epäonnistui',
+    pageNotFound: '404 - Sivua ei löytynyt',
   },
 };

@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './routes/Dashboard';
 import Login from './routes/Login';
 import PrivacyPolicy from './routes/PrivacyPolicy';
+import NotFound from './routes/NotFound';
 import NotificationProvider from './utils/NotifProvider';
 import RecipeDetail from './routes/RecipeDetail';
 import Recipes from './routes/Recipes';
@@ -36,6 +37,7 @@ const App = () => {
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/terms" element={<TermsService />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
             </div>

@@ -84,7 +84,7 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	u, err := getOrCreateGoogleUser(c, &gu)
+	u, err := getOrCreateGoogleUser(c.Request.Context(), &gu)
 	if err != nil {
 		var eu *errorUnauthorized
 		var eb *errorBadRequest

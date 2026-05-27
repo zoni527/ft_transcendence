@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-export type NotificationVariant = 'error' | 'success' | 'info' | 'warning';
+export type NotificationVariant = 'error' | 'success' | 'info';
 
 export type NotificationContextType = {
   showNotification: (message: string, variant: NotificationVariant) => void;

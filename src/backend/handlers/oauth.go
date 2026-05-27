@@ -93,7 +93,7 @@ func GoogleCallback(c *gin.Context) {
 			return
 		}
 		if errors.As(err, &eb) {
-			reportError(c, http.StatusBadRequest, eu.Error())
+			reportError(c, http.StatusBadRequest, eb.Error())
 			return
 		}
 		log.Printf("getOrCreateGoogleUser: %v", err)

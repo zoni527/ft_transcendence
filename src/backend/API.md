@@ -57,12 +57,6 @@ All errors return JSON in this format:
 
 Get all users.
 
-**Query parameters (optional):**
-| Param | Type  | Description                                       |
-|-------|-------|---------------------------------------------------|
-| page  | int   | Page number for pagination (default: 1)           |
-| limit | int   | Results per page (default: 12)                    |
-
 **Response** `200 OK`
 ```json
 [
@@ -416,17 +410,6 @@ Get a Cloudinary upload signature for uploading user avatars. This endpoint prov
 ### GET /api/recipes
 
 Get all recipes.
-
-**Query parameters (optional):**
-| Param         | Type      | Description                                                   |
-|---------------|-----------|---------------------------------------------------------------|
-| cuisine       | string    | Filter by cuisine (e.g. "italian")                            |
-| meal_type     | string    | Filter by meal type (breakfast/lunch/dinner/snack)            |
-| difficulty    | string    | Filter by difficulty (easy/medium/hard)                       |
-| sort          | string    | Sort by field (e.g. "created_at", "title", "calories")        |
-| order         | string    | Sort order: "asc" or "desc" (default: "desc")                 |
-| page          | int       | Page number for pagination (default: 1)                       |
-| limit         | int       | Results per page (default: 12)                                |
 
 **Response** `200 OK`
 ```json

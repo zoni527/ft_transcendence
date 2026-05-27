@@ -29,6 +29,7 @@ export const fiTranslations = {
     friendRequestRejected: 'Pyyntö hylätty',
     friendRequestSent: 'Pyyntö lähetetty',
     apiKeyGenerated: 'API-avain luotu',
+    noChanges: 'Muutoksia ei tehty',
   },
   info: {
     name: 'Ei näy muille käyttäjille',

@@ -97,6 +97,32 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
 
   const handleSubmitAsync = async () => {
     if (loading) return;
+
+    const originalData = {
+      name: user.name,
+      display_name: user.display_name,
+      email: user.email,
+    };
+
+    const currentData = {
+      name: fullName,
+      display_name: username,
+      email,
+    };
+
+    const coreChanged =
+      JSON.stringify(originalData) !== JSON.stringify(currentData);
+
+    const passwordChanged = password.trim().length > 0;
+    const avatarChanged = imageFile !== null;
+
+    const hasChanges = coreChanged || passwordChanged || avatarChanged;
+
+    if (!hasChanges) {
+      showNotification(t('notification.noChanges'), 'info');
+      return;
+    }
+
     setLoading(true);
 
     try {

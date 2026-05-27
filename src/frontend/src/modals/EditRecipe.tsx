@@ -102,24 +102,51 @@ const EditRecipeModal = ({
 
   const handleSubmitAsync = async () => {
     if (loading) return;
+
+    const currentData = {
+      title,
+      description,
+      preparation_time_min,
+      servings,
+      difficulty,
+      cuisine,
+      meal_type,
+      calories,
+      protein_g: protein,
+      carbs_g: carbs,
+      fat_g: fat,
+    };
+
+    const originalData = {
+      title: passedRecipe.title,
+      description: passedRecipe.description,
+      preparation_time_min: passedRecipe.preparation_time_min,
+      servings: passedRecipe.servings,
+      difficulty: passedRecipe.difficulty,
+      cuisine: passedRecipe.cuisine,
+      meal_type: passedRecipe.meal_type,
+      calories: passedRecipe.calories,
+      protein_g: passedRecipe.protein_g,
+      carbs_g: passedRecipe.carbs_g,
+      fat_g: passedRecipe.fat_g,
+    };
+
+    const hasChanges =
+      JSON.stringify(originalData) !== JSON.stringify(currentData) ||
+      imageFile !== null;
+
+    if (!hasChanges) {
+      showNotification(t('notification.noChanges'), 'info');
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     try {
       const schema = createRecipeSchema(t);
 
-      const result = schema.safeParse({
-        title,
-        description,
-        preparation_time_min,
-        servings,
-        difficulty,
-        cuisine,
-        meal_type,
-        calories,
-        protein_g: protein,
-        carbs_g: carbs,
-        fat_g: fat,
-      });
+      const result = schema.safeParse(currentData);
 
       if (!result.success) {
         throw new Error(result.error.issues[0]?.message || t('error.input'));

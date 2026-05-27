@@ -29,6 +29,7 @@ export const csTranslations = {
     friendRequestRejected: 'Žádost odmítnuta',
     friendRequestSent: 'Žádost odeslána',
     apiKeyGenerated: 'API klíč byl vygenerován',
+    noChanges: 'Neprovedly se žádné změny',
   },
   info: {
     name: 'Ostatní uživatelé nevidí vaše celé jméno',

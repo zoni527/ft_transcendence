@@ -29,6 +29,7 @@ export const enTranslations = {
     friendRequestRejected: 'Request rejected',
     friendRequestSent: 'Request sent',
     apiKeyGenerated: 'API key generated',
+    noChanges: 'No changes were made',
   },
   info: {
     name: "Other users can't see your full name",

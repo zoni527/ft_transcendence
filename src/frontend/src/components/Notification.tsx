@@ -10,8 +10,8 @@ type NotificationProps = {
 const variantStyles: Record<NotificationVariant, string> = {
   error: 'bg-red-600',
   success: 'bg-green-600',
-  warning: 'bg-yellow-500 text-black',
-  info: 'bg-blue-600',
+  warning: 'bg-orange-600',
+  info: 'bg-yellow-600',
 };
 
 const Notification = ({ message, onClose, variant }: NotificationProps) => {

@@ -39,7 +39,7 @@ func Authentication() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
-		roles, perms, err := repository.GetEffectivePermissionsByUser(c, claims.Subject)
+		roles, perms, err := repository.GetEffectivePermissionsByUser(c.Request.Context(), claims.Subject)
 		if err != nil {
 			log.Printf("GetEffectivePermissionsByUser: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

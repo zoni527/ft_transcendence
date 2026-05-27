@@ -750,14 +750,21 @@ export const acceptFriend = async (id: string, t: TFunction) => {
 };
 
 // DELETE /api/friendships/:id (delete / reject / cancel friend relationship)
-export const deleteFriend = async (id: string, t: TFunction) => {
-  const response = await fetch(`${baseUrl}/friendships/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
+export const deleteFriend = async (
+  id: string,
+  action: string,
+  t: TFunction,
+) => {
+  const response = await fetch(
+    `${baseUrl}/friendships/${id}?action=${action}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
     },
-    credentials: 'include',
-  });
+  );
 
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));

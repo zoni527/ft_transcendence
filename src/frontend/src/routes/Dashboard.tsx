@@ -120,7 +120,7 @@ const Dashboard = () => {
           try {
             setFriendLoadingIds((prev) => [...prev, id]);
 
-            await deleteFriend(id, t);
+            await deleteFriend(id, 'unfriend', t);
             await refreshFriendships();
 
             showNotification(t('notification.friendRemoved'), 'success');
@@ -140,7 +140,7 @@ const Dashboard = () => {
           try {
             setFriendLoadingIds((prev) => [...prev, id]);
 
-            await deleteFriend(id, t);
+            await deleteFriend(id, 'cancel', t);
             await refreshFriendships();
 
             showNotification(
@@ -184,7 +184,7 @@ const Dashboard = () => {
           try {
             setFriendLoadingIds((prev) => [...prev, id]);
 
-            await deleteFriend(id, t);
+            await deleteFriend(id, 'reject', t);
             await refreshFriendships();
 
             showNotification(

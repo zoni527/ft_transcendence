@@ -844,6 +844,8 @@ Remove the friendship row between the logged-in user and `:id`. One endpoint cov
 - **Deny** an incoming request — caller is the receiver on a `pending` row.
 - **Unfriend** — row is `accepted`; either side may call.
 
+The frontend passes the intended UI action as a query parameter: `?action=cancel`, `?action=reject`, or `?action=unfriend`.
+
 **Requires:** Valid JWT in `token` cookie.
 
 **Body:** none

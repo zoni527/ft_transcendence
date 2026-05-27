@@ -117,9 +117,9 @@ func AcceptFriendRequest(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"status": "accepted"})
 }
 
-// DELETE /api/friendships/:id (:id is the other user). One endpoint covers
-// three product actions: cancel an outgoing request, deny an incoming
-// request, and unfriend.
+// DELETE /api/friendships/:id?action=cancel|reject|unfriend (:id is the other
+// user). One endpoint covers three product actions: cancel an outgoing
+// request, deny an incoming request, and unfriend.
 func DeleteFriendship(c *gin.Context) {
 	callerID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerID) {

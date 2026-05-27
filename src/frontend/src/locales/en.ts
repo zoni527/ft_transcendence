@@ -101,13 +101,13 @@ export const enTranslations = {
       The data controller is the RISE team.`,
 
     section2_title: '2. What we collect',
-    section2_text: `Account information: name, email address, and a salted, hashed password.
-      Content you create: recipes, photos, comments, and ratings you publish on the platform.
+    section2_text: `Account information: name, username, email address, and a salted, hashed password.
+      Content you create: recipes and photos you publish on the platform.
       Technical data: IP address, browser type, and device information collected automatically.
       Cookies: see Section 6 below.`,
 
     section3_title: '3. How we use your information',
-    section3_text: `To operate the service and let you sign in, create and save recipes, post comments and reviews, and follow other users.
+    section3_text: `To operate the service and let you sign in, create and save recipes, and follow other users.
       To prevent abuse, fraud, and ensure platform security.
       To communicate with you about your account or important changes.`,
 
@@ -144,7 +144,7 @@ export const enTranslations = {
       We follow industry best practices for storage, access control, and incident response.`,
 
     section10_title: '10. Children',
-    section10_text: `RISE is not intended for users under 13.`,
+    section10_text: `RISE is not intended for users under 13 years old.`,
 
     section11_title: '11. Changes to this policy',
     section11_text: `We may update this policy from time to time.`,
@@ -168,7 +168,7 @@ export const enTranslations = {
       You are responsible for all activity that occurs under your account.`,
 
     section4_title: '4. Your content',
-    section4_text: `You retain ownership of the recipes, photos, comments, and other content you upload to RISE.
+    section4_text: `You retain ownership of the recipes, photos, and other content you upload to RISE.
       By posting content, you grant us a worldwide, non-exclusive, royalty-free licence to display, reproduce, and distribute it within the platform and its features.
 
       You agree not to upload content that:

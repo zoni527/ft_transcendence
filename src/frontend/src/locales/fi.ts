@@ -101,13 +101,13 @@ export const fiTranslations = {
       Rekisterinpitäjänä toimii RISE-tiimi.`,
 
     section2_title: '2. Mitä keräämme',
-    section2_text: `Tilitiedot: nimi, sähköpostiosoite ja suolattu, hajautettu salasana.
-      Luomasi sisältö: reseptit, kuvat, kommentit ja arviot, jotka julkaiset alustalla.
+    section2_text: `Tilitiedot: nimi, käyttäjätunnus, sähköpostiosoite ja suolattu, hajautettu salasana.
+      Luomasi sisältö: reseptit ja kuvat, jotka julkaiset alustalla.
       Tekniset tiedot: IP-osoite, selain ja laitteen tiedot, jotka kerätään automaattisesti.
       Evästeet: katso kohta 6.`,
 
     section3_title: '3. Miten käytämme tietojasi',
-    section3_text: `Palvelun tarjoamiseksi ja mahdollistaaksemme kirjautumisesi, reseptien luomisen ja tallentamisen, kommenttien ja arvostelujen julkaisemisen sekä muiden käyttäjien seuraamisen.
+    section3_text: `Palvelun tarjoamiseksi ja mahdollistaaksemme kirjautumisesi, reseptien luomisen ja tallentamisen sekä muiden käyttäjien seuraamisen.
       Väärinkäytösten, petosten ja tietoturvan estämiseen.
       Yhteydenpitoon tilisi tai tärkeiden muutosten osalta.`,
 
@@ -168,7 +168,7 @@ export const fiTranslations = {
       Olet vastuussa kaikesta tililläsi tapahtuvasta toiminnasta.`,
 
     section4_title: '4. Sisältösi',
-    section4_text: `Säilytät omistusoikeuden lataamiisi resepteihin, kuviin ja kommentteihin.
+    section4_text: `Säilytät omistusoikeuden lataamiisi resepteihin ja kuviin.
       Antamalla sisältöä myönnät meille maailmanlaajuisen, ei-yksinomaisen ja rojaltivapaan lisenssin näyttää, tallentaa ja jakaa sisältöä palvelussa.
 
       Et saa julkaista sisältöä, joka:

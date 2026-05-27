@@ -101,13 +101,13 @@ export const csTranslations = {
       Správcem údajů je tým RISE.`,
 
     section2_title: '2. Jaké údaje shromažďujeme',
-    section2_text: `Údaje o účtu: jméno, e-mailová adresa a heslo s jednosměrným hashováním a solí.
-      Obsah, který vytváříte: recepty, fotografie, komentáře a hodnocení, která publikujete na platformě.
+    section2_text: `Údaje o účtu: jméno, uživatelské jméno, e-mailová adresa a heslo s jednosměrným hashováním a solí.
+      Obsah, který vytváříte: recepty a fotografie, která publikujete na platformě.
       Technické údaje: IP adresa, typ prohlížeče a informace o zařízení shromažďované automaticky.
       Cookies: viz část 6 níže.`,
 
     section3_title: '3. Jak vaše údaje používáme',
-    section3_text: `K provozu služby a umožnění přihlášení, vytváření a ukládání receptů, zveřejňování komentářů a recenzí a sledování ostatních uživatelů.
+    section3_text: `K provozu služby a umožnění přihlášení, vytváření a ukládání receptů, a sledování ostatních uživatelů.
       K prevenci zneužití, podvodů a zajištění bezpečnosti platformy.
       Ke komunikaci s vámi ohledně vašeho účtu nebo důležitých změn.`,
 

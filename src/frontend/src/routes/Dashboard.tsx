@@ -246,14 +246,7 @@ const Dashboard = () => {
     return () => {
       controller.abort();
     };
-  }, [
-    activeSection,
-    authLoading,
-    authUser,
-    t,
-    showNotification,
-    activeSubsection,
-  ]);
+  }, [activeSection, authLoading, authUser, t, showNotification]);
 
   // Delete user profile
   const handleDelete = (id?: string) => {

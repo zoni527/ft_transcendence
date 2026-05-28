@@ -94,7 +94,7 @@ type SearchRecipeResponse struct {
 
 type CreateUserRequest struct {
 	Email       string `json:"email"        binding:"required,min=5,max=254"`
-	Password    string `json:"password"     binding:"required,min=8,max=20"`
+	Password    string `json:"password"     binding:"required,min=8,max=72"`
 	Name        string `json:"name"         binding:"omitempty,min=2,max=50"`
 	DisplayName string `json:"display_name" binding:"required,min=3,max=30"`
 }

@@ -21,7 +21,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const googleOAuthLockedPassword = "OAUTH_LOCKED_GOOGLE"
 const genericInternalErrorMsg = "internal server error"
 const unauthorizedErrorMsg = "unauthorized"
 const displayNameVersionLimit = 1000
@@ -137,7 +136,7 @@ func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.U
 
 	// User found
 	if err == nil {
-		if user.Password_hash != googleOAuthLockedPassword {
+		if user.Password_hash != integrations.GoogleOAuthLockedPassword {
 			return models.User{}, &errorUnauthorized{"not a google user"}
 		}
 		return user, nil
@@ -151,7 +150,7 @@ func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.U
 	stem := gu.Email[:at]
 	params := models.CreateUserParams{
 		Email:           gu.Email,
-		Password_hashed: googleOAuthLockedPassword,
+		Password_hashed: integrations.GoogleOAuthLockedPassword,
 		Name:            gu.Name,
 		Display_name:    stem,
 	}

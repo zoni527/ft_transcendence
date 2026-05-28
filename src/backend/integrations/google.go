@@ -9,6 +9,8 @@ import (
 
 var GoogleOAuthConfig *oauth2.Config
 
+const GoogleOAuthLockedPassword = "OAUTH_LOCKED_GOOGLE"
+
 func InitGoogleOAuth() {
 	nginxPort := os.Getenv("NGINX_PORT_EXTERNAL")
 	if nginxPort == "" {

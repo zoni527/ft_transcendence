@@ -546,7 +546,7 @@ func validatePassword(password string) error {
 // Set to 0 for development phase, to be set to 3
 func isPasswordStrong(password string) bool {
 	result := zxcvbn.PasswordStrength(password, nil)
-	return result.Score >= 0
+	return result.Score >= 3
 }
 
 // Validate roles: must not be empty, no duplicates, and only valid role names

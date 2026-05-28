@@ -117,9 +117,9 @@ func AcceptFriendRequest(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"status": "accepted"})
 }
 
-// DELETE /api/friendships/:id (:id is the other user). One endpoint covers
-// three product actions: cancel an outgoing request, deny an incoming
-// request, and unfriend.
+// DELETE /api/friendships/:id?action=cancel|reject|unfriend (:id is the other
+// user). One endpoint covers three product actions: cancel an outgoing
+// request, deny an incoming request, and unfriend.
 func DeleteFriendship(c *gin.Context) {
 	callerID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerID) {
@@ -146,15 +146,14 @@ func DeleteFriendship(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-
-	switch status {
-	case "pending":
+	action := c.Query("action")
+	if (action == "reject" || action == "cancel") && status == "pending" {
 		err = repository.DeleteFriendRequest(callerID, otherID)
-	case "accepted":
+	} else if action == "unfriend" && status == "accepted" {
 		err = repository.DeleteFriendship(callerID, otherID)
-	default:
-		log.Printf("handlers.DeleteFriendship: unexpected status %q", status)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+	} else {
+		log.Printf("handlers.DeleteFriendship: unexpected status and action %q, %q", status, action)
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 	if err != nil {

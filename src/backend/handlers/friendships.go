@@ -143,9 +143,9 @@ func DeleteFriendship(c *gin.Context) {
 	}
 	action := c.Query("action")
 	if (action == "reject" || action == "cancel") && status == "pending" {
-		err = repository.DeleteFriendRequest(callerID, otherID)
+		err = repository.DeleteFriendRequest(c.Request.Context(), callerID, otherID)
 	} else if action == "unfriend" && status == "accepted" {
-		err = repository.DeleteFriendship(callerID, otherID)
+		err = repository.DeleteFriendship(c.Request.Context(), callerID, otherID)
 	} else {
 		log.Printf("handlers.DeleteFriendship: unexpected status and action %q, %q", status, action)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid request"})

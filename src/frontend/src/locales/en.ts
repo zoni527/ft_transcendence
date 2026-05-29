@@ -285,10 +285,7 @@ export const enTranslations = {
     type_dessert: 'Dessert',
   },
   loginValidation: {
-    emailRequired: 'Email is required',
-    invalidEmail: 'Invalid email',
     passwordRequired: 'Password is required',
-    passwordControlChars: 'Password contains invalid characters',
   },
   signupValidation: {
     invalidName:

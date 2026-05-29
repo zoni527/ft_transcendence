@@ -285,10 +285,7 @@ export const fiTranslations = {
     type_dessert: 'Jälkiruoka',
   },
   loginValidation: {
-    emailRequired: 'Sähköposti on pakollinen',
-    invalidEmail: 'Virheellinen sähköpostiosoite',
     passwordRequired: 'Salasana on pakollinen',
-    passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',
   },
   signupValidation: {
     invalidName:

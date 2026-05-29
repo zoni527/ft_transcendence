@@ -285,10 +285,7 @@ export const csTranslations = {
     type_dessert: 'Dezert',
   },
   loginValidation: {
-    emailRequired: 'E-mail je povinný',
-    invalidEmail: 'Neplatná e-mailová adresa',
     passwordRequired: 'Heslo je povinné',
-    passwordControlChars: 'Heslo obsahuje neplatné znaky',
   },
   signupValidation: {
     invalidName:

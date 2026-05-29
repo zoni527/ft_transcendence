@@ -19,14 +19,16 @@ const loginSchema = (t: TFunction) =>
       .string()
       .trim()
       .toLowerCase()
-      .min(1, t('loginValidation.emailRequired'))
-      .email(t('loginValidation.invalidEmail')),
+      .min(1, t('signupValidation.invalidEmail'))
+      .max(254, t('signupValidation.invalidEmail'))
+      .email(t('signupValidation.invalidEmail')),
 
     password: z
       .string()
       .min(1, t('loginValidation.passwordRequired'))
+      .max(72, t('signupValidation.passwordTooLong'))
       .refine((val) => !hasControlChars(val), {
-        message: t('loginValidation.passwordControlChars'),
+        message: t('signupValidation.passwordControlChars'),
       }),
   });
 

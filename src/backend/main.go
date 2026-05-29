@@ -79,7 +79,7 @@ func main() {
 	router.GET("/api/users/search",
 		middleware.Authentication(),
 		handlers.SearchUser)
-	router.GET("/api/users/:id", handlers.GetUserById)
+	router.GET("/api/users/:id", handlers.GetUserByID)
 
 	router.POST("/api/users", handlers.CreateUser)
 	router.POST("/api/users/apikey",
@@ -103,7 +103,7 @@ func main() {
 		middleware.RequirePermission(authorization.PermCreateRecipe),
 		recipeHandler.RecipeImageSignature)
 	router.GET("/api/recipes/search", recipeHandler.SearchRecipes)
-	router.GET("/api/recipes/:id", recipeHandler.GetRecipeById)
+	router.GET("/api/recipes/:id", recipeHandler.GetRecipeByID)
 
 	router.POST("/api/recipes",
 		middleware.Authentication(),
@@ -137,7 +137,7 @@ func main() {
 	publicAPI.Use(middleware.APIKeyAuthenticator())
 	{
 		publicAPI.GET("/recipes", publicRecipeHandler.GetAllRecipes)
-		publicAPI.GET("/recipes/:id", publicRecipeHandler.GetRecipeById)
+		publicAPI.GET("/recipes/:id", publicRecipeHandler.GetRecipeByID)
 		publicAPI.POST("/recipes", publicRecipeHandler.CreateRecipe)
 		publicAPI.PUT("/recipes/:id", publicRecipeHandler.UpdateRecipe)
 		publicAPI.DELETE("/recipes/:id", publicRecipeHandler.DeleteRecipe)

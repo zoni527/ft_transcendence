@@ -37,19 +37,19 @@ func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
 
-func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
+func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
-	recipe, err := h.Repo.GetRecipeById(c.Request.Context(), id)
+	recipe, err := h.Repo.GetRecipeByID(c.Request.Context(), id)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
-		log.Printf("handlers.GetRecipeById: %v", err)
+		log.Printf("handlers.GetRecipeByID: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -98,7 +98,7 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	newRecipeId, err := h.Repo.CreateRecipe(c.Request.Context(), &r)
+	newRecipeID, err := h.Repo.CreateRecipe(c.Request.Context(), &r)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -108,18 +108,18 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": newRecipeId})
+	c.JSON(http.StatusCreated, gin.H{"id": newRecipeID})
 }
 
 func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
-	userId := c.GetString("userID")
-	if !authorization.IsValidUUID(userId) {
+	userID := c.GetString("userID")
+	if !authorization.IsValidUUID(userID) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	recipeId := c.Param("id")
-	if !authorization.IsValidUUID(recipeId) {
+	recipeID := c.Param("id")
+	if !authorization.IsValidUUID(recipeID) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
@@ -130,7 +130,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeId)
+	original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -146,7 +146,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	allowed := authorization.CanEditRecipe(roleSet, permSet, userId, original.Author.Id)
+	allowed := authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.ID)
 	if !allowed {
 		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
@@ -157,7 +157,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	r.Id = recipeId
+	r.ID = recipeID
 	if err := h.Repo.UpdateRecipe(c.Request.Context(), &r); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -167,23 +167,23 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"id": recipeId})
+	c.JSON(http.StatusOK, gin.H{"id": recipeID})
 }
 
 func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
-	userId := c.GetString("userID")
-	if !authorization.IsValidUUID(userId) {
+	userID := c.GetString("userID")
+	if !authorization.IsValidUUID(userID) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	recipeId := c.Param("id")
-	if !authorization.IsValidUUID(recipeId) {
+	recipeID := c.Param("id")
+	if !authorization.IsValidUUID(recipeID) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
-	original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeId)
+	original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
@@ -199,13 +199,13 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	allowed := authorization.CanDeleteRecipe(roleSet, permSet, userId, original.Author.Id)
+	allowed := authorization.CanDeleteRecipe(roleSet, permSet, userID, original.Author.ID)
 	if !allowed {
 		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 
-	if err := h.Repo.DeleteRecipe(c.Request.Context(), recipeId); err != nil {
+	if err := h.Repo.DeleteRecipe(c.Request.Context(), recipeID); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
@@ -256,7 +256,7 @@ const titleLenMax = 60
 const descriptionLenMin = 0
 const descriptionLenMax = 10000
 const cuisineLenMax = 50
-const imageUrlLenMax = 255
+const imageURLLenMax = 255
 
 func validateRecipeFields(r *models.Recipe) error {
 
@@ -320,7 +320,7 @@ func validateRecipeFields(r *models.Recipe) error {
 		{r.Title, "title", titleLenMin, titleLenMax},
 		{r.Description, "description", descriptionLenMin, descriptionLenMax},
 		{r.Cuisine, "cuisine", 0, cuisineLenMax},
-		{r.ImageURL, "image_url", 0, imageUrlLenMax},
+		{r.ImageURL, "image_url", 0, imageURLLenMax},
 	}
 
 	for _, v := range stringLimits {

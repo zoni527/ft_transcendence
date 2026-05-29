@@ -84,7 +84,7 @@ func GetAllUsers(ctx context.Context) ([]user, error) {
     var users []user
     for rows.Next() {
         var u user
-        err := rows.Scan(&u.Id, &u.Email, &u.DisplayName, &u.CreatedAt)
+        err := rows.Scan(&u.ID, &u.Email, &u.DisplayName, &u.CreatedAt)
         if err != nil {
             return nil, err
         }
@@ -108,7 +108,7 @@ func GetUserByID(ctx context.Context, id string) (user, error) {
     var u user
     err := Pool.QueryRow(ctx,
         `SELECT id, email, display_name, created_at FROM "user" WHERE id = $1`, id,
-    ).Scan(&u.Id, &u.Email, &u.DisplayName, &u.CreatedAt)
+    ).Scan(&u.ID, &u.Email, &u.DisplayName, &u.CreatedAt)
     if err != nil {
         return u, err
     }
@@ -131,7 +131,7 @@ func CreateUser(ctx context.Context, u user) (user, error) {
          VALUES ($1, $2, $3)
          RETURNING id, created_at`,
         u.Email, u.PasswordHash, u.DisplayName,
-    ).Scan(&u.Id, &u.CreatedAt)
+    ).Scan(&u.ID, &u.CreatedAt)
     if err != nil {
         return u, err
     }
@@ -228,17 +228,17 @@ For "edit your own thing" endpoints, handlers check authorship first:
 func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
     userID := c.GetString("userID")
     // error handling...
-    recipeId := c.Param("id")
+    recipeID := c.Param("id")
     // error handling and JSON binding...
 
-    original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeID)
+    original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
     // error handling ...
 
     roleSet, _ := authorization.RolesFromContext(c)
     permSet, _ := authorization.PermsFromContext(c)
     // error handling...
 
-    if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.Id) {
+    if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.ID) {
         c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
         return
     }

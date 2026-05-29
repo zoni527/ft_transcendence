@@ -17,7 +17,7 @@ import (
 
 type RecipeRepository interface {
 	GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error)
-	GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error)
+	GetRecipeByID(ctx context.Context, id string) (models.RecipeResponse, error)
 	CreateRecipe(ctx context.Context, r *models.Recipe) (string, error)
 	UpdateRecipe(ctx context.Context, r *models.Recipe) error
 	DeleteRecipe(ctx context.Context, id string) error
@@ -72,8 +72,8 @@ func (pgRepo *PostgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.R
 	for rows.Next() {
 		var r models.RecipeResponse
 		err := rows.Scan(
-			&r.Id,
-			&r.Author.Id, &r.Author.DisplayName, &r.Author.AvatarURL,
+			&r.ID,
+			&r.Author.ID, &r.Author.DisplayName, &r.Author.AvatarURL,
 			&r.Title, &r.Description,
 			&r.PreparationTimeMin, &r.Servings,
 			&r.Difficulty, &r.Cuisine, &r.MealType, &r.ImageURL,
@@ -134,7 +134,7 @@ func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.Se
 	for rows.Next() {
 		var r models.SearchRecipeResponse
 		err := rows.Scan(
-			&r.Id,
+			&r.ID,
 			&r.Title,
 			&r.PreparationTimeMin,
 			&r.ImageURL,
@@ -150,8 +150,8 @@ func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.Se
 	return recipes, nil
 }
 
-// GetRecipeById returns a single recipe by UUID.
-func (pgRepo *PostgresRecipeRepo) GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error) {
+// GetRecipeByID returns a single recipe by UUID.
+func (pgRepo *PostgresRecipeRepo) GetRecipeByID(ctx context.Context, id string) (models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),
 				COALESCE(u.display_name, ''),
@@ -169,8 +169,8 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeById(ctx context.Context, id string) 
 
 	var r models.RecipeResponse
 	err := pgRepo.Pool.QueryRow(ctx, sql, id).Scan(
-		&r.Id,
-		&r.Author.Id, &r.Author.DisplayName, &r.Author.AvatarURL,
+		&r.ID,
+		&r.Author.ID, &r.Author.DisplayName, &r.Author.AvatarURL,
 		&r.Title, &r.Description,
 		&r.PreparationTimeMin, &r.Servings,
 		&r.Difficulty, &r.Cuisine, &r.MealType, &r.ImageURL,
@@ -183,7 +183,7 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeById(ctx context.Context, id string) 
 	}
 
 	if err != nil {
-		return models.RecipeResponse{}, fmt.Errorf("GetRecipeById: %w", err)
+		return models.RecipeResponse{}, fmt.Errorf("GetRecipeByID: %w", err)
 	}
 
 	return r, nil
@@ -199,18 +199,18 @@ func (pgRepo *PostgresRecipeRepo) CreateRecipe(ctx context.Context, r *models.Re
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 		) RETURNING id`
 
-	var newId string
+	var newID string
 
 	err := pgRepo.Pool.QueryRow(ctx, sql,
 		r.AuthorID, r.Title, r.Description, r.PreparationTimeMin,
 		r.Servings, r.Difficulty, r.Cuisine, r.MealType, r.ImageURL,
 		r.Calories, r.ProteinGrams, r.CarbsGrams, r.FatGrams,
-	).Scan(&newId)
+	).Scan(&newID)
 	if err != nil {
 		return "", recipePostgresErrorClassification("repository.CreateRecipe", err)
 	}
 
-	return newId, nil
+	return newID, nil
 }
 
 func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Recipe) error {
@@ -230,7 +230,7 @@ func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Re
 		r.Title, r.Description, r.PreparationTimeMin, r.Servings,
 		r.Difficulty, r.Cuisine, r.MealType, r.ImageURL, r.Calories,
 		r.ProteinGrams, r.CarbsGrams, r.FatGrams,
-		r.Id,
+		r.ID,
 	)
 	if err != nil {
 		return recipePostgresErrorClassification("repository.UpdateRecipe", err)

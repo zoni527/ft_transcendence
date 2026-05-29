@@ -87,7 +87,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max image url length",
 		Description: strings.Repeat("-", descriptionLenMin),
-		ImageURL:    strings.Repeat("-", imageUrlLenMax),
+		ImageURL:    strings.Repeat("-", imageURLLenMax),
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -95,7 +95,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Newlines in description",
 		Description: "Testing\nnewlines\nin\na\ndescription",
-		ImageURL:    strings.Repeat("-", imageUrlLenMax),
+		ImageURL:    strings.Repeat("-", imageURLLenMax),
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -236,7 +236,7 @@ var badTestRecipes = []models.Recipe{
 	{
 		Title:       "Image url too long",
 		Description: strings.Repeat("-", descriptionLenMin),
-		ImageURL:    strings.Repeat("-", imageUrlLenMax+1),
+		ImageURL:    strings.Repeat("-", imageURLLenMax+1),
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",

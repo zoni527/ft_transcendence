@@ -100,7 +100,7 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	jwt, err := authorization.GenerateJWTToken(u.Id)
+	jwt, err := authorization.GenerateJWTToken(u.ID)
 	if err != nil {
 		log.Printf("LoginUser GenerateJWTToken: %v", err)
 		reportError(c, http.StatusInternalServerError, genericInternalErrorMsg)

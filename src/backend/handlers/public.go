@@ -34,7 +34,7 @@ func (h *PublicRecipeHandler) GetAllRecipes(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
 
-func (h *PublicRecipeHandler) GetRecipeById(c *gin.Context) {
+func (h *PublicRecipeHandler) GetRecipeByID(c *gin.Context) {
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
@@ -45,7 +45,7 @@ func (h *PublicRecipeHandler) GetRecipeById(c *gin.Context) {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}
-		log.Printf("handlers.GetRecipeById: %v", err)
+		log.Printf("handlers.GetRecipeByID: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

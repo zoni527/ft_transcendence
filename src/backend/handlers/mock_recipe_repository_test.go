@@ -16,7 +16,7 @@ import (
 
 type MockRecipeRepo struct {
 	MockGetAllRecipes func(ctx context.Context) ([]models.RecipeResponse, error)
-	MockGetRecipeById func(ctx context.Context, id string) (models.RecipeResponse, error)
+	MockGetRecipeByID func(ctx context.Context, id string) (models.RecipeResponse, error)
 	MockCreateRecipe  func(ctx context.Context, r *models.Recipe) (string, error)
 	MockUpdateRecipe  func(ctx context.Context, r *models.Recipe) error
 	MockDeleteRecipe  func(ctx context.Context, id string) error
@@ -29,9 +29,9 @@ func (repo *MockRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeR
 	}
 	return nil, nil
 }
-func (repo *MockRecipeRepo) GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error) {
-	if repo.MockGetRecipeById != nil {
-		return repo.MockGetRecipeById(ctx, id)
+func (repo *MockRecipeRepo) GetRecipeByID(ctx context.Context, id string) (models.RecipeResponse, error) {
+	if repo.MockGetRecipeByID != nil {
+		return repo.MockGetRecipeByID(ctx, id)
 	}
 	return models.RecipeResponse{}, nil
 }
@@ -126,22 +126,22 @@ func TestGetAllRecipes_TableDriven(t *testing.T) {
 }
 
 // =============
-// GetRecipeById
+// GetRecipeByID
 // =============
 
-var getRecipeByIdTests = []struct {
+var getRecipeByIDTests = []struct {
 	name           string
-	recipeId       string
+	recipeID       string
 	mockSetup      func(repo *MockRecipeRepo)
 	expectedStatus int
 	expectedBody   string
 }{
 	{
 		name:     "Success",
-		recipeId: "aa899f26-cf36-4570-b952-58752e6bf79a",
+		recipeID: "aa899f26-cf36-4570-b952-58752e6bf79a",
 		mockSetup: func(repo *MockRecipeRepo) {
-			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
-				return models.RecipeResponse{Id: id, Title: "Success"}, nil
+			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+				return models.RecipeResponse{ID: id, Title: "Success"}, nil
 			}
 		},
 		expectedStatus: 200,
@@ -149,16 +149,16 @@ var getRecipeByIdTests = []struct {
 	},
 	{
 		name:           "Invalid UUID caught by handler validation",
-		recipeId:       "invalid-uuid",
+		recipeID:       "invalid-uuid",
 		mockSetup:      func(repo *MockRecipeRepo) {},
 		expectedStatus: 404,
 		expectedBody:   `"error":"recipe not found"`,
 	},
 	{
 		name:     "Internal server error",
-		recipeId: "aa899f26-cf36-4570-b952-58752e6bf79a",
+		recipeID: "aa899f26-cf36-4570-b952-58752e6bf79a",
 		mockSetup: func(repo *MockRecipeRepo) {
-			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
 				return models.RecipeResponse{}, errors.New("problem with database")
 			}
 		},
@@ -167,18 +167,18 @@ var getRecipeByIdTests = []struct {
 	},
 }
 
-func TestGetRecipeById_TableDriven(t *testing.T) {
-	for _, tt := range getRecipeByIdTests {
+func TestGetRecipeByID_TableDriven(t *testing.T) {
+	for _, tt := range getRecipeByIDTests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
 			recipeHandler := NewRecipeHandler(mockRepo)
 			router := gin.New()
-			router.GET("/api/recipes/:id", recipeHandler.GetRecipeById)
+			router.GET("/api/recipes/:id", recipeHandler.GetRecipeByID)
 			req := httptest.NewRequest(
 				"GET",
-				"/api/recipes/"+tt.recipeId,
+				"/api/recipes/"+tt.recipeID,
 				nil,
 			)
 			w := httptest.NewRecorder()
@@ -359,9 +359,9 @@ var updateRecipeTests = []struct {
 		userID:      "00000000-0000-0000-0000-000000000001",
 		requestBody: `{"title":"Updated Title","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
-			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
 				resp := models.RecipeResponse{}
-				resp.Author.Id = "00000000-0000-0000-0000-000000000001"
+				resp.Author.ID = "00000000-0000-0000-0000-000000000001"
 				return resp, nil
 			}
 			repo.MockUpdateRecipe = func(ctx context.Context, r *models.Recipe) error {
@@ -377,7 +377,7 @@ var updateRecipeTests = []struct {
 		userID:      "00000000-0000-0000-0000-000000000001",
 		requestBody: `{"title":"Updated Title","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
-			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
 				return models.RecipeResponse{}, &repository.NotFoundError{Msg: "recipe not found"}
 			}
 		},
@@ -445,9 +445,9 @@ var deleteRecipeTests = []struct {
 		recipeID: "aa899f26-cf36-4570-b952-58752e6bf79a",
 		userID:   "00000000-0000-0000-0000-000000000001",
 		mockSetup: func(repo *MockRecipeRepo) {
-			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
 				resp := models.RecipeResponse{}
-				resp.Author.Id = "00000000-0000-0000-0000-000000000001"
+				resp.Author.ID = "00000000-0000-0000-0000-000000000001"
 				return resp, nil
 			}
 			repo.MockDeleteRecipe = func(ctx context.Context, id string) error {
@@ -462,9 +462,9 @@ var deleteRecipeTests = []struct {
 		recipeID: "aa899f26-cf36-4570-b952-58752e6bf79a",
 		userID:   "00000000-0000-0000-0000-000000000001",
 		mockSetup: func(repo *MockRecipeRepo) {
-			repo.MockGetRecipeById = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
 				resp := models.RecipeResponse{}
-				resp.Author.Id = "00000000-0000-0000-0000-000000000001"
+				resp.Author.ID = "00000000-0000-0000-0000-000000000001"
 				return resp, nil
 			}
 			repo.MockDeleteRecipe = func(ctx context.Context, id string) error {

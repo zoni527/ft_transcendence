@@ -15,15 +15,15 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-// GetRolesByUserId returns the role names for a given user.
+// GetRolesByUserID returns the role names for a given user.
 // Joins user_role and role tables to get the role name strings.
-func GetRolesByUserId(ctx context.Context, userId string) ([]string, error) {
+func GetRolesByUserID(ctx context.Context, userID string) ([]string, error) {
 	sql := `SELECT r.name
 			FROM user_role ur
 			JOIN role r ON ur.role_id = r.id
 			WHERE ur.user_id = $1`
 
-	rows, err := Pool.Query(ctx, sql, userId)
+	rows, err := Pool.Query(ctx, sql, userID)
 	if err != nil {
 		return nil, fmt.Errorf("error querying roles: %w", err)
 	}
@@ -43,14 +43,14 @@ func GetRolesByUserId(ctx context.Context, userId string) ([]string, error) {
 	return roles, nil
 }
 
-func GetEffectivePermissionsByUser(ctx context.Context, userId string) (map[string]bool, map[string]bool, error) {
+func GetEffectivePermissionsByUser(ctx context.Context, userID string) (map[string]bool, map[string]bool, error) {
 	sql := `SELECT r.name, p.name
 			FROM user_role ur
 			JOIN role r ON ur.role_id = r.id
 			LEFT JOIN role_permission rp ON rp.role_id = r.id
 			LEFT JOIN permission p ON rp.permission_id = p.id
 			WHERE ur.user_id = $1`
-	rows, err := Pool.Query(ctx, sql, userId)
+	rows, err := Pool.Query(ctx, sql, userID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error querying roles/permissions: %w", err)
 	}
@@ -91,7 +91,7 @@ func SearchUsersByUsername(ctx context.Context, username string) ([]models.UserS
 	for rows.Next() {
 		var u models.UserSearchResult
 		err := rows.Scan(
-			&u.Id,
+			&u.ID,
 			&u.Name,
 			&u.DisplayName,
 		)
@@ -106,14 +106,14 @@ func SearchUsersByUsername(ctx context.Context, username string) ([]models.UserS
 	return users, nil
 }
 
-// getRolesByUserIdTx is the transaction version of GetRolesByUserId.
-func getRolesByUserIdTx(ctx context.Context, tx pgx.Tx, userId string) ([]string, error) {
+// getRolesByUserIDTx is the transaction version of GetRolesByUserID.
+func getRolesByUserIDTx(ctx context.Context, tx pgx.Tx, userID string) ([]string, error) {
 	sql := `SELECT r.name
 			FROM user_role ur
 			JOIN role r ON ur.role_id = r.id
 			WHERE ur.user_id = $1`
 
-	rows, err := tx.Query(ctx, sql, userId)
+	rows, err := tx.Query(ctx, sql, userID)
 	if err != nil {
 		return nil, fmt.Errorf("error querying roles: %w", err)
 	}
@@ -149,7 +149,7 @@ func GetAllUsers(ctx context.Context) ([]models.User, error) {
 	for rows.Next() {
 		var u models.User
 		err := rows.Scan(
-			&u.Id,
+			&u.ID,
 			&u.Email,
 			&u.Name,
 			&u.DisplayName,
@@ -171,9 +171,9 @@ func GetAllUsers(ctx context.Context) ([]models.User, error) {
 	// TODO: N+1 query problem — this loops one query per user to get roles.
 	// Optimize with LEFT JOIN + array_agg to fetch users and roles in a single query.
 	for i := range users {
-		roles, err := GetRolesByUserId(ctx, users[i].Id)
+		roles, err := GetRolesByUserID(ctx, users[i].ID)
 		if err != nil {
-			return nil, fmt.Errorf("error getting roles for user %s: %w", users[i].Id, err)
+			return nil, fmt.Errorf("error getting roles for user %s: %w", users[i].ID, err)
 		}
 		users[i].Roles = roles
 	}
@@ -181,8 +181,8 @@ func GetAllUsers(ctx context.Context) ([]models.User, error) {
 	return users, nil
 }
 
-// GetUserById returns a single user by UUID, with roles attached.
-func GetUserById(ctx context.Context, id string) (models.User, error) {
+// GetUserByID returns a single user by UUID, with roles attached.
+func GetUserByID(ctx context.Context, id string) (models.User, error) {
 	sql := `SELECT id, email, name, display_name, avatar_url,
 				created_at, updated_at, last_seen
 			FROM "user"
@@ -190,7 +190,7 @@ func GetUserById(ctx context.Context, id string) (models.User, error) {
 
 	var u models.User
 	err := Pool.QueryRow(ctx, sql, id).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Email,
 		&u.Name,
 		&u.DisplayName,
@@ -209,7 +209,7 @@ func GetUserById(ctx context.Context, id string) (models.User, error) {
 	}
 
 	// TODO: Same N+1 issue — optimize with JOIN when GetAllUsers is updated.
-	roles, err := GetRolesByUserId(ctx, u.Id)
+	roles, err := GetRolesByUserID(ctx, u.ID)
 	if err != nil {
 		return models.User{}, fmt.Errorf("error getting roles for user: %w", err)
 	}
@@ -231,7 +231,7 @@ func getUserCredentialsBy(ctx context.Context, field, value string) (models.User
 
 	var u models.User
 	err := Pool.QueryRow(ctx, sql, value).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Email,
 		&u.PasswordHash,
 	)
@@ -271,7 +271,7 @@ func CreateUser(ctx context.Context, params models.CreateUserParams) (models.Use
 	var u models.User
 	err = tx.QueryRow(ctx, sql, params.Email, params.PasswordHashed,
 		params.Name, params.DisplayName).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Email,
 		&u.Name,
 		&u.DisplayName,
@@ -288,7 +288,7 @@ func CreateUser(ctx context.Context, params models.CreateUserParams) (models.Use
 
 	roleSQL := `INSERT INTO user_role(user_id, role_id)
 				VALUES($1, (SELECT id FROM role WHERE name = $2))`
-	_, err = tx.Exec(ctx, roleSQL, u.Id, "user")
+	_, err = tx.Exec(ctx, roleSQL, u.ID, "user")
 	if err != nil {
 		return models.User{}, fmt.Errorf("assign role: %w", err)
 	}
@@ -367,7 +367,7 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 		nullableString(params.AvatarURL),
 		id,
 	).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Email,
 		&u.Name,
 		&u.DisplayName,
@@ -402,7 +402,7 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 		}
 	}
 
-	roles, err := getRolesByUserIdTx(ctx, tx, u.Id)
+	roles, err := getRolesByUserIDTx(ctx, tx, u.ID)
 	if err != nil {
 		return models.User{}, fmt.Errorf("UpdateUser get roles: %w", err)
 	}
@@ -421,10 +421,10 @@ func nullableString(value *string) any {
 	return *value
 }
 
-func UpdateLastSeen(ctx context.Context, userId string) error {
+func UpdateLastSeen(ctx context.Context, userID string) error {
 	sql := `UPDATE "user" SET last_seen = NOW() WHERE id = $1`
 
-	commandTag, err := Pool.Exec(ctx, sql, userId)
+	commandTag, err := Pool.Exec(ctx, sql, userID)
 	if err != nil {
 		return fmt.Errorf("UpdateLastSeen: %w", err)
 	}
@@ -434,10 +434,10 @@ func UpdateLastSeen(ctx context.Context, userId string) error {
 	return nil
 }
 
-func MarkOffline(ctx context.Context, userId string) error {
+func MarkOffline(ctx context.Context, userID string) error {
 	sql := `UPDATE "user" SET last_seen = '1970-01-01' WHERE id = $1`
 
-	commandTag, err := Pool.Exec(ctx, sql, userId)
+	commandTag, err := Pool.Exec(ctx, sql, userID)
 	if err != nil {
 		return fmt.Errorf("MarkOffline: %w", err)
 	}
@@ -449,7 +449,7 @@ func MarkOffline(ctx context.Context, userId string) error {
 
 var ErrLastAdmin = errors.New("cannot delete the last admin")
 
-func DeleteUser(ctx context.Context, userId string) error {
+func DeleteUser(ctx context.Context, userID string) error {
 	tx, err := Pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("repository.DeleteUser: %w", err)
@@ -474,14 +474,14 @@ func DeleteUser(ctx context.Context, userId string) error {
 			AND
 			(SELECT COUNT(*) FROM user_role ur
 			 JOIN role r ON ur.role_id = r.id
-			 WHERE r.name = 'admin') = 1`, userId).Scan(&isLast); err != nil {
+			 WHERE r.name = 'admin') = 1`, userID).Scan(&isLast); err != nil {
 		return fmt.Errorf("repository.DeleteUser: %w", err)
 	}
 	if isLast {
 		return ErrLastAdmin
 	}
 
-	res, err := tx.Exec(ctx, `DELETE FROM "user" WHERE id = $1`, userId)
+	res, err := tx.Exec(ctx, `DELETE FROM "user" WHERE id = $1`, userID)
 	if err != nil {
 		return fmt.Errorf("repository.DeleteUser: %w", err)
 	}

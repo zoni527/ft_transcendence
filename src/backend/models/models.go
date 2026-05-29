@@ -7,12 +7,12 @@ package models
 //  In Go, capitalization controls visibility:
 // User (capital) → exported — accessible from other packages
 // user (lowercase) → unexported — only usable inside the same package
-// This applies to everything: structs, functions, variables, fields. That's why our struct fields are Id, Title, Email — if they were id, title, email, the JSON serializer (which lives in another package) couldn't access them.
+// This applies to everything: structs, functions, variables, fields. That's why our struct fields are ID, Title, Email — if they were id, title, email, the JSON serializer (which lives in another package) couldn't access them.
 
 import "time"
 
 type User struct {
-	Id           string    `json:"id"           db:"id"`
+	ID           string    `json:"id"           db:"id"`
 	Email        string    `json:"email"        db:"email"`
 	PasswordHash string    `json:"-"            db:"password_hash"`
 	Name         string    `json:"name"         db:"name"`
@@ -29,7 +29,7 @@ type User struct {
 // POST/PUT. The author is identified by AuthorID only — never trust an author
 // object from a request body.
 type Recipe struct {
-	Id                 string    `json:"id"                   db:"id"`
+	ID                 string    `json:"id"                   db:"id"`
 	AuthorID           string    `json:"author_id"            db:"author_id"`
 	Title              string    `json:"title"                db:"title"`
 	Description        string    `json:"description"          db:"description"`
@@ -51,7 +51,7 @@ type Recipe struct {
 // needs, joined in at read time so the frontend does not have to make a second
 // request to /api/users/:id just to render a card.
 type RecipeAuthor struct {
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	DisplayName string `json:"display_name"`
 	AvatarURL   string `json:"avatar_url"`
 }
@@ -59,7 +59,7 @@ type RecipeAuthor struct {
 // RecipeResponse is the read shape returned by GET /api/recipes and
 // GET /api/recipes/:id. It carries the author as a nested object
 type RecipeResponse struct {
-	Id                 string       `json:"id"`
+	ID                 string       `json:"id"`
 	Author             RecipeAuthor `json:"author"`
 	Title              string       `json:"title"`
 	Description        string       `json:"description"`
@@ -86,7 +86,7 @@ type SearchRecipeFilters struct {
 }
 
 type SearchRecipeResponse struct {
-	Id                 string `json:"id"`
+	ID                 string `json:"id"`
 	Title              string `json:"title"`
 	PreparationTimeMin int    `json:"preparation_time_min"`
 	ImageURL           string `json:"image_url"`
@@ -130,7 +130,7 @@ type UpdateUserParams struct {
 }
 
 type UserSearchResult struct {
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	Name        string `json:"name"`
 	DisplayName string `json:"display_name"`
 }
@@ -141,7 +141,7 @@ type FriendshipListItem struct {
 	Status      string    `json:"-"                    db:"status"`
 	SentByMe    bool      `json:"-"                    db:"sent_by_me"`
 	LastSeen    time.Time `json:"-"                    db:"last_seen"`
-	Id          string    `json:"id"                   db:"id"`
+	ID          string    `json:"id"                   db:"id"`
 	DisplayName string    `json:"display_name"         db:"display_name"`
 	Name        string    `json:"name"                 db:"name"`
 	IsOnline    *bool     `json:"is_online,omitempty"`
@@ -161,7 +161,7 @@ type CreateFriendRequestBody struct {
 }
 
 type GoogleUser struct {
-	Id            string `json:"id"`
+	ID            string `json:"id"`
 	Name          string `json:"name"`
 	Email         string `json:"email"`
 	VerifiedEmail bool   `json:"verified_email"`

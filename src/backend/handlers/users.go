@@ -43,20 +43,20 @@ func GetUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func GetUserById(c *gin.Context) {
+func GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
 		return
 	}
 
-	user, err := repository.GetUserById(c.Request.Context(), id)
+	user, err := repository.GetUserByID(c.Request.Context(), id)
 	if err == pgx.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 	if err != nil {
-		log.Printf("GetUserById: %v", err)
+		log.Printf("GetUserByID: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -70,7 +70,7 @@ func GetMe(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
-	user, err := repository.GetUserById(c.Request.Context(), userID)
+	user, err := repository.GetUserByID(c.Request.Context(), userID)
 	if err == pgx.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -130,7 +130,7 @@ func GetSession(c *gin.Context) {
 		return
 	}
 
-	user, err := repository.GetUserById(c.Request.Context(), claims.Subject)
+	user, err := repository.GetUserByID(c.Request.Context(), claims.Subject)
 	if err == pgx.ErrNoRows {
 		authorization.ClearAuthCookie(c)
 		c.JSON(http.StatusOK, gin.H{"authenticated": false})
@@ -185,15 +185,15 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	token, err := authorization.GenerateJWTToken(data.Id)
+	token, err := authorization.GenerateJWTToken(data.ID)
 	if err != nil {
 		log.Printf("CreateUser generateJWTToken: %v", err)
-		c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false})
+		c.JSON(http.StatusCreated, gin.H{"id": data.ID, "email": data.Email, "authenticated": false})
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("token", token, 3600, "/", "", true, true)
-	c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
+	c.JSON(http.StatusCreated, gin.H{"id": data.ID, "email": data.Email, "authenticated": true})
 }
 
 func LoginUser(c *gin.Context) {
@@ -217,18 +217,18 @@ func LoginUser(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
-	token, err := authorization.GenerateJWTToken(data.Id)
+	token, err := authorization.GenerateJWTToken(data.ID)
 	if err != nil {
 		log.Printf("LoginUser GenerateJWTToken: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	if err := repository.UpdateLastSeen(c.Request.Context(), data.Id); err != nil {
+	if err := repository.UpdateLastSeen(c.Request.Context(), data.ID); err != nil {
 		log.Printf("LoginUser UpdateLastSeen: %v", err)
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("token", token, 3600, "/", "", true, true)
-	c.JSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
+	c.JSON(http.StatusOK, gin.H{"id": data.ID, "email": data.Email, "authenticated": true})
 }
 
 func LogoutUser(c *gin.Context) {

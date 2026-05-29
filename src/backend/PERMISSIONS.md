@@ -136,9 +136,9 @@ from [authorization/recipe.go](authorization/recipe.go):
 Pattern:
 
 ```go
-func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
+func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
     // ...
-    recipe, err := h.Repo.GetRecipeById(c.Request.Context(), id)
+    recipe, err := h.Repo.GetRecipeByID(c.Request.Context(), id)
     if err != nil {
         // ... 404 if not found, 500 otherwise
         return
@@ -148,7 +148,7 @@ userID := c.GetString("userID")
 roleSet, _ := authorization.RolesFromContext(c)
 permSet, _ := authorization.PermsFromContext(c)
 
-if !authorization.CanEditRecipe(roleSet, permSet, userID, recipe.Author.Id) {
+if !authorization.CanEditRecipe(roleSet, permSet, userID, recipe.Author.ID) {
     c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
     return
 }

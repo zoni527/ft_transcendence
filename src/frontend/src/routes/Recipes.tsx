@@ -103,6 +103,7 @@ const Recipes = () => {
   const { t } = useTranslation();
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const [hasError, setHasError] = useState(false);
+  const pagingLock = useRef(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -205,6 +206,8 @@ const Recipes = () => {
         showNotification(message, 'error');
         void navigate('/');
       } finally {
+        pagingLock.current = false;
+
         if (!controller.signal.aborted) {
           setLoading(false);
         }
@@ -274,7 +277,14 @@ const Recipes = () => {
       (entries) => {
         const first = entries[0];
 
-        if (first.isIntersecting && hasMore && !loading && !hasError) {
+        if (
+          first.isIntersecting &&
+          hasMore &&
+          !loading &&
+          !hasError &&
+          !pagingLock.current
+        ) {
+          pagingLock.current = true;
           setPage((prev) => prev + 1);
         }
       },

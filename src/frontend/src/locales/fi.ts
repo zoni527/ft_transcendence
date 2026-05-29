@@ -305,7 +305,7 @@ export const fiTranslations = {
     descriptionRequired: 'Kuvauksen on oltava 0-10000 merkkiä',
     prepTime: 'Valmistusaika',
     servings: 'Annokset',
-    cuisineRequired: 'Keittiön tyyppi on 0-50 merkkiä',
+    cuisineRequired: 'Keittiön tyyppi on 0-50 merkkiä ilman numeroita',
     calories: 'Kalorit',
     protein: 'Proteiini',
     carbs: 'Hiilihydraatit',

@@ -304,7 +304,7 @@ export const csTranslations = {
     descriptionRequired: 'Popis musí mít 0-10000 znaků',
     prepTime: 'Doba přípravy',
     servings: 'Porce',
-    cuisineRequired: 'Kuchyně musí mít 0-50 znaků',
+    cuisineRequired: 'Kuchyně musí mít 0-50 znaků bez čísel',
     calories: 'Kalorie',
     protein: 'Bílkoviny',
     carbs: 'Sacharidy',

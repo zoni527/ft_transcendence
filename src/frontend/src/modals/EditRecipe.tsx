@@ -55,7 +55,10 @@ const createRecipeSchema = (t: TFunction) =>
     difficulty: z.enum(['easy', 'medium', 'hard'], {
       errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
     }),
-    cuisine: z.string().max(50, t('recValidation.cuisineRequired')),
+    cuisine: z
+      .string()
+      .max(50, t('recValidation.cuisineRequired'))
+      .regex(/^[^\d]*$/, { message: t('recValidation.cuisineRequired') }),
     meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack', 'dessert'], {
       errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),

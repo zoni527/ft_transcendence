@@ -304,7 +304,7 @@ export const enTranslations = {
     descriptionRequired: 'Description must be 0-10000 characters',
     prepTime: 'Prep time',
     servings: 'Servings',
-    cuisineRequired: 'Cuisine must be 0-50 characters',
+    cuisineRequired: 'Cuisine must be 0-50 characters without numbers',
     calories: 'Calories',
     protein: 'Protein',
     carbs: 'Carbs',

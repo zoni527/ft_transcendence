@@ -212,13 +212,13 @@ const Dashboard = () => {
 
   // Fetch all friends
   useEffect(() => {
+    if (authLoading) return;
+    if (activeSection !== 'friends') return;
+    if (!authUser) return;
+
     const controller = new AbortController();
 
     const fetchFriendships = async () => {
-      if (authLoading) return;
-      if (activeSection !== 'friends') return;
-      if (!authUser) return;
-
       try {
         setFriendsLoading(true);
 

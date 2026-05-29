@@ -37,7 +37,7 @@ func RandomStateToken() (string, error) {
 func GoogleLogin(c *gin.Context) {
 	randomState, err := RandomStateToken()
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": genericInternalErrorMsg})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": genericInternalErrorMsg})
 		return
 	}
 

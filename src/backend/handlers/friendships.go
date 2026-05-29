@@ -15,14 +15,14 @@ import (
 func GetFriendships(c *gin.Context) {
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 
 	rows, err := repository.GetFriendshipsForUser(c.Request.Context(), userID)
 	if err != nil {
 		log.Printf("GetFriendships error: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -44,28 +44,28 @@ func GetFriendships(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, resp)
 }
 
 // POST /api/friendships
 func CreateFriendRequest(c *gin.Context) {
 	requesterID := c.GetString("userID")
 	if !authorization.IsValidUUID(requesterID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 
 	var body models.CreateFriendRequestBody
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 	if !authorization.IsValidUUID(body.Receiver_id) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "receiver not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "receiver not found"})
 		return
 	}
 	if body.Receiver_id == requesterID {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "cannot send a request to yourself"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot send a request to yourself"})
 		return
 	}
 
@@ -74,11 +74,11 @@ func CreateFriendRequest(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.CreateFriendRequest: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusCreated, gin.H{"status": "pending"})
+	c.JSON(http.StatusCreated, gin.H{"status": "pending"})
 }
 
 // PATCH /api/friendships/:id — :id is the requester's user ID (the friend
@@ -86,17 +86,17 @@ func CreateFriendRequest(c *gin.Context) {
 func AcceptFriendRequest(c *gin.Context) {
 	receiverID := c.GetString("userID")
 	if !authorization.IsValidUUID(receiverID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 
 	requesterID := c.Param("id")
 	if !authorization.IsValidUUID(requesterID) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "friend request not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "friend request not found"})
 		return
 	}
 	if requesterID == receiverID {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "cannot accept your own request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot accept your own request"})
 		return
 	}
 
@@ -105,11 +105,11 @@ func AcceptFriendRequest(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.AcceptFriendRequest: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"status": "accepted"})
+	c.JSON(http.StatusOK, gin.H{"status": "accepted"})
 }
 
 // DELETE /api/friendships/:id?action=cancel|reject|unfriend (:id is the other
@@ -118,17 +118,17 @@ func AcceptFriendRequest(c *gin.Context) {
 func DeleteFriendship(c *gin.Context) {
 	callerID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 
 	otherID := c.Param("id")
 	if !authorization.IsValidUUID(otherID) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "friendship not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "friendship not found"})
 		return
 	}
 	if otherID == callerID {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "cannot delete a friendship with yourself"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot delete a friendship with yourself"})
 		return
 	}
 
@@ -138,7 +138,7 @@ func DeleteFriendship(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.DeleteFriendship: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	action := c.Query("action")
@@ -148,7 +148,7 @@ func DeleteFriendship(c *gin.Context) {
 		err = repository.DeleteFriendship(c.Request.Context(), callerID, otherID)
 	} else {
 		log.Printf("handlers.DeleteFriendship: unexpected status and action %q, %q", status, action)
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 	if err != nil {
@@ -156,9 +156,9 @@ func DeleteFriendship(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.DeleteFriendship: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"status": "deleted"})
+	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
 }

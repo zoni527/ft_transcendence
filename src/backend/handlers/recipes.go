@@ -30,17 +30,17 @@ func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
 	recipes, err := h.Repo.GetAllRecipes(c.Request.Context())
 	if err != nil {
 		log.Printf("handlers.GetAllRecipes: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, recipes)
+	c.JSON(http.StatusOK, recipes)
 }
 
 func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
@@ -50,18 +50,18 @@ func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.GetRecipeById: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, recipe)
+	c.JSON(http.StatusOK, recipe)
 }
 
 func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
 	var f models.SearchRecipeFilters
 
 	if err := c.ShouldBindQuery(&f); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
@@ -76,25 +76,25 @@ func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
 	recipes, err := h.Repo.SearchRecipes(c.Request.Context(), f, limitInt, offset)
 	if err != nil {
 		log.Printf("handlers.SearchRecipes: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, recipes)
+	c.JSON(http.StatusOK, recipes)
 }
 
 func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 	var r models.Recipe
 	if err := c.ShouldBindJSON(&r); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
 	r.Author_id = c.GetString("userID")
 	if !authorization.IsValidUUID(r.Author_id) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 	if err := validateRecipeFields(&r); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
 		return
 	}
 
@@ -104,29 +104,29 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.CreateRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": newRecipeId})
+	c.JSON(http.StatusCreated, gin.H{"id": newRecipeId})
 }
 
 func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 	userId := c.GetString("userID")
 	if !authorization.IsValidUUID(userId) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	recipeId := c.Param("id")
 	if !authorization.IsValidUUID(recipeId) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
 	var r models.Recipe
 	if err := c.ShouldBindJSON(&r); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
 
@@ -136,24 +136,24 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.UpdateRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	roleSet, okRoles := authorization.RolesFromContext(c)
 	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
 		log.Printf("handlers.UpdateRecipe: data missing from context")
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	allowed := authorization.CanEditRecipe(roleSet, permSet, userId, original.Author.Id)
 	if !allowed {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 
 	if err := validateRecipeFields(&r); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
 		return
 	}
 
@@ -163,23 +163,23 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.UpdateRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"id": recipeId})
+	c.JSON(http.StatusOK, gin.H{"id": recipeId})
 }
 
 func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 	userId := c.GetString("userID")
 	if !authorization.IsValidUUID(userId) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	recipeId := c.Param("id")
 	if !authorization.IsValidUUID(recipeId) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
 		return
 	}
 
@@ -189,19 +189,19 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	roleSet, okRoles := authorization.RolesFromContext(c)
 	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
 		log.Printf("handlers.DeleteRecipe: data missing from context")
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	allowed := authorization.CanDeleteRecipe(roleSet, permSet, userId, original.Author.Id)
 	if !allowed {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 
@@ -210,7 +210,7 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 			return
 		}
 		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -228,7 +228,7 @@ func (h *RecipeHandler) RecipeImageSignature(c *gin.Context) {
 	}
 	signature := integrations.GenerateCloudinarySignature(params)
 
-	c.IndentedJSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"signature":       signature,
 		"api_key":         integrations.APIKey(),
 		"cloud_name":      integrations.CloudName(),
@@ -429,10 +429,10 @@ func identifyAndRespondToUserError(c *gin.Context, err error) bool {
 	var nf *repository.NotFoundError
 	switch {
 	case errors.As(err, &br):
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": br.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": br.Error()})
 		return true
 	case errors.As(err, &nf):
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": nf.Error()})
 		return true
 	}
 

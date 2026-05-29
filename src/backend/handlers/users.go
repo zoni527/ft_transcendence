@@ -34,54 +34,54 @@ func GetUsers(c *gin.Context) {
 	users, err := repository.GetAllUsers(c.Request.Context())
 	if err != nil {
 		log.Printf("GetUsers: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	for i := range users {
 		markOnline(&users[i])
 	}
-	c.IndentedJSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, users)
 }
 
 func GetUserById(c *gin.Context) {
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
 		return
 	}
 
 	user, err := repository.GetUserById(c.Request.Context(), id)
 	if err == pgx.ErrNoRows {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 	if err != nil {
 		log.Printf("GetUserById: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	markOnline(&user)
-	c.IndentedJSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user)
 }
 
 func GetMe(c *gin.Context) {
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 	user, err := repository.GetUserById(c.Request.Context(), userID)
 	if err == pgx.ErrNoRows {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 	if err != nil {
 		log.Printf("Getme: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	markOnline(&user)
-	c.IndentedJSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user)
 }
 
 func UserAvatarSignature(c *gin.Context) {
@@ -94,7 +94,7 @@ func UserAvatarSignature(c *gin.Context) {
 		"allowed_formats": allowedFormats,
 	}
 	signature := integrations.GenerateCloudinarySignature(params)
-	c.IndentedJSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"signature":       signature,
 		"api_key":         integrations.APIKey(),
 		"cloud_name":      integrations.CloudName(),
@@ -107,66 +107,66 @@ func UserAvatarSignature(c *gin.Context) {
 func GetSession(c *gin.Context) {
 	token, err := c.Cookie("token")
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		c.JSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
 
 	claims, err := authorization.ValidateJWTToken(token)
 	if err != nil {
 		authorization.ClearAuthCookie(c)
-		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		c.JSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
 
 	blacklisted, err := authorization.IsTokenBlacklisted(c.Request.Context(), token)
 	if err != nil {
 		log.Printf("GetSession blacklist check: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	if blacklisted {
 		authorization.ClearAuthCookie(c)
-		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		c.JSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
 
 	user, err := repository.GetUserById(c.Request.Context(), claims.Subject)
 	if err == pgx.ErrNoRows {
 		authorization.ClearAuthCookie(c)
-		c.IndentedJSON(http.StatusOK, gin.H{"authenticated": false})
+		c.JSON(http.StatusOK, gin.H{"authenticated": false})
 		return
 	}
 	if err != nil {
 		log.Printf("GetSession: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	markOnline(&user)
-	c.IndentedJSON(http.StatusOK, gin.H{"authenticated": true, "user": user})
+	c.JSON(http.StatusOK, gin.H{"authenticated": true, "user": user})
 }
 
 func CreateUser(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
 	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if err := validatePassword(req.Password); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if !isPasswordStrong(req.Password) {
-		c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
 		return
 	}
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
 		log.Printf("CreateUser hashPassword: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	userParams := models.CreateUserParams{
@@ -178,49 +178,49 @@ func CreateUser(c *gin.Context) {
 	data, err := repository.CreateUser(c.Request.Context(), userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
+			c.JSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
 		log.Printf("CreateUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	token, err := authorization.GenerateJWTToken(data.Id)
 	if err != nil {
 		log.Printf("CreateUser generateJWTToken: %v", err)
-		c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false})
+		c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": false})
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("token", token, 3600, "/", "", true, true)
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
+	c.JSON(http.StatusCreated, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 
 func LoginUser(c *gin.Context) {
 	var req models.LoginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	data, err := repository.GetUserCredentialsByEmail(c.Request.Context(), req.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 			return
 		}
 		log.Printf("LoginUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(data.Password_hash), []byte(req.Password)); err != nil {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
 	token, err := authorization.GenerateJWTToken(data.Id)
 	if err != nil {
 		log.Printf("LoginUser GenerateJWTToken: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), data.Id); err != nil {
@@ -228,7 +228,7 @@ func LoginUser(c *gin.Context) {
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("token", token, 3600, "/", "", true, true)
-	c.IndentedJSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
+	c.JSON(http.StatusOK, gin.H{"id": data.Id, "email": data.Email, "authenticated": true})
 }
 
 func LogoutUser(c *gin.Context) {
@@ -236,7 +236,7 @@ func LogoutUser(c *gin.Context) {
 	expDate := c.GetTime("expDate")
 	if err := authorization.AddTokenToBlacklist(c.Request.Context(), token, expDate); err != nil {
 		log.Printf("LogoutUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -248,70 +248,70 @@ func LogoutUser(c *gin.Context) {
 	}
 
 	authorization.ClearAuthCookie(c)
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "logged out successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
 func UpdateUser(c *gin.Context) {
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
 	callerUserID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerUserID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 	roleSet, okRoles := authorization.RolesFromContext(c)
 	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
 		log.Printf("handlers.UpdateUser: data missing from context")
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	allowed := authorization.CanEditUser(roleSet, callerUserID, targetUserID)
 	if !allowed {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 		return
 	}
 
 	var req models.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
 	if err := normalizeAndValidateUpdateUserRequest(&req); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if req.Password != nil && callerUserID != targetUserID {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "password can only be changed by the account owner"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "password can only be changed by the account owner"})
 		return
 	}
 	if req.Password != nil {
 		if err := validatePassword(*req.Password); err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		if !isPasswordStrong(*req.Password) {
-			c.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
 			return
 		}
 	}
 	if req.Roles != nil {
 		canManageRoles := authorization.CanManageRoles(roleSet, permSet, callerUserID, targetUserID)
 		if !canManageRoles {
-			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions or self-update not allowed"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "insufficient permissions or self-update not allowed"})
 			return
 		}
 		if err := validateRoles(req.Roles); err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 	}
 	if !hasAnyUpdateField(&req) {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "no fields to update"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "no fields to update"})
 		return
 	}
 
@@ -320,7 +320,7 @@ func UpdateUser(c *gin.Context) {
 		hash, err := hashPassword(*req.Password)
 		if err != nil {
 			log.Printf("UpdateUser hashPassword: %v", err)
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}
 		hashedPassword = &hash
@@ -337,62 +337,62 @@ func UpdateUser(c *gin.Context) {
 	user, err := repository.UpdateUser(c.Request.Context(), targetUserID, userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.IndentedJSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
+			c.JSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
 		if errors.Is(err, pgx.ErrNoRows) {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 			return
 		}
 		log.Printf("UpdateUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	markOnline(&user)
-	c.IndentedJSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user)
 }
 
 func SearchUser(c *gin.Context) {
 	query := c.Query("q")
 	query = strings.TrimSpace(query)
 	if query == "" {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "search query not included"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "search query not included"})
 		return
 	}
 	if utf8.RuneCountInString(query) < 2 {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
 		return
 	}
 	users, err := repository.SearchUsersByUsername(c.Request.Context(), query)
 	if err != nil {
 		log.Printf("SearchUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, users)
 }
 
 func GenerateAPIKey(c *gin.Context) {
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 	apiKey, randomSecret, err := authorization.GenerateAPIKey(userID)
 	if err != nil {
 		log.Printf("GenerateAPIKey error: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	if err := repository.SaveAPIKey(c.Request.Context(), userID, randomSecret); err != nil {
 		log.Printf("GenerateApiKey error: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.Header("Cache-Control", "no-store, private")
 	c.Header("Pragma", "no-cache")
 	c.Header("Expires", "0")
-	c.IndentedJSON(http.StatusCreated, apiKey)
+	c.JSON(http.StatusCreated, apiKey)
 }
 
 // normalizeAndValidateUpdateUserRequest normalizes only the fields the caller sent.
@@ -655,12 +655,12 @@ func Heartbeat(c *gin.Context) {
 	userID := c.GetString("userID")
 
 	if !authorization.IsValidUUID(userID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), userID); err != nil {
 		log.Printf("Heartbeat: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -669,40 +669,40 @@ func Heartbeat(c *gin.Context) {
 func DeleteUser(c *gin.Context) {
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
 	callerUserID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerUserID) {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
 		return
 	}
 
 	roleSet, ok := authorization.RolesFromContext(c)
 	if !ok {
 		log.Printf("handlers.DeleteUser: data missing from context")
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
 	if !authorization.CanDeleteUser(roleSet, callerUserID, targetUserID) {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 		return
 	}
 
 	if err := repository.DeleteUser(c.Request.Context(), targetUserID); err != nil {
 		if errors.Is(err, repository.ErrLastAdmin) {
-			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
 			return
 		}
 		var nf *repository.NotFoundError
 		if errors.As(err, &nf) {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"error": nf.Error()})
+			c.JSON(http.StatusNotFound, gin.H{"error": nf.Error()})
 			return
 		}
 		log.Printf("handlers.DeleteUser: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 

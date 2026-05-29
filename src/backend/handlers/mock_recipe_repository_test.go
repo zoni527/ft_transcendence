@@ -83,7 +83,7 @@ var getAllRecipesTests = []struct {
 			}
 		},
 		expectedStatus: 200,
-		expectedBody:   `"title": "Success"`,
+		expectedBody:   `"title":"Success"`,
 	},
 	{
 		name: "Error",
@@ -93,7 +93,7 @@ var getAllRecipesTests = []struct {
 			}
 		},
 		expectedStatus: 500,
-		expectedBody:   `"error": "internal server error"`,
+		expectedBody:   `"error":"internal server error"`,
 	},
 }
 
@@ -145,14 +145,14 @@ var getRecipeByIdTests = []struct {
 			}
 		},
 		expectedStatus: 200,
-		expectedBody:   `"title": "Success"`,
+		expectedBody:   `"title":"Success"`,
 	},
 	{
 		name:           "Invalid UUID caught by handler validation",
 		recipeId:       "invalid-uuid",
 		mockSetup:      func(repo *MockRecipeRepo) {},
 		expectedStatus: 404,
-		expectedBody:   `"error": "recipe not found"`,
+		expectedBody:   `"error":"recipe not found"`,
 	},
 	{
 		name:     "Internal server error",
@@ -163,7 +163,7 @@ var getRecipeByIdTests = []struct {
 			}
 		},
 		expectedStatus: 500,
-		expectedBody:   `"error": "internal server error"`,
+		expectedBody:   `"error":"internal server error"`,
 	},
 }
 
@@ -215,7 +215,7 @@ var searchRecipesTests = []struct {
 			}
 		},
 		expectedStatus: 200,
-		expectedBody:   `"title": "Pasta Night"`,
+		expectedBody:   `"title":"Pasta Night"`,
 	},
 	{
 		name:        "Database Error",
@@ -226,7 +226,7 @@ var searchRecipesTests = []struct {
 			}
 		},
 		expectedStatus: 500,
-		expectedBody:   `"error": "internal server error"`,
+		expectedBody:   `"error":"internal server error"`,
 	},
 }
 
@@ -280,7 +280,7 @@ var createRecipeTests = []struct {
 			}
 		},
 		expectedStatus: 201,
-		expectedBody:   `"id": "new-recipe-uuid"`,
+		expectedBody:   `"id":"new-recipe-uuid"`,
 	},
 	{
 		name:           "Validation Failure - Title Too Short",
@@ -300,7 +300,7 @@ var createRecipeTests = []struct {
 			}
 		},
 		expectedStatus: 400,
-		expectedBody:   `"error": "invalid author id"`,
+		expectedBody:   `"error":"invalid author id"`,
 	},
 }
 
@@ -369,7 +369,7 @@ var updateRecipeTests = []struct {
 			}
 		},
 		expectedStatus: 200,
-		expectedBody:   `"id": "aa899f26-cf36-4570-b952-58752e6bf79a"`,
+		expectedBody:   `"id":"aa899f26-cf36-4570-b952-58752e6bf79a"`,
 	},
 	{
 		name:        "Target Recipe Not Found",
@@ -382,7 +382,7 @@ var updateRecipeTests = []struct {
 			}
 		},
 		expectedStatus: 404,
-		expectedBody:   `"error": "recipe not found"`,
+		expectedBody:   `"error":"recipe not found"`,
 	},
 }
 
@@ -472,7 +472,7 @@ var deleteRecipeTests = []struct {
 			}
 		},
 		expectedStatus: 500,
-		expectedBody:   `"error": "internal server error"`,
+		expectedBody:   `"error":"internal server error"`,
 	},
 }
 

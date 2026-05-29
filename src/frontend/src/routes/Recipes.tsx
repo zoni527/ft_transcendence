@@ -102,6 +102,7 @@ const Recipes = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const loaderRef = useRef<HTMLDivElement | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -195,6 +196,9 @@ const Recipes = () => {
       } catch (err: unknown) {
         if (controller.signal.aborted) return;
 
+        setHasError(true);
+        setHasMore(false);
+
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
@@ -270,7 +274,7 @@ const Recipes = () => {
       (entries) => {
         const first = entries[0];
 
-        if (first.isIntersecting && hasMore && !loading) {
+        if (first.isIntersecting && hasMore && !loading && !hasError) {
           setPage((prev) => prev + 1);
         }
       },
@@ -291,7 +295,7 @@ const Recipes = () => {
       }
       observer.disconnect();
     };
-  }, [hasMore, loading]);
+  }, [hasMore, loading, hasError]);
 
   return (
     <>

@@ -44,10 +44,7 @@ const createRecipeSchema = (t: TFunction) =>
       .string()
       .min(3, t('recValidation.recipeNameRequired'))
       .max(60, t('recValidation.recipeNameRequired')),
-    description: z
-      .string()
-      .min(0, t('recValidation.descriptionRequired'))
-      .max(10000, t('recValidation.descriptionRequired')),
+    description: z.string().max(10000, t('recValidation.descriptionRequired')),
     preparation_time_min: requiredNumber(
       t('recValidation.prepTime'),
       0,
@@ -58,10 +55,7 @@ const createRecipeSchema = (t: TFunction) =>
     difficulty: z.enum(['easy', 'medium', 'hard'], {
       errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
     }),
-    cuisine: z
-      .string()
-      .min(0, t('recValidation.cuisineRequired'))
-      .max(50, t('recValidation.cuisineRequired')),
+    cuisine: z.string().max(50, t('recValidation.cuisineRequired')),
     meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack', 'dessert'], {
       errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),

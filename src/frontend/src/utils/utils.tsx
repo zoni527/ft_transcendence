@@ -33,3 +33,10 @@ export function validateImageFile(
 
   return file;
 }
+
+// Helper function to check for valid characters
+export const hasControlChars = (value: string) =>
+  Array.from(value).some((c) => {
+    const code = c.codePointAt(0)!;
+    return code <= 31 || code === 127;
+  });

@@ -9,7 +9,7 @@ import SubmitButton from '../components/SubmitButton';
 import { getMe, postSignup } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue } from '../utils/utils';
+import { getStringValue, hasControlChars } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
@@ -17,19 +17,14 @@ const fullNameRegex = /^(?=.{2,}$)(?!.*[ '-]{2})[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
 const usernameRegex =
   /^(?=.{3,15}$)(?!.*[_.-]{2})[A-Za-z0-9]+(?:[_.-][A-Za-z0-9]+)*$/;
 
-const hasControlChars = (value: string) =>
-  Array.from(value).some((c) => {
-    const code = c.codePointAt(0)!;
-    return (code >= 0 && code <= 31) || code === 127;
-  });
-
 const signupSchema = (t: TFunction) =>
   z
     .object({
       fullName: z
         .string()
         .trim()
-        .min(1, t('signupValidation.nameRequired'))
+        .min(2, t('signupValidation.nameRequired'))
+        .max(50, t('signupValidation.nameRequired'))
         .refine((value) => fullNameRegex.test(value), {
           message: t('signupValidation.invalidName'),
         }),
@@ -37,8 +32,8 @@ const signupSchema = (t: TFunction) =>
       username: z
         .string()
         .trim()
-        .min(1, t('signupValidation.usernameRequired'))
-        .max(30, t('signupValidation.invalidUsername'))
+        .min(3, t('signupValidation.usernameRequired'))
+        .max(15, t('signupValidation.invalidUsername'))
         .refine((value) => usernameRegex.test(value), {
           message: t('signupValidation.invalidUsername'),
         }),
@@ -53,7 +48,7 @@ const signupSchema = (t: TFunction) =>
       password: z
         .string()
         .min(8, t('signupValidation.passwordLen'))
-        .max(100, t('signupValidation.passwordTooLong'))
+        .max(72, t('signupValidation.passwordTooLong'))
         .refine((val) => !hasControlChars(val), {
           message: t('signupValidation.passwordControlChars'),
         }),

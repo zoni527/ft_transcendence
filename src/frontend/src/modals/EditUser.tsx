@@ -25,20 +25,47 @@ type EditUserModalProps = {
 };
 
 // Validation schema
+const fullNameRegex = /^(?=.{2,}$)(?!.*[ '-]{2})[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
+const usernameRegex =
+  /^(?=.{3,15}$)(?!.*[_.-]{2})[A-Za-z0-9]+(?:[_.-][A-Za-z0-9]+)*$/;
+
 const editUserSchema = (t: TFunction) =>
   z
     .object({
-      fullName: z.string().min(1, t('signupValidation.nameRequired')),
-      username: z.string().min(1, t('signupValidation.usernameRequired')),
+      fullName: z
+        .string()
+        .trim()
+        .min(2, t('signupValidation.nameRequired'))
+        .max(50, t('signupValidation.nameRequired'))
+        .refine((value) => fullNameRegex.test(value), {
+          message: t('signupValidation.invalidName'),
+        }),
+
+      username: z
+        .string()
+        .trim()
+        .min(3, t('signupValidation.usernameRequired'))
+        .max(15, t('signupValidation.invalidUsername'))
+        .refine((value) => usernameRegex.test(value), {
+          message: t('signupValidation.invalidUsername'),
+        }),
+
       email: z
         .string()
+        .trim()
+        .toLowerCase()
         .min(1, t('signupValidation.emailRequired'))
         .email(t('signupValidation.invalidEmail')),
+
       password: z
         .string()
         .refine(
           (val) => val === '' || val.length >= 8,
           t('signupValidation.passwordLen'),
+        )
+        .refine(
+          (val) => val === '' || val.length <= 72,
+          t('signupValidation.passwordTooLong'),
         ),
 
       confirmPassword: z.string(),

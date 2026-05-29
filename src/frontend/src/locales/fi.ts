@@ -291,11 +291,12 @@ export const fiTranslations = {
     passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',
   },
   signupValidation: {
-    nameRequired: 'Koko nimi on pakollinen',
+    nameRequired:
+      'Koko nimen tulee olla 2-50 merkkiä pitkä ja se saa sisältää kirjaimia, välilyöntejä, heittomerkkejä ja yhdysmerkkejä',
     invalidName: 'Virheellinen koko nimi',
     usernameRequired: 'Käyttäjänimi on pakollinen',
     invalidUsername:
-      'Käyttäjänimen tulee olla 3-15 merkkiä ja se voi sisältää kirjaimia, numeroita sekä merkkejä ., _ ja -',
+      'Käyttäjänimen tulee olla 3-15 merkkiä pitkä ja se saa sisältää kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä',
     emailRequired: 'Sähköposti on pakollinen',
     invalidEmail: 'Virheellinen sähköpostiosoite',
     passwordLen: 'Salasanan tulee olla vähintään 8 merkkiä',

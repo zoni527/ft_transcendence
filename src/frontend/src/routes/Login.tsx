@@ -9,16 +9,10 @@ import SubmitButton from '../components/SubmitButton';
 import { getMe, postLogin } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue } from '../utils/utils';
+import { getStringValue, hasControlChars } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
-const hasControlChars = (value: string) =>
-  Array.from(value).some((c) => {
-    const code = c.codePointAt(0)!;
-    return code <= 31 || code === 127;
-  });
-
 const loginSchema = (t: TFunction) =>
   z.object({
     email: z
@@ -31,7 +25,6 @@ const loginSchema = (t: TFunction) =>
     password: z
       .string()
       .min(1, t('loginValidation.passwordRequired'))
-      .max(100, t('signupValidation.passwordTooLong'))
       .refine((val) => !hasControlChars(val), {
         message: t('loginValidation.passwordControlChars'),
       }),

@@ -291,11 +291,12 @@ export const enTranslations = {
     passwordControlChars: 'Password contains invalid characters',
   },
   signupValidation: {
-    nameRequired: 'Full name is required',
+    nameRequired:
+      'Full name must be 2-50 characters and may contain letters, spaces, apostrophes, and hyphens',
     invalidName: 'Invalid full name',
     usernameRequired: 'Username is required',
     invalidUsername:
-      'Username must be 3-15 characters and may contain letters, numbers, ., _, -',
+      'Username must be 3-15 characters and may contain letters, numbers, dots, underscores, and hyphens',
     emailRequired: 'Email is required',
     invalidEmail: 'Invalid email address',
     passwordLen: 'Password must be at least 8 characters',

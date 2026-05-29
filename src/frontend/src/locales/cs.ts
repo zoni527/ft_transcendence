@@ -291,11 +291,12 @@ export const csTranslations = {
     passwordControlChars: 'Heslo obsahuje neplatné znaky',
   },
   signupValidation: {
-    nameRequired: 'Celé jméno je povinné',
+    nameRequired:
+      'Celé jméno musí mít 2-50 znaků a může obsahovat písmena, mezery, apostrofy a pomlčky',
     invalidName: 'Neplatné celé jméno',
     usernameRequired: 'Uživatelské jméno je povinné',
     invalidUsername:
-      'Uživatelské jméno musí mít 3-15 znaků a může obsahovat písmena, čísla a znaky ., _ a -',
+      'Uživatelské jméno musí mít 3-15 znaků a může obsahovat písmena, čísla, tečky, podtržítka a pomlčky',
     emailRequired: 'E-mail je povinný',
     invalidEmail: 'Neplatná e-mailová adresa',
     passwordLen: 'Heslo musí mít alespoň 8 znaků',

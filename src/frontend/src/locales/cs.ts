@@ -286,16 +286,22 @@ export const csTranslations = {
   },
   loginValidation: {
     emailRequired: 'E-mail je povinný',
-    invalidEmail: 'Neplatný e-mail',
-    passwordLen: 'Heslo musí mít alespoň 8 znaků',
+    invalidEmail: 'Neplatná e-mailová adresa',
+    passwordRequired: 'Heslo je povinné',
+    passwordControlChars: 'Heslo obsahuje neplatné znaky',
   },
   signupValidation: {
     nameRequired: 'Celé jméno je povinné',
-    usernameRequired: 'Uživatelské jméno / Přezdívka je povinné',
+    invalidName: 'Neplatné celé jméno',
+    usernameRequired: 'Uživatelské jméno je povinné',
+    invalidUsername:
+      'Uživatelské jméno musí mít 3-15 znaků a může obsahovat písmena, čísla a znaky ., _ a -',
     emailRequired: 'E-mail je povinný',
-    invalidEmail: 'Neplatný e-mail',
+    invalidEmail: 'Neplatná e-mailová adresa',
     passwordLen: 'Heslo musí mít alespoň 8 znaků',
-    passwordConfirm: 'Prosím potvrďte své heslo',
+    passwordTooLong: 'Heslo je příliš dlouhé',
+    passwordControlChars: 'Heslo obsahuje neplatné znaky',
+    passwordConfirm: 'Potvrďte heslo',
     passwordMatch: 'Hesla se neshodují',
   },
   recValidation: {

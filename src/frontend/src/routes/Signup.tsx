@@ -13,17 +13,52 @@ import { getStringValue } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
+const fullNameRegex = /^(?=.{2,}$)(?!.*[ '-]{2})[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
+const usernameRegex =
+  /^(?=.{3,15}$)(?!.*[_.-]{2})[A-Za-z0-9]+(?:[_.-][A-Za-z0-9]+)*$/;
+
+const hasControlChars = (value: string) =>
+  Array.from(value).some((c) => {
+    const code = c.codePointAt(0)!;
+    return (code >= 0 && code <= 31) || code === 127;
+  });
+
 const signupSchema = (t: TFunction) =>
   z
     .object({
-      fullName: z.string().min(1, t('signupValidation.nameRequired')),
-      username: z.string().min(1, t('signupValidation.usernameRequired')),
+      fullName: z
+        .string()
+        .trim()
+        .min(1, t('signupValidation.nameRequired'))
+        .refine((value) => fullNameRegex.test(value), {
+          message: t('signupValidation.invalidName'),
+        }),
+
+      username: z
+        .string()
+        .trim()
+        .min(1, t('signupValidation.usernameRequired'))
+        .max(30, t('signupValidation.invalidUsername'))
+        .refine((value) => usernameRegex.test(value), {
+          message: t('signupValidation.invalidUsername'),
+        }),
+
       email: z
         .string()
+        .trim()
+        .toLowerCase()
         .min(1, t('signupValidation.emailRequired'))
         .email(t('signupValidation.invalidEmail')),
-      password: z.string().min(8, t('signupValidation.passwordLen')),
-      confirmPassword: z.string().min(8, t('signupValidation.passwordConfirm')),
+
+      password: z
+        .string()
+        .min(8, t('signupValidation.passwordLen'))
+        .max(100, t('signupValidation.passwordTooLong'))
+        .refine((val) => !hasControlChars(val), {
+          message: t('signupValidation.passwordControlChars'),
+        }),
+
+      confirmPassword: z.string().min(1, t('signupValidation.passwordConfirm')),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t('signupValidation.passwordMatch'),

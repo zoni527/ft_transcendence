@@ -287,14 +287,20 @@ export const enTranslations = {
   loginValidation: {
     emailRequired: 'Email is required',
     invalidEmail: 'Invalid email',
-    passwordLen: 'Password must be at least 8 characters',
+    passwordRequired: 'Password is required',
+    passwordControlChars: 'Password contains invalid characters',
   },
   signupValidation: {
     nameRequired: 'Full name is required',
-    usernameRequired: 'Username / Alias is required',
+    invalidName: 'Invalid full name',
+    usernameRequired: 'Username is required',
+    invalidUsername:
+      'Username must be 3-15 characters and may contain letters, numbers, ., _, -',
     emailRequired: 'Email is required',
-    invalidEmail: 'Invalid email',
+    invalidEmail: 'Invalid email address',
     passwordLen: 'Password must be at least 8 characters',
+    passwordTooLong: 'Password is too long',
+    passwordControlChars: 'Password contains invalid characters',
     passwordConfirm: 'Please confirm your password',
     passwordMatch: 'Passwords do not match',
   },

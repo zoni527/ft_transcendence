@@ -287,15 +287,21 @@ export const fiTranslations = {
   loginValidation: {
     emailRequired: 'Sähköposti on pakollinen',
     invalidEmail: 'Virheellinen sähköpostiosoite',
-    passwordLen: 'Salasanan on oltava vähintään 8 merkkiä pitkä',
+    passwordRequired: 'Salasana on pakollinen',
+    passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',
   },
   signupValidation: {
-    nameRequired: 'Nimi on pakollinen',
-    usernameRequired: 'Käyttäjätunnus / Alias on pakollinen',
+    nameRequired: 'Koko nimi on pakollinen',
+    invalidName: 'Virheellinen koko nimi',
+    usernameRequired: 'Käyttäjänimi on pakollinen',
+    invalidUsername:
+      'Käyttäjänimen tulee olla 3-15 merkkiä ja se voi sisältää kirjaimia, numeroita sekä merkkejä ., _ ja -',
     emailRequired: 'Sähköposti on pakollinen',
     invalidEmail: 'Virheellinen sähköpostiosoite',
-    passwordLen: 'Salasanan on oltava vähintään 8 merkkiä pitkä',
-    passwordConfirm: 'Vahvista salasanasi',
+    passwordLen: 'Salasanan tulee olla vähintään 8 merkkiä',
+    passwordTooLong: 'Salasana on liian pitkä',
+    passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',
+    passwordConfirm: 'Vahvista salasana',
     passwordMatch: 'Salasanat eivät täsmää',
   },
   recValidation: {

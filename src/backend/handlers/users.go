@@ -27,6 +27,7 @@ import (
 const onlineThreshold = 60 * time.Second
 const searchUserQueryMinLen = 2
 const searchUserQueryMaxLen = 50
+const passwordLenMax = 72
 
 func markOnline(user *models.User) {
 	user.IsOnline = time.Since(user.LastSeen) < onlineThreshold
@@ -540,6 +541,10 @@ func hashPassword(password string) (string, error) {
 // Password validation helper to check if password has control characters
 // Any extra validations would come in this step
 func validatePassword(password string) error {
+	bytes := []byte(password)
+	if len(bytes) > passwordLenMax {
+		return errors.New("password's length in bytes is too long")
+	}
 	for _, r := range password {
 		if unicode.IsControl(r) {
 			return errors.New("password contains invalid control characters")

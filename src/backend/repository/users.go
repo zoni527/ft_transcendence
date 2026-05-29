@@ -386,11 +386,11 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 		&u.ID,
 		&u.Email,
 		&u.Name,
-		&u.Display_name,
-		&u.Avatar_url,
-		&u.Created_at,
-		&u.Updated_at,
-		&u.Last_seen,
+		&u.DisplayName,
+		&u.AvatarURL,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+		&u.LastSeen,
 		&isOAuthBlock,
 	)
 	if err == pgx.ErrNoRows {

@@ -35,8 +35,8 @@ const editUserSchema = (t: TFunction) =>
       fullName: z
         .string()
         .trim()
-        .min(2, t('signupValidation.nameRequired'))
-        .max(50, t('signupValidation.nameRequired'))
+        .min(2, t('signupValidation.invalidName'))
+        .max(50, t('signupValidation.invalidName'))
         .refine((value) => fullNameRegex.test(value), {
           message: t('signupValidation.invalidName'),
         }),
@@ -44,7 +44,7 @@ const editUserSchema = (t: TFunction) =>
       username: z
         .string()
         .trim()
-        .min(3, t('signupValidation.usernameRequired'))
+        .min(3, t('signupValidation.invalidUsername'))
         .max(15, t('signupValidation.invalidUsername'))
         .refine((value) => usernameRegex.test(value), {
           message: t('signupValidation.invalidUsername'),
@@ -54,7 +54,8 @@ const editUserSchema = (t: TFunction) =>
         .string()
         .trim()
         .toLowerCase()
-        .min(1, t('signupValidation.emailRequired'))
+        .min(1, t('signupValidation.invalidEmail'))
+        .max(254, t('signupValidation.invalidEmail'))
         .email(t('signupValidation.invalidEmail')),
 
       password: z

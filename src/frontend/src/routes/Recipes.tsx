@@ -53,6 +53,7 @@ const FiltersContent = ({
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        maxLength={100}
         className="text-md block w-full rounded-full border border-gray-700 bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-800 focus:outline-none"
         placeholder={t('common.searchRecipe')}
       />

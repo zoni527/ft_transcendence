@@ -291,14 +291,11 @@ export const enTranslations = {
     passwordControlChars: 'Password contains invalid characters',
   },
   signupValidation: {
-    nameRequired:
+    invalidName:
       'Full name must be 2-50 characters and may contain letters, spaces, apostrophes, and hyphens',
-    invalidName: 'Invalid full name',
-    usernameRequired: 'Username is required',
     invalidUsername:
       'Username must be 3-15 characters and may contain letters, numbers, dots, underscores, and hyphens',
-    emailRequired: 'Email is required',
-    invalidEmail: 'Invalid email address',
+    invalidEmail: 'Email must be 1-254 characters and be valid',
     passwordLen: 'Password must be at least 8 characters',
     passwordTooLong: 'Password is too long',
     passwordControlChars: 'Password contains invalid characters',
@@ -362,5 +359,6 @@ export const enTranslations = {
     forbidden: 'No permissions to perform this action',
     copyFailed: 'Copy to clipboard failed',
     pageNotFound: '404 - Page not found',
+    weakPassword: 'Password too weak',
   },
 };

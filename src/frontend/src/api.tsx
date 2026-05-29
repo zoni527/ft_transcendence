@@ -267,6 +267,8 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
       return t('error.notFound');
     case 409:
       return t('error.conflict');
+    case 422:
+      return t('error.weakPassword');
     case 429:
       return t('error.rateLimit');
     case 500:

@@ -291,14 +291,12 @@ export const fiTranslations = {
     passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',
   },
   signupValidation: {
-    nameRequired:
+    invalidName:
       'Koko nimen tulee olla 2-50 merkkiä pitkä ja se saa sisältää kirjaimia, välilyöntejä, heittomerkkejä ja yhdysmerkkejä',
-    invalidName: 'Virheellinen koko nimi',
-    usernameRequired: 'Käyttäjänimi on pakollinen',
     invalidUsername:
       'Käyttäjänimen tulee olla 3-15 merkkiä pitkä ja se saa sisältää kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä',
-    emailRequired: 'Sähköposti on pakollinen',
-    invalidEmail: 'Virheellinen sähköpostiosoite',
+    invalidEmail:
+      'Sähköpostiosoitteen tulee olla 1-254 merkkiä pitkä ja kelvollinen',
     passwordLen: 'Salasanan tulee olla vähintään 8 merkkiä',
     passwordTooLong: 'Salasana on liian pitkä',
     passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',
@@ -362,5 +360,6 @@ export const fiTranslations = {
     forbidden: 'Ei käyttöoikeutta',
     copyFailed: 'Kopiointi leikepöydälle epäonnistui',
     pageNotFound: '404 - Sivua ei löytynyt',
+    weakPassword: 'Salasana on liian heikko',
   },
 };

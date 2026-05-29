@@ -36,7 +36,7 @@ func GetFriendshipsForUser(ctx context.Context, userID string) ([]models.Friends
 	var items []models.FriendshipListItem
 	for rows.Next() {
 		var it models.FriendshipListItem
-		if err := rows.Scan(&it.Status, &it.SentByMe, &it.Last_seen, &it.Id, &it.Display_name, &it.Name); err != nil {
+		if err := rows.Scan(&it.Status, &it.SentByMe, &it.LastSeen, &it.Id, &it.DisplayName, &it.Name); err != nil {
 			return nil, fmt.Errorf("scan friendship: %w", err)
 		}
 		items = append(items, it)

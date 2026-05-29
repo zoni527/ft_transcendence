@@ -84,7 +84,7 @@ func GetAllUsers(ctx context.Context) ([]user, error) {
     var users []user
     for rows.Next() {
         var u user
-        err := rows.Scan(&u.Id, &u.Email, &u.Display_name, &u.Created_at)
+        err := rows.Scan(&u.Id, &u.Email, &u.DisplayName, &u.CreatedAt)
         if err != nil {
             return nil, err
         }
@@ -108,7 +108,7 @@ func GetUserByID(ctx context.Context, id string) (user, error) {
     var u user
     err := Pool.QueryRow(ctx,
         `SELECT id, email, display_name, created_at FROM "user" WHERE id = $1`, id,
-    ).Scan(&u.Id, &u.Email, &u.Display_name, &u.Created_at)
+    ).Scan(&u.Id, &u.Email, &u.DisplayName, &u.CreatedAt)
     if err != nil {
         return u, err
     }
@@ -130,8 +130,8 @@ func CreateUser(ctx context.Context, u user) (user, error) {
         `INSERT INTO "user" (email, password_hash, display_name)
          VALUES ($1, $2, $3)
          RETURNING id, created_at`,
-        u.Email, u.Password_hash, u.Display_name,
-    ).Scan(&u.Id, &u.Created_at)
+        u.Email, u.PasswordHash, u.DisplayName,
+    ).Scan(&u.Id, &u.CreatedAt)
     if err != nil {
         return u, err
     }

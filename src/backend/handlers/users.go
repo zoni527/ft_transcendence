@@ -27,7 +27,7 @@ import (
 const onlineThreshold = 60 * time.Second
 
 func markOnline(user *models.User) {
-	user.Is_online = time.Since(user.Last_seen) < onlineThreshold
+	user.IsOnline = time.Since(user.LastSeen) < onlineThreshold
 }
 
 func GetUsers(c *gin.Context) {
@@ -151,7 +151,7 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.Display_name); err != nil {
+	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.DisplayName); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -170,10 +170,10 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	userParams := models.CreateUserParams{
-		Email:           req.Email,
-		Password_hashed: hashedPassword,
-		Name:            req.Name,
-		Display_name:    req.Display_name,
+		Email:          req.Email,
+		PasswordHashed: hashedPassword,
+		Name:           req.Name,
+		DisplayName:    req.DisplayName,
 	}
 	data, err := repository.CreateUser(c.Request.Context(), userParams)
 	if err != nil {
@@ -213,7 +213,7 @@ func LoginUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(data.Password_hash), []byte(req.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(data.PasswordHash), []byte(req.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
@@ -327,12 +327,12 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	userParams := models.UpdateUserParams{
-		Email:           req.Email,
-		Name:            req.Name,
-		Password_hashed: hashedPassword,
-		Display_name:    req.Display_name,
-		Avatar_url:      req.Avatar_url,
-		Roles:           req.Roles,
+		Email:          req.Email,
+		Name:           req.Name,
+		PasswordHashed: hashedPassword,
+		DisplayName:    req.DisplayName,
+		AvatarURL:      req.AvatarURL,
+		Roles:          req.Roles,
 	}
 	user, err := repository.UpdateUser(c.Request.Context(), targetUserID, userParams)
 	if err != nil {
@@ -419,26 +419,26 @@ func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error 
 			req.Name = nil
 		}
 	}
-	if req.Display_name != nil {
-		trimmed := strings.TrimSpace(*req.Display_name)
+	if req.DisplayName != nil {
+		trimmed := strings.TrimSpace(*req.DisplayName)
 		if trimmed != "" {
 			if !isValidDisplayName(trimmed) {
 				return errors.New("invalid display_name")
 			}
-			req.Display_name = &trimmed
+			req.DisplayName = &trimmed
 		} else {
-			req.Display_name = nil
+			req.DisplayName = nil
 		}
 	}
-	if req.Avatar_url != nil {
-		trimmed := strings.TrimSpace(*req.Avatar_url)
+	if req.AvatarURL != nil {
+		trimmed := strings.TrimSpace(*req.AvatarURL)
 		if trimmed != "" {
 			if err := validateCloudinaryAvatarURL(trimmed); err != nil {
 				return err
 			}
-			req.Avatar_url = &trimmed
+			req.AvatarURL = &trimmed
 		} else {
-			req.Avatar_url = nil
+			req.AvatarURL = nil
 		}
 	}
 	return nil
@@ -646,8 +646,8 @@ func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
 	return req.Email != nil ||
 		req.Name != nil ||
 		req.Password != nil ||
-		req.Display_name != nil ||
-		req.Avatar_url != nil ||
+		req.DisplayName != nil ||
+		req.AvatarURL != nil ||
 		req.Roles != nil
 }
 

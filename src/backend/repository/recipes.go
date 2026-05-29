@@ -73,12 +73,12 @@ func (pgRepo *PostgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.R
 		var r models.RecipeResponse
 		err := rows.Scan(
 			&r.Id,
-			&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
+			&r.Author.Id, &r.Author.DisplayName, &r.Author.AvatarURL,
 			&r.Title, &r.Description,
-			&r.Preparation_time_min, &r.Servings,
-			&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,
-			&r.Calories, &r.Protein_g, &r.Carbs_g, &r.Fat_g,
-			&r.Created_at, &r.Updated_at,
+			&r.PreparationTimeMin, &r.Servings,
+			&r.Difficulty, &r.Cuisine, &r.MealType, &r.ImageURL,
+			&r.Calories, &r.ProteinGrams, &r.CarbsGrams, &r.FatGrams,
+			&r.CreatedAt, &r.UpdatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning recipe row: %w", err)
@@ -136,8 +136,8 @@ func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.Se
 		err := rows.Scan(
 			&r.Id,
 			&r.Title,
-			&r.Preparation_time_min,
-			&r.Image_url,
+			&r.PreparationTimeMin,
+			&r.ImageURL,
 		)
 		if err != nil {
 			return nil, err
@@ -170,12 +170,12 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeById(ctx context.Context, id string) 
 	var r models.RecipeResponse
 	err := pgRepo.Pool.QueryRow(ctx, sql, id).Scan(
 		&r.Id,
-		&r.Author.Id, &r.Author.Display_name, &r.Author.Avatar_url,
+		&r.Author.Id, &r.Author.DisplayName, &r.Author.AvatarURL,
 		&r.Title, &r.Description,
-		&r.Preparation_time_min, &r.Servings,
-		&r.Difficulty, &r.Cuisine, &r.Meal_type, &r.Image_url,
-		&r.Calories, &r.Protein_g, &r.Carbs_g, &r.Fat_g,
-		&r.Created_at, &r.Updated_at,
+		&r.PreparationTimeMin, &r.Servings,
+		&r.Difficulty, &r.Cuisine, &r.MealType, &r.ImageURL,
+		&r.Calories, &r.ProteinGrams, &r.CarbsGrams, &r.FatGrams,
+		&r.CreatedAt, &r.UpdatedAt,
 	)
 
 	if err == pgx.ErrNoRows {
@@ -202,9 +202,9 @@ func (pgRepo *PostgresRecipeRepo) CreateRecipe(ctx context.Context, r *models.Re
 	var newId string
 
 	err := pgRepo.Pool.QueryRow(ctx, sql,
-		r.Author_id, r.Title, r.Description, r.Preparation_time_min,
-		r.Servings, r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url,
-		r.Calories, r.Protein_g, r.Carbs_g, r.Fat_g,
+		r.AuthorID, r.Title, r.Description, r.PreparationTimeMin,
+		r.Servings, r.Difficulty, r.Cuisine, r.MealType, r.ImageURL,
+		r.Calories, r.ProteinGrams, r.CarbsGrams, r.FatGrams,
 	).Scan(&newId)
 	if err != nil {
 		return "", recipePostgresErrorClassification("repository.CreateRecipe", err)
@@ -227,9 +227,9 @@ func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Re
 		WHERE id = $13`
 
 	res, err := pgRepo.Pool.Exec(ctx, sql,
-		r.Title, r.Description, r.Preparation_time_min, r.Servings,
-		r.Difficulty, r.Cuisine, r.Meal_type, r.Image_url, r.Calories,
-		r.Protein_g, r.Carbs_g, r.Fat_g,
+		r.Title, r.Description, r.PreparationTimeMin, r.Servings,
+		r.Difficulty, r.Cuisine, r.MealType, r.ImageURL, r.Calories,
+		r.ProteinGrams, r.CarbsGrams, r.FatGrams,
 		r.Id,
 	)
 	if err != nil {

@@ -34,8 +34,8 @@ func GetFriendships(c *gin.Context) {
 	for _, row := range rows {
 		switch {
 		case row.Status == "accepted":
-			online := time.Since(row.Last_seen) < onlineThreshold
-			row.Is_online = &online
+			online := time.Since(row.LastSeen) < onlineThreshold
+			row.IsOnline = &online
 			resp.Friends = append(resp.Friends, row)
 		case row.SentByMe:
 			resp.Sent = append(resp.Sent, row)
@@ -60,16 +60,16 @@ func CreateFriendRequest(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
-	if !authorization.IsValidUUID(body.Receiver_id) {
+	if !authorization.IsValidUUID(body.ReceiverID) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "receiver not found"})
 		return
 	}
-	if body.Receiver_id == requesterID {
+	if body.ReceiverID == requesterID {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot send a request to yourself"})
 		return
 	}
 
-	if err := repository.CreateFriendRequest(c.Request.Context(), requesterID, body.Receiver_id); err != nil {
+	if err := repository.CreateFriendRequest(c.Request.Context(), requesterID, body.ReceiverID); err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return
 		}

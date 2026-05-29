@@ -64,12 +64,12 @@ func (h *PublicRecipeHandler) CreateRecipe(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
-	r.Author_id = id
+	r.AuthorID = id
 	if err := validateRecipeFields(&r); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
 		return
 	}
-	recipeID, err := h.svc.CreateRecipe(c.Request.Context(), r.Author_id, r)
+	recipeID, err := h.svc.CreateRecipe(c.Request.Context(), r.AuthorID, r)
 	if err != nil {
 		if identifyAndRespondToUserError(c, err) {
 			return

@@ -34,7 +34,7 @@ func (s *recipeService) GetPublicRecipe(ctx context.Context, id string) (models.
 }
 
 func (s *recipeService) CreateRecipe(ctx context.Context, userID string, in models.Recipe) (string, error) {
-	in.Author_id = userID
+	in.AuthorID = userID
 	return s.repo.CreateRecipe(ctx, &in)
 }
 

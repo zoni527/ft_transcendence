@@ -136,7 +136,7 @@ func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.U
 
 	// User found
 	if err == nil {
-		if user.Password_hash != integrations.GoogleOAuthLockedPassword {
+		if user.PasswordHash != integrations.GoogleOAuthLockedPassword {
 			return models.User{}, &errorUnauthorized{"not a google user"}
 		}
 		return user, nil
@@ -149,16 +149,16 @@ func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.U
 	}
 	stem := gu.Email[:at]
 	params := models.CreateUserParams{
-		Email:           gu.Email,
-		Password_hashed: integrations.GoogleOAuthLockedPassword,
-		Name:            gu.Name,
-		Display_name:    stem,
+		Email:          gu.Email,
+		PasswordHashed: integrations.GoogleOAuthLockedPassword,
+		Name:           gu.Name,
+		DisplayName:    stem,
 	}
 
 	for i := range displayNameVersionLimit {
-		_, err := repository.GetUserCredentialsByDisplayName(ctx, params.Display_name)
+		_, err := repository.GetUserCredentialsByDisplayName(ctx, params.DisplayName)
 		if err == pgx.ErrNoRows {
-			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.Display_name)
+			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.DisplayName)
 			if err != nil {
 				return models.User{}, &errorBadRequest{"bad email/name/display name value"}
 			}
@@ -168,7 +168,7 @@ func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.U
 		}
 
 		postfix := strconv.Itoa(i)
-		params.Display_name = stem + postfix
+		params.DisplayName = stem + postfix
 	}
 	return models.User{}, fmt.Errorf("all display name versions already in use")
 }

@@ -93,7 +93,7 @@ func SearchUsersByUsername(ctx context.Context, username string) ([]models.UserS
 		err := rows.Scan(
 			&u.Id,
 			&u.Name,
-			&u.Display_name,
+			&u.DisplayName,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning user row: %w", err)
@@ -152,11 +152,11 @@ func GetAllUsers(ctx context.Context) ([]models.User, error) {
 			&u.Id,
 			&u.Email,
 			&u.Name,
-			&u.Display_name,
-			&u.Avatar_url,
-			&u.Created_at,
-			&u.Updated_at,
-			&u.Last_seen,
+			&u.DisplayName,
+			&u.AvatarURL,
+			&u.CreatedAt,
+			&u.UpdatedAt,
+			&u.LastSeen,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning user row: %w", err)
@@ -193,11 +193,11 @@ func GetUserById(ctx context.Context, id string) (models.User, error) {
 		&u.Id,
 		&u.Email,
 		&u.Name,
-		&u.Display_name,
-		&u.Avatar_url,
-		&u.Created_at,
-		&u.Updated_at,
-		&u.Last_seen,
+		&u.DisplayName,
+		&u.AvatarURL,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+		&u.LastSeen,
 	)
 
 	if err == pgx.ErrNoRows {
@@ -233,7 +233,7 @@ func getUserCredentialsBy(ctx context.Context, field, value string) (models.User
 	err := Pool.QueryRow(ctx, sql, value).Scan(
 		&u.Id,
 		&u.Email,
-		&u.Password_hash,
+		&u.PasswordHash,
 	)
 	if err == pgx.ErrNoRows {
 		return models.User{}, pgx.ErrNoRows
@@ -269,14 +269,14 @@ func CreateUser(ctx context.Context, params models.CreateUserParams) (models.Use
 			RETURNING id, email, name, display_name, created_at, updated_at;`
 
 	var u models.User
-	err = tx.QueryRow(ctx, sql, params.Email, params.Password_hashed,
-		params.Name, params.Display_name).Scan(
+	err = tx.QueryRow(ctx, sql, params.Email, params.PasswordHashed,
+		params.Name, params.DisplayName).Scan(
 		&u.Id,
 		&u.Email,
 		&u.Name,
-		&u.Display_name,
-		&u.Created_at,
-		&u.Updated_at,
+		&u.DisplayName,
+		&u.CreatedAt,
+		&u.UpdatedAt,
 	)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -362,19 +362,19 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 	err = tx.QueryRow(ctx, sql,
 		nullableString(params.Email),
 		nullableString(params.Name),
-		nullableString(params.Password_hashed),
-		nullableString(params.Display_name),
-		nullableString(params.Avatar_url),
+		nullableString(params.PasswordHashed),
+		nullableString(params.DisplayName),
+		nullableString(params.AvatarURL),
 		id,
 	).Scan(
 		&u.Id,
 		&u.Email,
 		&u.Name,
-		&u.Display_name,
-		&u.Avatar_url,
-		&u.Created_at,
-		&u.Updated_at,
-		&u.Last_seen,
+		&u.DisplayName,
+		&u.AvatarURL,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+		&u.LastSeen,
 	)
 	if err == pgx.ErrNoRows {
 		return models.User{}, pgx.ErrNoRows

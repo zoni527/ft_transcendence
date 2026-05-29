@@ -88,8 +88,8 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
 		return
 	}
-	r.Author_id = c.GetString("userID")
-	if !authorization.IsValidUUID(r.Author_id) {
+	r.AuthorID = c.GetString("userID")
+	if !authorization.IsValidUUID(r.AuthorID) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -268,7 +268,7 @@ func validateRecipeFields(r *models.Recipe) error {
 
 	// Minimum food: 1 serving of ice water
 	intFields := []intValidation{
-		{r.Preparation_time_min, "preparation_time_min", 0, preparationTimeMax},
+		{r.PreparationTimeMin, "preparation_time_min", 0, preparationTimeMax},
 		{r.Servings, "servings", 1, servingsMax},
 		{r.Calories, "calories", 0, caloriesMax},
 	}
@@ -290,9 +290,9 @@ func validateRecipeFields(r *models.Recipe) error {
 	}
 
 	floatFields := []floatValidation{
-		{r.Protein_g, "protein_g", 0, proteinMax},
-		{r.Carbs_g, "carbs_g", 0, carbsMax},
-		{r.Fat_g, "fat_g", 0, fatMax},
+		{r.ProteinGrams, "protein_g", 0, proteinMax},
+		{r.CarbsGrams, "carbs_g", 0, carbsMax},
+		{r.FatGrams, "fat_g", 0, fatMax},
 	}
 
 	for _, v := range floatFields {
@@ -314,13 +314,13 @@ func validateRecipeFields(r *models.Recipe) error {
 	r.Title = strings.TrimSpace(r.Title)
 	r.Description = strings.TrimSpace(r.Description)
 	r.Cuisine = strings.TrimSpace(r.Cuisine)
-	r.Image_url = strings.TrimSpace(r.Image_url)
+	r.ImageURL = strings.TrimSpace(r.ImageURL)
 
 	stringLimits := []stringLenValidation{
 		{r.Title, "title", titleLenMin, titleLenMax},
 		{r.Description, "description", descriptionLenMin, descriptionLenMax},
 		{r.Cuisine, "cuisine", 0, cuisineLenMax},
-		{r.Image_url, "image_url", 0, imageUrlLenMax},
+		{r.ImageURL, "image_url", 0, imageUrlLenMax},
 	}
 
 	for _, v := range stringLimits {
@@ -355,13 +355,13 @@ func validateRecipeFields(r *models.Recipe) error {
 		}
 	}
 
-	switch r.Meal_type {
+	switch r.MealType {
 	case "breakfast", "lunch", "dinner", "snack":
 	default:
 		return errors.New("meal_type: must be breakfast, lunch, dinner, or snack")
 	}
 
-	if err := onlyGraphicChars(r.Image_url); err != nil {
+	if err := onlyGraphicChars(r.ImageURL); err != nil {
 		return fmt.Errorf("image_url: %w", err)
 	}
 

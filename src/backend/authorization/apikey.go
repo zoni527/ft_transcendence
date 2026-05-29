@@ -1,6 +1,7 @@
 package authorization
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -24,7 +25,7 @@ func GenerateAPIKey(userID string) (string, string, error) {
 	return rawApiKey, randomSecret, nil
 }
 
-func ValidateAPIKey(key string) (userID string, err error) {
+func ValidateAPIKey(ctx context.Context, key string) (userID string, err error) {
 	parts := strings.Split(key, ".")
 	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
 		return "", fmt.Errorf("invalid api key format")
@@ -35,7 +36,7 @@ func ValidateAPIKey(key string) (userID string, err error) {
 	if !IsValidUUID(userID) {
 		return "", fmt.Errorf("invalid api key format")
 	}
-	storedHash, err := repository.GetAPIKeyHash(userID)
+	storedHash, err := repository.GetAPIKeyHash(ctx, userID)
 	if err != nil {
 		return "", err
 	}

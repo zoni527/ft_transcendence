@@ -9,7 +9,7 @@ import (
 
 type RecipeRepo interface {
 	GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error)
-	GetRecipeById(ctx context.Context, id string) (models.RecipeResponse, error)
+	GetRecipeByID(ctx context.Context, id string) (models.RecipeResponse, error)
 	CreateRecipe(ctx context.Context, r *models.Recipe) (string, error)
 	UpdateRecipe(ctx context.Context, r *models.Recipe) error
 	DeleteRecipe(ctx context.Context, id string) error
@@ -30,32 +30,32 @@ func (s *recipeService) ListPublicRecipes(ctx context.Context) ([]models.RecipeR
 }
 
 func (s *recipeService) GetPublicRecipe(ctx context.Context, id string) (models.RecipeResponse, error) {
-	return s.repo.GetRecipeById(ctx, id)
+	return s.repo.GetRecipeByID(ctx, id)
 }
 
 func (s *recipeService) CreateRecipe(ctx context.Context, userID string, in models.Recipe) (string, error) {
-	in.Author_id = userID
+	in.AuthorID = userID
 	return s.repo.CreateRecipe(ctx, &in)
 }
 
 func (s *recipeService) UpdateRecipe(ctx context.Context, userID, recipeID string, in models.Recipe) error {
-	in.Id = recipeID
-	recipe, err := s.repo.GetRecipeById(ctx, recipeID)
+	in.ID = recipeID
+	recipe, err := s.repo.GetRecipeByID(ctx, recipeID)
 	if err != nil {
 		return err
 	}
-	if recipe.Author.Id != userID {
+	if recipe.Author.ID != userID {
 		return ErrForbidden
 	}
 	return s.repo.UpdateRecipe(ctx, &in)
 }
 
 func (s *recipeService) DeleteRecipe(ctx context.Context, userID, recipeID string) error {
-	recipe, err := s.repo.GetRecipeById(ctx, recipeID)
+	recipe, err := s.repo.GetRecipeByID(ctx, recipeID)
 	if err != nil {
 		return err
 	}
-	if recipe.Author.Id != userID {
+	if recipe.Author.ID != userID {
 		return ErrForbidden
 	}
 	return s.repo.DeleteRecipe(ctx, recipeID)

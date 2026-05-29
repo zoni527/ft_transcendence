@@ -29,7 +29,7 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
-		blacklisted, err := authorization.IsTokenBlacklisted(token)
+		blacklisted, err := authorization.IsTokenBlacklisted(c.Request.Context(), token)
 		if err != nil {
 			log.Printf("Check blacklist failed: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -39,7 +39,7 @@ func Authentication() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
-		roles, perms, err := repository.GetEffectivePermissionsByUser(claims.Subject)
+		roles, perms, err := repository.GetEffectivePermissionsByUser(c.Request.Context(), claims.Subject)
 		if err != nil {
 			log.Printf("GetEffectivePermissionsByUser: %v", err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -78,7 +78,6 @@ func RequireRoles(roles ...string) gin.HandlerFunc {
 		}
 		log.Printf("RequireRoles: missing userRoles for user %s", userID)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
 	}
 }
 
@@ -106,7 +105,6 @@ func RequirePermission(permissions ...string) gin.HandlerFunc {
 		}
 		log.Printf("RequirePermission: missing perms for user %s", userID)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
 	}
 }
 
@@ -117,7 +115,7 @@ func APIKeyAuthenticator() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		userID, err := authorization.ValidateAPIKey(apiKey)
+		userID, err := authorization.ValidateAPIKey(c.Request.Context(), apiKey)
 		if err != nil {
 			log.Printf("APIKeyAuthenticator: %v", err)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid api key"})

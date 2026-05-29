@@ -7,74 +7,74 @@ package models
 //  In Go, capitalization controls visibility:
 // User (capital) → exported — accessible from other packages
 // user (lowercase) → unexported — only usable inside the same package
-// This applies to everything: structs, functions, variables, fields. That's why our struct fields are Id, Title, Email — if they were id, title, email, the JSON serializer (which lives in another package) couldn't access them.
+// This applies to everything: structs, functions, variables, fields. That's why our struct fields are ID, Title, Email — if they were id, title, email, the JSON serializer (which lives in another package) couldn't access them.
 
 import "time"
 
 type User struct {
-	Id            string    `json:"id"           db:"id"`
-	Email         string    `json:"email"        db:"email"`
-	Password_hash string    `json:"-"            db:"password_hash"`
-	Name          string    `json:"name"         db:"name"`
-	Display_name  string    `json:"display_name" db:"display_name"`
-	Avatar_url    string    `json:"avatar_url"   db:"avatar_url"`
-	Created_at    time.Time `json:"created_at"   db:"created_at"`
-	Updated_at    time.Time `json:"updated_at"   db:"updated_at"`
-	Last_seen     time.Time `json:"last_seen"    db:"last_seen"`
-	Is_online     bool      `json:"is_online"` // has no db: tag! it's computed in Go before sending JSON.
-	Roles         []string  `json:"roles"        db:"roles"`
+	ID           string    `json:"id"           db:"id"`
+	Email        string    `json:"email"        db:"email"`
+	PasswordHash string    `json:"-"            db:"password_hash"`
+	Name         string    `json:"name"         db:"name"`
+	DisplayName  string    `json:"display_name" db:"display_name"`
+	AvatarURL    string    `json:"avatar_url"   db:"avatar_url"`
+	CreatedAt    time.Time `json:"created_at"   db:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"   db:"updated_at"`
+	LastSeen     time.Time `json:"last_seen"    db:"last_seen"`
+	IsOnline     bool      `json:"is_online"` // has no db: tag! it's computed in Go before sending JSON.
+	Roles        []string  `json:"roles"        db:"roles"`
 }
 
 // Recipe is the write/request shape: what we persist and what clients send on
-// POST/PUT. The author is identified by Author_id only — never trust an author
+// POST/PUT. The author is identified by AuthorID only — never trust an author
 // object from a request body.
 type Recipe struct {
-	Id                   string    `json:"id"                   db:"id"`
-	Author_id            string    `json:"author_id"            db:"author_id"`
-	Title                string    `json:"title"                db:"title"`
-	Description          string    `json:"description"          db:"description"`
-	Preparation_time_min int       `json:"preparation_time_min" db:"preparation_time_min"`
-	Servings             int       `json:"servings"             db:"servings"`
-	Difficulty           string    `json:"difficulty"           db:"difficulty"`
-	Cuisine              string    `json:"cuisine"              db:"cuisine"`
-	Meal_type            string    `json:"meal_type"            db:"meal_type"`
-	Image_url            string    `json:"image_url"            db:"image_url"`
-	Calories             int       `json:"calories"             db:"calories"`
-	Protein_g            float64   `json:"protein_g"            db:"protein_g"`
-	Carbs_g              float64   `json:"carbs_g"              db:"carbs_g"`
-	Fat_g                float64   `json:"fat_g"                db:"fat_g"`
-	Created_at           time.Time `json:"created_at"           db:"created_at"`
-	Updated_at           time.Time `json:"updated_at"           db:"updated_at"`
+	ID                 string    `json:"id"                   db:"id"`
+	AuthorID           string    `json:"author_id"            db:"author_id"`
+	Title              string    `json:"title"                db:"title"`
+	Description        string    `json:"description"          db:"description"`
+	PreparationTimeMin int       `json:"preparation_time_min" db:"preparation_time_min"`
+	Servings           int       `json:"servings"             db:"servings"`
+	Difficulty         string    `json:"difficulty"           db:"difficulty"`
+	Cuisine            string    `json:"cuisine"              db:"cuisine"`
+	MealType           string    `json:"meal_type"            db:"meal_type"`
+	ImageURL           string    `json:"image_url"            db:"image_url"`
+	Calories           int       `json:"calories"             db:"calories"`
+	ProteinGrams       float64   `json:"protein_g"            db:"protein_g"`
+	CarbsGrams         float64   `json:"carbs_g"              db:"carbs_g"`
+	FatGrams           float64   `json:"fat_g"                db:"fat_g"`
+	CreatedAt          time.Time `json:"created_at"           db:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"           db:"updated_at"`
 }
 
 // RecipeAuthor is a denormalized snapshot of the author fields the recipe UI
 // needs, joined in at read time so the frontend does not have to make a second
 // request to /api/users/:id just to render a card.
 type RecipeAuthor struct {
-	Id           string `json:"id"`
-	Display_name string `json:"display_name"`
-	Avatar_url   string `json:"avatar_url"`
+	ID          string `json:"id"`
+	DisplayName string `json:"display_name"`
+	AvatarURL   string `json:"avatar_url"`
 }
 
 // RecipeResponse is the read shape returned by GET /api/recipes and
 // GET /api/recipes/:id. It carries the author as a nested object
 type RecipeResponse struct {
-	Id                   string       `json:"id"`
-	Author               RecipeAuthor `json:"author"`
-	Title                string       `json:"title"`
-	Description          string       `json:"description"`
-	Preparation_time_min int          `json:"preparation_time_min"`
-	Servings             int          `json:"servings"`
-	Difficulty           string       `json:"difficulty"`
-	Cuisine              string       `json:"cuisine"`
-	Meal_type            string       `json:"meal_type"`
-	Image_url            string       `json:"image_url"`
-	Calories             int          `json:"calories"`
-	Protein_g            float64      `json:"protein_g"`
-	Carbs_g              float64      `json:"carbs_g"`
-	Fat_g                float64      `json:"fat_g"`
-	Created_at           time.Time    `json:"created_at"`
-	Updated_at           time.Time    `json:"updated_at"`
+	ID                 string       `json:"id"`
+	Author             RecipeAuthor `json:"author"`
+	Title              string       `json:"title"`
+	Description        string       `json:"description"`
+	PreparationTimeMin int          `json:"preparation_time_min"`
+	Servings           int          `json:"servings"`
+	Difficulty         string       `json:"difficulty"`
+	Cuisine            string       `json:"cuisine"`
+	MealType           string       `json:"meal_type"`
+	ImageURL           string       `json:"image_url"`
+	Calories           int          `json:"calories"`
+	ProteinGrams       float64      `json:"protein_g"`
+	CarbsGrams         float64      `json:"carbs_g"`
+	FatGrams           float64      `json:"fat_g"`
+	CreatedAt          time.Time    `json:"created_at"`
+	UpdatedAt          time.Time    `json:"updated_at"`
 }
 
 type SearchRecipeFilters struct {
@@ -86,24 +86,24 @@ type SearchRecipeFilters struct {
 }
 
 type SearchRecipeResponse struct {
-	Id                   string `json:"id"`
-	Title                string `json:"title"`
-	Preparation_time_min int    `json:"preparation_time_min"`
-	Image_url            string `json:"image_url"`
+	ID                 string `json:"id"`
+	Title              string `json:"title"`
+	PreparationTimeMin int    `json:"preparation_time_min"`
+	ImageURL           string `json:"image_url"`
 }
 
 type CreateUserRequest struct {
-	Email        string `json:"email"        binding:"required"`
-	Password     string `json:"password"     binding:"required,min=8,max=20"`
-	Name         string `json:"name"         binding:"omitempty,min=2,max=50"`
-	Display_name string `json:"display_name" binding:"required,min=3,max=15"`
+	Email       string `json:"email"        binding:"required"`
+	Password    string `json:"password"     binding:"required,min=8,max=20"`
+	Name        string `json:"name"         binding:"omitempty,min=2,max=50"`
+	DisplayName string `json:"display_name" binding:"required,min=3,max=15"`
 }
 
 type CreateUserParams struct {
-	Email           string `json:"email"`
-	Password_hashed string `json:"-"`
-	Name            string `json:"name"`
-	Display_name    string `json:"display_name"`
+	Email          string `json:"email"`
+	PasswordHashed string `json:"-"`
+	Name           string `json:"name"`
+	DisplayName    string `json:"display_name"`
 }
 
 type LoginUserRequest struct {
@@ -112,39 +112,39 @@ type LoginUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	Email        *string  `json:"email,omitempty"        binding:"omitempty"`
-	Name         *string  `json:"name,omitempty"         binding:"omitempty,min=2,max=50"`
-	Password     *string  `json:"password,omitempty"     binding:"omitempty,min=8,max=20"`
-	Display_name *string  `json:"display_name,omitempty" binding:"omitempty,min=3,max=15"`
-	Avatar_url   *string  `json:"avatar_url,omitempty"   binding:"omitempty,url,max=255"`
-	Roles        []string `json:"roles,omitempty"        binding:"omitempty,dive,required"`
+	Email       *string  `json:"email,omitempty"        binding:"omitempty"`
+	Name        *string  `json:"name,omitempty"         binding:"omitempty,min=2,max=50"`
+	Password    *string  `json:"password,omitempty"     binding:"omitempty,min=8,max=20"`
+	DisplayName *string  `json:"display_name,omitempty" binding:"omitempty,min=3,max=15"`
+	AvatarURL   *string  `json:"avatar_url,omitempty"   binding:"omitempty,url,max=255"`
+	Roles       []string `json:"roles,omitempty"        binding:"omitempty,dive,required"`
 }
 
 type UpdateUserParams struct {
-	Email           *string  `json:"email,omitempty"`
-	Name            *string  `json:"name,omitempty"`
-	Password_hashed *string  `json:"-"`
-	Display_name    *string  `json:"display_name,omitempty"`
-	Avatar_url      *string  `json:"avatar_url,omitempty"`
-	Roles           []string `json:"roles,omitempty"`
+	Email          *string  `json:"email,omitempty"`
+	Name           *string  `json:"name,omitempty"`
+	PasswordHashed *string  `json:"-"`
+	DisplayName    *string  `json:"display_name,omitempty"`
+	AvatarURL      *string  `json:"avatar_url,omitempty"`
+	Roles          []string `json:"roles,omitempty"`
 }
 
 type UserSearchResult struct {
-	Id           string `json:"id"`
-	Name         string `json:"name"`
-	Display_name string `json:"display_name"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
 }
 
-// Is_online is a pointer so it can be omitted from the JSON for pending rows
+// IsOnline is a pointer so it can be omitted from the JSON for pending rows
 // (sent/incoming buckets) and only appear on accepted/friends.
 type FriendshipListItem struct {
-	Status       string    `json:"-"                    db:"status"`
-	SentByMe     bool      `json:"-"                    db:"sent_by_me"`
-	Last_seen    time.Time `json:"-"                    db:"last_seen"`
-	Id           string    `json:"id"                   db:"id"`
-	Display_name string    `json:"display_name"         db:"display_name"`
-	Name         string    `json:"name"                 db:"name"`
-	Is_online    *bool     `json:"is_online,omitempty"`
+	Status      string    `json:"-"                    db:"status"`
+	SentByMe    bool      `json:"-"                    db:"sent_by_me"`
+	LastSeen    time.Time `json:"-"                    db:"last_seen"`
+	ID          string    `json:"id"                   db:"id"`
+	DisplayName string    `json:"display_name"         db:"display_name"`
+	Name        string    `json:"name"                 db:"name"`
+	IsOnline    *bool     `json:"is_online,omitempty"`
 }
 
 // this is the body of GET /api/friendships.
@@ -157,11 +157,11 @@ type FriendshipsResponse struct {
 // Body of POST /api/friendships. The requester is taken from the JWT, so the
 // client only sends the target user's id.
 type CreateFriendRequestBody struct {
-	Receiver_id string `json:"receiver_id" binding:"required"`
+	ReceiverID string `json:"receiver_id" binding:"required"`
 }
 
 type GoogleUser struct {
-	Id            string `json:"id"`
+	ID            string `json:"id"`
 	Name          string `json:"name"`
 	Email         string `json:"email"`
 	VerifiedEmail bool   `json:"verified_email"`

@@ -70,10 +70,10 @@ The database does the searching — Go just asks and receives. No for-loop neede
 Use `Pool.Query()` to get multiple rows, then loop through them with `rows.Next()` and `rows.Scan()`.
 
 ```go
-func GetAllUsers() ([]user, error) {
+func GetAllUsers(ctx context.Context) ([]user, error) {
 
     //Pool.Query() returns a pgx.Rows object point to the result set of db.
-    rows, err := Pool.Query(context.Background(),
+    rows, err := Pool.Query(ctx,
         `SELECT id, email, display_name, created_at FROM "user"`)
     if err != nil {
         return nil, err
@@ -84,7 +84,7 @@ func GetAllUsers() ([]user, error) {
     var users []user
     for rows.Next() {
         var u user
-        err := rows.Scan(&u.Id, &u.Email, &u.Display_name, &u.Created_at)
+        err := rows.Scan(&u.ID, &u.Email, &u.DisplayName, &u.CreatedAt)
         if err != nil {
             return nil, err
         }
@@ -104,11 +104,11 @@ func GetAllUsers() ([]user, error) {
 Use `Pool.QueryRow()` when you expect one result (e.g. find by ID).
 
 ```go
-func GetUserByID(id string) (user, error) {
+func GetUserByID(ctx context.Context, id string) (user, error) {
     var u user
-    err := Pool.QueryRow(context.Background(),
+    err := Pool.QueryRow(ctx,
         `SELECT id, email, display_name, created_at FROM "user" WHERE id = $1`, id,
-    ).Scan(&u.Id, &u.Email, &u.Display_name, &u.Created_at)
+    ).Scan(&u.ID, &u.Email, &u.DisplayName, &u.CreatedAt)
     if err != nil {
         return u, err
     }
@@ -125,13 +125,13 @@ func GetUserByID(id string) (user, error) {
 Use `Pool.Exec()` for INSERT/UPDATE/DELETE, or `QueryRow()` if you want the inserted row back.
 
 ```go
-func CreateUser(u user) (user, error) {
-    err := Pool.QueryRow(context.Background(),
+func CreateUser(ctx context.Context, u user) (user, error) {
+    err := Pool.QueryRow(ctx,
         `INSERT INTO "user" (email, password_hash, display_name)
          VALUES ($1, $2, $3)
          RETURNING id, created_at`,
-        u.Email, u.Password_hash, u.Display_name,
-    ).Scan(&u.Id, &u.Created_at)
+        u.Email, u.PasswordHash, u.DisplayName,
+    ).Scan(&u.ID, &u.CreatedAt)
     if err != nil {
         return u, err
     }
@@ -228,17 +228,17 @@ For "edit your own thing" endpoints, handlers check authorship first:
 func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
     userID := c.GetString("userID")
     // error handling...
-    recipeId := c.Param("id")
+    recipeID := c.Param("id")
     // error handling and JSON binding...
 
-    original, err := h.Repo.GetRecipeById(c.Request.Context(), recipeID)
+    original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
     // error handling ...
 
     roleSet, _ := authorization.RolesFromContext(c)
     permSet, _ := authorization.PermsFromContext(c)
     // error handling...
 
-    if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.Id) {
+    if !authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.ID) {
         c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
         return
     }

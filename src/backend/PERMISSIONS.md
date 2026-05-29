@@ -64,7 +64,7 @@ Two patterns the table doesn't show:
 - **Authorship overrides.** A chef can edit and delete their *own* recipes
   even though `edit_recipe` and `delete_recipe` are not in their role. The
   handler checks `recipe.author_id == current_user.id` and short-circuits
-  the role check. See the TODO note in [002_seed.sql:45](../database/migrations/002_seed.sql#L45).
+  the role check.
 - **Public reads.** Browsing recipes needs no permission. Auth
   middleware is not attached to public GET routes.
 
@@ -136,9 +136,9 @@ from [authorization/recipe.go](authorization/recipe.go):
 Pattern:
 
 ```go
-func (h *RecipeHandler) GetRecipeById(c *gin.Context) {
+func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
     // ...
-    recipe, err := h.Repo.GetRecipeById(c.Request.Context(), id)
+    recipe, err := h.Repo.GetRecipeByID(c.Request.Context(), id)
     if err != nil {
         // ... 404 if not found, 500 otherwise
         return
@@ -148,7 +148,7 @@ userID := c.GetString("userID")
 roleSet, _ := authorization.RolesFromContext(c)
 permSet, _ := authorization.PermsFromContext(c)
 
-if !authorization.CanEditRecipe(roleSet, permSet, userID, recipe.Author.Id) {
+if !authorization.CanEditRecipe(roleSet, permSet, userID, recipe.Author.ID) {
     c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
     return
 }

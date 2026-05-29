@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -20,7 +21,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const googleOAuthLockedPassword = "OAUTH_LOCKED_GOOGLE"
 const genericInternalErrorMsg = "internal server error"
 const unauthorizedErrorMsg = "unauthorized"
 const displayNameVersionLimit = 1000
@@ -37,7 +37,7 @@ func RandomStateToken() (string, error) {
 func GoogleLogin(c *gin.Context) {
 	randomState, err := RandomStateToken()
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": genericInternalErrorMsg})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": genericInternalErrorMsg})
 		return
 	}
 
@@ -83,7 +83,7 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	u, err := getOrCreateGoogleUser(&gu)
+	u, err := getOrCreateGoogleUser(c.Request.Context(), &gu)
 	if err != nil {
 		var eu *errorUnauthorized
 		var eb *errorBadRequest
@@ -92,7 +92,7 @@ func GoogleCallback(c *gin.Context) {
 			return
 		}
 		if errors.As(err, &eb) {
-			reportError(c, http.StatusBadRequest, eu.Error())
+			reportError(c, http.StatusBadRequest, eb.Error())
 			return
 		}
 		log.Printf("getOrCreateGoogleUser: %v", err)
@@ -100,7 +100,7 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	jwt, err := authorization.GenerateJWTToken(u.Id)
+	jwt, err := authorization.GenerateJWTToken(u.ID)
 	if err != nil {
 		log.Printf("LoginUser GenerateJWTToken: %v", err)
 		reportError(c, http.StatusInternalServerError, genericInternalErrorMsg)
@@ -128,15 +128,15 @@ func (e *errorBadRequest) Error() string {
 	return e.msg
 }
 
-func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
-	user, err := repository.GetUserCredentialsByEmail(gu.Email)
+func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.User, error) {
+	user, err := repository.GetUserCredentialsByEmail(ctx, gu.Email)
 	if err != nil && err != pgx.ErrNoRows {
 		return models.User{}, err
 	}
 
 	// User found
 	if err == nil {
-		if user.Password_hash != googleOAuthLockedPassword {
+		if user.PasswordHash != integrations.GoogleOAuthLockedPassword {
 			return models.User{}, &errorUnauthorized{"not a google user"}
 		}
 		return user, nil
@@ -149,26 +149,26 @@ func getOrCreateGoogleUser(gu *models.GoogleUser) (models.User, error) {
 	}
 	stem := gu.Email[:at]
 	params := models.CreateUserParams{
-		Email:           gu.Email,
-		Password_hashed: googleOAuthLockedPassword,
-		Name:            gu.Name,
-		Display_name:    stem,
+		Email:          gu.Email,
+		PasswordHashed: integrations.GoogleOAuthLockedPassword,
+		Name:           gu.Name,
+		DisplayName:    stem,
 	}
 
 	for i := range displayNameVersionLimit {
-		_, err := repository.GetUserCredentialsByDisplayName(params.Display_name)
+		_, err := repository.GetUserCredentialsByDisplayName(ctx, params.DisplayName)
 		if err == pgx.ErrNoRows {
-			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.Display_name)
+			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.DisplayName)
 			if err != nil {
 				return models.User{}, &errorBadRequest{"bad email/name/display name value"}
 			}
-			return repository.CreateUser(params)
+			return repository.CreateUser(ctx, params)
 		} else if err != nil {
 			return models.User{}, err
 		}
 
 		postfix := strconv.Itoa(i)
-		params.Display_name = stem + postfix
+		params.DisplayName = stem + postfix
 	}
 	return models.User{}, fmt.Errorf("all display name versions already in use")
 }

@@ -659,6 +659,10 @@ func Heartbeat(c *gin.Context) {
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), userID); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			return
+		}
 		log.Printf("Heartbeat: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return

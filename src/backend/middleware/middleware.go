@@ -127,9 +127,9 @@ func APIKeyAuthenticator() gin.HandlerFunc {
 	}
 }
 
-func RateLimiter(r rate.Limit, b int) gin.HandlerFunc {
+func RateLimiter(r rate.Limit, m IdentifierMode, b int) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		identifier := getClientIdentifier(c, byApiKey)
+		identifier := getClientIdentifier(c, m)
 		mu.Lock()
 		cl, exists := clients[identifier]
 		if !exists {

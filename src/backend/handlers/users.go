@@ -378,6 +378,18 @@ func GenerateAPIKey(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
+	if createdAt, err := repository.GetAPIKeyCreatedAt(c.Request.Context(), userID); err == nil {
+		if time.Since(createdAt) < time.Hour {
+			c.JSON(http.StatusTooManyRequests, gin.H{"error": "rate limit exceeded"})
+			return
+		}
+	} else {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			log.Printf("GetAPIKeyCreatedAt: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			return
+		}
+	}
 	apiKey, randomSecret, err := authorization.GenerateAPIKey(userID)
 	if err != nil {
 		log.Printf("GenerateAPIKey error: %v", err)

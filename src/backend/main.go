@@ -85,7 +85,7 @@ func main() {
 	router.POST("/api/users/apikey",
 		middleware.Authentication(),
 		middleware.RequireRoles(authorization.RoleDeveloper),
-		middleware.RateLimiter(middleware.APIKeyRateLimit, 1),
+		middleware.RateLimiter(middleware.APIKeyRateLimit, middleware.ByUserID, 1),
 		handlers.GenerateAPIKey)
 
 	router.PUT("/api/users/me/heartbeat", // Heartbeat - update server state
@@ -133,7 +133,7 @@ func main() {
 	publicRecipeHandler := handlers.NewPublicRecipeHandler(recipeSvc)
 
 	publicAPI := router.Group("/api/v1")
-	publicAPI.Use(middleware.RateLimiter(1, 5))
+	publicAPI.Use(middleware.RateLimiter(1, middleware.ByApiKey, 5))
 	publicAPI.Use(middleware.APIKeyAuthenticator())
 	{
 		publicAPI.GET("/recipes", publicRecipeHandler.GetAllRecipes)

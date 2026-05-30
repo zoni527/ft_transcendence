@@ -521,7 +521,7 @@ Database design and backend integration.
 - **Friendship API:** `GET / POST / PATCH / DELETE /api/friendships` (pending / accepted state machine).
 - **Online presence:** `last_seen` column, `PUT /api/users/me/heartbeat`, `markOnline()` hook.
 - **Seed data:** 25 users, 25 recipes, 49 friendship pairs in `002_seed.sql`.
-- **Documentation:** `DATABASE.md`, `BACKEND.md`, `API.md`.
+- **Documentation:** `DATABASE.md`, `BACKEND.md`, `PERMISSIONS.md`, plus a heavy share of `API.md`.
 - **Challenges.** Designing the `friendship` table so it could power
   directional views (who-sent-who) AND block duplicate requests in either
   direction at the database level: solved with a unique sorted-pair index
@@ -560,6 +560,7 @@ Backend authentication, authorization, and the public API.
 - **User updates:** `UpdateMe` and `UpdateUser` handlers with field validation, password updates, avatar handling.
 - **Advanced search (backend):** `searchRecipes` repository + handler, search-users-by-username endpoint.
 - **Cloudinary:** avatar upload signature handler.
+- **Documentation:** `PUBLIC_API.md`, plus a heavy share of `API.md`.
 - **Challenges.** Reconciling cookie-based JWT auth with the new
   `X-API-Key` path so neither code path could accidentally satisfy the
   other. Designing the rate limit to be per-user rather than per-IP (since
@@ -576,7 +577,8 @@ Backend endpoints and infrastructure.
 - **Google OAuth:** `integrations/google.go`, user creation/validation, auth endpoints under `/api/auth`.
 - **Recipe write endpoints:** `PUT /api/recipes/:id`, `DELETE /api/recipes/:id` (auth + role + authorship checks).
 - **Backend testing:** interface refactor for mockable DB, table-driven tests for `GetRecipeById` and `GetAllRecipes`.
-- **Documentation and code quality:** maintained `API.md`, `DATABASE.md`, JWT and nginx docs; codebase-wide style passes (`Id` to `ID`, `Url` to `URL`).
+- **Documentation:** authored `docs/jwt_and_cookies.md`, `docs/nginx_links.md`, `docs/go_links.md`; co-maintained `API.md`, `DATABASE.md`, `BACKEND.md`, `PERMISSIONS.md`.
+- **Code quality:** codebase-wide style passes (`Id` to `ID`, `Url` to `URL`, request-context handling, JSON serialization).
 - **Challenges.** Bootstrapping self-signed certificates across multiple
   containers and getting the browser to trust them locally for
   development; configuring nginx to route a single origin to both the Go

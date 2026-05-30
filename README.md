@@ -134,9 +134,9 @@ Count: 7 points.
 
 ### User Management
 
-- **Major:** Standard user management and authentication — sign-up, login, profile editing, avatar upload, friend system, and online status
+- **Major:** Standard user management and authentication: sign-up, login, profile editing, avatar upload, friend system, and online status
 - **Minor:** Implement remote authentication with OAuth 2.0
-- **Major:** Advanced permission system — `admin`, `moderator`, `chef`, `user` roles, CRUD, enforced on both backend routes and frontend views
+- **Major:** Advanced permission system: `admin`, `moderator`, `chef`, `user` roles, CRUD, enforced on both backend routes and frontend views
 
 Count: 12 points.
 
@@ -166,7 +166,7 @@ Count: 1x
 Database design and backend integration.
 
 - **Database design.** Designed and built the PostgreSQL schema from scratch
-  (10 tables across user management, RBAC, recipes, engagement, friendship, and
+  (covering user management, RBAC, recipes, engagement, friendship, and the
   public API). Chose UUID primary keys via the `uuid-ossp` extension and
   documented the rationale.
 - **Database infrastructure.** Set up the `postgres` and `adminer` services in
@@ -195,4 +195,71 @@ Database design and backend integration.
 - **Documentation.** Authored `src/database/DATABASE.md`,
   `src/backend/BACKEND.md`, and `src/backend/API.md`.
 
-To be written - CONTINUE
+### bgazur
+
+Frontend development.
+
+- **Frontend foundation.** Set up the React + Vite app and linting, and built the
+  reusable component design system (30+ components in `components/`: buttons,
+  inputs, fields, navbar, footer, status boxes, language switcher).
+- **Recipe UI.** Recipe browsing (`RecipeCard`, `RecipeDetail`), the create and
+  edit recipe modals, and client-side image upload validation.
+- **Advanced search UI.** The search bar, the three filters (difficulty, cuisine,
+  meal type), sorting controls, and infinite scroll, with a sticky filter that
+  collapses into a sidebar on mobile.
+- **Friends UI.** The full friendship interface: add-friend modal with user
+  search, accept / deny / cancel / unfriend actions, and the
+  accepted / sent / incoming subtabs on the dashboard.
+- **Online presence UI.** Online/offline indicators wired to the heartbeat API.
+- **Admin panel.** The user-management split view, role-selection checkboxes, and
+  the edit/delete user flows.
+- **Auth and API key UI.** The Google login button, developer-role gating, and
+  the API key generation modal.
+- **Notifications.** The pop-up notification system for create/update/delete
+  actions.
+- **Internationalization.** English, Finnish, and Czech translations
+  (`locales/`).
+- **Responsive design.** Mobile layouts across the navbar, dashboard, recipe
+  detail, and admin panel.
+
+### lsurco-t
+
+Backend authentication, authorization, and the public API.
+
+- **Authentication.** JWT generation and validation (`jwt.go`), the login/logout
+  handlers, the token blacklist (add / check / clean revoked tokens),
+  `GetSession`, and cookie clearing.
+- **Authorization.** The `authorization` and `middleware` packages, which load
+  each user's roles and permissions from the database, pass them through the
+  request context, and enforce role/permission checks via the `Requires`
+  middleware (including self-action checks).
+- **Public API module.** API key generation and hashing, the `validateAPIKey`
+  middleware, per-user rate limiting (1 key request per hour), and gating the
+  public routes behind the `developer` role. Authored `PUBLIC_API.md`.
+- **User updates.** The `UpdateMe` (self) and `UpdateUser` (admin) handlers with
+  field validation, password updates, and avatar handling.
+- **Advanced search (backend).** The `searchRecipes` repository query and handler
+  with the difficulty / cuisine / meal-type filters, plus the search-users-by-
+  username endpoint.
+- **Cloudinary.** The avatar upload signature handler/integration.
+
+### jvarila
+
+Backend endpoints and infrastructure.
+
+- **HTTPS and reverse proxy.** The nginx reverse proxy, the certificate-generation
+  script (`cert_generator`), HTTPS-only JWT cookies, and configurable port
+  propagation from `.env` through Docker Compose.
+- **DevOps.** The `.env` validation script, and the Docker
+  Compose service dependencies.
+- **Google OAuth.** The backend OAuth 2.0 flow (`integrations/google.go`), Google
+  user creation/validation, and moving the auth endpoints under `/api/auth`.
+- **Recipe write endpoints.** `PUT /api/recipes/:id` and `DELETE /api/recipes/:id`
+  with authentication, role, and authorship checks, plus unified PostgreSQL error
+  classification.
+- **Backend testing.** Refactored the recipe handlers and repository to interfaces
+  for mock-database testing, and added table-driven tests for `GetRecipeById` and
+  `GetAllRecipes`.
+- **Documentation and code quality.** Maintained `API.md`, `DATABASE.md`, and the
+  JWT and nginx docs, and ran codebase-wide style passes (`Id` to `ID`, `Url` to
+  `URL`, request-context handling, JSON serialization).

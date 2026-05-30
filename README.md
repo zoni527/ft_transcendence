@@ -2,16 +2,8 @@ _This project has been created as part of the 42 curriculum by bgazur, lsurco-t,
 
 # ft_transcendence
 
-**Rise**: a recipe sharing platform, built as our full-stack web dev project at 42.
-
 ## Description
-
-### The Goal
-
-Our goal for the transcendence project was to learn how to design a proper full stack web application
-that uses a RESTful API and consists of multiple docker containers, practice project management,
-team work, and improve our Git workflows. At the same time we set out to learn React and Go, as well
-as getting familiar with SQL using PostgreSQL as our database.
+**Rise**: a recipe sharing platform, built as our full-stack web dev project at 42.
 
 ### Key features
 
@@ -140,19 +132,40 @@ every team member can explain the code they shipped.
 
 ### bgazur
 
-- Assigned roles: developer
+- **Assigned roles:** Product Owner, Developer
+- **Responsibilities:** owned the user-facing product surface (React + Vite
+  app, design system, page layouts, mobile responsiveness) and drove the
+  user-experience decisions on every flow (recipe browsing and creation,
+  friends, admin panel, notifications, API key modal). As PO, validated
+  that completed features matched what users would actually expect.
 
 ### lsurco-t
 
-- Assigned roles: developer
+- **Assigned roles:** Quality Assurance, Developer
+- **Responsibilities:** backend authentication (JWT and token blacklist),
+  the `authorization` and `middleware` packages, the public API module
+  (key issuance, hashing, rate limiting), user-update handlers, recipe
+  search backend, and the Cloudinary avatar signing handler.
 
 ### hiennguy
 
-- Assigned roles: developer
+- **Assigned roles:** Designer, Developer
+- **Responsibilities:** PostgreSQL schema design and the backend ↔
+  database integration layer (`pgx` pool and the
+  `models` / `repository` / `handlers` split), recipe and user/friendship
+  read endpoints, online presence, account deletion, seed data, and the
+  database documentation. As PM, coordinated the README finalization,
+  tracked the Kanban board, and ran the bi-weekly sync meetings.
 
 ### jvarila
 
-- Assigned roles: Tech Lead, Developer
+- **Assigned roles:** Technical Lead, Developer
+- **Responsibilities:** HTTPS infrastructure (nginx reverse proxy +
+  certificate generation), Docker Compose wiring, the env validation
+  script, Google OAuth backend, recipe write endpoints, backend tests, and
+  ongoing documentation upkeep. As Tech Lead, set the architectural
+  conventions (layered backend, JWT-cookie auth, no ORM) and ran the
+  codebase-wide style passes.
 
 ## Project Management
 
@@ -321,18 +334,48 @@ the rationale behind UUIDs, constraint details, and the local dev workflow
 
 ## Features List
 
-- **Recipes** (Lily: reads, Johnny: writes, Boris: UI): create, edit, delete, and browse recipes with images hosted on Cloudinary
-- **Advanced search** (Lucio: backend, Boris: UI): filter recipes by difficulty, cuisine, and meal type, with sorting and infinite scroll pagination
-- **User accounts** (Lily, Lucio: backend, Boris: UI): sign up, log in, log out, edit profile, upload avatar, delete account
-- **Authentication** (Lucio: JWT and sessions, Johnny: Google OAuth, Boris: UI): email/password login plus Google OAuth, JWT cookies with a server-side blacklist for revocation
-- **Roles and permissions** (Lily: schema, Lucio: backend enforcement, Boris: UI gating): `admin`, `moderator`, `chef`, and `user`, with role-based access enforced on both backend routes and frontend views
-- **Friends** (Lily: backend, Boris: UI): send, accept, deny, cancel, and unfriend, with separate dashboard buckets for accepted / sent / incoming
-- **Online presence** (Lily: backend, Boris: UI): heartbeat keeps `last_seen` fresh and exposes `is_online` on accepted friends
-- **Public API** (Lucio: backend, Boris: UI): dedicated `/api/v1/*` routes for recipes, gated by a per-user API key with hashing and rate limiting (required role: `developer`)
-- **Admin panel** (Lucio: backend, Boris: UI): user management UI for assigning roles and reviewing accounts
-- **Notification system** (Boris): pop-ups appear for events triggered
-- **Privacy Policy and Terms of Service** (Boris): dedicated pages linked from the footer, with content tailored to the app
-- **Multi-user support** (team): multiple users can sign in and use the app concurrently. JWT cookies isolate sessions per user, all writes are scoped to the acting user via the auth context, the friendship and heartbeat systems give cross-user visibility (online presence, incoming requests) in near real time, and PostgreSQL constraints prevent race conditions on shared writes.
+What the application lets a user do, and who built each part:
+
+- **Sign up and sign in** with email + password, or with a Google account.
+  _Built by:_ Lucio (backend auth and sessions), Johnny (Google OAuth flow),
+  Boris (UI).
+- **Browse and search recipes** by title, with a filter sidebar (difficulty,
+  cuisine, meal type), sort controls, and infinite scroll.
+  _Built by:_ Lily (read endpoints), Lucio (search backend), Boris (UI).
+- **Create, edit, and delete recipes** with a photo, ingredients, steps,
+  prep and cook times, and nutrition info.
+  _Built by:_ Lily (read endpoints), Johnny (write endpoints), Boris (UI and
+  image upload).
+- **Manage your account**: edit your display name, change your password,
+  upload a new avatar, or delete the account (your recipes stay but your
+  authorship is removed).
+  _Built by:_ Lucio (update handlers and Cloudinary avatar signing), Lily
+  (account deletion flow), Boris (profile UI).
+- **Add friends and see who's online**: send, accept, deny, cancel, or
+  unfriend; pending requests show up in Sent and Incoming tabs; accepted
+  friends show a live online/offline indicator.
+  _Built by:_ Lily (friendship API and heartbeat), Boris (UI).
+- **Switch the interface language** between English, Finnish, and Czech.
+  _Built by:_ Boris (i18n setup and most translations), Johnny (Finnish
+  strings).
+- **Manage users from the admin panel** (admin role): assign roles, edit,
+  or delete users.
+  _Built by:_ Lily and Lucio (backend), Boris (UI).
+- **Get in-app notifications** when something is created, updated, or
+  deleted.
+  _Built by:_ Boris.
+- **Access recipes through a public API** (developer role): generate a
+  personal API key in the navbar, then call `GET / POST / PUT / DELETE
+  /api/v1/recipes` with the `X-API-Key` header. Rate-limited and
+  documented.
+  _Built by:_ Lucio (backend), Boris (UI).
+- **Read the Privacy Policy and Terms of Service** pages linked from the
+  footer.
+  _Built by:_ Boris.
+- **Use the app with multiple users at the same time**: each user has
+  their own session, online status updates in near real time across users,
+  and the database prevents collisions on shared writes.
+  _Built by:_ team.
 
 ## Modules
 

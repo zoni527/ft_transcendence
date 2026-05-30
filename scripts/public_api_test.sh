@@ -85,6 +85,7 @@ status_code="$(request "$login_response" \
   -H 'Content-Type: application/json' \
   -d @"$login_payload" \
   "$BASE_URL/api/auth/login")"
+# Expect 200 (OK): login should succeed for the seeded user and return session cookie
 assert_status "$status_code" 200 'login with seeded user' "$login_response"
 
 if ! grep -q 'token' "$COOKIE_JAR"; then
@@ -127,18 +128,21 @@ printf 'PASS: API key received\n'
 sleep "${PUBLIC_API_INITIAL_PAUSE_SECONDS:-6}"
 
 no_key_response="$WORK_DIR/no-key.json"
+# Expect 401 (Unauthorized): requests without an API key must be rejected
 status_code="$(request "$no_key_response" \
   -H 'X-Forwarded-For: 203.0.113.42' \
   "$BASE_URL/api/v1/recipes")"
 assert_status "$status_code" 401 'GET /api/v1/recipes without API key' "$no_key_response"
 
 bad_key_response="$WORK_DIR/bad-key.json"
+# Expect 401 (Unauthorized): invalid API keys must be rejected
 status_code="$(request "$bad_key_response" \
   -H 'X-API-Key: invalid.key' \
   "$BASE_URL/api/v1/recipes")"
 assert_status "$status_code" 401 'GET /api/v1/recipes with invalid API key' "$bad_key_response"
 
 recipes_response="$WORK_DIR/recipes.json"
+# Expect 200 (OK): valid API key returns the list of recipes
 status_code="$(request "$recipes_response" \
   -H "X-API-Key: $api_key" \
   "$BASE_URL/api/v1/recipes")"
@@ -148,12 +152,14 @@ first_recipe_id="$(json_get "$recipes_response" first_recipe_id)"
 foreign_recipe_id="$(json_get "$recipes_response" first_foreign_recipe_id "$eve_user_id")"
 
 single_recipe_response="$WORK_DIR/single-recipe.json"
+# Expect 200 (OK): fetching an existing recipe by ID should succeed
 status_code="$(request "$single_recipe_response" \
   -H "X-API-Key: $api_key" \
   "$BASE_URL/api/v1/recipes/$first_recipe_id")"
 assert_status "$status_code" 200 'GET /api/v1/recipes/:id with valid API key' "$single_recipe_response"
 
 missing_recipe_response="$WORK_DIR/missing-recipe.json"
+# Expect 404 (Not Found): requesting a recipe with an unknown UUID
 status_code="$(request "$missing_recipe_response" \
   -H "X-API-Key: $api_key" \
   "$BASE_URL/api/v1/recipes/00000000-0000-0000-0000-000000000000")"
@@ -165,6 +171,7 @@ cat >"$invalid_post_payload" <<'JSON'
 JSON
 
 invalid_post_response="$WORK_DIR/invalid-post-response.json"
+# Expect 400 (Bad Request): POST with invalid payload should be rejected
 status_code="$(request "$invalid_post_response" \
   -H "X-API-Key: $api_key" \
   -H 'Content-Type: application/json' \
@@ -191,6 +198,7 @@ cat >"$create_payload" <<'JSON'
 JSON
 
 create_response="$WORK_DIR/create-response.json"
+# Expect 201 (Created): valid POST should create a recipe
 status_code="$(request "$create_response" \
   -H "X-API-Key: $api_key" \
   -H 'Content-Type: application/json' \
@@ -206,6 +214,7 @@ cat >"$invalid_put_payload" <<'JSON'
 JSON
 
 invalid_put_response="$WORK_DIR/invalid-put-response.json"
+# Expect 400 (Bad Request): PUT with an invalid payload should be rejected
 status_code="$(request "$invalid_put_response" \
   -H "X-API-Key: $api_key" \
   -H 'Content-Type: application/json' \
@@ -233,6 +242,7 @@ cat >"$update_payload" <<'JSON'
 JSON
 
 update_response="$WORK_DIR/update-response.json"
+# Expect 200 (OK): valid PUT should update the recipe
 status_code="$(request "$update_response" \
   -H "X-API-Key: $api_key" \
   -H 'Content-Type: application/json' \
@@ -242,6 +252,7 @@ status_code="$(request "$update_response" \
 assert_status "$status_code" 200 'PUT /api/v1/recipes/:id with valid payload' "$update_response"
 
 forbidden_put_response="$WORK_DIR/forbidden-put.json"
+# Expect 403 (Forbidden): updating another user's recipe should be forbidden
 status_code="$(request "$forbidden_put_response" \
   -H "X-API-Key: $api_key" \
   -H 'Content-Type: application/json' \
@@ -251,6 +262,7 @@ status_code="$(request "$forbidden_put_response" \
 assert_status "$status_code" 403 'PUT /api/v1/recipes/:id for another user' "$forbidden_put_response"
 
 forbidden_delete_response="$WORK_DIR/forbidden-delete.json"
+# Expect 403 (Forbidden): deleting another user's recipe should be forbidden
 status_code="$(request "$forbidden_delete_response" \
   -H "X-API-Key: $api_key" \
   -X DELETE \
@@ -258,6 +270,7 @@ status_code="$(request "$forbidden_delete_response" \
 assert_status "$status_code" 403 'DELETE /api/v1/recipes/:id for another user' "$forbidden_delete_response"
 
 missing_delete_response="$WORK_DIR/missing-delete.json"
+# Expect 404 (Not Found): deleting a non-existent recipe should return 404
 status_code="$(request "$missing_delete_response" \
   -H "X-API-Key: $api_key" \
   -X DELETE \
@@ -265,6 +278,7 @@ status_code="$(request "$missing_delete_response" \
 assert_status "$status_code" 404 'DELETE /api/v1/recipes/:id with unknown UUID' "$missing_delete_response"
 
 delete_response="$WORK_DIR/delete-response.json"
+# Expect 204 (No Content): successful delete returns no body
 status_code="$(request "$delete_response" \
   -H "X-API-Key: $api_key" \
   -X DELETE \

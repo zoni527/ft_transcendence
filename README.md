@@ -40,6 +40,70 @@ cp ./src/.env.example ./src/.env
 3. run `make` in the root folder of the repository
 4. Open [https://localhost:8443] on a web browser (replace port if customized)
 
+## Usage
+
+Once the containers are running and you have visited the site, the main flows
+are:
+
+### Account
+
+- **Sign up** with an email and a password, or click **Continue with Google**
+  to sign in with OAuth.
+- From the navbar, open your **profile** to edit your display name, change
+  your password, upload a new avatar, or delete the account. Deleting an
+  account keeps your published recipes but detaches them from your name.
+
+### Recipes
+
+- Open **Recipes** in the navbar to browse the full list.
+- Use the **search bar** to filter by title, the **filter sidebar** to narrow
+  by difficulty, cuisine, and meal type, and the **sort controls** to reorder.
+  The list pages itself with **infinite scroll**.
+- Click any card to open the **recipe detail** view.
+- Click **Create recipe** to add your own. The form takes a title, description,
+  image (JPG/PNG, validated client-side and uploaded directly to Cloudinary),
+  prep and cook times, servings, nutrition, ingredients, and steps.
+- On a recipe you own, **Edit** and **Delete** buttons appear in the detail
+  view.
+
+### Friends
+
+- Open **Friends** in the navbar.
+- Click **Add friend** and search for other users by username.
+- Pending requests show up under the **Sent** and **Incoming** subtabs.
+  Accept, deny, cancel, or unfriend from each row.
+- Accepted friends display an online/offline indicator, kept fresh by the
+  heartbeat.
+
+### Language
+
+- Use the **language switcher** in the navbar to change between **English**,
+  **Finnish**, and **Czech**.
+
+### Admin panel (admin role)
+
+- Open **Admin** in the navbar to manage users (assign roles, edit, delete)
+  and to review recipes.
+
+### Public API (developer role)
+
+- A user with the **developer** role can open the **API key** modal from the
+  navbar.
+- Click **Generate** to create a new key. The key is shown once and is then
+  stored only as a hash, so it cannot be retrieved later. Generation is rate
+  limited to one new key per user per hour.
+- Send the key as the `X-API-Key` header on any `/api/public/*` route. See
+  [src/backend/PUBLIC_API.md](src/backend/PUBLIC_API.md) for the full
+  endpoint list.
+
+### Demo data
+
+The database seed creates 25 demo users and 25 recipes so every page has
+content on a fresh database. All seeded users share the same bcrypt-hashed
+test password. See
+[src/database/migrations/002_seed.sql](src/database/migrations/002_seed.sql)
+for the seeded usernames and the test password.
+
 ## Resources
 
 - [Golang links](docs/go_links.md)

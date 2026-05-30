@@ -2,7 +2,7 @@ _This project has been created as part of the 42 curriculum by bgazur, lsurco-t,
 
 # ft_transcendence
 
-A recipe sharing platform, full-stack web dev project
+**Rise**: a recipe sharing platform, built as our full-stack web dev project at 42.
 
 ## Description
 
@@ -130,7 +130,7 @@ AI was used for code review on GitHub, debugging, planning of features, pointing
 
 ### jvarila
 
-- Assigned roles: developer
+- Assigned roles: Tech Lead, Developer
 
 ## Project Management
 
@@ -152,6 +152,7 @@ GitHub Project for Kanban board
 - **React + Vite (frontend).** React gave us a component model the whole team
   could share, and Vite's hot reload and ES module dev server were much faster
   to iterate against than Webpack or CRA.
+
   _Trade-off:_ a single-page app means client-side routing only, no SSR, and no
   meaningful SEO. We accepted this because the app is gated behind login for
   most actions anyway.
@@ -159,6 +160,7 @@ GitHub Project for Kanban board
   languages) and for the single static binary in the container. Gin stays close
   to `net/http` without pulling in a heavy framework or dependency injection we
   did not need.
+  
   _Trade-off:_ Gin is deliberately minimal, so we wrote our own middleware,
   validation, and authorization plumbing instead of getting it for free from a
   batteries-included framework like Django or Rails.
@@ -167,6 +169,7 @@ GitHub Project for Kanban board
   ORM because one of our explicit goals was to actually learn SQL; an ORM would
   have hidden exactly the joins, constraints, and migrations we wanted to
   practice.
+  
   _Trade-off:_ every repository function maps rows to structs by hand, which is
   more boilerplate per endpoint and one more place a bug can land. We also do
   not get automatic migrations: schema changes are numbered SQL files we have
@@ -174,12 +177,14 @@ GitHub Project for Kanban board
 - **nginx reverse proxy.** Centralises HTTPS termination and serves frontend and
   backend behind a single origin, which removes a whole class of CORS issues and
   satisfies the subject's HTTPS-everywhere requirement.
+  
   _Trade-off:_ one more container to keep alive, plus the certificate-generation
   script and templated config that comes with it. Debugging a failing request
   now means checking nginx as well as the backend.
 - **Docker Compose.** The subject requires the project to start with one
   command, so Compose orchestrates frontend, backend, Postgres, Adminer, the
   reverse proxy, and the certificate generator together.
+  
   _Trade-off:_ Compose is a dev/single-host tool, not real production
   orchestration: no autoscaling, no rolling deploys, no health-driven
   rescheduling. Fine for a school project, not something we would ship as-is.
@@ -187,6 +192,7 @@ GitHub Project for Kanban board
   the part of the project we wanted to build from scratch, and Cloudinary's
   signed-upload flow lets the browser upload directly without proxying bytes
   through our backend.
+  
   _Trade-off:_ we depend on an external service with its own free-tier limits
   and vendor lock-in on the image URLs. If Cloudinary is down or the account is
   exhausted, image uploads stop working.
@@ -259,58 +265,135 @@ the rationale behind UUIDs, constraint details, and the local dev workflow
 
 ## Features List
 
-- **Recipes:** create, edit, delete, and browse recipes with images hosted on Cloudinary
-- **Advanced search:** filter recipes by difficulty, cuisine, and meal type, with sorting and infinite scroll pagination
-- **User accounts:** sign up, log in, log out, edit profile, upload avatar, delete account
-- **Authentication:** email/password login plus Google OAuth, JWT cookies with a server-side blacklist for revocation
-- **Roles and permissions:** `admin`, `moderator`, `chef`, and `user`, with role-based access enforced on both backend routes and frontend views
-- **Friends:** send, accept, deny, cancel, and unfriend, with separate dashboard buckets for accepted / sent / incoming
-- **Online presence:** heartbeat keeps `last_seen` fresh and exposes `is_online` on accepted friends
-- **Public API:** dedicated `/api/public/*` routes for recipes, gated by a per-user API key with hashing and rate limiting (required role: `developer`)
-- **Admin panel:** user management UI for assigning roles and reviewing accounts
-- **Notification system:** pop-ups appear for events triggered
+- **Recipes** (Lily: reads, Johnny: writes, Boris: UI): create, edit, delete, and browse recipes with images hosted on Cloudinary
+- **Advanced search** (Lucio: backend, Boris: UI): filter recipes by difficulty, cuisine, and meal type, with sorting and infinite scroll pagination
+- **User accounts** (Lily, Lucio: backend, Boris: UI): sign up, log in, log out, edit profile, upload avatar, delete account
+- **Authentication** (Lucio: JWT and sessions, Johnny: Google OAuth, Boris: UI): email/password login plus Google OAuth, JWT cookies with a server-side blacklist for revocation
+- **Roles and permissions** (Lily: schema, Lucio: backend enforcement, Boris: UI gating): `admin`, `moderator`, `chef`, and `user`, with role-based access enforced on both backend routes and frontend views
+- **Friends** (Lily: backend, Boris: UI): send, accept, deny, cancel, and unfriend, with separate dashboard buckets for accepted / sent / incoming
+- **Online presence** (Lily: backend, Boris: UI): heartbeat keeps `last_seen` fresh and exposes `is_online` on accepted friends
+- **Public API** (Lucio: backend, Boris: UI): dedicated `/api/v1/*` routes for recipes, gated by a per-user API key with hashing and rate limiting (required role: `developer`)
+- **Admin panel** (Lucio: backend, Boris: UI): user management UI for assigning roles and reviewing accounts
+- **Notification system** (Boris): pop-ups appear for events triggered
+- **Privacy Policy and Terms of Service** (Boris): dedicated pages linked from the footer, with content tailored to the app
 
-## Modules - @TODO need checking before submit
+## Modules
 
-The ft_transcendence subject requires a minimum of 14 points.
+The ft_transcendence subject requires a minimum of 14 points (Major = 2pts,
+Minor = 1pt). We claim **15 points** across four categories. For each
+module we record the justification, how it was implemented, and who worked
+on it.
 
-### Web
+### Web (7 points)
 
-- **Minor:** Use a frontend framework (React + Vite)
-- **Minor:** Use a backend framework (Gin)
-- **Major:** A public API to interact with the database, with a secured API key, rate limiting, documentation, and at least 5 endpoints
-- **Minor:** Implement advanced search functionality with filters, sorting, and pagination
-- **Minor:** Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components)
-- **Minor:** A complete notification system for all creation, update, and deletion actions
+- **Minor, 1pt: Frontend framework (React + Vite).**
+  - _Justification:_ React is on the subject's accepted frontend framework
+    list; Vite provides the dev server and bundler.
+  - _Implementation:_ React 19 app under [src/frontend/](src/frontend/) with
+    file-based routing and a custom component design system.
+  - _Worked on by:_ Boris.
+- **Minor, 1pt: Backend framework (Gin / Go).**
+  - _Justification:_ Gin is the idiomatic web framework on top of Go's
+    `net/http`; it provides routing, middleware, and parameter binding.
+  - _Implementation:_ All HTTP routes wired in
+    [src/backend/main.go](src/backend/main.go); Gin middleware enforces
+    auth, roles, and rate limits.
+  - _Worked on by:_ Johnny, Lucio, Lily.
+- **Major, 2pts: Public API.**
+  - _Justification:_ Meets all four subject requirements: secured API key
+    (`X-API-Key` header), per-user rate limiting, dedicated documentation
+    file, and at least 5 endpoints covering `GET` / `POST` / `PUT` /
+    `DELETE`.
+  - _Implementation:_ Five `/api/v1/recipes` endpoints (list, get, create,
+    update, delete) gated by the `validateAPIKey` middleware. Keys are
+    issued via `POST /api/users/apikey`, stored only as a hash, and gated
+    behind the `developer` role. Full documentation in
+    [src/backend/PUBLIC_API.md](src/backend/PUBLIC_API.md).
+  - _Worked on by:_ Lucio (backend), Boris (UI).
+- **Minor, 1pt: Advanced search.**
+  - _Justification:_ Implements all three subject requirements: filters,
+    sorting, and pagination.
+  - _Implementation:_ `searchRecipes` repository query supports filtering
+    on difficulty, cuisine, and meal type plus sort order and
+    limit/offset. The frontend builds the query string from filter
+    components and pages via infinite scroll.
+  - _Worked on by:_ Lucio (backend), Boris (UI).
+- **Minor, 1pt: Custom design system.**
+  - _Justification:_ Subject minimum is 10 reusable components; the app
+    ships 30+.
+  - _Implementation:_ Reusable components under
+    [src/frontend/src/components/](src/frontend/src/components/) (buttons,
+    inputs, fields, navbar, footer, status boxes, language switcher, etc.)
+    with a shared Tailwind palette and typography.
+  - _Worked on by:_ Boris.
+- **Minor, 1pt: Notification system.**
+  - _Justification:_ Subject requires creation, update, and deletion
+    notifications; all three are covered.
+  - _Implementation:_ A notification context dispatches pop-ups on
+    create / update / delete mutations across the app.
+  - _Worked on by:_ Boris.
 
-Count: 7 points.
+### User Management (5 points)
 
-### User Management
+- **Major, 2pts: Standard user management and authentication.**
+  - _Justification:_ All four subject requirements covered: profile
+    editing, avatar upload (with a default), friends and online status,
+    profile page.
+  - _Implementation:_ Email + password signup with bcrypt-hashed
+    passwords, JWT cookies, profile-edit handlers, avatar uploads via a
+    Cloudinary signed URL, friendship system, and a heartbeat that
+    updates `last_seen` for online status.
+  - _Worked on by:_ Lily, Lucio (backend), Boris (UI).
+- **Minor, 1pt: OAuth 2.0 (Google).**
+  - _Justification:_ Google is a recognized OAuth 2.0 provider.
+  - _Implementation:_ Backend flow in
+    [src/backend/integrations/google.go](src/backend/integrations/google.go)
+    creates or links a user on a successful Google sign-in; auth
+    endpoints sit under `/api/auth`.
+  - _Worked on by:_ Johnny (backend), Boris (UI).
+- **Major, 2pts: Advanced permissions system.**
+  - _Justification:_ Subject requires CRUD on users, role management, and
+    role-based views; all three are implemented.
+  - _Implementation:_ Five roles (`admin`, `moderator`, `chef`,
+    `developer`, `user`) wired through `user_role` and `role_permission`
+    join tables. The `authorization` and `middleware` packages load each
+    user's roles and permissions into request context; the `Requires`
+    middleware enforces them. The frontend hides routes and actions based
+    on the user's roles, and the admin panel exposes CRUD on users.
+  - _Worked on by:_ Lily (schema), Lucio (backend), Boris (UI).
 
-- **Major:** Standard user management and authentication: sign-up, login, profile editing, avatar upload, friend system, and online status
-- **Minor:** Implement remote authentication with OAuth 2.0
-- **Major:** Advanced permission system: `admin`, `moderator`, `chef`, `user` roles, CRUD, enforced on both backend routes and frontend views
+### Accessibility and Internationalization (2 points)
 
-Count: 12 points.
+- **Minor, 1pt: Multiple languages.**
+  - _Justification:_ Subject minimum is 3 languages with i18n, a switcher,
+    and translatable user-facing text. We ship English, Finnish, and
+    Czech.
+  - _Implementation:_ `react-i18next` with locale files in
+    [src/frontend/src/locales/](src/frontend/src/locales/); language
+    switcher in the navbar.
+  - _Worked on by:_ Boris (i18n setup and most translations), Johnny
+    (Finnish strings).
+- **Minor, 1pt: Additional browsers.**
+  - _Justification:_ Subject requires functional compatibility with at
+    least two browsers beyond Chrome.
+  - _Implementation:_ Manually tested in Firefox and Safari in addition
+    to Chrome; Tailwind autoprefixes vendor-specific CSS and no
+    Chrome-only APIs are used.
+  - _Worked on by:_ team.
 
-### Accessibility and Internationalization
+### Data and Analytics (1 point)
 
-- **Minor:** Support for multiple languages (at least 3 languages).
-- **Minor:** Support for additional browsers.
+- **Minor, 1pt: GDPR compliance.**
+  - _Justification:_ Users can delete their account, and recipe
+    authorship is detached on deletion so a user's content can be removed
+    without breaking other users' experience.
+  - _Implementation:_ `DELETE /api/users/:id` cascades through joins
+    (`user_role`, `friendship`, `recipe_favourite`, `api_keys`) while
+    `recipe.author_id` is set to `NULL`. A last-admin guard prevents the
+    system from being left with no admin.
+  - _Worked on by:_ Lily.
 
-Count: 14
-
-### Data and Analytics @TODO
-
-- **Minor:** GDPR compliance features.
-
-Count: 15
-
-### Module of choice @TODO
-
-- **Major:** Testing and other things
-
-Count: 1x
+**Total: 15 points (14 required, 1 buffer).**
 
 ## Individual Contributions
 

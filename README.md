@@ -100,7 +100,7 @@ are:
 - Click **Generate** to create a new key. The key is shown once and is then
   stored only as a hash, so it cannot be retrieved later. Generation is rate
   limited to one new key per user per hour.
-- Send the key as the `X-API-Key` header on any `/api/public/*` route. See
+- Send the key as the `X-API-Key` header on any `/api/v1/*` route. See
   [src/backend/PUBLIC_API.md](src/backend/PUBLIC_API.md) for the full
   endpoint list.
 

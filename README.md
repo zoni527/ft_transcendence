@@ -3,6 +3,7 @@ _This project has been created as part of the 42 curriculum by bgazur, lsurco-t,
 # ft_transcendence
 
 ## Description
+
 **Rise**: a recipe sharing platform, built as our full-stack web dev project at 42.
 
 ### Key features
@@ -166,8 +167,7 @@ pair) drove and was accountable.
   PostgreSQL schema from scratch, and established the backend
   architecture (`pgx` connection pool, the
   `models` / `repository` / `handlers` layering that the rest of the
-  backend follows, foreign-key and cascade decisions including the
-  `author_id ON DELETE SET NULL` choice). Built the recipe and
+  backend follows. Built the recipe and
   user/friendship read endpoints, online presence (`last_seen` plus
   heartbeat), account deletion with the last-admin guard, the seed data,
   and the database documentation. As shared Tech Lead, owns database
@@ -390,7 +390,7 @@ What the application lets a user do, and who built each part:
   _Built by:_ Boris.
 - **Access recipes through a public API** (developer role): generate a
   personal API key in the navbar, then call `GET / POST / PUT / DELETE
-  /api/v1/recipes` with the `X-API-Key` header. Rate-limited and
+/api/v1/recipes` with the `X-API-Key` header. Rate-limited and
   documented.
   _Built by:_ Lucio (backend), Boris (UI).
 - **Read the Privacy Policy and Terms of Service** pages linked from the
@@ -513,35 +513,15 @@ on it.
 
 Database design and backend integration.
 
-- **Database design.** Designed and built the PostgreSQL schema from scratch
-  (covering user management, RBAC, recipes, engagement, friendship, and the
-  public API). Chose UUID primary keys via the `uuid-ossp` extension and
-  documented the rationale.
-- **Database infrastructure.** Set up the `postgres` and `adminer` services in
-  Docker Compose, wired the migration auto-init pattern (numbered SQL files in
-  `src/database/migrations/`), and added `make dbclean` for fresh resets.
-- **Backend ↔ database integration.** Connected the Go backend to PostgreSQL
-  via a `pgx` connection pool and established the backend layering
-  (`models/` / `repository/` / `handlers/`) that the rest of the backend
-  follows.
-- **Recipe endpoints.** Implemented `GET /api/recipes` and
-  `GET /api/recipes/:id` (with nested author info).
-- **User endpoints.** Implemented `GET /api/users`, `GET /api/users/:id`, and
-  the full `DELETE /api/users/:id` flow including the last-admin guard and the
-  blacklist-before-delete ordering so revocation can never silently fail.
-- **Friendship system.** Implemented the full friendship API
-  (`GET` / `POST` / `PATCH` / `DELETE /api/friendships`), including the
-  pending / accepted state machine and exposing `is_online` on accepted
-  friends.
-- **Online presence.** Added the `last_seen` column, the heartbeat
-  `PUT /api/users/me/heartbeat` endpoint, and the `markOnline()` hook on user
-  updates.
-- **Seed data.** Built the seed file (25 users with bcrypt-hashed passwords,
-  25 recipes with hand-picked Cloudinary images and prose cooking steps, 49
-  friendship pairs, randomised timestamps) so every dashboard view has
-  meaningful data on a fresh database.
-- **Documentation.** Authored `src/database/DATABASE.md`,
-  `src/backend/BACKEND.md`, and `src/backend/API.md`.
+- **Database design:** PostgreSQL schema from scratch (user management, RBAC, recipes, friendship, public API), UUID PKs via `uuid-ossp`.
+- **Database infrastructure:** `postgres` and `adminer` services in Docker Compose, migration auto-init from numbered SQL files, `make dbclean`.
+- **Backend ↔ database integration:** `pgx` connection pool, `models/` / `repository/` / `handlers/` layering.
+- **Recipe endpoints:** `GET /api/recipes`, `GET /api/recipes/:id` (nested author).
+- **User endpoints:** `GET /api/users`, `GET /api/users/:id`, `DELETE /api/users/:id` (last-admin guard, blacklist-before-delete).
+- **Friendship API:** `GET / POST / PATCH / DELETE /api/friendships` (pending / accepted state machine).
+- **Online presence:** `last_seen` column, `PUT /api/users/me/heartbeat`, `markOnline()` hook.
+- **Seed data:** 25 users, 25 recipes, 49 friendship pairs in `002_seed.sql`.
+- **Documentation:** `DATABASE.md`, `BACKEND.md`, `API.md`.
 - **Challenges.** Designing the `friendship` table so it could power
   directional views (who-sent-who) AND block duplicate requests in either
   direction at the database level: solved with a unique sorted-pair index
@@ -553,28 +533,16 @@ Database design and backend integration.
 
 Frontend development.
 
-- **Frontend foundation.** Set up the React + Vite app and linting, and built the
-  reusable component design system (30+ components in `components/`: buttons,
-  inputs, fields, navbar, footer, status boxes, language switcher).
-- **Recipe UI.** Recipe browsing (`RecipeCard`, `RecipeDetail`), the create and
-  edit recipe modals, and client-side image upload validation.
-- **Advanced search UI.** The search bar, the three filters (difficulty, cuisine,
-  meal type), sorting controls, and infinite scroll, with a sticky filter that
-  collapses into a sidebar on mobile.
-- **Friends UI.** The full friendship interface: add-friend modal with user
-  search, accept / deny / cancel / unfriend actions, and the
-  accepted / sent / incoming subtabs on the dashboard.
-- **Online presence UI.** Online/offline indicators wired to the heartbeat API.
-- **Admin panel.** The user-management split view, role-selection checkboxes, and
-  the edit/delete user flows.
-- **Auth and API key UI.** The Google login button, developer-role gating, and
-  the API key generation modal.
-- **Notifications.** The pop-up notification system for create/update/delete
-  actions.
-- **Internationalization.** English, Finnish, and Czech translations
-  (`locales/`).
-- **Responsive design.** Mobile layouts across the navbar, dashboard, recipe
-  detail, and admin panel.
+- **Frontend foundation:** React + Vite app, linting, 30+ reusable components in `components/`.
+- **Recipe UI:** `RecipeCard`, `RecipeDetail`, create/edit modals, image upload validation.
+- **Advanced search UI:** search bar, three filters, sort controls, infinite scroll, mobile sticky filter sidebar.
+- **Friends UI:** add-friend modal, accept / deny / cancel / unfriend, accepted / sent / incoming subtabs.
+- **Online presence UI:** indicators wired to the heartbeat.
+- **Admin panel UI:** split view, role checkboxes, edit/delete user flows.
+- **Auth and API key UI:** Google login button, developer-role gating, API key modal.
+- **Notifications:** pop-up system for create / update / delete.
+- **Internationalization:** `locales/` for English, Finnish, Czech.
+- **Responsive design:** mobile layouts across navbar, dashboard, recipe detail, admin panel.
 - **Challenges.** Keeping the design system consistent across very different
   pages (admin panel, dashboard, recipe detail, friends) while supporting
   mobile breakpoints; the navbar and several layouts were reworked
@@ -586,22 +554,12 @@ Frontend development.
 
 Backend authentication, authorization, and the public API.
 
-- **Authentication.** JWT generation and validation (`jwt.go`), the login/logout
-  handlers, the token blacklist (add / check / clean revoked tokens),
-  `GetSession`, and cookie clearing.
-- **Authorization.** The `authorization` and `middleware` packages, which load
-  each user's roles and permissions from the database, pass them through the
-  request context, and enforce role/permission checks via the `Requires`
-  middleware (including self-action checks).
-- **Public API module.** API key generation and hashing, the `validateAPIKey`
-  middleware, per-user rate limiting (1 key request per hour), and gating the
-  public routes behind the `developer` role. Authored `PUBLIC_API.md`.
-- **User updates.** The `UpdateMe` (self) and `UpdateUser` (admin) handlers with
-  field validation, password updates, and avatar handling.
-- **Advanced search (backend).** The `searchRecipes` repository query and handler
-  with the difficulty / cuisine / meal-type filters, plus the search-users-by-
-  username endpoint.
-- **Cloudinary.** The avatar upload signature handler/integration.
+- **Authentication:** `jwt.go`, login/logout handlers, token blacklist (add / check / clean), `GetSession`, cookie clearing.
+- **Authorization:** `authorization` and `middleware` packages, `Requires` middleware with self-action checks.
+- **Public API module:** API key generation + hashing, `validateAPIKey` middleware, 1-per-hour rate limit, `developer` role gate, `PUBLIC_API.md`.
+- **User updates:** `UpdateMe` and `UpdateUser` handlers with field validation, password updates, avatar handling.
+- **Advanced search (backend):** `searchRecipes` repository + handler, search-users-by-username endpoint.
+- **Cloudinary:** avatar upload signature handler.
 - **Challenges.** Reconciling cookie-based JWT auth with the new
   `X-API-Key` path so neither code path could accidentally satisfy the
   other. Designing the rate limit to be per-user rather than per-IP (since
@@ -613,22 +571,12 @@ Backend authentication, authorization, and the public API.
 
 Backend endpoints and infrastructure.
 
-- **HTTPS and reverse proxy.** The nginx reverse proxy, the certificate-generation
-  script (`cert_generator`), HTTPS-only JWT cookies, and configurable port
-  propagation from `.env` through Docker Compose.
-- **DevOps.** The `.env` validation script, and the Docker
-  Compose service dependencies.
-- **Google OAuth.** The backend OAuth 2.0 flow (`integrations/google.go`), Google
-  user creation/validation, and moving the auth endpoints under `/api/auth`.
-- **Recipe write endpoints.** `PUT /api/recipes/:id` and `DELETE /api/recipes/:id`
-  with authentication, role, and authorship checks, plus unified PostgreSQL error
-  classification.
-- **Backend testing.** Refactored the recipe handlers and repository to interfaces
-  for mock-database testing, and added table-driven tests for `GetRecipeById` and
-  `GetAllRecipes`.
-- **Documentation and code quality.** Maintained `API.md`, `DATABASE.md`, and the
-  JWT and nginx docs, and ran codebase-wide style passes (`Id` to `ID`, `Url` to
-  `URL`, request-context handling, JSON serialization).
+- **HTTPS and reverse proxy:** nginx reverse proxy, `cert_generator` script, HTTPS-only JWT cookies, configurable port propagation from `.env`.
+- **DevOps:** `.env` validation script, Docker Compose service dependencies.
+- **Google OAuth:** `integrations/google.go`, user creation/validation, auth endpoints under `/api/auth`.
+- **Recipe write endpoints:** `PUT /api/recipes/:id`, `DELETE /api/recipes/:id` (auth + role + authorship checks).
+- **Backend testing:** interface refactor for mockable DB, table-driven tests for `GetRecipeById` and `GetAllRecipes`.
+- **Documentation and code quality:** maintained `API.md`, `DATABASE.md`, JWT and nginx docs; codebase-wide style passes (`Id` to `ID`, `Url` to `URL`).
 - **Challenges.** Bootstrapping self-signed certificates across multiple
   containers and getting the browser to trust them locally for
   development; configuring nginx to route a single origin to both the Go

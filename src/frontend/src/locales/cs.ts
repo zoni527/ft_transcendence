@@ -291,8 +291,8 @@ export const csTranslations = {
     invalidName:
       'Celé jméno musí mít 2-50 znaků a může obsahovat písmena, mezery, apostrofy a pomlčky',
     invalidUsername:
-      'Uživatelské jméno musí mít 3-15 znaků a může obsahovat písmena, čísla, tečky, podtržítka a pomlčky',
-    invalidEmail: 'E-mail musí mít 1-254 znaků a být platný',
+      'Uživatelské jméno musí mít 3-30 znaků a může obsahovat písmena, čísla, tečky, podtržítka a pomlčky',
+    invalidEmail: 'E-mail musí mít 5-254 znaků a být platný',
     passwordLen: 'Heslo musí mít alespoň 8 znaků',
     passwordTooLong: 'Heslo je příliš dlouhé',
     passwordControlChars: 'Heslo obsahuje neplatné znaky',

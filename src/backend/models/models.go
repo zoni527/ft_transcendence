@@ -93,10 +93,10 @@ type SearchRecipeResponse struct {
 }
 
 type CreateUserRequest struct {
-	Email       string `json:"email"        binding:"required"`
+	Email       string `json:"email"        binding:"required,min=5,max=254"`
 	Password    string `json:"password"     binding:"required,min=8,max=20"`
 	Name        string `json:"name"         binding:"omitempty,min=2,max=50"`
-	DisplayName string `json:"display_name" binding:"required,min=3,max=15"`
+	DisplayName string `json:"display_name" binding:"required,min=3,max=30"`
 }
 
 type CreateUserParams struct {
@@ -112,10 +112,10 @@ type LoginUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	Email       *string  `json:"email,omitempty"        binding:"omitempty"`
+	Email       *string  `json:"email,omitempty"        binding:"omitempty,min=5,max=254"`
 	Name        *string  `json:"name,omitempty"         binding:"omitempty,min=2,max=50"`
 	Password    *string  `json:"password,omitempty"     binding:"omitempty,min=8,max=20"`
-	DisplayName *string  `json:"display_name,omitempty" binding:"omitempty,min=3,max=15"`
+	DisplayName *string  `json:"display_name,omitempty" binding:"omitempty,min=3,max=30"`
 	AvatarURL   *string  `json:"avatar_url,omitempty"   binding:"omitempty,url,max=255"`
 	Roles       []string `json:"roles,omitempty"        binding:"omitempty,dive,required"`
 }

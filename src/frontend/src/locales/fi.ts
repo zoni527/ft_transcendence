@@ -291,9 +291,9 @@ export const fiTranslations = {
     invalidName:
       'Koko nimen tulee olla 2-50 merkkiä pitkä ja se saa sisältää kirjaimia, välilyöntejä, heittomerkkejä ja yhdysmerkkejä',
     invalidUsername:
-      'Käyttäjänimen tulee olla 3-15 merkkiä pitkä ja se saa sisältää kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä',
+      'Käyttäjänimen tulee olla 3-30 merkkiä pitkä ja se saa sisältää kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä',
     invalidEmail:
-      'Sähköpostiosoitteen tulee olla 1-254 merkkiä pitkä ja kelvollinen',
+      'Sähköpostiosoitteen tulee olla 5-254 merkkiä pitkä ja kelvollinen',
     passwordLen: 'Salasanan tulee olla vähintään 8 merkkiä',
     passwordTooLong: 'Salasana on liian pitkä',
     passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',

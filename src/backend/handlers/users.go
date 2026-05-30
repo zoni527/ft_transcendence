@@ -611,7 +611,7 @@ func isValidDisplayName(displayName string) bool {
 	}
 
 	runeLen := len([]rune(displayName))
-	if runeLen < 3 || runeLen > 15 {
+	if runeLen < 3 || runeLen > 30 {
 		return false
 	}
 

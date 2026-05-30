@@ -291,8 +291,8 @@ export const enTranslations = {
     invalidName:
       'Full name must be 2-50 characters and may contain letters, spaces, apostrophes, and hyphens',
     invalidUsername:
-      'Username must be 3-15 characters and may contain letters, numbers, dots, underscores, and hyphens',
-    invalidEmail: 'Email must be 1-254 characters and be valid',
+      'Username must be 3-30 characters and may contain letters, numbers, dots, underscores, and hyphens',
+    invalidEmail: 'Email must be 5-254 characters and be valid',
     passwordLen: 'Password must be at least 8 characters',
     passwordTooLong: 'Password is too long',
     passwordControlChars: 'Password contains invalid characters',

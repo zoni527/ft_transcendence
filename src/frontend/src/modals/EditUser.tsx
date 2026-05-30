@@ -45,7 +45,7 @@ const editUserSchema = (t: TFunction) =>
         .string()
         .trim()
         .min(3, t('signupValidation.invalidUsername'))
-        .max(15, t('signupValidation.invalidUsername'))
+        .max(30, t('signupValidation.invalidUsername'))
         .refine((value) => usernameRegex.test(value), {
           message: t('signupValidation.invalidUsername'),
         }),
@@ -54,7 +54,7 @@ const editUserSchema = (t: TFunction) =>
         .string()
         .trim()
         .toLowerCase()
-        .min(1, t('signupValidation.invalidEmail'))
+        .min(5, t('signupValidation.invalidEmail'))
         .max(254, t('signupValidation.invalidEmail'))
         .email(t('signupValidation.invalidEmail')),
 

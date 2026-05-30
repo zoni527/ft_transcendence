@@ -90,7 +90,7 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 | `admin`       | All permissions                                                       |
 | `moderator`   | `edit_recipe`, `delete_recipe`, `moderate_content`                    |
 | `chef`        | `create_recipe`                                                       |
-| `user`        | None (browsing is implicit; `favourite`/`comment` permissions TBD)    |
+| `user`        | None (browsing is implicit)                                           |
 
 > **Note:** Users can have multiple roles. Chefs can edit their own recipes via authorship check in handler logic (no `edit_recipe` permission needed).
 
@@ -99,17 +99,11 @@ PostgreSQL doesn't generate UUIDs by default. The schema enables the `uuid-ossp`
 |---------------------------|---------------------------------------------------------------|
 | `recipe`                  | Recipe details (title, description, nutrition, etc.)          |
 
-**Engagement:**
-| Table                 | Purpose                                       |
-|-----------------------|-----------------------------------------------|
-| `recipe_favourite`    | Tracks which users favourited which recipes   |
-
 ### Key Design Decisions
 
-- **Favourite count is computed, not stored** — instead of a `has_been_favourite_times` column on recipe, we count from `recipe_favourite` with `COUNT(*)`. This prevents the count from going out of sync.
-- **CHECK constraints** — `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack/dessert) are validated at the database level.
-- **ON DELETE CASCADE** — deleting a user removes their favourites and roles. Deleting a recipe removes its favourites.
-- **ON DELETE SET NULL** — deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship). TOS should state that created recipes remain after account deletion with authorship anonymized.
+- **CHECK constraints**: `difficulty` (easy/medium/hard) and `meal_type` (breakfast/lunch/dinner/snack/dessert) are validated at the database level.
+- **ON DELETE CASCADE**: deleting a user removes their role assignments and friendships. Deleting a recipe removes its row.
+- **ON DELETE SET NULL**: deleting a user sets `recipe.author_id` to NULL (keeps the recipe, removes authorship). TOS should state that created recipes remain after account deletion with authorship anonymized.
 
 ## Accessing the Database
 

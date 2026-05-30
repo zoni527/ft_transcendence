@@ -224,7 +224,7 @@ Update a user profile. Requires authentication.
 
 ### DELETE /api/users/:id
 
-Delete a user. Requires authentication. A user may delete their own account; admins may delete any account. Cascades: removes the user's role assignments, favourites, and friendships. Recipes they authored remain with `author_id` set to NULL.
+Delete a user. Requires authentication. A user may delete their own account; admins may delete any account. Cascades: removes the user's role assignments and friendships. Recipes they authored remain with `author_id` set to NULL.
 
 On self-delete the caller's JWT is added to the token blacklist and the auth cookie is cleared in the response.
 
@@ -624,7 +624,7 @@ Update a recipe.
 
 ### DELETE /api/recipes/:id
 
-Delete a recipe. Cascades: removes its favourites.
+Delete a recipe.
 
 **Authentication:** `middleware.Authentication()`
 
@@ -640,67 +640,6 @@ Delete a recipe. Cascades: removes its favourites.
 | 401       | Unauthorized — missing or invalid JWT           |
 | 403       | Forbidden — not the author and lacks permission |
 | 404       | Recipe not found                                |
-
----
-
-## Favourites
-
-### POST /api/recipes/:id/favourite
-
-Favourite a recipe for the current user.
-
-**Request body:**
-```json
-{
-  "user_id": "uuid"
-}
-```
-
-**Response** `201 Created`
-```json
-{
-  "message": "recipe favourited"
-}
-```
-
-**Errors:**
-| Status    | When                  |
-|-----------|-----------------------|
-| 400       | Already favourited    |
-| 404       | Recipe not found      |
-
----
-
-### DELETE /api/recipes/:id/favourite
-
-Unfavourite a recipe.
-
-**Request body:**
-```json
-{
-  "user_id": "uuid"
-}
-```
-
-**Response** `200 OK`
-```json
-{
-  "message": "favourite removed"
-}
-```
-
-**Errors:**
-| Status    | When                          |
-|-----------|-------------------------------|
-| 404       | Recipe or favourite not found |
-
----
-
-### GET /api/users/:id/favourites
-
-Get all recipes a user has favourited.
-
-**Response** `200 OK` — returns an array of recipe objects (same format as GET /api/recipes).
 
 ---
 

@@ -37,7 +37,7 @@ Four roles, seeded in [002_seed.sql](../database/migrations/002_seed.sql).
 
 | Role          | Description                                                               |
 |---------------|---------------------------------------------------------------------------|
-| `user`        | Default. Browse and favourite. Every signed-up user gets this.            |
+| `user`        | Default. Browse recipes. Every signed-up user gets this.                  |
 | `chef`        | Can create recipes.                                                       |
 | `moderator`   | Can edit and delete any recipe. Reviews user content.                     |
 | `admin`       | Everything. Manages users, roles, and site settings.                      |
@@ -222,7 +222,7 @@ panel to populate a "grant role" dropdown.
 **Response** `200 OK`
 ```json
 [
-  { "name": "user",      "description": "Default. Browse and favourite." },
+  { "name": "user",      "description": "Default. Browse recipes." },
   { "name": "chef",      "description": "Can create recipes." },
   { "name": "moderator", "description": "Review and moderate content." },
   { "name": "admin",     "description": "Full access." }

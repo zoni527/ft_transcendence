@@ -280,7 +280,7 @@ the rationale behind UUIDs, constraint details, and the local dev workflow
 ## Modules
 
 The ft_transcendence subject requires a minimum of 14 points (Major = 2pts,
-Minor = 1pt). We claim **15 points** across four categories. For each
+Minor = 1pt). We claim **14 points** across three categories. For each
 module we record the justification, how it was implemented, and who worked
 on it.
 
@@ -381,19 +381,7 @@ on it.
     Chrome-only APIs are used.
   - _Worked on by:_ team.
 
-### Data and Analytics (1 point)
-
-- **Minor, 1pt: GDPR compliance.**
-  - _Justification:_ Users can delete their account, and recipe
-    authorship is detached on deletion so a user's content can be removed
-    without breaking other users' experience.
-  - _Implementation:_ `DELETE /api/users/:id` cascades through joins
-    (`user_role`, `friendship`, `recipe_favourite`, `api_keys`) while
-    `recipe.author_id` is set to `NULL`. A last-admin guard prevents the
-    system from being left with no admin.
-  - _Worked on by:_ Lily.
-
-**Total: 15 points (14 required, 1 buffer).**
+**Total: 14 points (14 required, no buffer).**
 
 ## Individual Contributions
 

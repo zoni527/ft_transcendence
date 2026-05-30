@@ -120,7 +120,21 @@ for the seeded usernames and the test password.
 
 ### AI Use
 
-AI was used for code review on GitHub, debugging, planning of features, pointing to resources...
+The team used GitHub Copilot's PR review bot and Claude (chat and Claude
+Code) at these specific points:
+
+- **Code review on pull requests.** Copilot's PR review surfaced style,
+  edge-case, and naming suggestions on most backend and frontend PRs;
+  authors accepted or rejected each suggestion before merging.
+- **Drafting documentation.** Claude generated first drafts of `API.md`,
+  `DATABASE.md`, `PUBLIC_API.md`, this README, and inline comments. Every
+  generated paragraph was reviewed and edited by hand before commit; no
+  AI-generated text was committed without a human author's understanding
+  of it.
+
+AI was not used to write feature code unattended: any AI-suggested code
+was reviewed and modified by the author before landing in `main`, and
+every team member can explain the code they shipped.
 
 ## Team Information
 
@@ -142,8 +156,33 @@ AI was used for code review on GitHub, debugging, planning of features, pointing
 
 ## Project Management
 
-Regular team meetings, communication through Discord, documentation in Google Docs, GitHub issues,
-GitHub Project for Kanban board
+### How we organized work
+
+Modules were split by domain (frontend, backend authentication, database
+plus backend integration, infrastructure) so each person owned a coherent
+slice that could move forward without blocking others. Cross-cutting
+features like advanced search and friendship were broken into a backend
+ticket and a frontend ticket so the two halves could land independently.
+
+### Cadence and communication
+
+- **Bi-weekly team meetings** to sync on progress, demo what landed,
+  agree on the next slice of work, and unblock anyone stuck.
+- **Discord** for daily chat, screen shares, and async questions between
+  meetings.
+
+### Pull request process
+
+All changes landed on `main` through pull requests. **At least one
+teammate had to approve a PR before it could merge.** Copilot's PR review
+bot was also enabled and its suggestions were considered (accepted or
+explicitly dismissed) before merge.
+
+### Tools
+
+- **GitHub Issues** for feature and bug tickets.
+- **GitHub Projects** for the Kanban board tracking ticket status.
+- **Google Docs** for design notes, API spec drafts, and meeting notes.
 
 ## Technical Stack
 
@@ -398,7 +437,7 @@ on it.
     Chrome-only APIs are used.
   - _Worked on by:_ team.
 
-**Total: 14 points (14 required, no buffer).**
+**Total: 14 points.**
 
 ## Individual Contributions
 

@@ -130,42 +130,66 @@ every team member can explain the code they shipped.
 
 ## Team Information
 
+Roles below reflect primary ownership, with explicit shared ownership
+where two people genuinely drove the same area together. All product and
+process decisions were discussed across the team; the named person (or
+pair) drove and was accountable.
+
 ### bgazur
 
 - **Assigned roles:** Product Owner, Developer
-- **Responsibilities:** owned the user-facing product surface (React + Vite
-  app, design system, page layouts, mobile responsiveness) and drove the
-  user-experience decisions on every flow (recipe browsing and creation,
-  friends, admin panel, notifications, API key modal). As PO, validated
-  that completed features matched what users would actually expect.
+- **Responsibilities:** owned the user-facing product surface (React +
+  Vite app, design system, every page layout, mobile responsiveness) and
+  drove user-experience decisions on every flow (recipe browsing and
+  creation, friends, admin panel, notifications, API key modal). As PO,
+  validated that completed features matched what users would actually
+  expect, made the call on UX trade-offs, and prioritized which frontend
+  slices landed first. Highest commit count on the team (310).
 
 ### lsurco-t
 
-- **Assigned roles:** Quality Assurance, Developer
-- **Responsibilities:** backend authentication (JWT and token blacklist),
-  the `authorization` and `middleware` packages, the public API module
-  (key issuance, hashing, rate limiting), user-update handlers, recipe
-  search backend, and the Cloudinary avatar signing handler.
+- **Assigned roles:** Security Lead, Developer
+- **Responsibilities:** owned the auth and security surface end-to-end:
+  JWT generation and validation (`jwt.go`), the token blacklist for real
+  logout and revocation, the `authorization` and `middleware` packages,
+  role and permission enforcement via the `Requires` middleware, the
+  public API module (key issuance, SHA-256 hashing, per-user rate
+  limiting), the Cloudinary signature handler, and input validation
+  across the user-update handlers. Also built the advanced recipe search
+  backend. Roughly 42% of his commits (92 of 221) are explicitly on the
+  security and auth axis.
 
 ### hiennguy
 
-- **Assigned roles:** Designer, Developer
-- **Responsibilities:** PostgreSQL schema design and the backend ↔
-  database integration layer (`pgx` pool and the
-  `models` / `repository` / `handlers` split), recipe and user/friendship
-  read endpoints, online presence, account deletion, seed data, and the
-  database documentation. As PM, coordinated the README finalization,
-  tracked the Kanban board, and ran the bi-weekly sync meetings.
+- **Assigned roles:** Technical Lead (shared with jvarila), Project Manager (shared with jvarila), Developer
+- **Responsibilities:** researched the stack choices, designed the
+  PostgreSQL schema from scratch, and established the backend
+  architecture (`pgx` connection pool, the
+  `models` / `repository` / `handlers` layering that the rest of the
+  backend follows, foreign-key and cascade decisions including the
+  `author_id ON DELETE SET NULL` choice). Built the recipe and
+  user/friendship read endpoints, online presence (`last_seen` plus
+  heartbeat), account deletion with the last-admin guard, the seed data,
+  and the database documentation. As shared Tech Lead, owns database
+  architecture and backend structural decisions. As shared PM,
+  coordinated the README finalization, drove module selection and
+  ordering, and planned the schema-first sequence that unblocked
+  frontend work.
 
 ### jvarila
 
-- **Assigned roles:** Technical Lead, Developer
-- **Responsibilities:** HTTPS infrastructure (nginx reverse proxy +
-  certificate generation), Docker Compose wiring, the env validation
-  script, Google OAuth backend, recipe write endpoints, backend tests, and
-  ongoing documentation upkeep. As Tech Lead, set the architectural
-  conventions (layered backend, JWT-cookie auth, no ORM) and ran the
-  codebase-wide style passes.
+- **Assigned roles:** Technical Lead (shared with hiennguy), Project Manager (shared with hiennguy), Developer
+- **Responsibilities:** built the HTTPS infrastructure (nginx reverse
+  proxy and the certificate-generation script), Docker Compose wiring
+  (configurable port propagation from `.env`), the env-validation
+  script, the Google OAuth backend (`integrations/google.go`), recipe
+  write endpoints (`PUT` and `DELETE /api/recipes/:id`), the backend
+  test scaffolding (interface refactor for a mockable DB plus
+  table-driven tests), and ongoing documentation upkeep. As shared Tech
+  Lead, owns infrastructure architecture (HTTPS, reverse proxy, Docker,
+  CI conventions) and ran codebase-wide style passes (`Id` to `ID`,
+  `Url` to `URL`). As shared PM, hosts the GitHub repo (`zoni527`),
+  manages the Kanban board, and merged the majority of cross-team PRs.
 
 ## Project Management
 

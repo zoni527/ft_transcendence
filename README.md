@@ -332,6 +332,7 @@ the rationale behind UUIDs, constraint details, and the local dev workflow
 - **Admin panel** (Lucio: backend, Boris: UI): user management UI for assigning roles and reviewing accounts
 - **Notification system** (Boris): pop-ups appear for events triggered
 - **Privacy Policy and Terms of Service** (Boris): dedicated pages linked from the footer, with content tailored to the app
+- **Multi-user support** (team): multiple users can sign in and use the app concurrently. JWT cookies isolate sessions per user, all writes are scoped to the acting user via the auth context, the friendship and heartbeat systems give cross-user visibility (online presence, incoming requests) in near real time, and PostgreSQL constraints prevent race conditions on shared writes.
 
 ## Modules
 

@@ -6,6 +6,7 @@ BASE_URL="${BASE_URL:-https://localhost:8443}"
 LOGIN_EMAIL="${LOGIN_EMAIL:-eve@test.com}"
 LOGIN_PASSWORD="${LOGIN_PASSWORD:-12345678}"
 API_KEY_FILE="${PUBLIC_API_KEY_FILE:-$HOME/.cache/ft_transcendence/public_api_key.txt}"
+CA_CERT="${CA_CERT:-$(pwd)/certs/ca.crt}"
 
 COOKIE_JAR="$(mktemp)"
 WORK_DIR="$(mktemp -d)"
@@ -20,7 +21,8 @@ request() {
   local output_file="$1"
   shift
   sleep "${PUBLIC_API_PAUSE_SECONDS:-1}"
-  curl -sk -o "$output_file" -w '%{http_code}' "$@"
+  local curl_args=( -sS --cacert "$CA_CERT" -o "$output_file" -w '%{http_code}' )
+  curl "${curl_args[@]}" "$@"
 }
 
 assert_status() {

@@ -13,6 +13,14 @@ that uses a RESTful API and consists of multiple docker containers, practice pro
 team work, and improve our Git workflows. At the same time we set out to learn React and Go, as well
 as getting familiar with SQL using PostgreSQL as our database.
 
+### Key features
+
+Rise is a recipe-sharing platform with email and Google sign-in, role-based
+permissions, recipe browsing with filters and infinite scroll, a friendship
+system with online presence, multilingual UI (English, Finnish, Czech), an
+admin panel, and a documented public API gated by per-user keys. See the
+[Features List](#features-list) for the full breakdown.
+
 ## Instructions
 
 ### Prerequisites
@@ -427,6 +435,12 @@ Database design and backend integration.
   meaningful data on a fresh database.
 - **Documentation.** Authored `src/database/DATABASE.md`,
   `src/backend/BACKEND.md`, and `src/backend/API.md`.
+- **Challenges.** Designing the `friendship` table so it could power
+  directional views (who-sent-who) AND block duplicate requests in either
+  direction at the database level: solved with a unique sorted-pair index
+  on top of the composite primary key. Also: wiring the migration
+  auto-init through Docker Compose so `make`, `make dbclean`, and
+  first-boot on a fresh volume all behave the same way.
 
 ### bgazur
 
@@ -454,6 +468,12 @@ Frontend development.
   (`locales/`).
 - **Responsive design.** Mobile layouts across the navbar, dashboard, recipe
   detail, and admin panel.
+- **Challenges.** Keeping the design system consistent across very different
+  pages (admin panel, dashboard, recipe detail, friends) while supporting
+  mobile breakpoints; the navbar and several layouts were reworked
+  mid-project. Also: managing the Friends page state across the
+  accepted / sent / incoming subtabs without prop-drilling, and reconciling
+  the heartbeat-driven online indicators with the friend list cache.
 
 ### lsurco-t
 
@@ -475,6 +495,12 @@ Backend authentication, authorization, and the public API.
   with the difficulty / cuisine / meal-type filters, plus the search-users-by-
   username endpoint.
 - **Cloudinary.** The avatar upload signature handler/integration.
+- **Challenges.** Reconciling cookie-based JWT auth with the new
+  `X-API-Key` path so neither code path could accidentally satisfy the
+  other. Designing the rate limit to be per-user rather than per-IP (since
+  the API key identifies the user), and storing the key so a database
+  leak does not expose live secrets: solution is to keep only the SHA-256
+  hash and let the user regenerate if lost.
 
 ### jvarila
 
@@ -496,3 +522,9 @@ Backend endpoints and infrastructure.
 - **Documentation and code quality.** Maintained `API.md`, `DATABASE.md`, and the
   JWT and nginx docs, and ran codebase-wide style passes (`Id` to `ID`, `Url` to
   `URL`, request-context handling, JSON serialization).
+- **Challenges.** Bootstrapping self-signed certificates across multiple
+  containers and getting the browser to trust them locally for
+  development; configuring nginx to route a single origin to both the Go
+  backend and the React dev server. Also: making the env-validation
+  script catch missing variables before the stack starts up, so we fail
+  fast with a clear message instead of a cryptic container crash.

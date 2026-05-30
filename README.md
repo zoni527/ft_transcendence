@@ -81,6 +81,95 @@ GitHub Project for Kanban board
 - Reverse proxy: nginx
 - Containerization: Docker Compose
 
+## Why these choices
+
+### Tech stack
+
+- **React + Vite (frontend).** React gave us a component model the whole team
+  could share, and Vite's hot reload and ES module dev server were much faster
+  to iterate against than Webpack or CRA.
+  _Trade-off:_ a single-page app means client-side routing only, no SSR, and no
+  meaningful SEO. We accepted this because the app is gated behind login for
+  most actions anyway.
+- **Go + Gin (backend).** Go for the learning goal (the subject encourages new
+  languages) and for the single static binary in the container. Gin stays close
+  to `net/http` without pulling in a heavy framework or dependency injection we
+  did not need.
+  _Trade-off:_ Gin is deliberately minimal, so we wrote our own middleware,
+  validation, and authorization plumbing instead of getting it for free from a
+  batteries-included framework like Django or Rails.
+- **PostgreSQL with `pgx` and no ORM.** Postgres for first-class UUIDs,
+  constraints, and indexes. We picked the `pgx` driver directly rather than an
+  ORM because one of our explicit goals was to actually learn SQL; an ORM would
+  have hidden exactly the joins, constraints, and migrations we wanted to
+  practice.
+  _Trade-off:_ every repository function maps rows to structs by hand, which is
+  more boilerplate per endpoint and one more place a bug can land. We also do
+  not get automatic migrations: schema changes are numbered SQL files we have
+  to write and apply ourselves.
+- **nginx reverse proxy.** Centralises HTTPS termination and serves frontend and
+  backend behind a single origin, which removes a whole class of CORS issues and
+  satisfies the subject's HTTPS-everywhere requirement.
+  _Trade-off:_ one more container to keep alive, plus the certificate-generation
+  script and templated config that comes with it. Debugging a failing request
+  now means checking nginx as well as the backend.
+- **Docker Compose.** The subject requires the project to start with one
+  command, so Compose orchestrates frontend, backend, Postgres, Adminer, the
+  reverse proxy, and the certificate generator together.
+  _Trade-off:_ Compose is a dev/single-host tool, not real production
+  orchestration: no autoscaling, no rolling deploys, no health-driven
+  rescheduling. Fine for a school project, not something we would ship as-is.
+- **Cloudinary for images.** Image upload, resizing, and CDN delivery were not
+  the part of the project we wanted to build from scratch, and Cloudinary's
+  signed-upload flow lets the browser upload directly without proxying bytes
+  through our backend.
+  _Trade-off:_ we depend on an external service with its own free-tier limits
+  and vendor lock-in on the image URLs. If Cloudinary is down or the account is
+  exhausted, image uploads stop working.
+
+### Design decisions
+
+- **UUID primary keys.** IDs are exposed in URLs and in the public API, so
+  sequential integers would have leaked record counts and made enumeration
+  trivial. UUIDs via the `uuid-ossp` extension fix both.
+  _Trade-off:_ UUIDs are 16 bytes instead of 4 or 8, indexes are bigger, and the
+  values are not human-friendly when reading logs or the Adminer UI.
+- **Layered backend (`handlers` / `repository` / `models`).** Handlers only
+  validate input and serialise JSON, the repository owns all SQL, and models
+  are the shared structs. This separation is what made it possible to swap the
+  repository for a mock in the backend tests.
+  _Trade-off:_ even a one-line query requires a handler function, a repository
+  function, and a model. There is more indirection per endpoint than a flatter
+  design would have.
+- **JWT in HttpOnly cookies + token blacklist.** Cookies keep the token out of
+  reach of any XSS, and the server-side blacklist gives us real
+  logout/revocation instead of waiting for tokens to expire naturally.
+  _Trade-off:_ the blacklist requires a database lookup on every authenticated
+  request, which gives up most of the "stateless JWT" performance argument. We
+  also have to handle CSRF because we authenticate with cookies.
+- **Friendship as directed rows with a unique pair index.** One `friendship`
+  table with `pending` / `accepted` status was simpler than splitting requests
+  and friendships into two tables, and the unique pair index makes "a request
+  already exists in the other direction" impossible at the database level
+  rather than something the application has to check.
+  _Trade-off:_ every read that asks "is X friends with Y" has to check both
+  `(X, Y)` and `(Y, X)`, which makes the queries a bit uglier than a
+  symmetric design would.
+- **Recipe author set to `NULL` on user delete.** When a user deletes their
+  account we keep the recipes (they have value to other users) but detach
+  authorship, which is both the GDPR-friendly choice and what makes account
+  deletion safe to allow at all.
+  _Trade-off:_ orphaned recipes lose attribution and a moderation contact
+  point, and any per-user statistics (e.g. recipes-per-chef) become inaccurate
+  once the account is gone.
+- **Per-user API keys, hashed, behind a `developer` role.** Storing the hash
+  (not the key) means a database leak does not compromise live keys, and gating
+  the public API behind an opt-in role keeps regular users from accidentally
+  generating credentials they would not use.
+  _Trade-off:_ because we only store the hash, a lost key cannot be recovered,
+  only regenerated. The rate limit is also per user rather than per integration,
+  so a developer running two clients shares one bucket.
+
 ## Database Schema
 
 PostgreSQL with UUID primary keys. The schema is initialised on first container startup from numbered SQL migration files in

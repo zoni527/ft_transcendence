@@ -156,43 +156,48 @@ GitHub Project for Kanban board
   _Trade-off:_ a single-page app means client-side routing only, no SSR, and no
   meaningful SEO. We accepted this because the app is gated behind login for
   most actions anyway.
+
 - **Go + Gin (backend).** Go for the learning goal (the subject encourages new
   languages) and for the single static binary in the container. Gin stays close
   to `net/http` without pulling in a heavy framework or dependency injection we
   did not need.
-  
+
   _Trade-off:_ Gin is deliberately minimal, so we wrote our own middleware,
   validation, and authorization plumbing instead of getting it for free from a
   batteries-included framework like Django or Rails.
+
 - **PostgreSQL with `pgx` and no ORM.** Postgres for first-class UUIDs,
   constraints, and indexes. We picked the `pgx` driver directly rather than an
   ORM because one of our explicit goals was to actually learn SQL; an ORM would
   have hidden exactly the joins, constraints, and migrations we wanted to
   practice.
-  
+
   _Trade-off:_ every repository function maps rows to structs by hand, which is
   more boilerplate per endpoint and one more place a bug can land. We also do
   not get automatic migrations: schema changes are numbered SQL files we have
   to write and apply ourselves.
+
 - **nginx reverse proxy.** Centralises HTTPS termination and serves frontend and
   backend behind a single origin, which removes a whole class of CORS issues and
   satisfies the subject's HTTPS-everywhere requirement.
-  
+
   _Trade-off:_ one more container to keep alive, plus the certificate-generation
   script and templated config that comes with it. Debugging a failing request
   now means checking nginx as well as the backend.
+
 - **Docker Compose.** The subject requires the project to start with one
   command, so Compose orchestrates frontend, backend, Postgres, Adminer, the
   reverse proxy, and the certificate generator together.
-  
+
   _Trade-off:_ Compose is a dev/single-host tool, not real production
   orchestration: no autoscaling, no rolling deploys, no health-driven
   rescheduling. Fine for a school project, not something we would ship as-is.
+
 - **Cloudinary for images.** Image upload, resizing, and CDN delivery were not
   the part of the project we wanted to build from scratch, and Cloudinary's
   signed-upload flow lets the browser upload directly without proxying bytes
   through our backend.
-  
+
   _Trade-off:_ we depend on an external service with its own free-tier limits
   and vendor lock-in on the image URLs. If Cloudinary is down or the account is
   exhausted, image uploads stop working.
@@ -247,21 +252,25 @@ PostgreSQL with UUID primary keys. The schema is initialised on first container 
 
 ### Tables
 
-| Table              | Purpose                                                                                                                           |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| `user`             | User accounts: email, password hash, display name, avatar, `last_seen` timestamp for online status                                |
-| `role`             | Role definitions: `admin`, `moderator`, `chef`, `developer`, `user`                                                               |
-| `permission`       | Permission definitions: `create_recipe`, `edit_recipe`, `delete_recipe`, `manage_users`, `manage_roles`, `moderate_content`       |
-| `user_role`        | Many-to-many link between users and roles                                                                                         |
-| `role_permission`  | Many-to-many link between roles and permissions                                                                                   |
-| `token_blacklist`  | Hashes of revoked JWTs, retained until natural expiry                                                                             |
-| `api_keys`         | One hashed API key per user for the public API module                                                                             |
-| `recipe`           | Recipe content, nutrition, image URL, and author (set to `NULL` if the author deletes their account)                              |
-| `friendship`       | Directed friend requests with status `pending` or `accepted`, with a unique pair index that blocks duplicates in either direction |
+| Table             | Purpose                                                                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `user`            | User accounts: email, password hash, display name, avatar, `last_seen` timestamp for online status                                |
+| `role`            | Role definitions: `admin`, `moderator`, `chef`, `developer`, `user`                                                               |
+| `permission`      | Permission definitions: `create_recipe`, `edit_recipe`, `delete_recipe`, `manage_users`, `manage_roles`, `moderate_content`       |
+| `user_role`       | Many-to-many link between users and roles                                                                                         |
+| `role_permission` | Many-to-many link between roles and permissions                                                                                   |
+| `token_blacklist` | Hashes of revoked JWTs, retained until natural expiry                                                                             |
+| `api_keys`        | One hashed API key per user for the public API module                                                                             |
+| `recipe`          | Recipe content, nutrition, image URL, and author (set to `NULL` if the author deletes their account)                              |
+| `friendship`      | Directed friend requests with status `pending` or `accepted`, with a unique pair index that blocks duplicates in either direction |
 
 See [src/database/DATABASE.md](src/database/DATABASE.md) for design decisions,
 the rationale behind UUIDs, constraint details, and the local dev workflow
 (`make`, `make dbclean`, Adminer on port `8081`).
+
+### Diagram
+
+![Database schema diagram](/docs/db_schema.png)
 
 ## Features List
 

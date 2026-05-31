@@ -59,8 +59,7 @@ export const enTranslations = {
     email: 'E-mail',
     roles: 'Roles',
     dev: 'API key',
-    devWarning:
-      'Warning: Only 1 key can be generated per 1 hour, save this generated key!',
+    devWarning: 'Save this generated key!',
     generate: 'Generate',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',

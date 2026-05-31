@@ -59,8 +59,7 @@ export const fiTranslations = {
     email: 'Sähköposti',
     roles: 'Roolit',
     dev: 'API-avain',
-    devWarning:
-      'Varoitus: Voit luoda vain 1:n avaimen tunnissa. Tallenna tämä avain!',
+    devWarning: 'Tallenna tämä avain!',
     generate: 'Luo',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',

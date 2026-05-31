@@ -59,8 +59,7 @@ export const csTranslations = {
     email: 'E-mail',
     roles: 'Role',
     dev: 'API klíč',
-    devWarning:
-      'Upozornění: Lze vygenerovat pouze 1 klíč za hodinu. Uložte si tento klíč!',
+    devWarning: 'Uložte si tento klíč!',
     generate: 'Generovat',
     createRecipe: 'Vytvořit recept',
     editUser: 'Upravit profil',

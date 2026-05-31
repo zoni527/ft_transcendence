@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"time"
 )
 
 func SaveAPIKey(ctx context.Context, userID, rawSecret string) error {
@@ -34,14 +33,4 @@ func GetAPIKeyHash(ctx context.Context, userID string) (string, error) {
 		return "", fmt.Errorf("GetAPIKeyHash: %w", err)
 	}
 	return hash, nil
-}
-
-func GetAPIKeyCreatedAt(ctx context.Context, userID string) (time.Time, error) {
-	sql := `SELECT created_at FROM api_keys WHERE user_id = $1`
-	var createdAt time.Time
-	err := Pool.QueryRow(ctx, sql, userID).Scan(&createdAt)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("GetAPIKeyCreatedAt: %w", err)
-	}
-	return createdAt, nil
 }

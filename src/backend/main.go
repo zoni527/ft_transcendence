@@ -85,7 +85,6 @@ func main() {
 	router.POST("/api/users/apikey",
 		middleware.Authentication(),
 		middleware.RequireRoles(authorization.RoleDeveloper),
-		middleware.RateLimiter(middleware.APIKeyRateLimit, middleware.ByUserID, 1),
 		handlers.GenerateAPIKey)
 
 	router.PUT("/api/users/me/heartbeat", // Heartbeat - update server state

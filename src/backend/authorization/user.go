@@ -18,16 +18,6 @@ func CanManageRoles(roleSet, permSet map[string]bool, userID, targetUserID strin
 	return true
 }
 
-/*----------- These functions are not used yet, to be implement with advanced permissions/GDPR----------*/
-
-func CanManageUsers(roleSet, permSet map[string]bool, userID string) bool {
-	return HasPermission(roleSet, permSet, PermManageUsers)
-}
-
-func CanModerateContent(roleSet, permSet map[string]bool, userID string) bool {
-	return HasPermission(roleSet, permSet, PermModerateContent)
-}
-
 func CanDeleteUser(roleSet map[string]bool, userID, targetUserID string) bool {
 	if userID == targetUserID {
 		return true

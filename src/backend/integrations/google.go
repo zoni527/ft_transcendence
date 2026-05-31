@@ -12,10 +12,6 @@ var GoogleOAuthConfig *oauth2.Config
 const GoogleOAuthLockedPassword = "OAUTH_LOCKED_GOOGLE"
 
 func InitGoogleOAuth() {
-	nginxPort := os.Getenv("NGINX_PORT_EXTERNAL")
-	if nginxPort == "" {
-		nginxPort = "8443"
-	}
 	GoogleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),

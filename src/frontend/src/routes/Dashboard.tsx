@@ -511,9 +511,15 @@ const Dashboard = () => {
                     value={userData.name}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.name')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.name')}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between border-b border-gray-300 pb-4">
@@ -523,9 +529,15 @@ const Dashboard = () => {
                     value={userData.display_name}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.username')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.username')}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between border-b border-gray-300 pb-4">
@@ -535,9 +547,15 @@ const Dashboard = () => {
                     value={userData.email}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.email')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.email')}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between border-b border-gray-300 pb-4">
@@ -547,9 +565,15 @@ const Dashboard = () => {
                     value={userData.roles.join(', ')}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.roles')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.roles')}
+                  </div>
+                </div>
               </div>
 
               {hasRole(['developer']) && isSelf && (

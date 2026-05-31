@@ -6,7 +6,15 @@ _This project has been created as part of the 42 curriculum by bgazur, lsurco-t,
 
 **Rise**: a recipe sharing platform, built as our full-stack web dev project at 42.
 
-### Key features
+### Goals
+
+Our goal for the transcendence project was to learn how to design a proper full
+stack web application that uses a RESTful API, and consists of multiple docker
+containers, practice project management, team work, and improve our Git
+workflows. At the same time we set out to learn React and Go, as well as getting
+more familiar with SQL, using PostgreSQL as our database.
+
+### Overview & key features
 
 Rise is a recipe-sharing platform with email and Google sign-in, role-based
 permissions, recipe browsing with filters and infinite scroll, a friendship
@@ -21,8 +29,8 @@ admin panel, and a documented public API gated by per-user keys. See the
 - Docker (developed using 26.1.4)
 - Docker Compose (developed using v2.27.1)
 - [Cloudinary for image hosting](https://cloudinary.com/)
-- JWT secret
 - Git
+- GNU Make
 
 ### Steps
 
@@ -38,7 +46,11 @@ git clone https://github.com/zoni527/ft_transcendence.git && cd ./ft_transcenden
 cp ./src/.env.example ./src/.env
 ```
 
-3. run `make` in the root folder of the repository
+In order to use image hosting one has to setup [Cloudinary](https://cloudinary.com/),
+and for Google login a [Google Console OAuth 2.0 Client](https://developers.google.com/identity/protocols/oauth2)
+registered to the application.
+
+3. run `make` in the root folder of the repository (`make help` for list of commands)
 4. Open [https://localhost:8443] on a web browser (replace port if customized)
 
 ## Usage
@@ -48,8 +60,7 @@ are:
 
 ### Account
 
-- **Sign up** with an email and a password, or click **Continue with Google**
-  to sign in with OAuth.
+- **Sign up** with an email and a password, or through Google OAuth.
 - From the navbar, open your **profile** to edit your display name, change
   your password, upload a new avatar, or delete the account. Deleting an
   account keeps your published recipes but detaches them from your name.
@@ -61,20 +72,21 @@ are:
   by difficulty, cuisine, and meal type, and the **sort controls** to reorder.
   The list pages itself with **infinite scroll**.
 - Click any card to open the **recipe detail** view.
-- Click **Create recipe** to add your own. The form takes a title, description,
+- Click **Create recipe** from the Profile view to add your own (requires
+  chef role). The form takes a recipe name, preparation steps,
   image (JPG/PNG, validated client-side and uploaded directly to Cloudinary),
-  prep and cook times, servings, nutrition, ingredients, and steps.
+  preparation time, servings, difficulty, cuisine and meal type, and nutrition information.
 - On a recipe you own, **Edit** and **Delete** buttons appear in the detail
   view.
 
 ### Friends
 
-- Open **Friends** in the navbar.
+- Open **Friends** in the Profile view.
 - Click **Add friend** and search for other users by username.
-- Pending requests show up under the **Sent** and **Incoming** subtabs.
-  Accept, deny, cancel, or unfriend from each row.
-- Accepted friends display an online/offline indicator, kept fresh by the
-  heartbeat.
+- Pending requests show up under the **Sent** and **Requests** subtabs.
+  Accept, Reject, Cancel, or Remove based on friendship state.
+- Accepted friends display an online/offline indicator, kept updated by the
+  heartbeat endpoint call.
 
 ### Language
 
@@ -88,11 +100,10 @@ are:
 
 ### Public API (developer role)
 
-- A user with the **developer** role can open the **API key** modal from the
-  navbar.
+- A user with the **developer** role can create a personal API key from their
+  profile.
 - Click **Generate** to create a new key. The key is shown once and is then
-  stored only as a hash, so it cannot be retrieved later. Generation is rate
-  limited to one new key per user per hour.
+  stored only as a hash, so it cannot be retrieved later.
 - Send the key as the `X-API-Key` header on any `/api/v1/*` route. See
   [src/backend/PUBLIC_API.md](src/backend/PUBLIC_API.md) for the full
   endpoint list.
@@ -110,10 +121,12 @@ for the seeded usernames and the test password.
 - [Golang links](docs/go_links.md)
 - [nginx links](docs/nginx_links.md)
 - [JWT and cookies](docs/jwt_and_cookies.md)
+- [Google Console OAuth 2.0 Client](https://developers.google.com/identity/protocols/oauth2)
+- [Cloudinary](https://cloudinary.com/)
 
 ### AI Use
 
-The team used GitHub Copilot's PR review bot and Claude (chat and Claude
+The team used GitHub Copilot's PR review bot, Google Gemini, ChatGPT, and Claude (chat and Claude
 Code) at these specific points:
 
 - **Code review on pull requests.** Copilot's PR review surfaced style,
@@ -124,6 +137,8 @@ Code) at these specific points:
   generated paragraph was reviewed and edited by hand before commit; no
   AI-generated text was committed without a human author's understanding
   of it.
+- Troubleshooting, finding bugs, searching for resources and documentation.
+- Test generation based on a pre-established structure, reviewed by humans.
 
 AI was not used to write feature code unattended: any AI-suggested code
 was reviewed and modified by the author before landing in `main`, and
@@ -210,16 +225,17 @@ ticket and a frontend ticket so the two halves could land independently.
 
 ### Pull request process
 
-All changes landed on `main` through pull requests. **At least one
-teammate had to approve a PR before it could merge.** Copilot's PR review
-bot was also enabled and its suggestions were considered (accepted or
-explicitly dismissed) before merge.
+All changes landed in `main` through pull requests. At least two
+teammates had to approve a PR before it could be merged. Copilot's PR review
+bot was also utilized and its suggestions were considered (accepted or
+explicitly dismissed) before merging.
 
 ### Tools
 
 - **GitHub Issues** for feature and bug tickets.
 - **GitHub Projects** for the Kanban board tracking ticket status.
 - **Google Docs** for design notes, API spec drafts, and meeting notes.
+- **Discord** for communication.
 
 ## Technical Stack
 
@@ -229,7 +245,7 @@ explicitly dismissed) before merge.
 - Reverse proxy: nginx
 - Containerization: Docker Compose
 
-## Why these choices
+## Justifications
 
 ### Tech stack
 
@@ -326,8 +342,7 @@ explicitly dismissed) before merge.
   the public API behind an opt-in role keeps regular users from accidentally
   generating credentials they would not use.
   _Trade-off:_ because we only store the hash, a lost key cannot be recovered,
-  only regenerated. The rate limit is also per user rather than per integration,
-  so a developer running two clients shares one bucket.
+  only regenerated.
 
 ## Database Schema
 
@@ -367,7 +382,7 @@ What the application lets a user do, and who built each part:
   cuisine, meal type), sort controls, and infinite scroll.
   _Built by:_ Lily (read endpoints), Lucio (search backend), Boris (UI).
 - **Create, edit, and delete recipes** with a photo, ingredients, steps,
-  prep and cook times, and nutrition info.
+  preparation time, and nutrition info.
   _Built by:_ Lily (read endpoints), Johnny (write endpoints), Boris (UI and
   image upload).
 - **Manage your account**: edit your display name, change your password,

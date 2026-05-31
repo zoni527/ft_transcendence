@@ -217,7 +217,7 @@ export const enTranslations = {
     password: 'Password',
     passwordPlace: 'Enter your password',
     submit: 'Continue',
-    google: 'Login with Google',
+    google: 'Continue with Google',
     or: 'OR',
   },
   signup: {

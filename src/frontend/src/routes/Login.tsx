@@ -9,7 +9,11 @@ import SubmitButton from '../components/SubmitButton';
 import { getMe, postLogin } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue, hasControlChars } from '../utils/utils';
+import {
+  getStringValue,
+  hasControlChars,
+  handleGoogleLogin,
+} from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
@@ -88,11 +92,6 @@ const Login = () => {
         })
         .finally(() => setLoading(false));
     }
-  };
-
-  // Google auth
-  const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google/login';
   };
 
   return (

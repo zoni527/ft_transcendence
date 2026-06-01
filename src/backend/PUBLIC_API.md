@@ -29,11 +29,11 @@ Public API keys are issued to authenticated users through:
 
 Requirements:
 
-- Caller must be logged in (valid JWT cookie from `/api/users/login`).
+- Caller must be logged in (valid JWT cookie from `/api/auth/login`).
 
 Example flow:
 
-1. Authenticate with `POST /api/users/login`.
+1. Authenticate with `POST /api/auth/login`.
 2. Call `POST /api/users/apikey`.
 3. Store the returned API key securely and send it in `X-API-Key` for `/api/v1/*` requests.
 

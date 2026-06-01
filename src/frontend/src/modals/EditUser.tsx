@@ -13,7 +13,11 @@ import {
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
-import { validateImageFile } from '../utils/utils';
+import {
+  validateImageFile,
+  isValidName,
+  isValidDisplayName,
+} from '../utils/utils';
 import type { UpdateUserPayload } from '../api';
 import type { User } from '../types/types';
 import { cardBase, uploadButtonBase } from '../styles/styles';
@@ -25,10 +29,6 @@ type EditUserModalProps = {
 };
 
 // Validation schema
-const fullNameRegex = /^(?=.{2,}$)(?!.*[ '-]{2})[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
-const usernameRegex =
-  /^(?=.{3,15}$)(?!.*[_.-]{2})[A-Za-z0-9]+(?:[_.-][A-Za-z0-9]+)*$/;
-
 const editUserSchema = (t: TFunction) =>
   z
     .object({
@@ -37,16 +37,14 @@ const editUserSchema = (t: TFunction) =>
         .trim()
         .min(2, t('signupValidation.invalidName'))
         .max(50, t('signupValidation.invalidName'))
-        .refine((value) => fullNameRegex.test(value), {
+        .refine((value) => isValidName(value), {
           message: t('signupValidation.invalidName'),
         }),
 
       username: z
         .string()
         .trim()
-        .min(3, t('signupValidation.invalidUsername'))
-        .max(30, t('signupValidation.invalidUsername'))
-        .refine((value) => usernameRegex.test(value), {
+        .refine(isValidDisplayName, {
           message: t('signupValidation.invalidUsername'),
         }),
 

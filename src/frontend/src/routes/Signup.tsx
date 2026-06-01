@@ -9,14 +9,15 @@ import SubmitButton from '../components/SubmitButton';
 import { getMe, postSignup } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue, hasControlChars } from '../utils/utils';
+import {
+  getStringValue,
+  hasControlChars,
+  isValidName,
+  isValidDisplayName,
+} from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
-const fullNameRegex = /^(?=.{2,}$)(?!.*[ '-]{2})[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
-const usernameRegex =
-  /^(?=.{3,15}$)(?!.*[_.-]{2})[A-Za-z0-9]+(?:[_.-][A-Za-z0-9]+)*$/;
-
 const signupSchema = (t: TFunction) =>
   z
     .object({
@@ -25,16 +26,14 @@ const signupSchema = (t: TFunction) =>
         .trim()
         .min(2, t('signupValidation.invalidName'))
         .max(50, t('signupValidation.invalidName'))
-        .refine((value) => fullNameRegex.test(value), {
+        .refine((value) => isValidName(value), {
           message: t('signupValidation.invalidName'),
         }),
 
       username: z
         .string()
         .trim()
-        .min(3, t('signupValidation.invalidUsername'))
-        .max(30, t('signupValidation.invalidUsername'))
-        .refine((value) => usernameRegex.test(value), {
+        .refine(isValidDisplayName, {
           message: t('signupValidation.invalidUsername'),
         }),
 

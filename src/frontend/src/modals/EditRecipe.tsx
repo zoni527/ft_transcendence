@@ -57,8 +57,21 @@ const createRecipeSchema = (t: TFunction) =>
     }),
     cuisine: z
       .string()
+      .trim()
       .max(50, t('recValidation.cuisineRequired'))
-      .regex(/^[^\d]*$/, { message: t('recValidation.cuisineRequired') }),
+      .refine(
+        (value) =>
+          [...value].every(
+            (c) =>
+              /\p{L}/u.test(c) ||
+              /\p{S}/u.test(c) ||
+              /\p{P}/u.test(c) ||
+              c === ' ',
+          ),
+        {
+          message: t('recValidation.cuisineRequired'),
+        },
+      ),
     meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack', 'dessert'], {
       errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),

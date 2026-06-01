@@ -343,8 +343,8 @@ func UpdateUser(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
-		if errors.Is(err, repository.ErrOAuthUserPasswordUpdate) {
-			c.JSON(http.StatusForbidden, gin.H{"error": "OAuth users cannot update their password"})
+		if errors.Is(err, repository.ErrOAuthUserBlock) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "OAuth users cannot update their password or email"})
 			return
 		}
 		if errors.Is(err, pgx.ErrNoRows) {

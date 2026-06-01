@@ -342,7 +342,7 @@ func CleanExpiredTokens(currentTime time.Time) error {
 	return nil
 }
 
-var ErrOAuthUserPasswordUpdate = errors.New("password changing blocked for google users")
+var ErrOAuthUserBlock = errors.New("password and email changing blocked for OAuth users")
 
 func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
 	tx, err := Pool.Begin(ctx)
@@ -351,8 +351,11 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 	}
 	defer tx.Rollback(ctx)
 
-	sql := `UPDATE "user"
-			SET email = COALESCE($1, email),
+	sql := `UPDATE "user" SET
+				email = CASE
+					WHEN password_hash = $7 AND $1::varchar IS NOT NULL THEN email
+					ELSE COALESCE($1, email)
+				END,
 				name = COALESCE($2, name),
 				password_hash = CASE
 					WHEN password_hash = $7 AND $3::varchar IS NOT NULL THEN password_hash
@@ -361,13 +364,15 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 				display_name = COALESCE($4, display_name),
 				avatar_url = COALESCE($5, avatar_url),
 				updated_at = CASE
-					WHEN password_hash = $7 AND $3::varchar IS NOT NULL THEN updated_at
+					WHEN (password_hash = $7 AND $3::varchar IS NOT NULL)
+					  OR (password_hash = $7 AND $1::varchar IS NOT NULL) THEN updated_at
 					ELSE NOW()
 				END
 			WHERE id = $6
 			RETURNING
 				id, email, name, display_name, avatar_url, created_at, updated_at, last_seen,
-				(password_hash = $7 AND $3::varchar IS NOT NULL) AS is_oauth_block`
+				   (password_hash = $7 AND $1::varchar IS NOT NULL AND $1 != email)
+				OR (password_hash = $7 AND $3::varchar IS NOT NULL) AS is_oauth_block`
 
 	var u models.User
 	var isOAuthBlock bool
@@ -403,7 +408,7 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 	}
 
 	if isOAuthBlock {
-		return models.User{}, ErrOAuthUserPasswordUpdate
+		return models.User{}, ErrOAuthUserBlock
 	}
 
 	if params.Roles != nil {

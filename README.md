@@ -51,7 +51,7 @@ and for Google login a [Google Console OAuth 2.0 Client](https://developers.goog
 registered to the application.
 
 3. run `make` in the root folder of the repository (`make help` for list of commands)
-4. Open [https://localhost:8443] on a web browser (replace port if customized)
+4. Open [https://localhost:8443](https://localhost:8443) on a web browser (replace port if customized)
 
 ## Usage
 

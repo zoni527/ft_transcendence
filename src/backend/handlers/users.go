@@ -362,11 +362,15 @@ func SearchUser(c *gin.Context) {
 		return
 	}
 	if utf8.RuneCountInString(query) < searchUserQueryMinLen {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": fmt.Sprintf("query must be at least %d characters", searchUserQueryMinLen),
+		})
 		return
 	}
 	if utf8.RuneCountInString(query) > searchUserQueryMaxLen {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "query must be at most 50 characters"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": fmt.Sprintf("query must be at most %d characters", searchUserQueryMaxLen),
+		})
 		return
 	}
 	users, err := repository.SearchUsersByUsername(c.Request.Context(), query)

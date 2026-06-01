@@ -4,7 +4,8 @@ set -euo pipefail
 BASE_URL="${BASE_URL:-https://localhost:8443}"
 LOGIN_EMAIL="${LOGIN_EMAIL:-eve@test.com}"
 LOGIN_PASSWORD="${LOGIN_PASSWORD:-12345678}"
-CA_CERT="${CA_CERT:-$(pwd)/certs/ca.crt}"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+CA_CERT="${CA_CERT:-$SCRIPT_DIR/../certs/ca.crt}"
 
 COOKIE_JAR="$(mktemp)"
 WORK_DIR="$(mktemp -d)"

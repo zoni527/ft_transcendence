@@ -224,7 +224,7 @@ Update a user profile. Requires authentication.
 
 ### DELETE /api/users/:id
 
-Delete a user. Requires authentication. A user may delete their own account; admins may delete any account. Cascades: removes the user's role assignments and friendships. Recipes they authored remain with `author_id` set to NULL.
+Delete a user. Requires authentication. A user may delete their own account; admins may delete any account. Cascades: removes the user's role assignments, friendships, and API key. Recipes they authored remain with `author_id` set to NULL.
 
 On self-delete the caller's JWT is added to the token blacklist and the auth cookie is cleared in the response.
 

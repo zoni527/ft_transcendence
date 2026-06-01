@@ -46,6 +46,12 @@ Response:
 - One API key is stored per user.
 - This implementation provides issuance via `POST /api/users/apikey`.
 
+## Rate Limiting
+
+Requests are rate-limited per API key. If the limit is exceeded, the server responds with `429 Too Many Requests`.
+
+The rate-limit window and quota are enforced by the server implementation as a fixed policy.
+
 ## Endpoint Summary
 
 | HTTP Method & URL            | What it maps to in SQL               | What it does for the user                                  |

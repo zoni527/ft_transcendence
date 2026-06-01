@@ -46,7 +46,7 @@ INSERT INTO role (name, description) VALUES
     ('developer', 'Can request apikey to have CRUD permissions on their own content'),
     ('moderator', 'Can review, edit, and delete recipes'),
     ('chef',      'Can create recipes'),
-    ('user',      'Default role — can browse and favourite');
+    ('user',      'Default role: can browse recipes');
 
 INSERT INTO permission (name, description) VALUES
     ('create_recipe',    'Create new recipes'),

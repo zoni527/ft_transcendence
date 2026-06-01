@@ -71,7 +71,12 @@ const AdminPanel = () => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
+        if (
+          !(err instanceof Error && err.name === 'AbortError') &&
+          !(err instanceof Error && err.name === 'TypeError')
+        ) {
+          showNotification(message, 'error');
+        }
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);

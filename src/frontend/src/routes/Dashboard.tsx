@@ -233,7 +233,12 @@ const Dashboard = () => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
+        if (
+          !(err instanceof Error && err.name === 'AbortError') &&
+          !(err instanceof Error && err.name === 'TypeError')
+        ) {
+          showNotification(message, 'error');
+        }
       } finally {
         if (!controller.signal.aborted) {
           setFriendsLoading(false);
@@ -304,9 +309,14 @@ const Dashboard = () => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
-        setUserData(null);
-        void navigate('/');
+        if (
+          !(err instanceof Error && err.name === 'AbortError') &&
+          !(err instanceof Error && err.name === 'TypeError')
+        ) {
+          showNotification(message, 'error');
+          setUserData(null);
+          void navigate('/');
+        }
       } finally {
         if (!controller.signal.aborted) {
           setPageLoading(false);

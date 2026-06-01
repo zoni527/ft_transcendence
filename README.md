@@ -404,9 +404,8 @@ What the application lets a user do, and who built each part:
   deleted.
   _Built by:_ Boris.
 - **Access recipes through a public API** (developer role): generate a
-  personal API key in the navbar, then call `GET / POST / PUT / DELETE
-/api/v1/recipes` with the `X-API-Key` header. Rate-limited and
-  documented.
+  personal API key in the navbar, then call `GET / POST / PUT / DELETE /api/v1/recipes`
+  with the `X-API-Key` header. Rate-limited and documented.
   _Built by:_ Lucio (backend), Boris (UI).
 - **Read the Privacy Policy and Terms of Service** pages linked from the
   footer.

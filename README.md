@@ -427,8 +427,7 @@ on it.
 - **Minor, 1pt: Frontend framework (React + Vite).**
   - _Justification:_ React is on the subject's accepted frontend framework
     list; Vite provides the dev server and bundler.
-  - _Implementation:_ React 19 app under [src/frontend/](src/frontend/) with
-    file-based routing and a custom component design system.
+  - _Implementation:_ React 19 app under [src/frontend/](src/frontend/) using React Router and a custom component design system.
   - _Worked on by:_ Boris.
 - **Minor, 1pt: Backend framework (Gin / Go).**
   - _Justification:_ Gin is the idiomatic web framework on top of Go's

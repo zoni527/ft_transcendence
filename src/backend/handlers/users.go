@@ -344,7 +344,7 @@ func UpdateUser(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, repository.ErrOAuthUserPasswordUpdate) {
-			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "OAuth users cannot update their password"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "OAuth users cannot update their password"})
 			return
 		}
 		if errors.Is(err, pgx.ErrNoRows) {

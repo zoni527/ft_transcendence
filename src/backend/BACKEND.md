@@ -269,5 +269,5 @@ Missing variables cause the app to exit on startup.
 
 ## Connecting Gin handlers to repository functions
 
-- `c.IndentedJSON(status, data)` — serializes the given struct as pretty JSON (indented + endlines) into the response body. First argument is the HTTP status code, second is the data to send.
+- `c.JSON(status, data)` — serializes the given struct as JSON into the response body. First argument is the HTTP status code, second is the data to send.
 - `gin.H{"key": "value"}` — shorthand for creating a JSON object (used for error messages, etc.)

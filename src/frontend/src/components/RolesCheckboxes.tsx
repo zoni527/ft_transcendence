@@ -33,8 +33,11 @@ const RolesCheckboxes = ({
 
   return (
     <div>
-      <label className={`${inputLabelText}`}>{t('dashboard.roles')}</label>
-      <div className={`${cardBase} ${inputFieldBase} mt-1 flex flex-col gap-2`}>
+      <div className={inputLabelText}>{t('dashboard.roles')}</div>
+
+      <fieldset
+        className={`${cardBase} ${inputFieldBase} flex flex-col gap-2 p-4`}
+      >
         {availableRoles.map((roleKey) => (
           <label key={roleKey} className="flex items-center gap-2">
             <input
@@ -47,7 +50,7 @@ const RolesCheckboxes = ({
             <span className="text-md">{t(`roles.${roleKey}`)}</span>
           </label>
         ))}
-      </div>
+      </fieldset>
     </div>
   );
 };

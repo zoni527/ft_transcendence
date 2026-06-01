@@ -21,32 +21,62 @@ type CreateRecipeModalProps = {
   onClose: () => void;
 };
 
-// Helper function for validation
-const requiredNumber = (field: string, value: number, t: TFunction) =>
+// Helper function for validation with min and max
+const requiredNumber = (
+  field: string,
+  minValue: number,
+  maxValue: number,
+  t: TFunction,
+) =>
   z.coerce
     .number({
       required_error: t('recValidation.fieldRequired', { field }),
       invalid_type_error: t('recValidation.numRequired', { field }),
     })
-    .min(value, t('recValidation.numMin', { field, value }));
+    .min(minValue, t('recValidation.numMin', { field, minValue }))
+    .max(maxValue, t('recValidation.numMax', { field, maxValue }));
 
 const createRecipeSchema = (t: TFunction) =>
   z.object({
-    title: z.string().min(1, t('recValidation.recipeNameRequired')),
-    description: z.string().min(1, t('recValidation.descriptionRequired')),
-    preparation_time_min: requiredNumber(t('recValidation.prepTime'), 0, t),
-    servings: requiredNumber(t('recValidation.servings'), 1, t),
+    title: z
+      .string()
+      .min(3, t('recValidation.recipeNameRequired'))
+      .max(60, t('recValidation.recipeNameRequired')),
+    description: z.string().max(10000, t('recValidation.descriptionRequired')),
+    preparation_time_min: requiredNumber(
+      t('recValidation.prepTime'),
+      0,
+      60000,
+      t,
+    ),
+    servings: requiredNumber(t('recValidation.servings'), 1, 100, t),
     difficulty: z.enum(['easy', 'medium', 'hard'], {
       errorMap: () => ({ message: t('recValidation.selectDifficulty') }),
     }),
-    cuisine: z.string().min(1, t('recValidation.cuisineRequired')),
+    cuisine: z
+      .string()
+      .trim()
+      .max(50, t('recValidation.cuisineRequired'))
+      .refine(
+        (value) =>
+          [...value].every(
+            (c) =>
+              /\p{L}/u.test(c) ||
+              /\p{S}/u.test(c) ||
+              /\p{P}/u.test(c) ||
+              c === ' ',
+          ),
+        {
+          message: t('recValidation.cuisineRequired'),
+        },
+      ),
     meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack', 'dessert'], {
       errorMap: () => ({ message: t('recValidation.selectMealType') }),
     }),
-    calories: requiredNumber(t('recValidation.calories'), 0, t),
-    protein_g: requiredNumber(t('recValidation.protein'), 0, t),
-    carbs_g: requiredNumber(t('recValidation.carbs'), 0, t),
-    fat_g: requiredNumber(t('recValidation.fat'), 0, t),
+    calories: requiredNumber(t('recValidation.calories'), 0, 1000000, t),
+    protein_g: requiredNumber(t('recValidation.protein'), 0, 100000, t),
+    carbs_g: requiredNumber(t('recValidation.carbs'), 0, 100000, t),
+    fat_g: requiredNumber(t('recValidation.fat'), 0, 100000, t),
   });
 
 const CreateRecipeModal = ({ onClose }: CreateRecipeModalProps) => {

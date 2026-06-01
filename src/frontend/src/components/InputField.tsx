@@ -8,6 +8,7 @@ interface InputFieldProps {
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  autoComplete?: string;
 }
 
 const InputField = ({
@@ -18,6 +19,7 @@ const InputField = ({
   placeholder = '...',
   value,
   onChange,
+  autoComplete,
 }: InputFieldProps) => {
   const isControlled = value !== undefined;
 
@@ -33,6 +35,7 @@ const InputField = ({
         type={type}
         placeholder={placeholder}
         className={`${cardBase} ${inputFieldBase}`}
+        autoComplete={autoComplete}
         {...(isControlled ? { value, onChange } : {})}
       />
     </div>

@@ -9,20 +9,50 @@ import SubmitButton from '../components/SubmitButton';
 import { getMe, postSignup } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue } from '../utils/utils';
+import {
+  getStringValue,
+  hasControlChars,
+  isValidName,
+  isValidDisplayName,
+} from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
 const signupSchema = (t: TFunction) =>
   z
     .object({
-      fullName: z.string().min(1, t('signupValidation.nameRequired')),
-      username: z.string().min(1, t('signupValidation.usernameRequired')),
+      fullName: z
+        .string()
+        .trim()
+        .min(2, t('signupValidation.invalidName'))
+        .max(50, t('signupValidation.invalidName'))
+        .refine((value) => isValidName(value), {
+          message: t('signupValidation.invalidName'),
+        }),
+
+      username: z
+        .string()
+        .trim()
+        .refine(isValidDisplayName, {
+          message: t('signupValidation.invalidUsername'),
+        }),
+
       email: z
         .string()
-        .min(1, t('signupValidation.emailRequired'))
+        .trim()
+        .toLowerCase()
+        .min(5, t('signupValidation.invalidEmail'))
+        .max(254, t('signupValidation.invalidEmail'))
         .email(t('signupValidation.invalidEmail')),
-      password: z.string().min(8, t('signupValidation.passwordLen')),
+
+      password: z
+        .string()
+        .min(8, t('signupValidation.passwordLen'))
+        .max(72, t('signupValidation.passwordTooLong'))
+        .refine((val) => !hasControlChars(val), {
+          message: t('signupValidation.passwordControlChars'),
+        }),
+
       confirmPassword: z.string().min(8, t('signupValidation.passwordConfirm')),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -106,6 +136,7 @@ const Signup = () => {
           label={t('signup.name')}
           type="text"
           placeholder={t('signup.namePlace')}
+          autoComplete="name"
         />
 
         {/* Username */}
@@ -115,6 +146,7 @@ const Signup = () => {
           label={t('signup.username')}
           type="text"
           placeholder={t('signup.usernamePlace')}
+          autoComplete="username"
         />
 
         {/* Email */}
@@ -124,6 +156,7 @@ const Signup = () => {
           label={t('signup.email')}
           type="email"
           placeholder={t('signup.emailPlace')}
+          autoComplete="email"
         />
 
         {/* Password */}
@@ -133,6 +166,7 @@ const Signup = () => {
           label={t('signup.password')}
           type="password"
           placeholder={t('signup.passwordPlace')}
+          autoComplete="new-password"
         />
 
         {/* Confirm Password */}
@@ -142,6 +176,7 @@ const Signup = () => {
           label={t('signup.rePassword')}
           type="password"
           placeholder={t('signup.rePasswordPlace')}
+          autoComplete="new-password"
         />
 
         {/* Submit Button */}

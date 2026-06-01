@@ -43,10 +43,17 @@ const FiltersContent = ({
   <>
     {/* Search */}
     <div className="mt-6 mb-4">
+      <label htmlFor="recipe-search" className="sr-only">
+        {t('common.searchRecipe')}
+      </label>
+
       <input
+        id="recipe-search"
+        name="recipeSearch"
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        maxLength={100}
         className="text-md block w-full rounded-full border border-gray-700 bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-800 focus:outline-none"
         placeholder={t('common.searchRecipe')}
       />
@@ -95,6 +102,8 @@ const Recipes = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const loaderRef = useRef<HTMLDivElement | null>(null);
+  const [hasError, setHasError] = useState(false);
+  const pagingLock = useRef(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -164,10 +173,11 @@ const Recipes = () => {
 
   // Fetch recipes
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     const fetchRecipes = async () => {
       setLoading(true);
+      setHasError(false);
 
       try {
         const params: SearchRecipesParams = {
@@ -178,15 +188,18 @@ const Recipes = () => {
           difficulty,
         };
 
-        const data = await getRecipesSearch(t, params);
+        const data = await getRecipesSearch(t, params, controller.signal);
 
-        if (!cancelled) {
-          setRecipes((prev) => (page === 1 ? data : [...prev, ...data]));
+        if (controller.signal.aborted) return;
 
-          setHasMore(data.length === 12);
-        }
+        setRecipes((prev) => (page === 1 ? data : [...prev, ...data]));
+
+        setHasMore(data.length === 12);
       } catch (err: unknown) {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
+
+        setHasError(true);
+        setHasMore(false);
 
         const message =
           err instanceof Error ? err.message : t('error.genericError');
@@ -194,7 +207,9 @@ const Recipes = () => {
         showNotification(message, 'error');
         void navigate('/');
       } finally {
-        if (!cancelled) {
+        pagingLock.current = false;
+
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
@@ -203,7 +218,7 @@ const Recipes = () => {
     void fetchRecipes();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [
     page,
@@ -263,7 +278,14 @@ const Recipes = () => {
       (entries) => {
         const first = entries[0];
 
-        if (first.isIntersecting && hasMore && !loading) {
+        if (
+          first.isIntersecting &&
+          hasMore &&
+          !loading &&
+          !hasError &&
+          !pagingLock.current
+        ) {
+          pagingLock.current = true;
           setPage((prev) => prev + 1);
         }
       },
@@ -284,7 +306,7 @@ const Recipes = () => {
       }
       observer.disconnect();
     };
-  }, [hasMore, loading]);
+  }, [hasMore, loading, hasError]);
 
   return (
     <>

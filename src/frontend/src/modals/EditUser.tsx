@@ -13,7 +13,11 @@ import {
 } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext';
-import { validateImageFile } from '../utils/utils';
+import {
+  validateImageFile,
+  isValidName,
+  isValidDisplayName,
+} from '../utils/utils';
 import type { UpdateUserPayload } from '../api';
 import type { User } from '../types/types';
 import { cardBase, uploadButtonBase } from '../styles/styles';
@@ -28,17 +32,39 @@ type EditUserModalProps = {
 const editUserSchema = (t: TFunction) =>
   z
     .object({
-      fullName: z.string().min(1, t('signupValidation.nameRequired')),
-      username: z.string().min(1, t('signupValidation.usernameRequired')),
+      fullName: z
+        .string()
+        .trim()
+        .min(2, t('signupValidation.invalidName'))
+        .max(50, t('signupValidation.invalidName'))
+        .refine((value) => isValidName(value), {
+          message: t('signupValidation.invalidName'),
+        }),
+
+      username: z
+        .string()
+        .trim()
+        .refine(isValidDisplayName, {
+          message: t('signupValidation.invalidUsername'),
+        }),
+
       email: z
         .string()
-        .min(1, t('signupValidation.emailRequired'))
+        .trim()
+        .toLowerCase()
+        .min(5, t('signupValidation.invalidEmail'))
+        .max(254, t('signupValidation.invalidEmail'))
         .email(t('signupValidation.invalidEmail')),
+
       password: z
         .string()
         .refine(
           (val) => val === '' || val.length >= 8,
           t('signupValidation.passwordLen'),
+        )
+        .refine(
+          (val) => val === '' || val.length <= 72,
+          t('signupValidation.passwordTooLong'),
         ),
 
       confirmPassword: z.string(),
@@ -97,6 +123,40 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
 
   const handleSubmitAsync = async () => {
     if (loading) return;
+
+    const originalData = {
+      name: user.name,
+      display_name: user.display_name,
+      email: user.email,
+    };
+
+    const currentData = {
+      name: fullName,
+      display_name: username,
+      email,
+    };
+
+    const coreChanged =
+      JSON.stringify(originalData) !== JSON.stringify(currentData);
+
+    const originalRoles = user.roles ?? [];
+    const currentRoles = roles ?? [];
+
+    const rolesChanged =
+      JSON.stringify([...originalRoles].sort()) !==
+      JSON.stringify([...currentRoles].sort());
+
+    const passwordChanged = password.trim().length > 0;
+    const avatarChanged = imageFile !== null;
+
+    const hasChanges =
+      coreChanged || passwordChanged || avatarChanged || rolesChanged;
+
+    if (!hasChanges) {
+      showNotification(t('notification.noChanges'), 'info');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -186,6 +246,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             placeholder={t('signup.namePlace')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            autoComplete="name"
           />
 
           <InputField
@@ -196,6 +257,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             placeholder={t('signup.usernamePlace')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
           />
 
           {hasRole(['admin']) && !isSelf && (
@@ -210,27 +272,34 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
             placeholder={t('signup.emailPlace')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
           />
 
-          <InputField
-            id="password"
-            name="password"
-            label={t('signup.password')}
-            type="password"
-            placeholder={t('signup.passwordPlace')}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {isSelf && (
+            <InputField
+              id="password"
+              name="password"
+              label={t('signup.password')}
+              type="password"
+              placeholder={t('signup.passwordPlace')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          )}
 
-          <InputField
-            id="confirmPassword"
-            name="confirmPassword"
-            label={t('signup.rePassword')}
-            type="password"
-            placeholder={t('signup.rePasswordPlace')}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+          {isSelf && (
+            <InputField
+              id="confirmPassword"
+              name="confirmPassword"
+              label={t('signup.rePassword')}
+              type="password"
+              placeholder={t('signup.rePasswordPlace')}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          )}
 
           {/* Image Upload */}
           <div className="mt-12 flex items-center gap-3">

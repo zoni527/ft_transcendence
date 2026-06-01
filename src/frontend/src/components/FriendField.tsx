@@ -30,11 +30,11 @@ const FriendField = ({
     >
       {/* Left side */}
       <div className="flex min-w-0 flex-col gap-2 md:flex-row md:items-center md:gap-6">
-        <div className="w-38 shrink-0 truncate text-xl font-semibold text-gray-700 sm:w-60">
+        <div className="w-36 shrink-0 truncate text-xl font-semibold text-gray-700 sm:w-60">
           {user.name}
         </div>
 
-        <div className="w-38 shrink-0 truncate text-xl font-semibold text-gray-700 sm:w-60">
+        <div className="w-36 shrink-0 truncate text-xl font-semibold text-gray-700 sm:w-60">
           {user.display_name}
         </div>
       </div>

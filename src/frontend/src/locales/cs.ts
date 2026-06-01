@@ -29,6 +29,7 @@ export const csTranslations = {
     friendRequestRejected: 'Žádost odmítnuta',
     friendRequestSent: 'Žádost odeslána',
     apiKeyGenerated: 'API klíč byl vygenerován',
+    noChanges: 'Neprovedly se žádné změny',
   },
   info: {
     name: 'Ostatní uživatelé nevidí vaše celé jméno',
@@ -100,13 +101,13 @@ export const csTranslations = {
       Správcem údajů je tým RISE.`,
 
     section2_title: '2. Jaké údaje shromažďujeme',
-    section2_text: `Údaje o účtu: jméno, e-mailová adresa a heslo s jednosměrným hashováním a solí.
-      Obsah, který vytváříte: recepty, fotografie, komentáře a hodnocení, která publikujete na platformě.
+    section2_text: `Údaje o účtu: jméno, uživatelské jméno, e-mailová adresa a heslo s jednosměrným hashováním a solí.
+      Obsah, který vytváříte: recepty a fotografie, která publikujete na platformě.
       Technické údaje: IP adresa, typ prohlížeče a informace o zařízení shromažďované automaticky.
       Cookies: viz část 6 níže.`,
 
     section3_title: '3. Jak vaše údaje používáme',
-    section3_text: `K provozu služby a umožnění přihlášení, vytváření a ukládání receptů, zveřejňování komentářů a recenzí a sledování ostatních uživatelů.
+    section3_text: `K provozu služby a umožnění přihlášení, vytváření a ukládání receptů, a sledování ostatních uživatelů.
       K prevenci zneužití, podvodů a zajištění bezpečnosti platformy.
       Ke komunikaci s vámi ohledně vašeho účtu nebo důležitých změn.`,
 
@@ -283,35 +284,34 @@ export const csTranslations = {
     type_snack: 'Svačina',
     type_dessert: 'Dezert',
   },
-  loginValidation: {
-    emailRequired: 'E-mail je povinný',
-    invalidEmail: 'Neplatný e-mail',
-    passwordLen: 'Heslo musí mít alespoň 8 znaků',
-  },
   signupValidation: {
-    nameRequired: 'Celé jméno je povinné',
-    usernameRequired: 'Uživatelské jméno / Přezdívka je povinné',
-    emailRequired: 'E-mail je povinný',
-    invalidEmail: 'Neplatný e-mail',
+    invalidName:
+      'Celé jméno musí mít 2-50 znaků a může obsahovat písmena, mezery, apostrofy a pomlčky',
+    invalidUsername:
+      'Uživatelské jméno musí mít 3-30 znaků a může obsahovat písmena, čísla, tečky, podtržítka a pomlčky',
+    invalidEmail: 'E-mail musí mít 5-254 znaků a být platný',
     passwordLen: 'Heslo musí mít alespoň 8 znaků',
-    passwordConfirm: 'Prosím potvrďte své heslo',
+    passwordTooLong: 'Heslo je příliš dlouhé',
+    passwordControlChars: 'Heslo obsahuje neplatné znaky',
+    passwordConfirm: 'Potvrďte heslo',
     passwordMatch: 'Hesla se neshodují',
   },
   recValidation: {
-    recipeNameRequired: 'Název receptu je povinný',
-    descriptionRequired: 'Popis je povinný',
+    recipeNameRequired: 'Název receptu musí mít 3-60 znaků',
+    descriptionRequired: 'Popis musí mít 0-10000 znaků',
     prepTime: 'Doba přípravy',
     servings: 'Porce',
-    cuisineRequired: 'Typ kuchyně je povinný',
+    cuisineRequired: 'Kuchyně musí mít 0-50 znaků bez čísel',
     calories: 'Kalorie',
     protein: 'Bílkoviny',
     carbs: 'Sacharidy',
     fat: 'Tuky',
     selectDifficulty: 'Vyberte obtížnost',
     selectMealType: 'Vyberte typ jídla',
-    fieldRequired: '{{field}} je povinné',
+    fieldRequired: '{{field}} je povinný',
     numRequired: '{{field}} musí být číslo',
-    numMin: '{{field}} musí být alespoň {{value}}',
+    numMin: '{{field}} musí být alespoň {{minValue}}',
+    numMax: '{{field}} může být nejvýše {{maxValue}}',
     imageRequired: 'Obrázek je povinný',
   },
   common: {
@@ -341,7 +341,7 @@ export const csTranslations = {
     recipesNotFound: 'Nebyly nalezeny žádné recepty',
     genericError: 'Došlo k chybě, zkuste to prosím později',
     invalidResponse: 'Neplatná odpověď databáze',
-    badRequest: 'Chybný požadavek, zkontrolujte, zda jsou data správná',
+    badRequest: 'Chybný požadavek',
     unauthorized: 'Nemáte oprávnění k provedení této akce',
     notFound: 'Požadovaný zdroj nebyl nalezen',
     conflict: 'Duplicitní uživatelské jméno nebo e-mail',
@@ -352,5 +352,7 @@ export const csTranslations = {
     fileTooLarge: 'Soubor je příliš velký',
     forbidden: 'Chybí potřebná oprávnění.',
     copyFailed: 'Kopírování do schránky se nezdařilo',
+    pageNotFound: '404 - Stránka nenalezena',
+    weakPassword: 'Heslo je příliš slabé',
   },
 };

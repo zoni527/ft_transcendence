@@ -29,6 +29,7 @@ export const fiTranslations = {
     friendRequestRejected: 'Pyyntö hylätty',
     friendRequestSent: 'Pyyntö lähetetty',
     apiKeyGenerated: 'API-avain luotu',
+    noChanges: 'Muutoksia ei tehty',
   },
   info: {
     name: 'Ei näy muille käyttäjille',
@@ -100,13 +101,13 @@ export const fiTranslations = {
       Rekisterinpitäjänä toimii RISE-tiimi.`,
 
     section2_title: '2. Mitä keräämme',
-    section2_text: `Tilitiedot: nimi, sähköpostiosoite ja suolattu, hajautettu salasana.
-      Luomasi sisältö: reseptit, kuvat, kommentit ja arviot, jotka julkaiset alustalla.
+    section2_text: `Tilitiedot: nimi, käyttäjätunnus, sähköpostiosoite ja suolattu, hajautettu salasana.
+      Luomasi sisältö: reseptit ja kuvat, jotka julkaiset alustalla.
       Tekniset tiedot: IP-osoite, selain ja laitteen tiedot, jotka kerätään automaattisesti.
       Evästeet: katso kohta 6.`,
 
     section3_title: '3. Miten käytämme tietojasi',
-    section3_text: `Palvelun tarjoamiseksi ja mahdollistaaksemme kirjautumisesi, reseptien luomisen ja tallentamisen, kommenttien ja arvostelujen julkaisemisen sekä muiden käyttäjien seuraamisen.
+    section3_text: `Palvelun tarjoamiseksi ja mahdollistaaksemme kirjautumisesi, reseptien luomisen ja tallentamisen sekä muiden käyttäjien seuraamisen.
       Väärinkäytösten, petosten ja tietoturvan estämiseen.
       Yhteydenpitoon tilisi tai tärkeiden muutosten osalta.`,
 
@@ -167,7 +168,7 @@ export const fiTranslations = {
       Olet vastuussa kaikesta tililläsi tapahtuvasta toiminnasta.`,
 
     section4_title: '4. Sisältösi',
-    section4_text: `Säilytät omistusoikeuden lataamiisi resepteihin, kuviin ja kommentteihin.
+    section4_text: `Säilytät omistusoikeuden lataamiisi resepteihin ja kuviin.
       Antamalla sisältöä myönnät meille maailmanlaajuisen, ei-yksinomaisen ja rojaltivapaan lisenssin näyttää, tallentaa ja jakaa sisältöä palvelussa.
 
       Et saa julkaista sisältöä, joka:
@@ -283,36 +284,36 @@ export const fiTranslations = {
     type_snack: 'Välipala',
     type_dessert: 'Jälkiruoka',
   },
-  loginValidation: {
-    emailRequired: 'Sähköposti on pakollinen',
-    invalidEmail: 'Virheellinen sähköpostiosoite',
-    passwordLen: 'Salasanan on oltava vähintään 8 merkkiä pitkä',
-  },
   signupValidation: {
-    nameRequired: 'Nimi on pakollinen',
-    usernameRequired: 'Käyttäjätunnus / Alias on pakollinen',
-    emailRequired: 'Sähköposti on pakollinen',
-    invalidEmail: 'Virheellinen sähköpostiosoite',
-    passwordLen: 'Salasanan on oltava vähintään 8 merkkiä pitkä',
-    passwordConfirm: 'Vahvista salasanasi',
+    invalidName:
+      'Koko nimen tulee olla 2-50 merkkiä pitkä ja se saa sisältää kirjaimia, välilyöntejä, heittomerkkejä ja yhdysmerkkejä',
+    invalidUsername:
+      'Käyttäjänimen tulee olla 3-30 merkkiä pitkä ja se saa sisältää kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä',
+    invalidEmail:
+      'Sähköpostiosoitteen tulee olla 5-254 merkkiä pitkä ja kelvollinen',
+    passwordLen: 'Salasanan tulee olla vähintään 8 merkkiä',
+    passwordTooLong: 'Salasana on liian pitkä',
+    passwordControlChars: 'Salasana sisältää virheellisiä merkkejä',
+    passwordConfirm: 'Vahvista salasana',
     passwordMatch: 'Salasanat eivät täsmää',
   },
   recValidation: {
-    recipeNameRequired: 'Reseptin nimi on pakollinen',
-    descriptionRequired: 'Kuvaus on pakollinen',
+    recipeNameRequired: 'Reseptin nimen on oltava 3-60 merkkiä',
+    descriptionRequired: 'Kuvauksen on oltava 0-10000 merkkiä',
     prepTime: 'Valmistusaika',
     servings: 'Annokset',
-    cuisineRequired: 'Ruokakulttuuri on pakollinen',
+    cuisineRequired: 'Ruokakulttuurin on oltava 0-50 merkkiä ilman numeroita',
     calories: 'Kalorit',
     protein: 'Proteiini',
     carbs: 'Hiilihydraatit',
     fat: 'Rasva',
     selectDifficulty: 'Valitse vaikeustaso',
-    selectMealType: 'Valitse ateriatyyppi',
+    selectMealType: 'Valitse aterian tyyppi',
     fieldRequired: '{{field}} on pakollinen',
-    numRequired: '{{field}} täytyy olla numero',
-    numMin: '{{field}} täytyy olla vähintään {{value}}',
-    imageRequired: 'Kuva vaaditaan',
+    numRequired: '{{field}} on oltava numero',
+    numMin: '{{field}} on oltava vähintään {{minValue}}',
+    numMax: '{{field}} on enintään {{maxValue}}',
+    imageRequired: 'Kuva on pakollinen',
   },
   common: {
     bannerTitle: 'Reseptejä, joita varten kannattaa herätä',
@@ -341,7 +342,7 @@ export const fiTranslations = {
     recipesNotFound: 'Reseptejä ei löytynyt',
     genericError: 'Tapahtui virhe, yritä myöhemmin uudelleen',
     invalidResponse: 'Virheellinen tietokannan vastaus',
-    badRequest: 'Virheellinen pyyntö, tarkista syötteesi',
+    badRequest: 'Virheellinen pyyntö',
     unauthorized: 'Sinulla ei ole oikeuksia suorittaa tätä toimintoa',
     notFound: 'Haettua resurssia ei löydy',
     conflict: 'Käyttäjänimi tai sähköpostiosoite on jo käytössä',
@@ -352,5 +353,7 @@ export const fiTranslations = {
     fileTooLarge: 'Tiedosto on liian suuri',
     forbidden: 'Ei käyttöoikeutta',
     copyFailed: 'Kopiointi leikepöydälle epäonnistui',
+    pageNotFound: '404 - Sivua ei löytynyt',
+    weakPassword: 'Salasana on liian heikko',
   },
 };

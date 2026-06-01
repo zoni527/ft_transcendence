@@ -8,10 +8,9 @@ type NotificationProps = {
 };
 
 const variantStyles: Record<NotificationVariant, string> = {
-  error: 'bg-red-600',
-  success: 'bg-green-600',
-  warning: 'bg-yellow-500 text-black',
-  info: 'bg-blue-600',
+  error: 'bg-red-600 text-white',
+  success: 'bg-green-600 text-white',
+  info: 'bg-yellow-400 text-gray-800',
 };
 
 const Notification = ({ message, onClose, variant }: NotificationProps) => {
@@ -21,11 +20,11 @@ const Notification = ({ message, onClose, variant }: NotificationProps) => {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, [onClose, message, variant]);
 
   return (
     <div
-      className={`fixed right-0 bottom-5 left-0 z-50 mx-4 rounded-md border-2 border-slate-800 px-4 py-2 text-lg font-semibold text-white shadow-lg sm:right-5 sm:left-auto sm:mx-0 sm:w-auto ${
+      className={`fixed right-0 bottom-5 left-0 z-50 mx-4 rounded-md border-2 border-slate-800 px-4 py-2 text-lg font-semibold shadow-lg sm:right-5 sm:left-auto sm:mx-0 sm:w-auto ${
         variantStyles[variant]
       }`}
     >

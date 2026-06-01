@@ -9,7 +9,7 @@ import SubmitButton from '../components/SubmitButton';
 import { getMe, postLogin } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue } from '../utils/utils';
+import { getStringValue, hasControlChars } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
@@ -17,9 +17,19 @@ const loginSchema = (t: TFunction) =>
   z.object({
     email: z
       .string()
-      .min(1, t('loginValidation.emailRequired'))
-      .email(t('loginValidation.invalidEmail')),
-    password: z.string().min(8, t('loginValidation.passwordLen')),
+      .trim()
+      .toLowerCase()
+      .min(5, t('signupValidation.invalidEmail'))
+      .max(254, t('signupValidation.invalidEmail'))
+      .email(t('signupValidation.invalidEmail')),
+
+    password: z
+      .string()
+      .min(8, t('signupValidation.passwordLen'))
+      .max(72, t('signupValidation.passwordTooLong'))
+      .refine((val) => !hasControlChars(val), {
+        message: t('signupValidation.passwordControlChars'),
+      }),
   });
 
 const Login = () => {
@@ -99,6 +109,7 @@ const Login = () => {
           label={t('login.email')}
           type="email"
           placeholder={t('login.emailPlace')}
+          autoComplete="email"
         />
 
         {/* Password */}
@@ -108,6 +119,7 @@ const Login = () => {
           label={t('login.password')}
           type="password"
           placeholder={t('login.passwordPlace')}
+          autoComplete="current-password"
         />
 
         {/* Submit Button */}

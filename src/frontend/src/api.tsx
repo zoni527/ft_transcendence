@@ -267,6 +267,8 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
       return t('error.notFound');
     case 409:
       return t('error.conflict');
+    case 422:
+      return t('error.weakPassword');
     case 429:
       return t('error.rateLimit');
     case 500:
@@ -277,8 +279,11 @@ function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
 }
 
 // GET /api/recipes (get all recipes)
-export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
-  const response = await fetch(`${baseUrl}/recipes`);
+export const getRecipes = async (
+  t: TFunction,
+  signal?: AbortSignal,
+): Promise<Recipe[]> => {
+  const response = await fetch(`${baseUrl}/recipes`, { signal });
 
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));
@@ -297,6 +302,7 @@ export const getRecipes = async (t: TFunction): Promise<Recipe[]> => {
 export const getRecipesSearch = async (
   t: TFunction,
   params: SearchRecipesParams = {},
+  signal?: AbortSignal,
 ): Promise<Recipe[]> => {
   const queryParams = new URLSearchParams();
 
@@ -309,7 +315,7 @@ export const getRecipesSearch = async (
 
   const url = `${baseUrl}/recipes/search?${queryParams.toString()}`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, { signal });
 
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));
@@ -328,8 +334,9 @@ export const getRecipesSearch = async (
 export const getRecipeById = async (
   id: string,
   t: TFunction,
+  signal?: AbortSignal,
 ): Promise<Recipe> => {
-  const response = await fetch(`${baseUrl}/recipes/${id}`);
+  const response = await fetch(`${baseUrl}/recipes/${id}`, { signal });
 
   if (!response.ok) {
     const errorMessage = getTranslatedErrorMessage(response.status, t);
@@ -391,10 +398,14 @@ export const postCreateRecipe = async (
 };
 
 // GET /api/auth/session (session authentication)
-export const getSession = async (t: TFunction): Promise<User | null> => {
+export const getSession = async (
+  t: TFunction,
+  signal?: AbortSignal,
+): Promise<User | null> => {
   const response = await fetch(`${baseUrl}/auth/session`, {
     method: 'GET',
     credentials: 'include',
+    signal,
   });
 
   let data: unknown = null;
@@ -454,8 +465,13 @@ export const getSearch = async (
 };
 
 // GET /api/users (get all users)
-export const getUsers = async (t: TFunction): Promise<User[]> => {
-  const response = await fetch(`${baseUrl}/users`);
+export const getUsers = async (
+  t: TFunction,
+  signal?: AbortSignal,
+): Promise<User[]> => {
+  const response = await fetch(`${baseUrl}/users`, {
+    signal,
+  });
 
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));
@@ -498,10 +514,15 @@ export const getMe = async (t: TFunction): Promise<User> => {
 };
 
 // GET /api/users/:id (get a user by ID)
-export const getUserbyId = async (id: string, t: TFunction): Promise<User> => {
+export const getUserbyId = async (
+  id: string,
+  t: TFunction,
+  signal?: AbortSignal,
+): Promise<User> => {
   const response = await fetch(`${baseUrl}/users/${id}`, {
     method: 'GET',
     credentials: 'include',
+    signal,
   });
 
   let data: unknown = null;
@@ -619,13 +640,14 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
 };
 
 // PUT /api/users/me/heartbeat
-export const putHeartbeat = async (t: TFunction) => {
+export const putHeartbeat = async (t: TFunction, signal?: AbortSignal) => {
   const response = await fetch(`${baseUrl}/users/me/heartbeat`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
+    signal,
   });
 
   if (!response.ok) {
@@ -672,9 +694,11 @@ export const putUpdateUser = async (
 // GET /api/friendships (get all friendships)
 export const getFriendships = async (
   t: TFunction,
+  signal?: AbortSignal,
 ): Promise<FriendshipsResponse> => {
   const response = await fetch(`${baseUrl}/friendships`, {
     credentials: 'include',
+    signal,
   });
 
   let data: unknown = null;
@@ -728,14 +752,21 @@ export const acceptFriend = async (id: string, t: TFunction) => {
 };
 
 // DELETE /api/friendships/:id (delete / reject / cancel friend relationship)
-export const deleteFriend = async (id: string, t: TFunction) => {
-  const response = await fetch(`${baseUrl}/friendships/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
+export const deleteFriend = async (
+  id: string,
+  action: string,
+  t: TFunction,
+) => {
+  const response = await fetch(
+    `${baseUrl}/friendships/${id}?action=${action}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
     },
-    credentials: 'include',
-  });
+  );
 
   if (!response.ok) {
     throw new Error(getTranslatedErrorMessage(response.status, t));

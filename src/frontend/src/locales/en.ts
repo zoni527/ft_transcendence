@@ -29,6 +29,7 @@ export const enTranslations = {
     friendRequestRejected: 'Request rejected',
     friendRequestSent: 'Request sent',
     apiKeyGenerated: 'API key generated',
+    noChanges: 'No changes were made',
   },
   info: {
     name: "Other users can't see your full name",
@@ -100,13 +101,13 @@ export const enTranslations = {
       The data controller is the RISE team.`,
 
     section2_title: '2. What we collect',
-    section2_text: `Account information: name, email address, and a salted, hashed password.
-      Content you create: recipes, photos, comments, and ratings you publish on the platform.
+    section2_text: `Account information: name, username, email address, and a salted, hashed password.
+      Content you create: recipes and photos you publish on the platform.
       Technical data: IP address, browser type, and device information collected automatically.
       Cookies: see Section 6 below.`,
 
     section3_title: '3. How we use your information',
-    section3_text: `To operate the service and let you sign in, create and save recipes, post comments and reviews, and follow other users.
+    section3_text: `To operate the service and let you sign in, create and save recipes, and follow other users.
       To prevent abuse, fraud, and ensure platform security.
       To communicate with you about your account or important changes.`,
 
@@ -143,7 +144,7 @@ export const enTranslations = {
       We follow industry best practices for storage, access control, and incident response.`,
 
     section10_title: '10. Children',
-    section10_text: `RISE is not intended for users under 13.`,
+    section10_text: `RISE is not intended for users under 13 years old.`,
 
     section11_title: '11. Changes to this policy',
     section11_text: `We may update this policy from time to time.`,
@@ -167,7 +168,7 @@ export const enTranslations = {
       You are responsible for all activity that occurs under your account.`,
 
     section4_title: '4. Your content',
-    section4_text: `You retain ownership of the recipes, photos, comments, and other content you upload to RISE.
+    section4_text: `You retain ownership of the recipes, photos, and other content you upload to RISE.
       By posting content, you grant us a worldwide, non-exclusive, royalty-free licence to display, reproduce, and distribute it within the platform and its features.
 
       You agree not to upload content that:
@@ -283,26 +284,24 @@ export const enTranslations = {
     type_snack: 'Snack',
     type_dessert: 'Dessert',
   },
-  loginValidation: {
-    emailRequired: 'Email is required',
-    invalidEmail: 'Invalid email',
-    passwordLen: 'Password must be at least 8 characters',
-  },
   signupValidation: {
-    nameRequired: 'Full name is required',
-    usernameRequired: 'Username / Alias is required',
-    emailRequired: 'Email is required',
-    invalidEmail: 'Invalid email',
+    invalidName:
+      'Full name must be 2-50 characters and may contain letters, spaces, apostrophes, and hyphens',
+    invalidUsername:
+      'Username must be 3-30 characters and may contain letters, numbers, dots, underscores, and hyphens',
+    invalidEmail: 'Email must be 5-254 characters and be valid',
     passwordLen: 'Password must be at least 8 characters',
+    passwordTooLong: 'Password is too long',
+    passwordControlChars: 'Password contains invalid characters',
     passwordConfirm: 'Please confirm your password',
     passwordMatch: 'Passwords do not match',
   },
   recValidation: {
-    recipeNameRequired: 'Recipe name is required',
-    descriptionRequired: 'Description is required',
+    recipeNameRequired: 'Recipe name must be 3-60 characters',
+    descriptionRequired: 'Description must be 0-10000 characters',
     prepTime: 'Prep time',
     servings: 'Servings',
-    cuisineRequired: 'Cuisine type is required',
+    cuisineRequired: 'Cuisine must be 0-50 characters without numbers',
     calories: 'Calories',
     protein: 'Protein',
     carbs: 'Carbs',
@@ -311,7 +310,8 @@ export const enTranslations = {
     selectMealType: 'Please select a meal type',
     fieldRequired: '{{field}} is required',
     numRequired: '{{field}} must be a number',
-    numMin: '{{field}} must be at least {{value}}',
+    numMin: '{{field}} must be at least {{minValue}}',
+    numMax: '{{field}} must be at most {{maxValue}}',
     imageRequired: 'Image required',
   },
   common: {
@@ -341,7 +341,7 @@ export const enTranslations = {
     recipesNotFound: 'No recipes found',
     genericError: 'An error occurred, please try again later',
     invalidResponse: 'Invalid database response',
-    badRequest: 'Invalid request, please check your input',
+    badRequest: 'Invalid request',
     unauthorized: 'You are not authorized to perform this action',
     notFound: 'The requested resource could not be found',
     conflict: 'Duplicate username or email',
@@ -352,5 +352,7 @@ export const enTranslations = {
     fileTooLarge: 'File too large',
     forbidden: 'No permissions to perform this action',
     copyFailed: 'Copy to clipboard failed',
+    pageNotFound: '404 - Page not found',
+    weakPassword: 'Password too weak',
   },
 };

@@ -356,9 +356,9 @@ func validateRecipeFields(r *models.Recipe) error {
 	}
 
 	switch r.MealType {
-	case "breakfast", "lunch", "dinner", "snack":
+	case "breakfast", "lunch", "dinner", "snack", "dessert":
 	default:
-		return errors.New("meal_type: must be breakfast, lunch, dinner, or snack")
+		return errors.New("meal_type: must be breakfast, lunch, dinner, snack, or dessert")
 	}
 
 	if err := onlyGraphicChars(r.ImageURL); err != nil {

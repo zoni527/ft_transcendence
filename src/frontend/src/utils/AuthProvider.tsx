@@ -18,21 +18,17 @@ const AuthProvider = ({ children, t }: Props) => {
   };
 
   useEffect(() => {
-    let isMounted = true;
+    const controller = new AbortController();
 
     const initAuth = async () => {
       try {
-        const me = await getSession(t);
-
-        if (isMounted) {
-          setUser(me);
-        }
+        const me = await getSession(t, controller.signal);
+        setUser(me);
       } catch {
-        if (isMounted) {
-          setUser(null);
-        }
+        if (controller.signal.aborted) return;
+        setUser(null);
       } finally {
-        if (isMounted) {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
@@ -41,7 +37,7 @@ const AuthProvider = ({ children, t }: Props) => {
     void initAuth();
 
     return () => {
-      isMounted = false;
+      controller.abort();
     };
   }, [t]);
 
@@ -49,10 +45,13 @@ const AuthProvider = ({ children, t }: Props) => {
   useEffect(() => {
     if (!user) return;
 
+    const controller = new AbortController();
+
     const sendHeartbeat = async () => {
       try {
-        await putHeartbeat(t);
+        await putHeartbeat(t, controller.signal);
       } catch (err: unknown) {
+        if (controller.signal.aborted) return;
         console.error('Heartbeat failed', err);
       }
     };
@@ -60,10 +59,14 @@ const AuthProvider = ({ children, t }: Props) => {
     void sendHeartbeat();
 
     const interval = setInterval(() => {
+      if (controller.signal.aborted) return;
       void sendHeartbeat();
     }, 30000);
 
-    return () => clearInterval(interval);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, [user, t]);
 
   const login = (userData: User) => {

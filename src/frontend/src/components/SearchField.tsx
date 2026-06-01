@@ -18,10 +18,13 @@ const SearchField = ({ placeholder, onSearch }: SearchFieldProps) => {
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-2">
       <input
+        id="user-search"
+        name="search"
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder || t('common.searchUser')}
+        maxLength={50}
         className="text-md block w-full rounded-full border border-gray-700 bg-white px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-800 focus:outline-none"
       />
     </form>

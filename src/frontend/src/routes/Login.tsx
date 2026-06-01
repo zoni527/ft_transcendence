@@ -41,7 +41,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   // Normal login
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -93,6 +93,10 @@ const Login = () => {
         .finally(() => setLoading(false));
     }
   };
+
+  if (user) {
+    return void navigate('/me');
+  }
 
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-sm p-8`}>

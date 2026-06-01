@@ -14,12 +14,8 @@ services:
     build: ./frontend
     image: transcendence_frontend:dev_1.0
     pull_policy: build
-    volumes:
-      - ./frontend/src:/app/src
     expose:
-      - "5173"
-    environment:
-      - NGINX_PORT_EXTERNAL=${NGINX_PORT_EXTERNAL:-8443}
+      - "80"
     networks:
       - transcendence_network
     restart: unless-stopped

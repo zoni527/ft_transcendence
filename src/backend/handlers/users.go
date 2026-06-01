@@ -541,9 +541,8 @@ func hashPassword(password string) (string, error) {
 // Password validation helper to check if password has control characters
 // Any extra validations would come in this step
 func validatePassword(password string) error {
-	bytes := []byte(password)
-	if len(bytes) > passwordLenMax {
-		return errors.New("password's length in bytes is too long")
+	if len(password) > passwordLenMax {
+		return fmt.Errorf("password is too long (max %d bytes)", passwordLenMax)
 	}
 	for _, r := range password {
 		if unicode.IsControl(r) {

@@ -177,6 +177,7 @@ const Recipes = () => {
 
     const fetchRecipes = async () => {
       setLoading(true);
+      setHasError(false);
 
       try {
         const params: SearchRecipesParams = {

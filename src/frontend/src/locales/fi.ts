@@ -284,9 +284,6 @@ export const fiTranslations = {
     type_snack: 'Välipala',
     type_dessert: 'Jälkiruoka',
   },
-  loginValidation: {
-    passwordRequired: 'Salasana on pakollinen',
-  },
   signupValidation: {
     invalidName:
       'Koko nimen tulee olla 2-50 merkkiä pitkä ja se saa sisältää kirjaimia, välilyöntejä, heittomerkkejä ja yhdysmerkkejä',

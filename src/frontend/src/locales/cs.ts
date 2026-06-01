@@ -284,9 +284,6 @@ export const csTranslations = {
     type_snack: 'Svačina',
     type_dessert: 'Dezert',
   },
-  loginValidation: {
-    passwordRequired: 'Heslo je povinné',
-  },
   signupValidation: {
     invalidName:
       'Celé jméno musí mít 2-50 znaků a může obsahovat písmena, mezery, apostrofy a pomlčky',

@@ -25,7 +25,7 @@ const loginSchema = (t: TFunction) =>
 
     password: z
       .string()
-      .min(8, t('loginValidation.passwordRequired'))
+      .min(8, t('signupValidation.passwordLen'))
       .max(72, t('signupValidation.passwordTooLong'))
       .refine((val) => !hasControlChars(val), {
         message: t('signupValidation.passwordControlChars'),

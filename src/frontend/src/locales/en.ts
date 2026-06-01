@@ -284,9 +284,6 @@ export const enTranslations = {
     type_snack: 'Snack',
     type_dessert: 'Dessert',
   },
-  loginValidation: {
-    passwordRequired: 'Password is required',
-  },
   signupValidation: {
     invalidName:
       'Full name must be 2-50 characters and may contain letters, spaces, apostrophes, and hyphens',

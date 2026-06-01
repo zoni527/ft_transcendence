@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
 import AddFriendModal from '../modals/AddFriend';
@@ -368,7 +368,9 @@ const Dashboard = () => {
   }
 
   if (!id && !authUser) {
-    return <Navigate to="/login" replace />;
+    return (
+      <StatusBox message={t('error.userNotFound')} className="text-red-600" />
+    );
   }
 
   if (userFetched && !userData) {

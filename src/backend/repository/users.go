@@ -351,26 +351,23 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 	}
 	defer tx.Rollback(ctx)
 
-	sql := fmt.Sprintf(`UPDATE "user"
+	sql := `UPDATE "user"
 			SET email = COALESCE($1, email),
 				name = COALESCE($2, name),
 				password_hash = CASE
-					WHEN password_hash = '%v' AND $3::varchar IS NOT NULL THEN password_hash
+					WHEN password_hash = $7 AND $3::varchar IS NOT NULL THEN password_hash
 					ELSE COALESCE($3, password_hash)
 				END,
 				display_name = COALESCE($4, display_name),
 				avatar_url = COALESCE($5, avatar_url),
 				updated_at = CASE
-					WHEN password_hash = '%v' AND $3::varchar IS NOT NULL THEN updated_at
+					WHEN password_hash = $7 AND $3::varchar IS NOT NULL THEN updated_at
 					ELSE NOW()
 				END
 			WHERE id = $6
 			RETURNING
 				id, email, name, display_name, avatar_url, created_at, updated_at, last_seen,
-				(password_hash = '%v' AND $3::varchar IS NOT NULL) AS is_oauth_block`,
-		integrations.GoogleOAuthLockedPassword,
-		integrations.GoogleOAuthLockedPassword,
-		integrations.GoogleOAuthLockedPassword)
+				(password_hash = $7 AND $3::varchar IS NOT NULL) AS is_oauth_block`
 
 	var u models.User
 	var isOAuthBlock bool
@@ -382,6 +379,7 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 		nullableString(params.DisplayName),
 		nullableString(params.AvatarURL),
 		id,
+		integrations.GoogleOAuthLockedPassword,
 	).Scan(
 		&u.ID,
 		&u.Email,

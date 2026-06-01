@@ -25,6 +25,8 @@ import (
 )
 
 const onlineThreshold = 60 * time.Second
+const searchUserQueryMinLen = 2
+const searchUserQueryMaxLen = 50
 
 func markOnline(user *models.User) {
 	user.IsOnline = time.Since(user.LastSeen) < onlineThreshold
@@ -359,8 +361,12 @@ func SearchUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "search query not included"})
 		return
 	}
-	if utf8.RuneCountInString(query) < 2 {
+	if utf8.RuneCountInString(query) < searchUserQueryMinLen {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "query must be at least 2 characters"})
+		return
+	}
+	if utf8.RuneCountInString(query) > searchUserQueryMaxLen {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "query must be at most 50 characters"})
 		return
 	}
 	users, err := repository.SearchUsersByUsername(c.Request.Context(), query)

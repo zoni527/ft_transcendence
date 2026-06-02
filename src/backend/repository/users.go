@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"ft_transcendence/backend/integrations"
 	"ft_transcendence/backend/models"
 
 	"github.com/jackc/pgerrcode"
@@ -341,6 +342,8 @@ func CleanExpiredTokens(currentTime time.Time) error {
 	return nil
 }
 
+var ErrOAuthUserBlock = errors.New("password and email changing blocked for OAuth users")
+
 func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
 	tx, err := Pool.Begin(ctx)
 	if err != nil {
@@ -348,17 +351,32 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 	}
 	defer tx.Rollback(ctx)
 
-	sql := `UPDATE "user"
-			SET email = COALESCE($1, email),
+	sql := `UPDATE "user" SET
+				email = CASE
+					WHEN password_hash = $7 AND $1::varchar IS NOT NULL THEN email
+					ELSE COALESCE($1, email)
+				END,
 				name = COALESCE($2, name),
-				password_hash = COALESCE($3, password_hash),
+				password_hash = CASE
+					WHEN password_hash = $7 AND $3::varchar IS NOT NULL THEN password_hash
+					ELSE COALESCE($3, password_hash)
+				END,
 				display_name = COALESCE($4, display_name),
 				avatar_url = COALESCE($5, avatar_url),
-				updated_at = NOW()
+				updated_at = CASE
+					WHEN (password_hash = $7 AND $3::varchar IS NOT NULL)
+					  OR (password_hash = $7 AND $1::varchar IS NOT NULL) THEN updated_at
+					ELSE NOW()
+				END
 			WHERE id = $6
-			RETURNING id, email, name, display_name, avatar_url, created_at, updated_at, last_seen`
+			RETURNING
+				id, email, name, display_name, avatar_url, created_at, updated_at, last_seen,
+				   (password_hash = $7 AND $1::varchar IS NOT NULL AND $1 != email)
+				OR (password_hash = $7 AND $3::varchar IS NOT NULL) AS is_oauth_block`
 
 	var u models.User
+	var isOAuthBlock bool
+
 	err = tx.QueryRow(ctx, sql,
 		nullableString(params.Email),
 		nullableString(params.Name),
@@ -366,6 +384,7 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 		nullableString(params.DisplayName),
 		nullableString(params.AvatarURL),
 		id,
+		integrations.GoogleOAuthLockedPassword,
 	).Scan(
 		&u.ID,
 		&u.Email,
@@ -375,6 +394,7 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 		&u.CreatedAt,
 		&u.UpdatedAt,
 		&u.LastSeen,
+		&isOAuthBlock,
 	)
 	if err == pgx.ErrNoRows {
 		return models.User{}, pgx.ErrNoRows
@@ -385,6 +405,10 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 			return models.User{}, ErrUserAlreadyExists
 		}
 		return models.User{}, fmt.Errorf("UpdateUser profile: %w", err)
+	}
+
+	if isOAuthBlock {
+		return models.User{}, ErrOAuthUserBlock
 	}
 
 	if params.Roles != nil {

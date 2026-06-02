@@ -27,6 +27,7 @@ import (
 const onlineThreshold = 60 * time.Second
 const searchUserQueryMinLen = 2
 const searchUserQueryMaxLen = 50
+const passwordLenMax = 72
 
 func markOnline(user *models.User) {
 	user.IsOnline = time.Since(user.LastSeen) < onlineThreshold
@@ -342,6 +343,10 @@ func UpdateUser(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
 			return
 		}
+		if errors.Is(err, repository.ErrOAuthUserBlock) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "OAuth users cannot update their password or email"})
+			return
+		}
 		if errors.Is(err, pgx.ErrNoRows) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 			return
@@ -536,6 +541,9 @@ func hashPassword(password string) (string, error) {
 // Password validation helper to check if password has control characters
 // Any extra validations would come in this step
 func validatePassword(password string) error {
+	if len(password) > passwordLenMax {
+		return fmt.Errorf("password is too long (max %d bytes)", passwordLenMax)
+	}
 	for _, r := range password {
 		if unicode.IsControl(r) {
 			return errors.New("password contains invalid control characters")

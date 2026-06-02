@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { z } from 'zod';
@@ -95,7 +95,7 @@ const Login = () => {
   };
 
   if (user) {
-    return void navigate('/me');
+    return <Navigate to="/me" replace />;
   }
 
   return (

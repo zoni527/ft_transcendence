@@ -353,5 +353,6 @@ export const csTranslations = {
     copyFailed: 'Kopírování do schránky se nezdařilo',
     pageNotFound: '404 - Stránka nenalezena',
     weakPassword: 'Heslo je příliš slabé',
+    noAuth: 'Neověřený uživatel',
   },
 };

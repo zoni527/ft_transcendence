@@ -354,5 +354,6 @@ export const fiTranslations = {
     copyFailed: 'Kopiointi leikepöydälle epäonnistui',
     pageNotFound: '404 - Sivua ei löytynyt',
     weakPassword: 'Salasana on liian heikko',
+    noAuth: 'Ei tunnistauduttu',
   },
 };

@@ -368,9 +368,7 @@ const Dashboard = () => {
   }
 
   if (!id && !authUser) {
-    return (
-      <StatusBox message={t('error.userNotFound')} className="text-red-600" />
-    );
+    return <StatusBox message={t('error.noAuth')} className="text-red-600" />;
   }
 
   if (userFetched && !userData) {

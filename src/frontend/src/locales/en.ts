@@ -353,5 +353,6 @@ export const enTranslations = {
     copyFailed: 'Copy to clipboard failed',
     pageNotFound: '404 - Page not found',
     weakPassword: 'Password too weak',
+    noAuth: 'Not authenticated',
   },
 };

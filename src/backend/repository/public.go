@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"fmt"
-
 	"context"
+	"fmt"
 )
 
 func SaveAPIKey(ctx context.Context, userID, rawSecret string) error {

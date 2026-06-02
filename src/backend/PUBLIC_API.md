@@ -3,8 +3,8 @@
 ## Overview
 
 Major requirements for the public API:
-- Secured by an API key (see **Security**)
-- Rate limiting per API key (see **Rate Limiting**)
+- Secured by an API key
+- Rate limiting per API key
 - Documentation for each endpoint (this file)
 - At least five endpoints: `GET`, `POST`, `PUT`, `DELETE` (listed below)
 

@@ -10,12 +10,12 @@ import (
 	"golang.org/x/time/rate"
 )
 
-type identifierMode int
+type IdentifierMode int
 
 const (
-	byUserID identifierMode = iota
-	byApiKey
-	byIPOnly
+	ByUserID IdentifierMode = iota
+	ByApiKey
+	ByIPOnly
 )
 
 type client struct {
@@ -23,16 +23,18 @@ type client struct {
 	lastSeen time.Time
 }
 
+var cleanRetention = 5 * time.Minute
+var sleepInterval = 1 * time.Minute
 var clients = make(map[string]*client)
 var mu sync.Mutex
 
 func init() {
 	go func() {
 		for {
-			time.Sleep(1 * time.Minute)
+			time.Sleep(sleepInterval)
 			mu.Lock()
 			for id, client := range clients {
-				if time.Since(client.lastSeen) > 3*time.Minute {
+				if time.Since(client.lastSeen) > cleanRetention {
 					delete(clients, id)
 				}
 			}
@@ -41,9 +43,9 @@ func init() {
 	}()
 }
 
-func getClientIdentifier(c *gin.Context, mode identifierMode) string {
+func getClientIdentifier(c *gin.Context, mode IdentifierMode) string {
 	switch mode {
-	case byApiKey:
+	case ByApiKey:
 		apiKey := c.GetString("apiKey")
 		if apiKey == "" {
 			apiKey = c.GetHeader("X-API-Key")
@@ -52,11 +54,11 @@ func getClientIdentifier(c *gin.Context, mode identifierMode) string {
 			h := sha256.Sum256([]byte(apiKey))
 			return "hashKey:" + hex.EncodeToString(h[:])
 		}
-	case byUserID:
+	case ByUserID:
 		if userID := c.GetString("userID"); userID != "" {
 			return "user:" + userID
 		}
-	case byIPOnly:
+	case ByIPOnly:
 		return "ip:" + c.ClientIP()
 	}
 	return "ip:" + c.ClientIP()

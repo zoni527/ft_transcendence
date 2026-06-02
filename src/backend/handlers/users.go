@@ -50,7 +50,7 @@ func GetUserByID(c *gin.Context) {
 	functionName := "GetUsersByID"
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
-		err := errorhandling.NewRecipeNotFound()
+		err := errorhandling.NewUserNotFound()
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
@@ -67,7 +67,7 @@ func GetMe(c *gin.Context) {
 	userID := c.GetString("userID")
 	functionName := "GetMe"
 	if !authorization.IsValidUUID(userID) {
-		err := errorhandling.NewRecipeNotFound()
+		err := errorhandling.NewUserNotFound()
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
@@ -192,21 +192,24 @@ func LoginUser(c *gin.Context) {
 	functionName := "LoginUser"
 	var req models.LoginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		err := errorhandling.NewBadRequest(errorhandling.UserBindingError, "invalid input data")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	data, err := repository.GetUserCredentialsByEmail(c.Request.Context(), req.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+			err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "invalid credentials")
+			errorhandling.IdentifyAndRespond(c, functionName, err)
 			return
 		}
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(data.PasswordHash), []byte(req.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "invalid credentials")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	token, err := authorization.GenerateJWTToken(data.ID)
@@ -224,18 +227,18 @@ func LoginUser(c *gin.Context) {
 }
 
 func LogoutUser(c *gin.Context) {
+	functionName := "LogoutUser"
 	token := c.GetString("token")
 	expDate := c.GetTime("expDate")
 	if err := authorization.AddTokenToBlacklist(c.Request.Context(), token, expDate); err != nil {
-		log.Printf("LogoutUser: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
 	userID := c.GetString("userID")
 	if userID != "" {
 		if err := repository.MarkOffline(c.Request.Context(), userID); err != nil {
-			log.Printf("LogoutUser MarkOffline: %v", err)
+			log.Printf(functionName+" MarkOffline: %v", err)
 		}
 	}
 
@@ -658,16 +661,16 @@ func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
 }
 
 func Heartbeat(c *gin.Context) {
-	funcionName := "Heartbeat"
+	functionName := "Heartbeat"
 	userID := c.GetString("userID")
 
 	if !authorization.IsValidUUID(userID) {
 		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
-		errorhandling.IdentifyAndRespond(c, funcionName, err)
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), userID); err != nil {
-		errorhandling.IdentifyAndRespond(c, funcionName, err)
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -683,7 +686,8 @@ func DeleteUser(c *gin.Context) {
 
 	callerUserID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerUserID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
@@ -694,13 +698,15 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	if !authorization.CanDeleteUser(roleSet, callerUserID, targetUserID) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+		err := errorhandling.NewForbidden(errorhandling.UserCantDelete, "insufficient permissions")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
 	if err := repository.DeleteUser(c.Request.Context(), targetUserID); err != nil {
 		if errors.Is(err, repository.ErrLastAdmin) {
-			c.JSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
+			err := errorhandling.NewForbidden(errorhandling.UserLastAdmin, "cannot delete the last admin")
+			errorhandling.IdentifyAndRespond(c, functionName, err)
 			return
 		}
 		errorhandling.IdentifyAndRespond(c, "handlers.DeleteUser", err)

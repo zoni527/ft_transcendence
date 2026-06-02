@@ -32,6 +32,8 @@ const (
 	UserPasswordTooWeak         ErrorCode = "USER_PASSWORD_TOO_WEAK"
 	UserPasswordChangeForbidden ErrorCode = "USER_PASSWORD_CHANGE_FORBIDDEN"
 	UserAlreadyExists           ErrorCode = "USER_ALREADY_EXISTS"
+	UserCantDelete              ErrorCode = "USER_CANT_DELETE"
+	UserLastAdmin               ErrorCode = "USER_LAST_ADMIN"
 
 	FriendshipAlreadyExists    ErrorCode = "FRIENDSHIP_ALREADY_EXISTS"
 	FriendshipReceiverNotFound ErrorCode = "FRIENDSHIP_RECEIVER_NOT_FOUND"
@@ -39,6 +41,9 @@ const (
 	FriendshipDataInvalid      ErrorCode = "FRIENDSHIP_DATA_INVALID"
 	FriendshipRequestNotFound  ErrorCode = "FRIENDSHIP_REQUEST_NOT_FOUND"
 	FriendshipNotFound         ErrorCode = "FRIENDSHIP_NOT_FOUND"
+
+	OAuthLoginFail         ErrorCode = "OAUTH_LOGIN_FAIL"
+	OAuthLoginNotOAuthUser ErrorCode = "OAUTH_LOGIN_NOT_OAUTH_USER"
 )
 
 type APIError struct {

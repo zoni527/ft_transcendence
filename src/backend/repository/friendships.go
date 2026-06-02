@@ -74,7 +74,7 @@ func friendshipPostgresErrorClassification(functionName string, err error) error
 			"friendship already exists",
 		)
 	case pgerrcode.ForeignKeyViolation:
-		return errorhandling.NewBadRequest(
+		return errorhandling.NewNotFound(
 			errorhandling.FriendshipReceiverNotFound,
 			"receiver not found",
 		)
@@ -91,7 +91,7 @@ func friendshipPostgresErrorClassification(functionName string, err error) error
 			"invalid frienship data",
 		)
 	case pgerrcode.InvalidTextRepresentation:
-		return errorhandling.NewBadRequest(
+		return errorhandling.NewNotFound(
 			errorhandling.FriendshipReceiverNotFound,
 			"receiver not found",
 		)

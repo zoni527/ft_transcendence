@@ -31,7 +31,7 @@ func NewRecipeHandler(repo repository.RecipeRepository) *RecipeHandler {
 func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
 	recipes, err := h.Repo.GetAllRecipes(c.Request.Context())
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.GetAllRecipes", err)
+		errorhandling.IdentifyAndRespond(c, "GetAllRecipes", err)
 		return
 	}
 
@@ -39,7 +39,7 @@ func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
 }
 
 func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
-	functionName := "handlers.GetRecipeByID"
+	functionName := "GetRecipeByID"
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
 		err := errorhandling.NewRecipeNotFound()
@@ -57,13 +57,10 @@ func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
 }
 
 func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
-	functionName := "handlers.SearchRecipes"
+	functionName := "SearchRecipes"
 	var f models.SearchRecipeFilters
 	if err := c.ShouldBindQuery(&f); err != nil {
-		err := errorhandling.NewBadRequest(
-			errorhandling.RecipeBindingError,
-			"error binding recipe query",
-		)
+		err := errorhandling.NewBadRequest(errorhandling.RecipeBindingError, "error binding recipe query")
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
@@ -85,23 +82,17 @@ func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
 }
 
 func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
-	functionName := "handlers.CreateRecipe"
+	functionName := "CreateRecipe"
 	var r models.Recipe
 	if err := c.ShouldBindJSON(&r); err != nil {
-		err := errorhandling.NewBadRequest(
-			errorhandling.RecipeBindingError,
-			"error binding recipe from json",
-		)
+		err := errorhandling.NewBadRequest(errorhandling.RecipeBindingError, "error binding recipe from json")
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
 	r.AuthorID = c.GetString("userID")
 	if !authorization.IsValidUUID(r.AuthorID) {
-		err := errorhandling.NewUnauthorized(
-			errorhandling.RecipeAuthorIDInvalid,
-			"unauthorized",
-		)
+		err := errorhandling.NewUnauthorized(errorhandling.RecipeAuthorIDInvalid, "unauthorized")
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
@@ -124,13 +115,10 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 }
 
 func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
-	functionName := "handlers.UpdateRecipe"
+	functionName := "UpdateRecipe"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		err := errorhandling.NewUnauthorized(
-			errorhandling.UserUnauthorized,
-			"unauthorized",
-		)
+		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized")
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
@@ -144,10 +132,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 
 	var r models.Recipe
 	if err := c.ShouldBindJSON(&r); err != nil {
-		err := errorhandling.NewBadRequest(
-			errorhandling.RecipeBindingError,
-			"invalid input data",
-		)
+		err := errorhandling.NewBadRequest(errorhandling.RecipeBindingError, "invalid input data")
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
@@ -165,26 +150,20 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 	}
 	allowed := authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.ID)
 	if !allowed {
-		err := errorhandling.NewForbidden(
-			errorhandling.RecipeCantEdit,
-			"forbidden",
-		)
+		err := errorhandling.NewForbidden(errorhandling.RecipeCantEdit, "forbidden")
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
 	if err := validateRecipeFields(&r); err != nil {
-		validationErr := errorhandling.NewBadRequest(
-			errorhandling.RecipeBadField,
-			fmt.Sprintf("%v", err),
-		)
+		validationErr := errorhandling.NewBadRequest(errorhandling.RecipeBadField, fmt.Sprintf("%v", err))
 		errorhandling.IdentifyAndRespond(c, functionName, validationErr)
 		return
 	}
 
 	r.ID = recipeID
 	if err := h.Repo.UpdateRecipe(c.Request.Context(), &r); err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.UpdateRecipe", err)
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
@@ -192,7 +171,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 }
 
 func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
-	functionName := "handlers.DeleteRecipe"
+	functionName := "DeleteRecipe"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
 		err := errorhandling.NewUnauthorized(
@@ -223,10 +202,7 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 	}
 	allowed := authorization.CanDeleteRecipe(roleSet, permSet, userID, original.Author.ID)
 	if !allowed {
-		err := errorhandling.NewForbidden(
-			errorhandling.RecipeCantDelete,
-			"forbidden",
-		)
+		err := errorhandling.NewForbidden(errorhandling.RecipeCantDelete, "forbidden")
 		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}

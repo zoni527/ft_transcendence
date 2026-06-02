@@ -14,16 +14,17 @@ import (
 )
 
 func GetFriendships(c *gin.Context) {
+	functionName := "GetFriendships"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
 	rows, err := repository.GetFriendshipsForUser(c.Request.Context(), userID)
 	if err != nil {
-		log.Printf("GetFriendships error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 
@@ -50,9 +51,11 @@ func GetFriendships(c *gin.Context) {
 
 // POST /api/friendships
 func CreateFriendRequest(c *gin.Context) {
+	functionName := "CreateFriendRequest"
 	requesterID := c.GetString("userID")
 	if !authorization.IsValidUUID(requesterID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 

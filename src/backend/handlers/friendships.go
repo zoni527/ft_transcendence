@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
@@ -70,11 +71,7 @@ func CreateFriendRequest(c *gin.Context) {
 	}
 
 	if err := repository.CreateFriendRequest(c.Request.Context(), requesterID, body.ReceiverID); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.CreateFriendRequest: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.CreateFriendRequest", err)
 		return
 	}
 
@@ -101,11 +98,7 @@ func AcceptFriendRequest(c *gin.Context) {
 	}
 
 	if err := repository.AcceptFriendRequest(c.Request.Context(), requesterID, receiverID); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.AcceptFriendRequest: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.AcceptFriendRequest", err)
 		return
 	}
 
@@ -134,11 +127,7 @@ func DeleteFriendship(c *gin.Context) {
 
 	status, err := repository.GetFriendshipStatus(c.Request.Context(), callerID, otherID)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteFriendship: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.DeleteFriendship", err)
 		return
 	}
 	action := c.Query("action")
@@ -152,11 +141,7 @@ func DeleteFriendship(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteFriendship: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.DeleteFriendship", err)
 		return
 	}
 

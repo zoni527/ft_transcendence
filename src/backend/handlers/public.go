@@ -3,12 +3,12 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/services"
 )
@@ -24,11 +24,7 @@ func NewPublicRecipeHandler(svc services.RecipeService) *PublicRecipeHandler {
 func (h *PublicRecipeHandler) GetAllRecipes(c *gin.Context) {
 	recipes, err := h.svc.ListPublicRecipes(c.Request.Context())
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.GetAllRecipes: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.GetAllRecipes", err)
 		return
 	}
 	c.JSON(http.StatusOK, recipes)
@@ -42,11 +38,7 @@ func (h *PublicRecipeHandler) GetRecipeByID(c *gin.Context) {
 	}
 	recipe, err := h.svc.GetPublicRecipe(c.Request.Context(), id)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.GetRecipeByID: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.GetRecipeByID", err)
 		return
 	}
 	c.JSON(http.StatusOK, recipe)
@@ -71,11 +63,7 @@ func (h *PublicRecipeHandler) CreateRecipe(c *gin.Context) {
 	}
 	recipeID, err := h.svc.CreateRecipe(c.Request.Context(), r.AuthorID, r)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.CreateRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.CreateRecipe", err)
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"id": recipeID})
@@ -107,11 +95,7 @@ func (h *PublicRecipeHandler) UpdateRecipe(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.UpdateRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.UpdateRecipe", err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"id": recipeID})
@@ -133,11 +117,7 @@ func (h *PublicRecipeHandler) DeleteRecipe(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.DeleteRecipe", err)
 		return
 	}
 	c.Status(http.StatusNoContent)

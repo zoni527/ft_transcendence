@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/models"
 
 	"github.com/jackc/pgerrcode"
@@ -68,17 +69,32 @@ func friendshipPostgresErrorClassification(functionName string, err error) error
 	}
 	switch pgErr.Code {
 	case pgerrcode.UniqueViolation:
-		return &BadRequestError{"friendship already exists"}
+		return errorhandling.NewBadRequest(
+			errorhandling.FriendshipAlreadyExists,
+			"friendship already exists",
+		)
 	case pgerrcode.ForeignKeyViolation:
-		return &NotFoundError{"receiver not found"}
+		return errorhandling.NewBadRequest(
+			errorhandling.FriendshipReceiverNotFound,
+			"receiver not found",
+		)
 	case pgerrcode.CheckViolation:
 		if pgErr.ConstraintName == "friendship_no_self" {
-			return &BadRequestError{"cannot send a request to yourself"}
+			return errorhandling.NewBadRequest(
+				errorhandling.FriendshipNoSelf,
+				"cannot send a request to yourself",
+			)
 		}
 		log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
-		return &BadRequestError{"invalid friendship data"}
+		return errorhandling.NewBadRequest(
+			errorhandling.FriendshipDataInvalid,
+			"invalid frienship data",
+		)
 	case pgerrcode.InvalidTextRepresentation:
-		return &NotFoundError{"receiver not found"}
+		return errorhandling.NewBadRequest(
+			errorhandling.FriendshipReceiverNotFound,
+			"receiver not found",
+		)
 	default:
 		return fmt.Errorf("%v: %w", functionName, err)
 	}
@@ -100,7 +116,10 @@ func AcceptFriendRequest(ctx context.Context, requesterID, receiverID string) er
 		return fmt.Errorf("repository.AcceptFriendRequest: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return &NotFoundError{"friend request not found"}
+		return errorhandling.NewNotFound(
+			errorhandling.FriendshipRequestNotFound,
+			"friend request not found",
+		)
 	}
 	return nil
 }
@@ -115,7 +134,10 @@ func GetFriendshipStatus(ctx context.Context, userAID, userBID string) (string, 
 	err := Pool.QueryRow(ctx, sql, userAID, userBID).Scan(&status)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return "", &NotFoundError{"friendship not found"}
+			return "", errorhandling.NewNotFound(
+				errorhandling.FriendshipNotFound,
+				"friendship not found",
+			)
 		}
 		return "", fmt.Errorf("repository.GetFriendshipStatus: %w", err)
 	}
@@ -136,7 +158,10 @@ func DeleteFriendRequest(ctx context.Context, callerID, otherID string) error {
 		return fmt.Errorf("repository.DeleteFriendRequest: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return &NotFoundError{"friend request not found"}
+		return errorhandling.NewNotFound(
+			errorhandling.FriendshipRequestNotFound,
+			"friend request not found",
+		)
 	}
 	return nil
 }
@@ -154,7 +179,10 @@ func DeleteFriendship(ctx context.Context, callerID, otherID string) error {
 		return fmt.Errorf("repository.DeleteFriendship: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return &NotFoundError{"friendship not found"}
+		return errorhandling.NewNotFound(
+			errorhandling.FriendshipNotFound,
+			"friendship not found",
+		)
 	}
 	return nil
 }

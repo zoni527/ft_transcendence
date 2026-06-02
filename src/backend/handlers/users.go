@@ -14,6 +14,7 @@ import (
 	"unicode/utf8"
 
 	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/integrations"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
@@ -36,8 +37,7 @@ func markOnline(user *models.User) {
 func GetUsers(c *gin.Context) {
 	users, err := repository.GetAllUsers(c.Request.Context())
 	if err != nil {
-		log.Printf("GetUsers: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "GetUsers", err)
 		return
 	}
 	for i := range users {
@@ -47,20 +47,16 @@ func GetUsers(c *gin.Context) {
 }
 
 func GetUserByID(c *gin.Context) {
+	functionName := "GetUsersByID"
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		err := errorhandling.NewRecipeNotFound()
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
-
 	user, err := repository.GetUserByID(c.Request.Context(), id)
-	if err == pgx.ErrNoRows {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
-		return
-	}
 	if err != nil {
-		log.Printf("GetUserByID: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -69,18 +65,15 @@ func GetUserByID(c *gin.Context) {
 
 func GetMe(c *gin.Context) {
 	userID := c.GetString("userID")
+	functionName := "GetMe"
 	if !authorization.IsValidUUID(userID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.NewRecipeNotFound()
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	user, err := repository.GetUserByID(c.Request.Context(), userID)
-	if err == pgx.ErrNoRows {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
-		return
-	}
 	if err != nil {
-		log.Printf("Getme: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -108,6 +101,7 @@ func UserAvatarSignature(c *gin.Context) {
 }
 
 func GetSession(c *gin.Context) {
+	functionName := "GetSession"
 	token, err := c.Cookie("token")
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"authenticated": false})
@@ -123,8 +117,7 @@ func GetSession(c *gin.Context) {
 
 	blacklisted, err := authorization.IsTokenBlacklisted(c.Request.Context(), token)
 	if err != nil {
-		log.Printf("GetSession blacklist check: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName+" blacklist check", err)
 		return
 	}
 	if blacklisted {
@@ -140,8 +133,7 @@ func GetSession(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		log.Printf("GetSession: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -149,27 +141,29 @@ func GetSession(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
+	functionName := "CreateUser"
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		err := errorhandling.NewBadRequest(errorhandling.UserBindingError, "invalid input data")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.DisplayName); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if err := validatePassword(req.Password); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if !isPasswordStrong(req.Password) {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+		err := errorhandling.NewUnprocessableEntity(errorhandling.UserPasswordTooWeak, "password is too weak")
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
-		log.Printf("CreateUser hashPassword: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	userParams := models.CreateUserParams{
@@ -180,12 +174,7 @@ func CreateUser(c *gin.Context) {
 	}
 	data, err := repository.CreateUser(c.Request.Context(), userParams)
 	if err != nil {
-		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.JSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
-			return
-		}
-		log.Printf("CreateUser: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	token, err := authorization.GenerateJWTToken(data.ID)
@@ -200,6 +189,7 @@ func CreateUser(c *gin.Context) {
 }
 
 func LoginUser(c *gin.Context) {
+	functionName := "LoginUser"
 	var req models.LoginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
@@ -212,8 +202,7 @@ func LoginUser(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 			return
 		}
-		log.Printf("LoginUser: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(data.PasswordHash), []byte(req.Password)); err != nil {
@@ -222,12 +211,12 @@ func LoginUser(c *gin.Context) {
 	}
 	token, err := authorization.GenerateJWTToken(data.ID)
 	if err != nil {
-		log.Printf("LoginUser GenerateJWTToken: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), data.ID); err != nil {
-		log.Printf("LoginUser UpdateLastSeen: %v", err)
+		errorhandling.IdentifyAndRespond(c, functionName, err)
+		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("token", token, 3600, "/", "", true, true)
@@ -255,6 +244,7 @@ func LogoutUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
+	functionName := "UpdateUser"
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
@@ -269,8 +259,7 @@ func UpdateUser(c *gin.Context) {
 	roleSet, okRoles := authorization.RolesFromContext(c)
 	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
-		log.Printf("handlers.UpdateUser: data missing from context")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, fmt.Errorf("data missing from context"))
 		return
 	}
 	allowed := authorization.CanEditUser(roleSet, callerUserID, targetUserID)
@@ -289,16 +278,21 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	if req.Password != nil && callerUserID != targetUserID {
-		c.JSON(http.StatusForbidden, gin.H{"error": "password can only be changed by the account owner"})
+		err := errorhandling.NewForbidden(
+			errorhandling.UserPasswordChangeForbidden,
+			"password can only be changed by the account owner",
+		)
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	if req.Password != nil {
 		if err := validatePassword(*req.Password); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			errorhandling.IdentifyAndRespond(c, functionName, err)
 			return
 		}
 		if !isPasswordStrong(*req.Password) {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "password is too weak"})
+			err := errorhandling.NewUnprocessableEntity(errorhandling.UserPasswordTooWeak, "password is too weak")
+			errorhandling.IdentifyAndRespond(c, functionName, err)
 			return
 		}
 	}
@@ -339,20 +333,11 @@ func UpdateUser(c *gin.Context) {
 	}
 	user, err := repository.UpdateUser(c.Request.Context(), targetUserID, userParams)
 	if err != nil {
-		if errors.Is(err, repository.ErrUserAlreadyExists) {
-			c.JSON(http.StatusConflict, gin.H{"error": "username/email already exists"})
-			return
-		}
 		if errors.Is(err, repository.ErrOAuthUserBlock) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "OAuth users cannot update their password or email"})
 			return
 		}
-		if errors.Is(err, pgx.ErrNoRows) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
-			return
-		}
-		log.Printf("UpdateUser: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -471,11 +456,11 @@ func normalizeAndValidateUserFields(email, name, displayName *string) error {
 	if *name != "" {
 		*name = strings.TrimSpace(*name)
 		if !isValidName(*name) {
-			return errors.New("invalid name")
+			return errorhandling.NewBadRequest(errorhandling.UserNameInvalid, "invalid name")
 		}
 	}
 	if !isValidDisplayName(*displayName) {
-		return errors.New("invalid display_name")
+		return errorhandling.NewBadRequest(errorhandling.UserDisplayNameInvalid, "invalid display_name")
 	}
 	return nil
 }
@@ -508,7 +493,7 @@ func validateEmail(email string) error {
 
 	for _, r := range email {
 		if unicode.IsControl(r) {
-			return errors.New("email contains control characters")
+			return errorhandling.NewBadRequest(errorhandling.UserEmailInvalid, "email contains control characters")
 		}
 	}
 
@@ -546,7 +531,10 @@ func validatePassword(password string) error {
 	}
 	for _, r := range password {
 		if unicode.IsControl(r) {
-			return errors.New("password contains invalid control characters")
+			return errorhandling.NewBadRequest(
+				errorhandling.UserPasswordInvalid,
+				"password contains invalid control characters",
+			)
 		}
 	}
 	return nil
@@ -670,25 +658,23 @@ func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
 }
 
 func Heartbeat(c *gin.Context) {
+	funcionName := "Heartbeat"
 	userID := c.GetString("userID")
 
 	if !authorization.IsValidUUID(userID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
+		errorhandling.IdentifyAndRespond(c, funcionName, err)
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), userID); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"error": "user not found"})
-			return
-		}
-		log.Printf("Heartbeat: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, funcionName, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
 }
 
 func DeleteUser(c *gin.Context) {
+	functionName := "DeleteUser"
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
@@ -703,8 +689,7 @@ func DeleteUser(c *gin.Context) {
 
 	roleSet, ok := authorization.RolesFromContext(c)
 	if !ok {
-		log.Printf("handlers.DeleteUser: data missing from context")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, functionName, fmt.Errorf("data missing from context"))
 		return
 	}
 
@@ -718,13 +703,7 @@ func DeleteUser(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "cannot delete the last admin"})
 			return
 		}
-		var nf *repository.NotFoundError
-		if errors.As(err, &nf) {
-			c.JSON(http.StatusNotFound, gin.H{"error": nf.Error()})
-			return
-		}
-		log.Printf("handlers.DeleteUser: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.IdentifyAndRespond(c, "handlers.DeleteUser", err)
 		return
 	}
 

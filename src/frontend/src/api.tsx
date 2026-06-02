@@ -6,6 +6,11 @@ import type {
   AcceptedFriend,
 } from './types/types';
 
+interface ApiError {
+  code?: string;
+  message?: string;
+}
+
 export interface SearchRecipesParams {
   query?: string;
   page?: number;
@@ -255,26 +260,29 @@ function isCloudinaryResponse(data: unknown): data is CloudinaryResponse {
 }
 
 // Function to get translated error messages based on status code
-function getTranslatedErrorMessage(statusCode: number, t: TFunction): string {
-  switch (statusCode) {
-    case 400:
+function getTranslatedErrorMessage(
+  errorCode: string | undefined,
+  t: TFunction,
+): string {
+  switch (errorCode) {
+    case '0':
       return t('error.badRequest');
-    case 401:
+    case '1':
       return t('error.unauthorized');
-    case 403:
+    case '2':
       return t('error.forbidden');
-    case 404:
+    case '3':
       return t('error.notFound');
-    case 409:
+    case '4':
       return t('error.conflict');
-    case 422:
+    case '5':
       return t('error.weakPassword');
-    case 429:
+    case '6':
       return t('error.rateLimit');
-    case 500:
+    case '7':
       return t('error.serverError');
     default:
-      return t('error.genericError', { statusCode });
+      return t('error.genericError');
   }
 }
 
@@ -286,11 +294,18 @@ export const getRecipes = async (
   const response = await fetch(`${baseUrl}/recipes`, { signal });
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   const data: unknown = await response.json();
-
   if (!Array.isArray(data)) {
     return [];
   }
@@ -318,7 +333,15 @@ export const getRecipesSearch = async (
   const response = await fetch(url, { signal });
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   const data: unknown = await response.json();
@@ -339,8 +362,15 @@ export const getRecipeById = async (
   const response = await fetch(`${baseUrl}/recipes/${id}`, { signal });
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   const data = (await response.json()) as Recipe;
@@ -358,8 +388,15 @@ export const deleteRecipe = async (id: string, t: TFunction) => {
   });
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 };
 
@@ -386,8 +423,15 @@ export const postCreateRecipe = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isCreateRecipeResponse(data)) {
@@ -417,8 +461,15 @@ export const getSession = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isSessionResponse(data)) {
@@ -453,8 +504,15 @@ export const getSearch = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isGetSearchResponse(data)) {
@@ -474,7 +532,15 @@ export const getUsers = async (
   });
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   const data: unknown = await response.json();
@@ -502,8 +568,15 @@ export const getMe = async (t: TFunction): Promise<User> => {
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isUserResponse(data)) {
@@ -534,8 +607,15 @@ export const getUserbyId = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isUserResponse(data)) {
@@ -556,8 +636,15 @@ export const deleteUser = async (id: string, t: TFunction) => {
   });
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 };
 
@@ -581,8 +668,15 @@ export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isLoginSignupResponse(data)) {
@@ -601,8 +695,15 @@ export const postLogout = async (t: TFunction) => {
   });
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 };
 
@@ -626,8 +727,15 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isLoginSignupResponse(data)) {
@@ -651,8 +759,15 @@ export const putHeartbeat = async (t: TFunction, signal?: AbortSignal) => {
   });
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 };
 
@@ -680,8 +795,15 @@ export const putUpdateUser = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isUserResponse(data)) {
@@ -710,7 +832,15 @@ export const getFriendships = async (
   }
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isFriendshipsResponse(data)) {
@@ -732,7 +862,15 @@ export const sendFriendship = async (receiver_id: string, t: TFunction) => {
   });
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 };
 
@@ -747,7 +885,15 @@ export const acceptFriend = async (id: string, t: TFunction) => {
   });
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 };
 
@@ -769,7 +915,15 @@ export const deleteFriend = async (
   );
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 };
 
@@ -792,7 +946,15 @@ export const generateApiKey = async (t: TFunction) => {
   }
 
   if (!response.ok) {
-    throw new Error(getTranslatedErrorMessage(response.status, t));
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (typeof data !== 'string') {
@@ -826,8 +988,15 @@ export const putUpdateRecipe = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isCreateRecipeResponse(data)) {
@@ -855,8 +1024,15 @@ export const getCloudinarySignature = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isCloudinaryBackendResponse(data)) {
@@ -884,8 +1060,15 @@ export const getCloudinarySignatureAvatar = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isCloudinaryBackendResponse(data)) {
@@ -928,8 +1111,15 @@ export const uploadImageToCloudinary = async (
   }
 
   if (!response.ok) {
-    const errorMessage = getTranslatedErrorMessage(response.status, t);
-    throw new Error(errorMessage);
+    let apiError: ApiError | undefined;
+
+    try {
+      apiError = (await response.json()) as ApiError;
+    } catch {
+      // ignore parse errors
+    }
+
+    throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
   if (!isCloudinaryResponse(data)) {

@@ -310,12 +310,36 @@ function getTranslatedErrorMessage(
       return t('error.userCantDelete');
     case 'USER_LAST_ADMIN':
       return t('error.userLastAdmin');
+    case 'USER_CREDENTIALS_INVALID':
+      return t('error.userCredentialsInvalid');
+    case 'USER_QUERY_MISSING':
+      return t('error.userQueryMissing');
+    case 'USER_QUERY_TOO_LONG':
+      return t('error.userQueryTooLong');
+    case 'USER_QUERY_TOO_SHORT':
+      return t('error.userQueryTooShort');
+    case 'USER_REQUIRED_PERMISSION_MISSING':
+      return t('error.userRequiredPermissionMissing');
+    case 'USER_REQUIRED_ROLE_MISSING':
+      return t('error.userRequiredRoleMissing');
+    case 'USER_UPDATE_FORBIDDEN':
+      return t('error.userUpdateForbidden');
+    case 'USER_UPDATE_NO_PERM_OR_SELF':
+      return t('error.userUpdateNoPermOrSelf');
+    case 'USER_UPDATE_NO_UPDATE':
+      return t('error.userUpdateNoUpdate');
+    case 'USER_UPDATE_OAUTH_FORBIDDEN':
+      return t('error.userUpdateOAuthForbidden');
+    case 'USER_UPDATE_ROLES_INVALID':
+      return t('error.userUpdateRolesInvalid');
 
     case 'FRIENDSHIP_ALREADY_EXISTS':
       return t('error.friendshipAlreadyExists');
     case 'FRIENDSHIP_RECEIVER_NOT_FOUND':
       return t('error.friendshipReceiverNotFound');
-    case 'FRIENDSHIP_NO_SELF':
+    case 'FRIENDSHIP_ACCEPT_NO_SELF':
+    case 'FRIENDSHIP_CREATE_NO_SELF':
+    case 'FRIENDSHIP_DELETE_NO_SELF':
       return t('error.friendshipNoSelf');
     case 'FRIENDSHIP_DATA_INVALID':
       return t('error.friendshipDataInvalid');
@@ -323,11 +347,24 @@ function getTranslatedErrorMessage(
       return t('error.friendshipRequestNotFound');
     case 'FRIENDSHIP_NOT_FOUND':
       return t('error.friendshipNotFound');
+    case 'FRIENDSHIP_QUERY_INVALID':
+      return t('error.friendshipQueryInvalid');
 
     case 'OAUTH_LOGIN_FAIL':
       return t('error.oAuthLoginFailed');
     case 'OAUTH_LOGIN_NOT_OAUTH_USER':
       return t('error.oAuthLoginNotOAuthUser');
+
+    case 'API_KEY_INVALID':
+      return t('error.apiKeyInvalid');
+
+    case 'TOKEN_INVALID':
+      return t('error.tokenInvalid');
+    case 'TOKEN_MISSING':
+      return t('error.tokenMissing');
+
+    case 'RATE_LIMIT':
+      return t('error.rateLimit');
 
     default:
       return t('error.genericError');

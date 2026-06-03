@@ -368,6 +368,18 @@ export const csTranslations = {
     userAlreadyExists: 'Účet s těmito údaji již existuje',
     userCantDelete: 'Tento účet nelze smazat',
     userLastAdmin: 'Posledního administrátora nelze odstranit',
+    userCredentialsInvalid: 'Neplatné uživatelské jméno nebo heslo',
+    userQueryMissing: 'Vyhledávací dotaz je povinný',
+    userQueryTooLong: 'Vyhledávací dotaz je příliš dlouhý',
+    userQueryTooShort: 'Vyhledávací dotaz je příliš krátký',
+    userRequiredPermissionMissing: 'Nemáte požadované oprávnění',
+    userRequiredRoleMissing: 'Nemáte požadovanou roli',
+    userUpdateForbidden: 'Úprava tohoto uživatele není povolena',
+    userUpdateNoPermOrSelf:
+      'Můžete upravovat pouze svůj vlastní účet nebo uživatele, ke kterým máte oprávnění',
+    userUpdateNoUpdate: 'Nebyly zadány žádné změny k aktualizaci',
+    userUpdateOAuthForbidden: 'Uživatele OAuth nelze tímto způsobem upravovat',
+    userUpdateRolesInvalid: 'Jedna nebo více rolí jsou neplatné',
 
     friendshipAlreadyExists: 'S tímto uživatelem jste již propojeni',
     friendshipReceiverNotFound: 'Vybraný uživatel nebyl nalezen',
@@ -375,8 +387,16 @@ export const csTranslations = {
     friendshipDataInvalid: 'Data žádosti o přátelství jsou neplatná',
     friendshipRequestNotFound: 'Žádost o přátelství nebyla nalezena',
     friendshipNotFound: 'Přátelství nebylo nalezeno',
+    friendshipQueryInvalid: 'Neplatný dotaz na přátelství',
 
     oAuthLoginFailed: 'Přihlášení přes OAuth se nezdařilo. Zkuste to znovu',
     oAuthLoginNotOAuthUser: 'Tento účet není propojen s OAuth přihlášením',
+
+    apiKeyInvalid: 'Neplatný API klíč',
+
+    tokenInvalid: 'Neplatný nebo expirovaný token',
+    tokenMissing: 'Autentizační token je povinný',
+
+    rateLimit: 'Příliš mnoho požadavků. Zkuste to prosím později',
   },
 };

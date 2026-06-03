@@ -369,6 +369,18 @@ export const fiTranslations = {
     userAlreadyExists: 'Tiedoilla on jo olemassa oleva käyttäjä',
     userCantDelete: 'Tätä käyttäjää ei voi poistaa',
     userLastAdmin: 'Viimeistä ylläpitäjää ei voi poistaa',
+    userCredentialsInvalid: 'Virheellinen käyttäjätunnus tai salasana',
+    userQueryMissing: 'Hakukysely vaaditaan',
+    userQueryTooLong: 'Hakukysely on liian pitkä',
+    userQueryTooShort: 'Hakukysely on liian lyhyt',
+    userRequiredPermissionMissing: 'Sinulla ei ole vaadittua käyttöoikeutta',
+    userRequiredRoleMissing: 'Sinulta puuttuu vaadittu rooli',
+    userUpdateForbidden: 'Tämän käyttäjän päivittäminen ei ole sallittua',
+    userUpdateNoPermOrSelf:
+      'Voit päivittää vain omaa tiliäsi tai käyttäjiä, joiden hallintaan sinulla on oikeus',
+    userUpdateNoUpdate: 'Päivitystä varten ei annettu muutoksia',
+    userUpdateOAuthForbidden: 'OAuth-käyttäjiä ei voi päivittää tällä tavalla',
+    userUpdateRolesInvalid: 'Yksi tai useampi rooli on virheellinen',
 
     friendshipAlreadyExists: 'Olette jo ystäviä',
     friendshipReceiverNotFound: 'Valittua käyttäjää ei löytynyt',
@@ -376,8 +388,16 @@ export const fiTranslations = {
     friendshipDataInvalid: 'Ystäväpyynnön tiedot ovat virheelliset',
     friendshipRequestNotFound: 'Ystäväpyyntöä ei löytynyt',
     friendshipNotFound: 'Ystävyyttä ei löytynyt',
+    friendshipQueryInvalid: 'Virheellinen ystävyyshaku',
 
     oAuthLoginFailed: 'OAuth-kirjautuminen epäonnistui. Yritä uudelleen',
     oAuthLoginNotOAuthUser: 'Tätä tiliä ei ole liitetty OAuth-kirjautumiseen',
+
+    apiKeyInvalid: 'Virheellinen API-avain',
+
+    tokenInvalid: 'Virheellinen tai vanhentunut tunniste',
+    tokenMissing: 'Todennustunniste vaaditaan',
+
+    rateLimit: 'Liian monta pyyntöä. Yritä myöhemmin uudelleen',
   },
 };

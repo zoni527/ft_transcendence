@@ -368,6 +368,18 @@ export const enTranslations = {
     userAlreadyExists: 'An account with these details already exists',
     userCantDelete: 'This user cannot be deleted',
     userLastAdmin: 'The last administrator cannot be removed',
+    userCredentialsInvalid: 'Invalid username or password',
+    userQueryMissing: 'Search query is required',
+    userQueryTooLong: 'Search query is too long',
+    userQueryTooShort: 'Search query is too short',
+    userRequiredPermissionMissing: 'You do not have the required permission',
+    userRequiredRoleMissing: 'You do not have the required role',
+    userUpdateForbidden: 'Updating this user is not allowe.',
+    userUpdateNoPermOrSelf:
+      'You can only update your own account or users you have permission to manage',
+    userUpdateNoUpdate: 'No changes were provided for the update',
+    userUpdateOAuthForbidden: 'OAuth users cannot be updated in this way',
+    userUpdateRolesInvalid: 'One or more roles are invalid',
 
     friendshipAlreadyExists: 'You are already connected with this user',
     friendshipReceiverNotFound: 'The selected user was not found',
@@ -375,8 +387,16 @@ export const enTranslations = {
     friendshipDataInvalid: 'Friend request data is invalid',
     friendshipRequestNotFound: 'Friend request not found',
     friendshipNotFound: 'Friendship not found',
+    friendshipQueryInvalid: 'Invalid friendship query',
 
     oAuthLoginFailed: 'OAuth login failed. Please try again',
     oAuthLoginNotOAuthUser: 'This account is not linked to OAuth login',
+
+    apiKeyInvalid: 'Invalid API key.',
+
+    tokenInvalid: 'Invalid or expired token.',
+    tokenMissing: 'Authentication token is required.',
+
+    rateLimit: 'Too many requests. Please try again later.',
   },
 };

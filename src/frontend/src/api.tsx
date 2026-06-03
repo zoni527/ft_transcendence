@@ -8,7 +8,7 @@ import type {
 
 interface ApiError {
   code?: string;
-  message?: string;
+  error?: string;
 }
 
 export interface SearchRecipesParams {

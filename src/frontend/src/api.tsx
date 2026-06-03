@@ -265,22 +265,70 @@ function getTranslatedErrorMessage(
   t: TFunction,
 ): string {
   switch (errorCode) {
-    case '0':
-      return t('error.badRequest');
-    case '1':
-      return t('error.unauthorized');
-    case '2':
-      return t('error.forbidden');
-    case '3':
-      return t('error.notFound');
-    case '4':
-      return t('error.conflict');
-    case '5':
-      return t('error.weakPassword');
-    case '6':
-      return t('error.rateLimit');
-    case '7':
-      return t('error.serverError');
+    case 'RECIPE_NOT_FOUND':
+      return t('error.recipeNotFound');
+    case 'RECIPE_BINDING_ERROR':
+      return t('error.recipeBindingError');
+    case 'RECIPE_AUTHOR_ID_INVALID':
+      return t('error.recipeAuthorIdInvalid');
+    case 'RECIPE_DATA_INVALID':
+      return t('error.recipeDataInvalid');
+    case 'RECIPE_DIFFICULTY_INVALID':
+      return t('error.recipeDifficultyInvalid');
+    case 'RECIPE_MEAL_TYPE_INVALID':
+      return t('error.recipeMealTypeInvalid');
+    case 'RECIPE_CANT_EDIT':
+      return t('error.recipeCantEdit');
+    case 'RECIPE_CANT_DELETE':
+      return t('error.recipeCantDelete');
+    case 'RECIPE_BAD_FIELD':
+      return t('error.recipeBadField');
+
+    case 'USER_NOT_FOUND':
+      return t('error.userNotFound');
+    case 'USER_BINDING_ERROR':
+      return t('error.userBindingError');
+    case 'USER_UNAUTHORIZED':
+      return t('error.userUnauthorized');
+    case 'USER_BAD_FIELD':
+      return t('error.userBadField');
+    case 'USER_NAME_INVALID':
+      return t('error.userNameInvalid');
+    case 'USER_EMAIL_INVALID':
+      return t('error.userEmailInvalid');
+    case 'USER_DISPLAY_NAME_INVALID':
+      return t('error.userUsernameInvalid');
+    case 'USER_PASSWORD_INVALID':
+      return t('error.userPasswordInvalid');
+    case 'USER_PASSWORD_TOO_WEAK':
+      return t('error.userPasswordWeak');
+    case 'USER_PASSWORD_CHANGE_FORBIDDEN':
+      return t('error.userPasswordChangeForbid');
+    case 'USER_ALREADY_EXISTS':
+      return t('error.userAlreadyExists');
+    case 'USER_CANT_DELETE':
+      return t('error.userCantDelete');
+    case 'USER_LAST_ADMIN':
+      return t('error.userLastAdmin');
+
+    case 'FRIENDSHIP_ALREADY_EXISTS':
+      return t('error.friendshipAlreadyExists');
+    case 'FRIENDSHIP_RECEIVER_NOT_FOUND':
+      return t('error.friendshipReceiverNotFound');
+    case 'FRIENDSHIP_NO_SELF':
+      return t('error.friendshipNoSelf');
+    case 'FRIENDSHIP_DATA_INVALID':
+      return t('error.friendshipDataInvalid');
+    case 'FRIENDSHIP_REQUEST_NOT_FOUND':
+      return t('error.friendshipRequestNotFound');
+    case 'FRIENDSHIP_NOT_FOUND':
+      return t('error.friendshipNotFound');
+
+    case 'OAUTH_LOGIN_FAIL':
+      return t('error.oAuthLoginFailed');
+    case 'OAUTH_LOGIN_NOT_OAUTH_USER':
+      return t('error.oAuthLoginNotOAuthUser');
+
     default:
       return t('error.genericError');
   }

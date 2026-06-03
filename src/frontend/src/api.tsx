@@ -378,19 +378,22 @@ export const getRecipes = async (
 ): Promise<Recipe[]> => {
   const response = await fetch(`${baseUrl}/recipes`, { signal });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown = null;
+
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = raw;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
-  const data: unknown = await response.json();
   if (!Array.isArray(data)) {
     return [];
   }
@@ -413,23 +416,25 @@ export const getRecipesSearch = async (
   if (params.difficulty) queryParams.append('difficulty', params.difficulty);
   if (params.cuisine) queryParams.append('cuisine', params.cuisine);
 
-  const url = `${baseUrl}/recipes/search?${queryParams.toString()}`;
+  const response = await fetch(
+    `${baseUrl}/recipes/search?${queryParams.toString()}`,
+    { signal },
+  );
 
-  const response = await fetch(url, { signal });
+  const raw = await response.text();
+
+  let data: unknown;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    data = null;
+  }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError: ApiError | undefined = data as ApiError;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
-
-  const data: unknown = await response.json();
 
   if (!Array.isArray(data)) {
     return [];
@@ -446,20 +451,26 @@ export const getRecipeById = async (
 ): Promise<Recipe> => {
   const response = await fetch(`${baseUrl}/recipes/${id}`, { signal });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError: ApiError | undefined = data as ApiError;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
 
-  const data = (await response.json()) as Recipe;
-  return data;
+  if (!data || typeof data !== 'object') {
+    throw new Error(t('error.invalidResponse'));
+  }
+
+  return data as Recipe;
 };
 
 // DELETE /api/recipes/:id (delete a single recipe by ID)
@@ -472,17 +483,22 @@ export const deleteRecipe = async (id: string, t: TFunction) => {
     credentials: 'include',
   });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError: ApiError | undefined = data as ApiError;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
+
+  return true;
 };
 
 // POST /api/recipes (create a new recipe)
@@ -499,22 +515,17 @@ export const postCreateRecipe = async (
     body: JSON.stringify(payload),
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -537,22 +548,17 @@ export const getSession = async (
     signal,
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -572,6 +578,7 @@ export const getSearch = async (
   t: TFunction,
 ): Promise<GetSearchResponse[]> => {
   const searchParams = new URLSearchParams({ q: query });
+
   const response = await fetch(
     `${baseUrl}/users/search?${searchParams.toString()}`,
     {
@@ -580,22 +587,17 @@ export const getSearch = async (
     },
   );
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -616,19 +618,20 @@ export const getUsers = async (
     signal,
   });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
-
-  const data: unknown = await response.json();
 
   if (!Array.isArray(data)) {
     return [];
@@ -644,22 +647,17 @@ export const getMe = async (t: TFunction): Promise<User> => {
     credentials: 'include',
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -683,22 +681,17 @@ export const getUserbyId = async (
     signal,
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -720,17 +713,22 @@ export const deleteUser = async (id: string, t: TFunction) => {
     credentials: 'include',
   });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
+
+  return;
 };
 
 // POST /api/auth/login (user login)
@@ -744,22 +742,17 @@ export const postLogin = async (payload: LoginPayload, t: TFunction) => {
     body: JSON.stringify(payload),
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -767,6 +760,8 @@ export const postLogin = async (payload: LoginPayload, t: TFunction) => {
   if (!isLoginSignupResponse(data)) {
     throw new Error(t('error.invalidResponse'));
   }
+
+  return data;
 };
 
 // POST /api/auth/logout (user logout)
@@ -779,17 +774,22 @@ export const postLogout = async (t: TFunction) => {
     credentials: 'include',
   });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
+
+  return;
 };
 
 // POST /api/users (user signup)
@@ -803,22 +803,17 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
     body: JSON.stringify(payload),
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = JSON.parse(raw);
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError: ApiError | undefined = data as ApiError;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -830,6 +825,8 @@ export const postSignup = async (payload: SignupPayload, t: TFunction) => {
   if (!data.authenticated) {
     throw new Error(t('error.authError'));
   }
+
+  return data;
 };
 
 // PUT /api/users/me/heartbeat
@@ -843,17 +840,22 @@ export const putHeartbeat = async (t: TFunction, signal?: AbortSignal) => {
     signal,
   });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
+
+  return;
 };
 
 // PUT /api/users/:id (user update)
@@ -871,22 +873,17 @@ export const putUpdateUser = async (
     body: JSON.stringify(payload),
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -908,22 +905,17 @@ export const getFriendships = async (
     signal,
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -946,17 +938,22 @@ export const sendFriendship = async (receiver_id: string, t: TFunction) => {
     body: JSON.stringify({ receiver_id }),
   });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
+
+  return;
 };
 
 // PATCH /api/friendships/:id (accept a friend request)
@@ -969,17 +966,22 @@ export const acceptFriend = async (id: string, t: TFunction) => {
     credentials: 'include',
   });
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
+
+  return;
 };
 
 // DELETE /api/friendships/:id (delete / reject / cancel friend relationship)
@@ -999,17 +1001,22 @@ export const deleteFriend = async (
     },
   );
 
-  if (!response.ok) {
-    let apiError: ApiError | undefined;
+  const raw = await response.text();
 
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+  let data: unknown;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
+
+  return;
 };
 
 // POST /api/users/apikey
@@ -1022,22 +1029,17 @@ export const generateApiKey = async (t: TFunction) => {
     credentials: 'include',
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -1064,22 +1066,17 @@ export const putUpdateRecipe = async (
     body: JSON.stringify(payload),
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -1100,22 +1097,17 @@ export const getCloudinarySignature = async (
     credentials: 'include',
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -1136,22 +1128,17 @@ export const getCloudinarySignatureAvatar = async (
     credentials: 'include',
   });
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }
@@ -1187,22 +1174,17 @@ export const uploadImageToCloudinary = async (
     },
   );
 
-  let data: unknown = null;
+  const raw = await response.text();
 
+  let data: unknown;
   try {
-    data = await response.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch {
     data = null;
   }
 
   if (!response.ok) {
-    let apiError: ApiError | undefined;
-
-    try {
-      apiError = (await response.json()) as ApiError;
-    } catch {
-      // ignore parse errors
-    }
+    const apiError = data as ApiError | undefined;
 
     throw new Error(getTranslatedErrorMessage(apiError?.code, t));
   }

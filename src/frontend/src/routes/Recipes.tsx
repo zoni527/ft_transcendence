@@ -78,6 +78,7 @@ const FiltersContent = ({
         { label: t('meal.type_lunch'), value: 'lunch' },
         { label: t('meal.type_dinner'), value: 'dinner' },
         { label: t('meal.type_snack'), value: 'snack' },
+        { label: t('meal.type_dessert'), value: 'dessert' },
       ]}
     />
 

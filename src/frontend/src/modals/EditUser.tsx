@@ -315,7 +315,7 @@ const EditUserModal = ({ user, onClose, onSave }: EditUserModalProps) => {
 
                   try {
                     const validFile = validateImageFile(file, t, {
-                      maxSizeMB: 5,
+                      maxSizeMB: 10,
                     });
                     setFileName(validFile?.name ?? '');
                     setImageFile(validFile);

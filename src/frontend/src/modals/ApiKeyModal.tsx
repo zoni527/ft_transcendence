@@ -71,7 +71,7 @@ const ApiKeyModal = ({ apiKey, onClose }: ApiKeyModalProps) => {
         <FormHeader title={t('dashboard.dev')} />
         <div className="flex flex-col gap-4">
           {/* Warning */}
-          <div className="w-full rounded-lg p-4 text-lg text-red-500">
+          <div className="w-full rounded-lg p-4 text-center text-lg text-red-500">
             {t('dashboard.devWarning')}
           </div>
 

@@ -42,8 +42,13 @@ const RecipeDetail = () => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
-        void navigate('/');
+        if (
+          !(err instanceof Error && err.name === 'AbortError') &&
+          !(err instanceof Error && err.name === 'TypeError')
+        ) {
+          showNotification(message, 'error');
+          void navigate('/');
+        }
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);

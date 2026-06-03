@@ -59,8 +59,7 @@ export const fiTranslations = {
     email: 'Sähköposti',
     roles: 'Roolit',
     dev: 'API-avain',
-    devWarning:
-      'Varoitus: Voit luoda vain 1:n avaimen tunnissa. Tallenna tämä avain!',
+    devWarning: 'Tallenna tämä avain!',
     generate: 'Luo',
     createRecipe: 'Luo resepti',
     editUser: 'Muokkaa profiilia',
@@ -355,5 +354,6 @@ export const fiTranslations = {
     copyFailed: 'Kopiointi leikepöydälle epäonnistui',
     pageNotFound: '404 - Sivua ei löytynyt',
     weakPassword: 'Salasana on liian heikko',
+    noAuth: 'Ei tunnistauduttu',
   },
 };

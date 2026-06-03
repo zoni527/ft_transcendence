@@ -204,7 +204,12 @@ const Recipes = () => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
+        if (
+          !(err instanceof Error && err.name === 'AbortError') &&
+          !(err instanceof Error && err.name === 'TypeError')
+        ) {
+          showNotification(message, 'error');
+        }
         void navigate('/');
       } finally {
         pagingLock.current = false;

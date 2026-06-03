@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { z } from 'zod';
@@ -14,6 +14,7 @@ import {
   hasControlChars,
   isValidName,
   isValidDisplayName,
+  handleGoogleLogin,
 } from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
@@ -65,7 +66,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -121,6 +122,10 @@ const Signup = () => {
         .finally(() => setLoading(false));
     }
   };
+
+  if (user) {
+    return <Navigate to="/me" replace />;
+  }
 
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-sm p-8`}>
@@ -185,6 +190,26 @@ const Signup = () => {
             className="rounded-full border-3 border-orange-700 hover:border-orange-800"
             isLoading={loading}
             defaultText={t('signup.submit')}
+          />
+        </div>
+
+        {/* Divider */}
+        <div className="my-6 flex items-center">
+          <hr className="grow border-t border-gray-300" />
+          <span className="mx-4 font-medium text-gray-500">
+            {t('login.or')}
+          </span>
+          <hr className="grow border-t border-gray-300" />
+        </div>
+
+        {/* Google Button */}
+        <div className="mt-4 flex justify-center">
+          <SubmitButton
+            type="button"
+            onClick={handleGoogleLogin}
+            isLoading={false}
+            defaultText={t('login.google')}
+            className="rounded-full border-3 border-orange-700 hover:border-orange-800"
           />
         </div>
       </form>

@@ -59,8 +59,7 @@ export const enTranslations = {
     email: 'E-mail',
     roles: 'Roles',
     dev: 'API key',
-    devWarning:
-      'Warning: Only 1 key can be generated per 1 hour, save this generated key!',
+    devWarning: 'Save this generated key!',
     generate: 'Generate',
     createRecipe: 'Create recipe',
     editUser: 'Edit profile',
@@ -217,7 +216,7 @@ export const enTranslations = {
     password: 'Password',
     passwordPlace: 'Enter your password',
     submit: 'Continue',
-    google: 'Login with Google',
+    google: 'Continue with Google',
     or: 'OR',
   },
   signup: {
@@ -354,5 +353,6 @@ export const enTranslations = {
     copyFailed: 'Copy to clipboard failed',
     pageNotFound: '404 - Page not found',
     weakPassword: 'Password too weak',
+    noAuth: 'Not authenticated',
   },
 };

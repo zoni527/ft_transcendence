@@ -133,3 +133,8 @@ export function isValidDisplayName(displayName: string): boolean {
 
   return hasAlphaNum;
 }
+
+// Google auth
+export const handleGoogleLogin = () => {
+  window.location.href = '/api/auth/google/login';
+};

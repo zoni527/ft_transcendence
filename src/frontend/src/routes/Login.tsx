@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { z } from 'zod';
@@ -9,7 +9,11 @@ import SubmitButton from '../components/SubmitButton';
 import { getMe, postLogin } from '../api';
 import { useAuth } from '../utils/AuthContext';
 import { useNotification } from '../utils/NotifContext.ts';
-import { getStringValue, hasControlChars } from '../utils/utils';
+import {
+  getStringValue,
+  hasControlChars,
+  handleGoogleLogin,
+} from '../utils/utils';
 import { cardBase } from '../styles/styles';
 
 // Validation schema
@@ -37,7 +41,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   // Normal login
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -90,10 +94,9 @@ const Login = () => {
     }
   };
 
-  // Google auth
-  const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google/login';
-  };
+  if (user) {
+    return <Navigate to="/me" replace />;
+  }
 
   return (
     <div className={`${cardBase} mx-auto mt-8 max-w-sm p-8`}>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../utils/NotifContext';
 import AddFriendModal from '../modals/AddFriend';
@@ -233,7 +233,12 @@ const Dashboard = () => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
+        if (
+          !(err instanceof Error && err.name === 'AbortError') &&
+          !(err instanceof Error && err.name === 'TypeError')
+        ) {
+          showNotification(message, 'error');
+        }
       } finally {
         if (!controller.signal.aborted) {
           setFriendsLoading(false);
@@ -304,9 +309,14 @@ const Dashboard = () => {
         const message =
           err instanceof Error ? err.message : t('error.genericError');
 
-        showNotification(message, 'error');
-        setUserData(null);
-        void navigate('/');
+        if (
+          !(err instanceof Error && err.name === 'AbortError') &&
+          !(err instanceof Error && err.name === 'TypeError')
+        ) {
+          showNotification(message, 'error');
+          setUserData(null);
+          void navigate('/');
+        }
       } finally {
         if (!controller.signal.aborted) {
           setPageLoading(false);
@@ -358,7 +368,7 @@ const Dashboard = () => {
   }
 
   if (!id && !authUser) {
-    return <Navigate to="/login" replace />;
+    return <StatusBox message={t('error.noAuth')} className="text-red-600" />;
   }
 
   if (userFetched && !userData) {
@@ -511,9 +521,15 @@ const Dashboard = () => {
                     value={userData.name}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.name')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.name')}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between border-b border-gray-300 pb-4">
@@ -523,9 +539,15 @@ const Dashboard = () => {
                     value={userData.display_name}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.username')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.username')}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between border-b border-gray-300 pb-4">
@@ -535,9 +557,15 @@ const Dashboard = () => {
                     value={userData.email}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.email')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.email')}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between border-b border-gray-300 pb-4">
@@ -547,9 +575,15 @@ const Dashboard = () => {
                     value={userData.roles.join(', ')}
                   />
                 </div>
-                <button className="rounded p-2" title={t('info.roles')}>
-                  <InfoIcon />
-                </button>
+                <div className="group relative">
+                  <button className="rounded p-2">
+                    <InfoIcon />
+                  </button>
+
+                  <div className="absolute right-0 bottom-full mb-2 hidden rounded bg-gray-800 px-2 py-1 text-sm whitespace-nowrap text-white shadow-lg group-hover:block">
+                    {t('info.roles')}
+                  </div>
+                </div>
               </div>
 
               {hasRole(['developer']) && isSelf && (

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -340,6 +342,10 @@ func validateRecipeFields(r *models.Recipe) error {
 		return fmt.Errorf("description: %w", err)
 	}
 
+	if err := isValidURL(r.ImageURL); err != nil {
+		return fmt.Errorf("url: %w", err)
+	}
+
 	switch r.Difficulty {
 	case "easy", "medium", "hard":
 	default:
@@ -413,6 +419,19 @@ func isValidDescription(d string) error {
 	}
 
 	return nil
+}
+
+func isValidURL(rawURL string) error {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return fmt.Errorf("parsing url failed: %v", err)
+	}
+	ext := strings.ToLower(path.Ext(u.Path))
+	switch ext {
+	case ".jpg", ".jpeg", ".png", ".webp":
+		return nil
+	}
+	return fmt.Errorf("invalid url suffix: %s", ext)
 }
 
 func onlyGraphicChars(s string) error {

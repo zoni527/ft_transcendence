@@ -11,6 +11,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:              "Max preparation time",
 		Description:        strings.Repeat("-", descriptionLenMin),
+		ImageURL:           "https://example.com/image.jpg",
 		Servings:           1,
 		Difficulty:         "easy",
 		MealType:           "snack",
@@ -19,6 +20,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max servings",
 		Description: strings.Repeat("-", descriptionLenMin),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    servingsMax,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -26,6 +28,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max calories",
 		Description: strings.Repeat("-", descriptionLenMin),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -34,6 +37,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:        "Max protein",
 		Description:  strings.Repeat("-", descriptionLenMin),
+		ImageURL:     "https://example.com/image.jpg",
 		Servings:     1,
 		Difficulty:   "easy",
 		MealType:     "snack",
@@ -42,6 +46,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max carbs",
 		Description: strings.Repeat("-", descriptionLenMin),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -50,6 +55,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max fat",
 		Description: strings.Repeat("-", descriptionLenMin),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -58,6 +64,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       strings.Repeat("-", titleLenMin),
 		Description: strings.Repeat("-", descriptionLenMin),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -65,6 +72,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       strings.Repeat("-", titleLenMax),
 		Description: strings.Repeat("-", descriptionLenMin),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -72,6 +80,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max description length",
 		Description: strings.Repeat("-", descriptionLenMax),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -79,6 +88,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max cuisine length",
 		Description: strings.Repeat("-", descriptionLenMin),
+		ImageURL:    "https://example.com/image.jpg",
 		Cuisine:     strings.Repeat("-", cuisineLenMax),
 		Servings:    1,
 		Difficulty:  "easy",
@@ -87,7 +97,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Max image url length",
 		Description: strings.Repeat("-", descriptionLenMin),
-		ImageURL:    strings.Repeat("-", imageURLLenMax),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",
@@ -95,7 +105,7 @@ var goodTestRecipes = []models.Recipe{
 	{
 		Title:       "Newlines in description",
 		Description: "Testing\nnewlines\nin\na\ndescription",
-		ImageURL:    strings.Repeat("-", imageURLLenMax),
+		ImageURL:    "https://example.com/image.jpg",
 		Servings:    1,
 		Difficulty:  "easy",
 		MealType:    "snack",

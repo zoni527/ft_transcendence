@@ -273,7 +273,7 @@ var createRecipeTests = []struct {
 	{
 		name:        "Success",
 		userID:      "00000000-0000-0000-0000-000000000001",
-		requestBody: `{"title":"Valid Title","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
+		requestBody: `{"title":"Valid Title","image_url":"https://example.com/image.jpg","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockCreateRecipe = func(ctx context.Context, r *models.Recipe) (string, error) {
 				return "new-recipe-uuid", nil
@@ -285,7 +285,7 @@ var createRecipeTests = []struct {
 	{
 		name:           "Validation Failure - Title Too Short",
 		userID:         "00000000-0000-0000-0000-000000000001",
-		requestBody:    `{"title":"No","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
+		requestBody:    `{"title":"No","image_url":"https://example.com/image.jpg","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
 		mockSetup:      func(repo *MockRecipeRepo) {},
 		expectedStatus: 400,
 		expectedBody:   `title: too short`,
@@ -293,7 +293,7 @@ var createRecipeTests = []struct {
 	{
 		name:        "Repository Bad Request Error (Foreign Key / Constraint)",
 		userID:      "00000000-0000-0000-0000-000000000001",
-		requestBody: `{"title":"Valid Title","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
+		requestBody: `{"title":"Valid Title","image_url":"https://example.com/image.jpg","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockCreateRecipe = func(ctx context.Context, r *models.Recipe) (string, error) {
 				return "", &repository.BadRequestError{Msg: "invalid author id"}
@@ -357,7 +357,7 @@ var updateRecipeTests = []struct {
 		name:        "Success",
 		recipeID:    "aa899f26-cf36-4570-b952-58752e6bf79a",
 		userID:      "00000000-0000-0000-0000-000000000001",
-		requestBody: `{"title":"Updated Title","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
+		requestBody: `{"title":"Updated Title","image_url":"https://example.com/image.jpg","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
 				resp := models.RecipeResponse{}
@@ -375,7 +375,7 @@ var updateRecipeTests = []struct {
 		name:        "Target Recipe Not Found",
 		recipeID:    "aa899f26-cf36-4570-b952-58752e6bf79a",
 		userID:      "00000000-0000-0000-0000-000000000001",
-		requestBody: `{"title":"Updated Title","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
+		requestBody: `{"title":"Updated Title","image_url":"https://example.com/image.jpg","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
 				return models.RecipeResponse{}, &repository.NotFoundError{Msg: "recipe not found"}

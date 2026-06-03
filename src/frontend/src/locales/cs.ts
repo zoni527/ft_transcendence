@@ -389,7 +389,7 @@ export const csTranslations = {
     friendshipNotFound: 'Přátelství nebylo nalezeno',
     friendshipQueryInvalid: 'Neplatný dotaz na přátelství',
 
-    oAuthLoginFailed: 'Přihlášení přes OAuth se nezdařilo. Zkuste to znovu',
+    oAuthLoginFailed: 'Přihlášení přes OAuth se nezdařilo, zkuste to znovu',
     oAuthLoginNotOAuthUser: 'Tento účet není propojen s OAuth přihlášením',
 
     apiKeyInvalid: 'Neplatný API klíč',
@@ -397,6 +397,6 @@ export const csTranslations = {
     tokenInvalid: 'Neplatný nebo expirovaný token',
     tokenMissing: 'Autentizační token je povinný',
 
-    rateLimit: 'Příliš mnoho požadavků. Zkuste to prosím později',
+    rateLimit: 'Příliš mnoho požadavků, zkuste to prosím později',
   },
 };

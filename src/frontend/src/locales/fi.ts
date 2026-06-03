@@ -390,7 +390,7 @@ export const fiTranslations = {
     friendshipNotFound: 'Ystävyyttä ei löytynyt',
     friendshipQueryInvalid: 'Virheellinen ystävyyshaku',
 
-    oAuthLoginFailed: 'OAuth-kirjautuminen epäonnistui. Yritä uudelleen',
+    oAuthLoginFailed: 'OAuth-kirjautuminen epäonnistui, yritä uudelleen',
     oAuthLoginNotOAuthUser: 'Tätä tiliä ei ole liitetty OAuth-kirjautumiseen',
 
     apiKeyInvalid: 'Virheellinen API-avain',
@@ -398,6 +398,6 @@ export const fiTranslations = {
     tokenInvalid: 'Virheellinen tai vanhentunut tunniste',
     tokenMissing: 'Todennustunniste vaaditaan',
 
-    rateLimit: 'Liian monta pyyntöä. Yritä myöhemmin uudelleen',
+    rateLimit: 'Liian monta pyyntöä, yritä myöhemmin uudelleen',
   },
 };

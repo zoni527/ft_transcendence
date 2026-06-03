@@ -374,7 +374,7 @@ export const enTranslations = {
     userQueryTooShort: 'Search query is too short',
     userRequiredPermissionMissing: 'You do not have the required permission',
     userRequiredRoleMissing: 'You do not have the required role',
-    userUpdateForbidden: 'Updating this user is not allowe.',
+    userUpdateForbidden: 'Updating this user is not allowed',
     userUpdateNoPermOrSelf:
       'You can only update your own account or users you have permission to manage',
     userUpdateNoUpdate: 'No changes were provided for the update',
@@ -389,14 +389,14 @@ export const enTranslations = {
     friendshipNotFound: 'Friendship not found',
     friendshipQueryInvalid: 'Invalid friendship query',
 
-    oAuthLoginFailed: 'OAuth login failed. Please try again',
+    oAuthLoginFailed: 'OAuth login failed, please try again',
     oAuthLoginNotOAuthUser: 'This account is not linked to OAuth login',
 
-    apiKeyInvalid: 'Invalid API key.',
+    apiKeyInvalid: 'Invalid API key',
 
-    tokenInvalid: 'Invalid or expired token.',
-    tokenMissing: 'Authentication token is required.',
+    tokenInvalid: 'Invalid or expired token',
+    tokenMissing: 'Authentication token is required',
 
-    rateLimit: 'Too many requests. Please try again later.',
+    rateLimit: 'Too many requests, please try again later',
   },
 };

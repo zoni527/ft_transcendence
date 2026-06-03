@@ -103,7 +103,7 @@ func TestGetAllRecipes_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := RecipeHandler(mockRepo)
+			recipeHandler := NewRecipeHandler(mockRepo)
 			router := gin.New()
 			router.GET("/api/recipes", recipeHandler.GetAllRecipes)
 			req := httptest.NewRequest(
@@ -173,7 +173,7 @@ func TestGetRecipeByID_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := RecipeHandler(mockRepo)
+			recipeHandler := NewRecipeHandler(mockRepo)
 			router := gin.New()
 			router.GET("/api/recipes/:id", recipeHandler.GetRecipeByID)
 			req := httptest.NewRequest(
@@ -236,7 +236,7 @@ func TestSearchRecipes_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := RecipeHandler(mockRepo)
+			recipeHandler := NewRecipeHandler(mockRepo)
 			router := gin.New()
 			router.GET("/api/recipes/search", recipeHandler.SearchRecipes)
 			req := httptest.NewRequest(
@@ -310,7 +310,7 @@ func TestCreateRecipe_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := RecipeHandler(mockRepo)
+			recipeHandler := NewRecipeHandler(mockRepo)
 			router := gin.New()
 			router.Use(func(c *gin.Context) {
 				if tt.userID != "" {
@@ -392,7 +392,7 @@ func TestUpdateRecipe_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := RecipeHandler(mockRepo)
+			recipeHandler := NewRecipeHandler(mockRepo)
 			router := gin.New()
 			router.Use(func(c *gin.Context) {
 				if tt.userID != "" {
@@ -482,7 +482,7 @@ func TestDeleteRecipe_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := RecipeHandler(mockRepo)
+			recipeHandler := NewRecipeHandler(mockRepo)
 			router := gin.New()
 			router.Use(func(c *gin.Context) {
 				if tt.userID != "" {

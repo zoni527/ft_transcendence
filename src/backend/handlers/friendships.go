@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -61,15 +61,21 @@ func CreateFriendRequest(c *gin.Context) {
 
 	var body models.CreateFriendRequestBody
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		err := errorhandling.BadRequest(errorhandling.FriendshipDataInvalid, "invalid request body")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if !authorization.IsValidUUID(body.ReceiverID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "receiver not found"})
+		err := errorhandling.NotFound(errorhandling.FriendshipReceiverNotFound, "receiver not found")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if body.ReceiverID == requesterID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot send a request to yourself"})
+		err := errorhandling.BadRequest(
+			errorhandling.FriendshipCreateNoSelf,
+			"cannot send a request to yourself",
+		)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -94,11 +100,16 @@ func AcceptFriendRequest(c *gin.Context) {
 
 	requesterID := c.Param("id")
 	if !authorization.IsValidUUID(requesterID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "friend request not found"})
+		err := errorhandling.NotFound(errorhandling.FriendshipNotFound, "friend request not found")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if requesterID == receiverID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot accept your own request"})
+		err := errorhandling.BadRequest(
+			errorhandling.FriendshipAcceptNoSelf,
+			"cannot accept your own request",
+		)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -124,11 +135,16 @@ func DeleteFriendship(c *gin.Context) {
 
 	otherID := c.Param("id")
 	if !authorization.IsValidUUID(otherID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "friendship not found"})
+		err := errorhandling.NotFound(errorhandling.FriendshipNotFound, "friendship not found")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if otherID == callerID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot delete a friendship with yourself"})
+		err := errorhandling.BadRequest(
+			errorhandling.FriendshipDeleteNoSelf,
+			"cannot delete a friendship with yourself",
+		)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -143,8 +159,9 @@ func DeleteFriendship(c *gin.Context) {
 	} else if action == "unfriend" && status == "accepted" {
 		err = repository.DeleteFriendship(c.Request.Context(), callerID, otherID)
 	} else {
-		log.Printf("handlers.DeleteFriendship: unexpected status and action %q, %q", status, action)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		context := fmt.Sprintf("unexpected status and action %q, %q", status, action)
+		err := errorhandling.BadRequest(errorhandling.FriendshipQueryInvalid, context)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err != nil {

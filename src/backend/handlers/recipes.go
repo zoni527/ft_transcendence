@@ -118,7 +118,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 	functionName := "UpdateRecipe"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, "unauthorized")
+		err := errorhandling.UnauthorizedUser()
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
@@ -174,10 +174,7 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 	functionName := "DeleteRecipe"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		err := errorhandling.Unauthorized(
-			errorhandling.UserUnauthorized,
-			"unauthorized",
-		)
+		err := errorhandling.UnauthorizedUser()
 		errorhandling.Respond(c, functionName, err)
 		return
 	}

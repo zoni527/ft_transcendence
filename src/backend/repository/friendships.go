@@ -81,14 +81,14 @@ func friendshipPostgresErrorClassification(functionName string, err error) error
 	case pgerrcode.CheckViolation:
 		if pgErr.ConstraintName == "friendship_no_self" {
 			return errorhandling.BadRequest(
-				errorhandling.FriendshipNoSelf,
+				errorhandling.FriendshipCreateNoSelf,
 				"cannot send a request to yourself",
 			)
 		}
 		log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
 		return errorhandling.BadRequest(
 			errorhandling.FriendshipDataInvalid,
-			"invalid frienship data",
+			"invalid friendship data",
 		)
 	case pgerrcode.InvalidTextRepresentation:
 		return errorhandling.NotFound(

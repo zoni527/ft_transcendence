@@ -22,7 +22,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const unauthorizedErrorMsg = "unauthorized"
 const displayNameVersionLimit = 1000
 
 func RandomStateToken() (string, error) {
@@ -68,21 +67,21 @@ func GoogleCallback(c *gin.Context) {
 	client := integrations.GoogleOAuthConfig.Client(c, token)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
-		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
+		err := errorhandling.UnauthorizedUser()
 		errorhandling.Respond(c, "GoogleCallback", err)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
+		err := errorhandling.UnauthorizedUser()
 		errorhandling.Respond(c, "GoogleCallback", err)
 		return
 	}
 
 	var gu models.GoogleUser
 	if err := json.NewDecoder(resp.Body).Decode(&gu); err != nil || !gu.VerifiedEmail {
-		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
+		err := errorhandling.UnauthorizedUser()
 		errorhandling.Respond(c, "GoogleCallback", err)
 		return
 	}

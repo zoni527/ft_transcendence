@@ -56,7 +56,7 @@ func (e *APIError) Error() string {
 	return e.Message
 }
 
-func IdentifyAndRespond(c *gin.Context, context string, err error) {
+func Respond(c *gin.Context, context string, err error) {
 	var apiErr *APIError
 
 	if errors.As(err, &apiErr) {
@@ -80,34 +80,38 @@ func newError(httpStatus int, code ErrorCode, msg string) *APIError {
 	}
 }
 
-func NewBadRequest(code ErrorCode, msg string) *APIError {
+func BadRequest(code ErrorCode, msg string) *APIError {
 	return newError(http.StatusBadRequest, code, msg)
 }
 
-func NewNotFound(code ErrorCode, msg string) *APIError {
+func NotFound(code ErrorCode, msg string) *APIError {
 	return newError(http.StatusNotFound, code, msg)
 }
 
-func NewUnauthorized(code ErrorCode, msg string) *APIError {
+func Unauthorized(code ErrorCode, msg string) *APIError {
 	return newError(http.StatusUnauthorized, code, msg)
 }
 
-func NewForbidden(code ErrorCode, msg string) *APIError {
+func Forbidden(code ErrorCode, msg string) *APIError {
 	return newError(http.StatusForbidden, code, msg)
 }
 
-func NewConflict(code ErrorCode, msg string) *APIError {
+func Conflict(code ErrorCode, msg string) *APIError {
 	return newError(http.StatusConflict, code, msg)
 }
 
-func NewUnprocessableEntity(code ErrorCode, msg string) *APIError {
+func UnprocessableEntity(code ErrorCode, msg string) *APIError {
 	return newError(http.StatusUnprocessableEntity, code, msg)
 }
 
-func NewRecipeNotFound() *APIError {
-	return NewNotFound(RecipeNotFound, "recipe not found")
+func NotFoundRecipe() *APIError {
+	return NotFound(RecipeNotFound, "recipe not found")
 }
 
-func NewUserNotFound() *APIError {
-	return NewNotFound(UserNotFound, "user not found")
+func NotFoundUser() *APIError {
+	return NotFound(UserNotFound, "user not found")
+}
+
+func UnauthorizedUser() *APIError {
+	return Unauthorized(UserUnauthorized, "unauthorized user")
 }

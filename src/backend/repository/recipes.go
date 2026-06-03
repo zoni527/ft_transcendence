@@ -180,7 +180,7 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeByID(ctx context.Context, id string) 
 	)
 
 	if err == pgx.ErrNoRows {
-		return models.RecipeResponse{}, errorhandling.NewRecipeNotFound()
+		return models.RecipeResponse{}, errorhandling.NotFoundRecipe()
 	}
 
 	if err != nil {
@@ -237,7 +237,7 @@ func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Re
 		return recipePostgresErrorClassification("repository.UpdateRecipe", err)
 	}
 	if res.RowsAffected() == 0 {
-		return errorhandling.NewRecipeNotFound()
+		return errorhandling.NotFoundRecipe()
 	}
 
 	return nil
@@ -250,7 +250,7 @@ func (pgRepo *PostgresRecipeRepo) DeleteRecipe(ctx context.Context, id string) e
 		return fmt.Errorf("repository.DeleteRecipe: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return errorhandling.NewRecipeNotFound()
+		return errorhandling.NotFoundRecipe()
 	}
 
 	return nil
@@ -268,13 +268,13 @@ func recipePostgresErrorClassification(functionName string, err error) error {
 	switch pgErr.Code {
 	case pgerrcode.ForeignKeyViolation:
 		if pgErr.ConstraintName == "fk_author_id" {
-			return errorhandling.NewBadRequest(
+			return errorhandling.BadRequest(
 				errorhandling.RecipeAuthorIDInvalid,
 				"invalid author id",
 			)
 		}
 		log.Printf("%v: foreign key violation: %v", functionName, pgErr.ConstraintName)
-		return errorhandling.NewBadRequest(
+		return errorhandling.BadRequest(
 			errorhandling.RecipeDataInvalid,
 			"invalid recipe data",
 		)
@@ -282,25 +282,25 @@ func recipePostgresErrorClassification(functionName string, err error) error {
 	case pgerrcode.CheckViolation:
 		switch pgErr.ConstraintName {
 		case "recipe_difficulty_allowed_values":
-			return errorhandling.NewBadRequest(
+			return errorhandling.BadRequest(
 				errorhandling.RecipeDifficultyInvalid,
 				"invalid difficulty value",
 			)
 		case "recipe_meal_type_allowed_values":
-			return errorhandling.NewBadRequest(
+			return errorhandling.BadRequest(
 				errorhandling.RecipeMealTypeInvalid,
 				"invalid meal type value",
 			)
 		default:
 			log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
-			return errorhandling.NewBadRequest(
+			return errorhandling.BadRequest(
 				errorhandling.RecipeDataInvalid,
 				"invalid recipe data",
 			)
 		}
 
 	case pgerrcode.InvalidTextRepresentation:
-		return errorhandling.NewRecipeNotFound()
+		return errorhandling.NotFoundRecipe()
 
 	default:
 		return fmt.Errorf("%v: %w", functionName, err)

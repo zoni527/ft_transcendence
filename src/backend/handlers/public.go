@@ -24,7 +24,7 @@ func NewPublicRecipeHandler(svc services.RecipeService) *PublicRecipeHandler {
 func (h *PublicRecipeHandler) GetAllRecipes(c *gin.Context) {
 	recipes, err := h.svc.ListPublicRecipes(c.Request.Context())
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.GetAllRecipes", err)
+		errorhandling.Respond(c, "handlers.GetAllRecipes", err)
 		return
 	}
 	c.JSON(http.StatusOK, recipes)
@@ -38,7 +38,7 @@ func (h *PublicRecipeHandler) GetRecipeByID(c *gin.Context) {
 	}
 	recipe, err := h.svc.GetPublicRecipe(c.Request.Context(), id)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.GetRecipeByID", err)
+		errorhandling.Respond(c, "handlers.GetRecipeByID", err)
 		return
 	}
 	c.JSON(http.StatusOK, recipe)
@@ -63,7 +63,7 @@ func (h *PublicRecipeHandler) CreateRecipe(c *gin.Context) {
 	}
 	recipeID, err := h.svc.CreateRecipe(c.Request.Context(), r.AuthorID, r)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.CreateRecipe", err)
+		errorhandling.Respond(c, "handlers.CreateRecipe", err)
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"id": recipeID})
@@ -95,7 +95,7 @@ func (h *PublicRecipeHandler) UpdateRecipe(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
-		errorhandling.IdentifyAndRespond(c, "handlers.UpdateRecipe", err)
+		errorhandling.Respond(c, "handlers.UpdateRecipe", err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"id": recipeID})
@@ -117,7 +117,7 @@ func (h *PublicRecipeHandler) DeleteRecipe(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
-		errorhandling.IdentifyAndRespond(c, "handlers.DeleteRecipe", err)
+		errorhandling.Respond(c, "handlers.DeleteRecipe", err)
 		return
 	}
 	c.Status(http.StatusNoContent)

@@ -37,7 +37,7 @@ func markOnline(user *models.User) {
 func GetUsers(c *gin.Context) {
 	users, err := repository.GetAllUsers(c.Request.Context())
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "GetUsers", err)
+		errorhandling.Respond(c, "GetUsers", err)
 		return
 	}
 	for i := range users {
@@ -50,13 +50,13 @@ func GetUserByID(c *gin.Context) {
 	functionName := "GetUsersByID"
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
-		err := errorhandling.NewUserNotFound()
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.NotFoundUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	user, err := repository.GetUserByID(c.Request.Context(), id)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -67,13 +67,13 @@ func GetMe(c *gin.Context) {
 	userID := c.GetString("userID")
 	functionName := "GetMe"
 	if !authorization.IsValidUUID(userID) {
-		err := errorhandling.NewUserNotFound()
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.NotFoundUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	user, err := repository.GetUserByID(c.Request.Context(), userID)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -117,7 +117,7 @@ func GetSession(c *gin.Context) {
 
 	blacklisted, err := authorization.IsTokenBlacklisted(c.Request.Context(), token)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName+" blacklist check", err)
+		errorhandling.Respond(c, functionName+" blacklist check", err)
 		return
 	}
 	if blacklisted {
@@ -133,7 +133,7 @@ func GetSession(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -144,26 +144,26 @@ func CreateUser(c *gin.Context) {
 	functionName := "CreateUser"
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		err := errorhandling.NewBadRequest(errorhandling.UserBindingError, "invalid input data")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.BadRequest(errorhandling.UserBindingError, "invalid input data")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err := normalizeAndValidateUserFields(&req.Email, &req.Name, &req.DisplayName); err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err := validatePassword(req.Password); err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if !isPasswordStrong(req.Password) {
-		err := errorhandling.NewUnprocessableEntity(errorhandling.UserPasswordTooWeak, "password is too weak")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.UnprocessableEntity(errorhandling.UserPasswordTooWeak, "password is too weak")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	userParams := models.CreateUserParams{
@@ -174,7 +174,7 @@ func CreateUser(c *gin.Context) {
 	}
 	data, err := repository.CreateUser(c.Request.Context(), userParams)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	token, err := authorization.GenerateJWTToken(data.ID)
@@ -192,33 +192,33 @@ func LoginUser(c *gin.Context) {
 	functionName := "LoginUser"
 	var req models.LoginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		err := errorhandling.NewBadRequest(errorhandling.UserBindingError, "invalid input data")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.BadRequest(errorhandling.UserBindingError, "invalid input data")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	data, err := repository.GetUserCredentialsByEmail(c.Request.Context(), req.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "invalid credentials")
-			errorhandling.IdentifyAndRespond(c, functionName, err)
+			err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, "invalid credentials")
+			errorhandling.Respond(c, functionName, err)
 			return
 		}
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(data.PasswordHash), []byte(req.Password)); err != nil {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "invalid credentials")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, "invalid credentials")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	token, err := authorization.GenerateJWTToken(data.ID)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), data.ID); err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
@@ -231,7 +231,7 @@ func LogoutUser(c *gin.Context) {
 	token := c.GetString("token")
 	expDate := c.GetTime("expDate")
 	if err := authorization.AddTokenToBlacklist(c.Request.Context(), token, expDate); err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -250,19 +250,21 @@ func UpdateUser(c *gin.Context) {
 	functionName := "UpdateUser"
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		err := errorhandling.NotFoundUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	callerUserID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerUserID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	roleSet, okRoles := authorization.RolesFromContext(c)
 	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
-		errorhandling.IdentifyAndRespond(c, functionName, fmt.Errorf("data missing from context"))
+		errorhandling.Respond(c, functionName, fmt.Errorf("data missing from context"))
 		return
 	}
 	allowed := authorization.CanEditUser(roleSet, callerUserID, targetUserID)
@@ -281,21 +283,21 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	if req.Password != nil && callerUserID != targetUserID {
-		err := errorhandling.NewForbidden(
+		err := errorhandling.Forbidden(
 			errorhandling.UserPasswordChangeForbidden,
 			"password can only be changed by the account owner",
 		)
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if req.Password != nil {
 		if err := validatePassword(*req.Password); err != nil {
-			errorhandling.IdentifyAndRespond(c, functionName, err)
+			errorhandling.Respond(c, functionName, err)
 			return
 		}
 		if !isPasswordStrong(*req.Password) {
-			err := errorhandling.NewUnprocessableEntity(errorhandling.UserPasswordTooWeak, "password is too weak")
-			errorhandling.IdentifyAndRespond(c, functionName, err)
+			err := errorhandling.UnprocessableEntity(errorhandling.UserPasswordTooWeak, "password is too weak")
+			errorhandling.Respond(c, functionName, err)
 			return
 		}
 	}
@@ -340,7 +342,7 @@ func UpdateUser(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "OAuth users cannot update their password or email"})
 			return
 		}
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	markOnline(&user)
@@ -376,20 +378,19 @@ func SearchUser(c *gin.Context) {
 }
 
 func GenerateAPIKey(c *gin.Context) {
+	functionName := "GenerateAPIKey"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		errorhandling.Respond(c, functionName, errorhandling.UnauthorizedUser())
 		return
 	}
 	apiKey, randomSecret, err := authorization.GenerateAPIKey(userID)
 	if err != nil {
-		log.Printf("GenerateAPIKey error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err := repository.SaveAPIKey(c.Request.Context(), userID, randomSecret); err != nil {
-		log.Printf("GenerateApiKey error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	c.Header("Cache-Control", "no-store, private")
@@ -459,11 +460,11 @@ func normalizeAndValidateUserFields(email, name, displayName *string) error {
 	if *name != "" {
 		*name = strings.TrimSpace(*name)
 		if !isValidName(*name) {
-			return errorhandling.NewBadRequest(errorhandling.UserNameInvalid, "invalid name")
+			return errorhandling.BadRequest(errorhandling.UserNameInvalid, "invalid name")
 		}
 	}
 	if !isValidDisplayName(*displayName) {
-		return errorhandling.NewBadRequest(errorhandling.UserDisplayNameInvalid, "invalid display_name")
+		return errorhandling.BadRequest(errorhandling.UserDisplayNameInvalid, "invalid display_name")
 	}
 	return nil
 }
@@ -496,7 +497,7 @@ func validateEmail(email string) error {
 
 	for _, r := range email {
 		if unicode.IsControl(r) {
-			return errorhandling.NewBadRequest(errorhandling.UserEmailInvalid, "email contains control characters")
+			return errorhandling.BadRequest(errorhandling.UserEmailInvalid, "email contains control characters")
 		}
 	}
 
@@ -534,7 +535,7 @@ func validatePassword(password string) error {
 	}
 	for _, r := range password {
 		if unicode.IsControl(r) {
-			return errorhandling.NewBadRequest(
+			return errorhandling.BadRequest(
 				errorhandling.UserPasswordInvalid,
 				"password contains invalid control characters",
 			)
@@ -665,12 +666,12 @@ func Heartbeat(c *gin.Context) {
 	userID := c.GetString("userID")
 
 	if !authorization.IsValidUUID(userID) {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err := repository.UpdateLastSeen(c.Request.Context(), userID); err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -680,36 +681,37 @@ func DeleteUser(c *gin.Context) {
 	functionName := "DeleteUser"
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		err := errorhandling.NotFoundUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	callerUserID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerUserID) {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	roleSet, ok := authorization.RolesFromContext(c)
 	if !ok {
-		errorhandling.IdentifyAndRespond(c, functionName, fmt.Errorf("data missing from context"))
+		errorhandling.Respond(c, functionName, fmt.Errorf("data missing from context"))
 		return
 	}
 
 	if !authorization.CanDeleteUser(roleSet, callerUserID, targetUserID) {
-		err := errorhandling.NewForbidden(errorhandling.UserCantDelete, "insufficient permissions")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.Forbidden(errorhandling.UserCantDelete, "insufficient permissions")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	if err := repository.DeleteUser(c.Request.Context(), targetUserID); err != nil {
 		if errors.Is(err, repository.ErrLastAdmin) {
-			err := errorhandling.NewForbidden(errorhandling.UserLastAdmin, "cannot delete the last admin")
-			errorhandling.IdentifyAndRespond(c, functionName, err)
+			err := errorhandling.Forbidden(errorhandling.UserLastAdmin, "cannot delete the last admin")
+			errorhandling.Respond(c, functionName, err)
 			return
 		}
-		errorhandling.IdentifyAndRespond(c, "handlers.DeleteUser", err)
+		errorhandling.Respond(c, "handlers.DeleteUser", err)
 		return
 	}
 

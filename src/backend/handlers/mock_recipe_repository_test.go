@@ -103,7 +103,7 @@ func TestGetAllRecipes_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := NewRecipeHandler(mockRepo)
+			recipeHandler := RecipeHandler(mockRepo)
 			router := gin.New()
 			router.GET("/api/recipes", recipeHandler.GetAllRecipes)
 			req := httptest.NewRequest(
@@ -173,7 +173,7 @@ func TestGetRecipeByID_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := NewRecipeHandler(mockRepo)
+			recipeHandler := RecipeHandler(mockRepo)
 			router := gin.New()
 			router.GET("/api/recipes/:id", recipeHandler.GetRecipeByID)
 			req := httptest.NewRequest(
@@ -236,7 +236,7 @@ func TestSearchRecipes_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := NewRecipeHandler(mockRepo)
+			recipeHandler := RecipeHandler(mockRepo)
 			router := gin.New()
 			router.GET("/api/recipes/search", recipeHandler.SearchRecipes)
 			req := httptest.NewRequest(
@@ -296,7 +296,7 @@ var createRecipeTests = []struct {
 		requestBody: `{"title":"Valid Title","image_url":"https://example.com/image.jpg","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockCreateRecipe = func(ctx context.Context, r *models.Recipe) (string, error) {
-				return "", errorhandling.NewBadRequest(errorhandling.RecipeAuthorIDInvalid, "invalid author id")
+				return "", errorhandling.BadRequest(errorhandling.RecipeAuthorIDInvalid, "invalid author id")
 			}
 		},
 		expectedStatus: 400,
@@ -310,7 +310,7 @@ func TestCreateRecipe_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := NewRecipeHandler(mockRepo)
+			recipeHandler := RecipeHandler(mockRepo)
 			router := gin.New()
 			router.Use(func(c *gin.Context) {
 				if tt.userID != "" {
@@ -378,7 +378,7 @@ var updateRecipeTests = []struct {
 		requestBody: `{"title":"Updated Title","image_url":"https://example.com/image.jpg","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
-				return models.RecipeResponse{}, errorhandling.NewRecipeNotFound()
+				return models.RecipeResponse{}, errorhandling.NotFoundRecipe()
 			}
 		},
 		expectedStatus: 404,
@@ -392,7 +392,7 @@ func TestUpdateRecipe_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := NewRecipeHandler(mockRepo)
+			recipeHandler := RecipeHandler(mockRepo)
 			router := gin.New()
 			router.Use(func(c *gin.Context) {
 				if tt.userID != "" {
@@ -482,7 +482,7 @@ func TestDeleteRecipe_TableDriven(t *testing.T) {
 			mockRepo := &MockRecipeRepo{}
 			tt.mockSetup(mockRepo)
 
-			recipeHandler := NewRecipeHandler(mockRepo)
+			recipeHandler := RecipeHandler(mockRepo)
 			router := gin.New()
 			router.Use(func(c *gin.Context) {
 				if tt.userID != "" {

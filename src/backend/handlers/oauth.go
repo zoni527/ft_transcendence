@@ -37,7 +37,7 @@ func RandomStateToken() (string, error) {
 func GoogleLogin(c *gin.Context) {
 	randomState, err := RandomStateToken()
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "GoogleLogin", err)
+		errorhandling.Respond(c, "GoogleLogin", err)
 		return
 	}
 
@@ -60,30 +60,30 @@ func GoogleCallback(c *gin.Context) {
 	code := c.Query("code")
 	token, err := integrations.GoogleOAuthConfig.Exchange(c, code)
 	if err != nil {
-		err := errorhandling.NewUnauthorized(errorhandling.OAuthLoginFail, "google login failed")
-		errorhandling.IdentifyAndRespond(c, "GoogleCallback", err)
+		err := errorhandling.Unauthorized(errorhandling.OAuthLoginFail, "google login failed")
+		errorhandling.Respond(c, "GoogleCallback", err)
 		return
 	}
 
 	client := integrations.GoogleOAuthConfig.Client(c, token)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
-		errorhandling.IdentifyAndRespond(c, "GoogleCallback", err)
+		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
+		errorhandling.Respond(c, "GoogleCallback", err)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
-		errorhandling.IdentifyAndRespond(c, "GoogleCallback", err)
+		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
+		errorhandling.Respond(c, "GoogleCallback", err)
 		return
 	}
 
 	var gu models.GoogleUser
 	if err := json.NewDecoder(resp.Body).Decode(&gu); err != nil || !gu.VerifiedEmail {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
-		errorhandling.IdentifyAndRespond(c, "GoogleCallback", err)
+		err := errorhandling.Unauthorized(errorhandling.UserUnauthorized, unauthorizedErrorMsg)
+		errorhandling.Respond(c, "GoogleCallback", err)
 		return
 	}
 
@@ -99,13 +99,13 @@ func GoogleCallback(c *gin.Context) {
 			reportError(c, http.StatusBadRequest, eb.Error())
 			return
 		}
-		errorhandling.IdentifyAndRespond(c, "getOrCreateGoogleUser", err)
+		errorhandling.Respond(c, "getOrCreateGoogleUser", err)
 		return
 	}
 
 	jwt, err := authorization.GenerateJWTToken(u.ID)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "LoginUser GenerateJWTToken", err)
+		errorhandling.Respond(c, "LoginUser GenerateJWTToken", err)
 		return
 	}
 	c.SetSameSite(http.SameSiteLaxMode)

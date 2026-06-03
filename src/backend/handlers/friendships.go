@@ -17,14 +17,14 @@ func GetFriendships(c *gin.Context) {
 	functionName := "GetFriendships"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	rows, err := repository.GetFriendshipsForUser(c.Request.Context(), userID)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -54,8 +54,8 @@ func CreateFriendRequest(c *gin.Context) {
 	functionName := "CreateFriendRequest"
 	requesterID := c.GetString("userID")
 	if !authorization.IsValidUUID(requesterID) {
-		err := errorhandling.NewUnauthorized(errorhandling.UserUnauthorized, "unauthorized user")
-		errorhandling.IdentifyAndRespond(c, functionName, err)
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -74,7 +74,7 @@ func CreateFriendRequest(c *gin.Context) {
 	}
 
 	if err := repository.CreateFriendRequest(c.Request.Context(), requesterID, body.ReceiverID); err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.CreateFriendRequest", err)
+		errorhandling.Respond(c, "handlers.CreateFriendRequest", err)
 		return
 	}
 
@@ -84,9 +84,11 @@ func CreateFriendRequest(c *gin.Context) {
 // PATCH /api/friendships/:id — :id is the requester's user ID (the friend
 // who sent me the pending request)
 func AcceptFriendRequest(c *gin.Context) {
+	functionName := "AcceptFriendRequest"
 	receiverID := c.GetString("userID")
 	if !authorization.IsValidUUID(receiverID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -101,7 +103,7 @@ func AcceptFriendRequest(c *gin.Context) {
 	}
 
 	if err := repository.AcceptFriendRequest(c.Request.Context(), requesterID, receiverID); err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.AcceptFriendRequest", err)
+		errorhandling.Respond(c, "handlers.AcceptFriendRequest", err)
 		return
 	}
 
@@ -112,9 +114,11 @@ func AcceptFriendRequest(c *gin.Context) {
 // user). One endpoint covers three product actions: cancel an outgoing
 // request, deny an incoming request, and unfriend.
 func DeleteFriendship(c *gin.Context) {
+	functionName := "DeleteFriendship"
 	callerID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -130,7 +134,7 @@ func DeleteFriendship(c *gin.Context) {
 
 	status, err := repository.GetFriendshipStatus(c.Request.Context(), callerID, otherID)
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.DeleteFriendship", err)
+		errorhandling.Respond(c, "handlers.DeleteFriendship", err)
 		return
 	}
 	action := c.Query("action")
@@ -144,7 +148,7 @@ func DeleteFriendship(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		errorhandling.IdentifyAndRespond(c, "handlers.DeleteFriendship", err)
+		errorhandling.Respond(c, "handlers.DeleteFriendship", err)
 		return
 	}
 

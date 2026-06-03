@@ -203,7 +203,7 @@ func GetUserByID(ctx context.Context, id string) (models.User, error) {
 	)
 
 	if err == pgx.ErrNoRows {
-		return models.User{}, errorhandling.NewUserNotFound()
+		return models.User{}, errorhandling.NotFoundUser()
 	}
 
 	if err != nil {
@@ -281,7 +281,7 @@ func CreateUser(ctx context.Context, params models.CreateUserParams) (models.Use
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-			return models.User{}, errorhandling.NewConflict(
+			return models.User{}, errorhandling.Conflict(
 				errorhandling.UserAlreadyExists,
 				"user with email/username already exists",
 			)
@@ -399,12 +399,12 @@ func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) 
 		&isOAuthBlock,
 	)
 	if err == pgx.ErrNoRows {
-		return models.User{}, errorhandling.NewUserNotFound()
+		return models.User{}, errorhandling.NotFoundUser()
 	}
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-			return models.User{}, errorhandling.NewConflict(
+			return models.User{}, errorhandling.Conflict(
 				errorhandling.UserAlreadyExists,
 				"user with email/username already exists",
 			)
@@ -458,7 +458,7 @@ func UpdateLastSeen(ctx context.Context, userID string) error {
 		return fmt.Errorf("UpdateLastSeen: %w", err)
 	}
 	if commandTag.RowsAffected() == 0 {
-		return errorhandling.NewUserNotFound()
+		return errorhandling.NotFoundUser()
 	}
 	return nil
 }
@@ -515,7 +515,7 @@ func DeleteUser(ctx context.Context, userID string) error {
 		return fmt.Errorf("repository.DeleteUser: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return errorhandling.NewUserNotFound()
+		return errorhandling.NotFoundUser()
 	}
 
 	if err := tx.Commit(ctx); err != nil {

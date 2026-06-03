@@ -69,29 +69,29 @@ func friendshipPostgresErrorClassification(functionName string, err error) error
 	}
 	switch pgErr.Code {
 	case pgerrcode.UniqueViolation:
-		return errorhandling.NewBadRequest(
+		return errorhandling.BadRequest(
 			errorhandling.FriendshipAlreadyExists,
 			"friendship already exists",
 		)
 	case pgerrcode.ForeignKeyViolation:
-		return errorhandling.NewNotFound(
+		return errorhandling.NotFound(
 			errorhandling.FriendshipReceiverNotFound,
 			"receiver not found",
 		)
 	case pgerrcode.CheckViolation:
 		if pgErr.ConstraintName == "friendship_no_self" {
-			return errorhandling.NewBadRequest(
+			return errorhandling.BadRequest(
 				errorhandling.FriendshipNoSelf,
 				"cannot send a request to yourself",
 			)
 		}
 		log.Printf("%v: check violation: %v", functionName, pgErr.ConstraintName)
-		return errorhandling.NewBadRequest(
+		return errorhandling.BadRequest(
 			errorhandling.FriendshipDataInvalid,
 			"invalid frienship data",
 		)
 	case pgerrcode.InvalidTextRepresentation:
-		return errorhandling.NewNotFound(
+		return errorhandling.NotFound(
 			errorhandling.FriendshipReceiverNotFound,
 			"receiver not found",
 		)
@@ -116,7 +116,7 @@ func AcceptFriendRequest(ctx context.Context, requesterID, receiverID string) er
 		return fmt.Errorf("repository.AcceptFriendRequest: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return errorhandling.NewNotFound(
+		return errorhandling.NotFound(
 			errorhandling.FriendshipRequestNotFound,
 			"friend request not found",
 		)
@@ -134,7 +134,7 @@ func GetFriendshipStatus(ctx context.Context, userAID, userBID string) (string, 
 	err := Pool.QueryRow(ctx, sql, userAID, userBID).Scan(&status)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return "", errorhandling.NewNotFound(
+			return "", errorhandling.NotFound(
 				errorhandling.FriendshipNotFound,
 				"friendship not found",
 			)
@@ -158,7 +158,7 @@ func DeleteFriendRequest(ctx context.Context, callerID, otherID string) error {
 		return fmt.Errorf("repository.DeleteFriendRequest: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return errorhandling.NewNotFound(
+		return errorhandling.NotFound(
 			errorhandling.FriendshipRequestNotFound,
 			"friend request not found",
 		)
@@ -179,7 +179,7 @@ func DeleteFriendship(ctx context.Context, callerID, otherID string) error {
 		return fmt.Errorf("repository.DeleteFriendship: %w", err)
 	}
 	if res.RowsAffected() == 0 {
-		return errorhandling.NewNotFound(
+		return errorhandling.NotFound(
 			errorhandling.FriendshipNotFound,
 			"friendship not found",
 		)

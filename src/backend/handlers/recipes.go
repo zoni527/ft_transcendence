@@ -3,7 +3,6 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -13,6 +12,7 @@ import (
 	"unicode"
 
 	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/integrations"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
@@ -31,8 +31,7 @@ func NewRecipeHandler(repo repository.RecipeRepository) *RecipeHandler {
 func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
 	recipes, err := h.Repo.GetAllRecipes(c.Request.Context())
 	if err != nil {
-		log.Printf("handlers.GetAllRecipes: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, "GetAllRecipes", err)
 		return
 	}
 
@@ -40,19 +39,17 @@ func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
 }
 
 func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
+	functionName := "GetRecipeByID"
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		err := errorhandling.NotFoundRecipe()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	recipe, err := h.Repo.GetRecipeByID(c.Request.Context(), id)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.GetRecipeByID: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -60,10 +57,11 @@ func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
 }
 
 func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
+	functionName := "SearchRecipes"
 	var f models.SearchRecipeFilters
-
 	if err := c.ShouldBindQuery(&f); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		err := errorhandling.BadRequest(errorhandling.RecipeBindingError, "error binding recipe query")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -77,36 +75,39 @@ func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
 
 	recipes, err := h.Repo.SearchRecipes(c.Request.Context(), f, limitInt, offset)
 	if err != nil {
-		log.Printf("handlers.SearchRecipes: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	c.JSON(http.StatusOK, recipes)
 }
 
 func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
+	functionName := "CreateRecipe"
 	var r models.Recipe
 	if err := c.ShouldBindJSON(&r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		err := errorhandling.BadRequest(errorhandling.RecipeBindingError, "error binding recipe from json")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
+
 	r.AuthorID = c.GetString("userID")
 	if !authorization.IsValidUUID(r.AuthorID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		err := errorhandling.Unauthorized(errorhandling.RecipeAuthorIDInvalid, "unauthorized")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err := validateRecipeFields(&r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
+		validationErr := errorhandling.BadRequest(
+			errorhandling.RecipeBadField,
+			fmt.Sprintf("%v", err),
+		)
+		errorhandling.Respond(c, functionName, validationErr)
 		return
 	}
 
 	newRecipeID, err := h.Repo.CreateRecipe(c.Request.Context(), &r)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.CreateRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -114,58 +115,55 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 }
 
 func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
+	functionName := "UpdateRecipe"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	recipeID := c.Param("id")
 	if !authorization.IsValidUUID(recipeID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		err := errorhandling.NotFoundRecipe()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	var r models.Recipe
 	if err := c.ShouldBindJSON(&r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input data"})
+		err := errorhandling.BadRequest(errorhandling.RecipeBindingError, "invalid input data")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.UpdateRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	roleSet, okRoles := authorization.RolesFromContext(c)
 	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
-		log.Printf("handlers.UpdateRecipe: data missing from context")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, fmt.Errorf("data missing from context"))
 		return
 	}
 	allowed := authorization.CanEditRecipe(roleSet, permSet, userID, original.Author.ID)
 	if !allowed {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		err := errorhandling.Forbidden(errorhandling.RecipeCantEdit, "forbidden")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	if err := validateRecipeFields(&r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%v", err)})
+		validationErr := errorhandling.BadRequest(errorhandling.RecipeBadField, fmt.Sprintf("%v", err))
+		errorhandling.Respond(c, functionName, validationErr)
 		return
 	}
 
 	r.ID = recipeID
 	if err := h.Repo.UpdateRecipe(c.Request.Context(), &r); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.UpdateRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -173,46 +171,41 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 }
 
 func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
+	functionName := "DeleteRecipe"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	recipeID := c.Param("id")
 	if !authorization.IsValidUUID(recipeID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "recipe not found"})
+		err := errorhandling.NotFoundRecipe()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	roleSet, okRoles := authorization.RolesFromContext(c)
 	permSet, okPerms := authorization.PermsFromContext(c)
 	if !okRoles || !okPerms {
-		log.Printf("handlers.DeleteRecipe: data missing from context")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, fmt.Errorf("data missing from context"))
 		return
 	}
 	allowed := authorization.CanDeleteRecipe(roleSet, permSet, userID, original.Author.ID)
 	if !allowed {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		err := errorhandling.Forbidden(errorhandling.RecipeCantDelete, "forbidden")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	if err := h.Repo.DeleteRecipe(c.Request.Context(), recipeID); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteRecipe: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -441,19 +434,4 @@ func onlyGraphicChars(s string) error {
 		}
 	}
 	return nil
-}
-
-func identifyAndRespondToUserError(c *gin.Context, err error) bool {
-	var br *repository.BadRequestError
-	var nf *repository.NotFoundError
-	switch {
-	case errors.As(err, &br):
-		c.JSON(http.StatusBadRequest, gin.H{"error": br.Error()})
-		return true
-	case errors.As(err, &nf):
-		c.JSON(http.StatusNotFound, gin.H{"error": nf.Error()})
-		return true
-	}
-
-	return false
 }

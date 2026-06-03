@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"time"
 
 	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/models"
 	"ft_transcendence/backend/repository"
 
@@ -13,16 +14,17 @@ import (
 )
 
 func GetFriendships(c *gin.Context) {
+	functionName := "GetFriendships"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	rows, err := repository.GetFriendshipsForUser(c.Request.Context(), userID)
 	if err != nil {
-		log.Printf("GetFriendships error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
@@ -49,32 +51,36 @@ func GetFriendships(c *gin.Context) {
 
 // POST /api/friendships
 func CreateFriendRequest(c *gin.Context) {
+	functionName := "CreateFriendRequest"
 	requesterID := c.GetString("userID")
 	if !authorization.IsValidUUID(requesterID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	var body models.CreateFriendRequestBody
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		err := errorhandling.BadRequest(errorhandling.FriendshipDataInvalid, "invalid request body")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if !authorization.IsValidUUID(body.ReceiverID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "receiver not found"})
+		err := errorhandling.NotFound(errorhandling.FriendshipReceiverNotFound, "receiver not found")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if body.ReceiverID == requesterID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot send a request to yourself"})
+		err := errorhandling.BadRequest(
+			errorhandling.FriendshipCreateNoSelf,
+			"cannot send a request to yourself",
+		)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	if err := repository.CreateFriendRequest(c.Request.Context(), requesterID, body.ReceiverID); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.CreateFriendRequest: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, "handlers.CreateFriendRequest", err)
 		return
 	}
 
@@ -84,28 +90,31 @@ func CreateFriendRequest(c *gin.Context) {
 // PATCH /api/friendships/:id — :id is the requester's user ID (the friend
 // who sent me the pending request)
 func AcceptFriendRequest(c *gin.Context) {
+	functionName := "AcceptFriendRequest"
 	receiverID := c.GetString("userID")
 	if !authorization.IsValidUUID(receiverID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	requesterID := c.Param("id")
 	if !authorization.IsValidUUID(requesterID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "friend request not found"})
+		err := errorhandling.NotFound(errorhandling.FriendshipNotFound, "friend request not found")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if requesterID == receiverID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot accept your own request"})
+		err := errorhandling.BadRequest(
+			errorhandling.FriendshipAcceptNoSelf,
+			"cannot accept your own request",
+		)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	if err := repository.AcceptFriendRequest(c.Request.Context(), requesterID, receiverID); err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.AcceptFriendRequest: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, "handlers.AcceptFriendRequest", err)
 		return
 	}
 
@@ -116,29 +125,32 @@ func AcceptFriendRequest(c *gin.Context) {
 // user). One endpoint covers three product actions: cancel an outgoing
 // request, deny an incoming request, and unfriend.
 func DeleteFriendship(c *gin.Context) {
+	functionName := "DeleteFriendship"
 	callerID := c.GetString("userID")
 	if !authorization.IsValidUUID(callerID) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user"})
+		err := errorhandling.UnauthorizedUser()
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	otherID := c.Param("id")
 	if !authorization.IsValidUUID(otherID) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "friendship not found"})
+		err := errorhandling.NotFound(errorhandling.FriendshipNotFound, "friendship not found")
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if otherID == callerID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot delete a friendship with yourself"})
+		err := errorhandling.BadRequest(
+			errorhandling.FriendshipDeleteNoSelf,
+			"cannot delete a friendship with yourself",
+		)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 
 	status, err := repository.GetFriendshipStatus(c.Request.Context(), callerID, otherID)
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteFriendship: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, "handlers.DeleteFriendship", err)
 		return
 	}
 	action := c.Query("action")
@@ -147,16 +159,13 @@ func DeleteFriendship(c *gin.Context) {
 	} else if action == "unfriend" && status == "accepted" {
 		err = repository.DeleteFriendship(c.Request.Context(), callerID, otherID)
 	} else {
-		log.Printf("handlers.DeleteFriendship: unexpected status and action %q, %q", status, action)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		context := fmt.Sprintf("unexpected status and action %q, %q", status, action)
+		err := errorhandling.BadRequest(errorhandling.FriendshipQueryInvalid, context)
+		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	if err != nil {
-		if identifyAndRespondToUserError(c, err) {
-			return
-		}
-		log.Printf("handlers.DeleteFriendship: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		errorhandling.Respond(c, "handlers.DeleteFriendship", err)
 		return
 	}
 

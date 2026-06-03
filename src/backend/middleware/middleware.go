@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"ft_transcendence/backend/authorization"
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
@@ -16,14 +17,20 @@ func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie("token")
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "unauthorized",
+				"code":  errorhandling.TokenMissing,
+			})
 			return
 		}
 
 		claims, err := authorization.ValidateJWTToken(token)
 		if err != nil {
 			log.Printf("ValidateJWTToken: %v", err)
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "invalid token",
+				"code":  errorhandling.TokenInvalid,
+			})
 			return
 		}
 
@@ -34,7 +41,10 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 		if blacklisted {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "invalid token",
+				"code":  errorhandling.TokenInvalid,
+			})
 			return
 		}
 		roles, perms, err := repository.GetEffectivePermissionsByUser(c.Request.Context(), claims.Subject)
@@ -68,7 +78,10 @@ func RequireRoles(roles ...string) gin.HandlerFunc {
 				}
 			}
 			if !allowed {
-				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+					"error": "insufficient permissions",
+					"code":  errorhandling.UserRequiredRoleMissing,
+				})
 				return
 			}
 			c.Next()
@@ -83,7 +96,10 @@ func RequirePermission(permissions ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := c.GetString("userID")
 		if !authorization.IsValidUUID(userID) {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "unauthorized",
+				"code":  errorhandling.UserUnauthorized,
+			})
 			return
 		}
 		if perms, ok := authorization.PermsFromContext(c); ok {
@@ -95,7 +111,10 @@ func RequirePermission(permissions ...string) gin.HandlerFunc {
 				}
 			}
 			if !allowed {
-				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+					"error": "insufficient permissions",
+					"code":  errorhandling.UserRequiredPermissionMissing,
+				})
 				return
 			}
 			c.Next()
@@ -116,7 +135,10 @@ func APIKeyAuthenticator() gin.HandlerFunc {
 		userID, err := authorization.ValidateAPIKey(c.Request.Context(), apiKey)
 		if err != nil {
 			log.Printf("APIKeyAuthenticator: %v", err)
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid api key"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "invalid api key",
+				"code":  errorhandling.APIKeyInvalid,
+			})
 			return
 		}
 		c.Set("userID", userID)
@@ -137,7 +159,10 @@ func RateLimiter(r rate.Limit, m IdentifierMode, b int) gin.HandlerFunc {
 		cl.lastSeen = time.Now()
 		mu.Unlock()
 		if !cl.limiter.Allow() {
-			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "rate limit exceeded"})
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
+				"error": "rate limit exceeded",
+				"code":  errorhandling.RateLimit,
+			})
 			return
 		}
 		c.Next()

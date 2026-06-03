@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	"ft_transcendence/backend/errorhandling"
 	"ft_transcendence/backend/models"
-	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
 )
@@ -296,7 +296,7 @@ var createRecipeTests = []struct {
 		requestBody: `{"title":"Valid Title","image_url":"https://example.com/image.jpg","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockCreateRecipe = func(ctx context.Context, r *models.Recipe) (string, error) {
-				return "", &repository.BadRequestError{Msg: "invalid author id"}
+				return "", errorhandling.BadRequest(errorhandling.RecipeAuthorIDInvalid, "invalid author id")
 			}
 		},
 		expectedStatus: 400,
@@ -378,7 +378,7 @@ var updateRecipeTests = []struct {
 		requestBody: `{"title":"Updated Title","image_url":"https://example.com/image.jpg","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
 		mockSetup: func(repo *MockRecipeRepo) {
 			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
-				return models.RecipeResponse{}, &repository.NotFoundError{Msg: "recipe not found"}
+				return models.RecipeResponse{}, errorhandling.NotFoundRecipe()
 			}
 		},
 		expectedStatus: 404,

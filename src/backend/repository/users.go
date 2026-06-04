@@ -15,17 +15,40 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type UserRepository interface {
+	GetRolesByUserID(ctx context.Context, userID string) ([]string, error)
+	SearchUsersByUsername(ctx context.Context, username string) ([]models.UserSearchResult, error)
+	GetAllUsers(ctx context.Context) ([]models.User, error)
+	GetUserByID(ctx context.Context, id string) (models.User, error)
+	GetUserCredentialsByEmail(ctx context.Context, email string) (models.User, error)
+	GetUserCredentialsByDisplayName(ctx context.Context, displayName string) (models.User, error)
+	CreateUser(ctx context.Context, params models.CreateUserParams) (models.User, error)
+	UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error)
+	UpdateLastSeen(ctx context.Context, userID string) error
+	MarkOffline(ctx context.Context, userID string) error
+	DeleteUser(ctx context.Context, userID string) error
+}
+
+type postgresUserRepo struct {
+	pool *pgxpool.Pool
+}
+
+func NewPostgresUserRepo(pool *pgxpool.Pool) UserRepository {
+	return &postgresUserRepo{pool: pool}
+}
 
 // GetRolesByUserID returns the role names for a given user.
 // Joins user_role and role tables to get the role name strings.
-func GetRolesByUserID(ctx context.Context, userID string) ([]string, error) {
+func (pgRepo *postgresUserRepo) GetRolesByUserID(ctx context.Context, userID string) ([]string, error) {
 	sql := `SELECT r.name
 			FROM user_role ur
 			JOIN role r ON ur.role_id = r.id
 			WHERE ur.user_id = $1`
 
-	rows, err := Pool.Query(ctx, sql, userID)
+	rows, err := pgRepo.pool.Query(ctx, sql, userID)
 	if err != nil {
 		return nil, fmt.Errorf("error querying roles: %w", err)
 	}
@@ -77,13 +100,13 @@ func GetEffectivePermissionsByUser(ctx context.Context, userID string) (map[stri
 	return roles, perms, nil
 }
 
-func SearchUsersByUsername(ctx context.Context, username string) ([]models.UserSearchResult, error) {
+func (pgRepo *postgresUserRepo) SearchUsersByUsername(ctx context.Context, username string) ([]models.UserSearchResult, error) {
 	searchTerm := "%" + username + "%"
 	sql := `SELECT id, name, display_name
 		    FROM "user"
 		    WHERE display_name ILIKE $1
 			LIMIT 10`
-	rows, err := Pool.Query(ctx, sql, searchTerm)
+	rows, err := pgRepo.pool.Query(ctx, sql, searchTerm)
 	if err != nil {
 		return nil, fmt.Errorf("error querying users: %w", err)
 	}
@@ -136,12 +159,12 @@ func getRolesByUserIDTx(ctx context.Context, tx pgx.Tx, userID string) ([]string
 }
 
 // GetAllUsers returns all users with their roles attached.
-func GetAllUsers(ctx context.Context) ([]models.User, error) {
+func (pgRepo *postgresUserRepo) GetAllUsers(ctx context.Context) ([]models.User, error) {
 	sql := `SELECT id, email, name, display_name, avatar_url,
 				created_at, updated_at, last_seen
 			FROM "user" `
 
-	rows, err := Pool.Query(ctx, sql)
+	rows, err := pgRepo.pool.Query(ctx, sql)
 	if err != nil {
 		return nil, fmt.Errorf("error querying users: %w", err)
 	}
@@ -173,7 +196,7 @@ func GetAllUsers(ctx context.Context) ([]models.User, error) {
 	// TODO: N+1 query problem — this loops one query per user to get roles.
 	// Optimize with LEFT JOIN + array_agg to fetch users and roles in a single query.
 	for i := range users {
-		roles, err := GetRolesByUserID(ctx, users[i].ID)
+		roles, err := pgRepo.GetRolesByUserID(ctx, users[i].ID)
 		if err != nil {
 			return nil, fmt.Errorf("error getting roles for user %s: %w", users[i].ID, err)
 		}
@@ -184,14 +207,14 @@ func GetAllUsers(ctx context.Context) ([]models.User, error) {
 }
 
 // GetUserByID returns a single user by UUID, with roles attached.
-func GetUserByID(ctx context.Context, id string) (models.User, error) {
+func (pgRepo *postgresUserRepo) GetUserByID(ctx context.Context, id string) (models.User, error) {
 	sql := `SELECT id, email, name, display_name, avatar_url,
 				created_at, updated_at, last_seen
 			FROM "user"
 			WHERE id = $1`
 
 	var u models.User
-	err := Pool.QueryRow(ctx, sql, id).Scan(
+	err := pgRepo.pool.QueryRow(ctx, sql, id).Scan(
 		&u.ID,
 		&u.Email,
 		&u.Name,
@@ -211,7 +234,7 @@ func GetUserByID(ctx context.Context, id string) (models.User, error) {
 	}
 
 	// TODO: Same N+1 issue — optimize with JOIN when GetAllUsers is updated.
-	roles, err := GetRolesByUserID(ctx, u.ID)
+	roles, err := pgRepo.GetRolesByUserID(ctx, u.ID)
 	if err != nil {
 		return models.User{}, fmt.Errorf("error getting roles for user: %w", err)
 	}
@@ -221,7 +244,7 @@ func GetUserByID(ctx context.Context, id string) (models.User, error) {
 }
 
 // Helper function for fetching user credentials by a unique field
-func getUserCredentialsBy(ctx context.Context, field, value string) (models.User, error) {
+func (pgRepo *postgresUserRepo) getUserCredentialsBy(ctx context.Context, field, value string) (models.User, error) {
 	if !(field == "email" || field == "display_name") {
 		return models.User{}, fmt.Errorf("invalid query field")
 	}
@@ -232,7 +255,7 @@ func getUserCredentialsBy(ctx context.Context, field, value string) (models.User
 		WHERE %v = $1`, field)
 
 	var u models.User
-	err := Pool.QueryRow(ctx, sql, value).Scan(
+	err := pgRepo.pool.QueryRow(ctx, sql, value).Scan(
 		&u.ID,
 		&u.Email,
 		&u.PasswordHash,
@@ -247,18 +270,18 @@ func getUserCredentialsBy(ctx context.Context, field, value string) (models.User
 }
 
 // Returns a single user's credentials by email
-func GetUserCredentialsByEmail(ctx context.Context, email string) (models.User, error) {
-	return getUserCredentialsBy(ctx, "email", email)
+func (pgRepo *postgresUserRepo) GetUserCredentialsByEmail(ctx context.Context, email string) (models.User, error) {
+	return pgRepo.getUserCredentialsBy(ctx, "email", email)
 }
 
 // Returns a single user's credentials by display_name
-func GetUserCredentialsByDisplayName(ctx context.Context, displayName string) (models.User, error) {
-	return getUserCredentialsBy(ctx, "display_name", displayName)
+func (pgRepo *postgresUserRepo) GetUserCredentialsByDisplayName(ctx context.Context, displayName string) (models.User, error) {
+	return pgRepo.getUserCredentialsBy(ctx, "display_name", displayName)
 }
 
 // Add new user to database, Database validates email and username uniqueness, checked at this level to avoid race conditions
-func CreateUser(ctx context.Context, params models.CreateUserParams) (models.User, error) {
-	tx, err := Pool.Begin(ctx)
+func (pgRepo *postgresUserRepo) CreateUser(ctx context.Context, params models.CreateUserParams) (models.User, error) {
+	tx, err := pgRepo.pool.Begin(ctx)
 	if err != nil {
 		return models.User{}, fmt.Errorf("start transaction: %w", err)
 	}
@@ -346,8 +369,8 @@ func CleanExpiredTokens(currentTime time.Time) error {
 
 var ErrOAuthUserBlock = errors.New("password and email changing blocked for OAuth users")
 
-func UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
-	tx, err := Pool.Begin(ctx)
+func (pgRepo *postgresUserRepo) UpdateUser(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
+	tx, err := pgRepo.pool.Begin(ctx)
 	if err != nil {
 		return models.User{}, fmt.Errorf("start transaction: %w", err)
 	}
@@ -450,10 +473,10 @@ func nullableString(value *string) any {
 	return *value
 }
 
-func UpdateLastSeen(ctx context.Context, userID string) error {
+func (pgRepo *postgresUserRepo) UpdateLastSeen(ctx context.Context, userID string) error {
 	sql := `UPDATE "user" SET last_seen = NOW() WHERE id = $1`
 
-	commandTag, err := Pool.Exec(ctx, sql, userID)
+	commandTag, err := pgRepo.pool.Exec(ctx, sql, userID)
 	if err != nil {
 		return fmt.Errorf("UpdateLastSeen: %w", err)
 	}
@@ -463,10 +486,10 @@ func UpdateLastSeen(ctx context.Context, userID string) error {
 	return nil
 }
 
-func MarkOffline(ctx context.Context, userID string) error {
+func (pgRepo *postgresUserRepo) MarkOffline(ctx context.Context, userID string) error {
 	sql := `UPDATE "user" SET last_seen = '1970-01-01' WHERE id = $1`
 
-	commandTag, err := Pool.Exec(ctx, sql, userID)
+	commandTag, err := pgRepo.pool.Exec(ctx, sql, userID)
 	if err != nil {
 		return fmt.Errorf("MarkOffline: %w", err)
 	}
@@ -478,8 +501,8 @@ func MarkOffline(ctx context.Context, userID string) error {
 
 var ErrLastAdmin = errors.New("cannot delete the last admin")
 
-func DeleteUser(ctx context.Context, userID string) error {
-	tx, err := Pool.Begin(ctx)
+func (pgRepo *postgresUserRepo) DeleteUser(ctx context.Context, userID string) error {
+	tx, err := pgRepo.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("repository.DeleteUser: %w", err)
 	}

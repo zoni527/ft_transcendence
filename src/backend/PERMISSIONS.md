@@ -138,7 +138,7 @@ Pattern:
 ```go
 func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
     // ...
-    recipe, err := h.Repo.GetRecipeByID(c.Request.Context(), id)
+    recipe, err := h.repo.GetRecipeByID(c.Request.Context(), id)
     if err != nil {
         // ... 404 if not found, 500 otherwise
         return

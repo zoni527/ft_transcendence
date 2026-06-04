@@ -21,15 +21,15 @@ import (
 )
 
 type RecipeHandler struct {
-	Repo repository.RecipeRepository
+	repo repository.RecipeRepository
 }
 
 func NewRecipeHandler(repo repository.RecipeRepository) *RecipeHandler {
-	return &RecipeHandler{Repo: repo}
+	return &RecipeHandler{repo: repo}
 }
 
 func (h *RecipeHandler) GetAllRecipes(c *gin.Context) {
-	recipes, err := h.Repo.GetAllRecipes(c.Request.Context())
+	recipes, err := h.repo.GetAllRecipes(c.Request.Context())
 	if err != nil {
 		errorhandling.Respond(c, "GetAllRecipes", err)
 		return
@@ -47,7 +47,7 @@ func (h *RecipeHandler) GetRecipeByID(c *gin.Context) {
 		return
 	}
 
-	recipe, err := h.Repo.GetRecipeByID(c.Request.Context(), id)
+	recipe, err := h.repo.GetRecipeByID(c.Request.Context(), id)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -73,7 +73,7 @@ func (h *RecipeHandler) SearchRecipes(c *gin.Context) {
 	}
 	offset := (f.Page - 1) * limitInt
 
-	recipes, err := h.Repo.SearchRecipes(c.Request.Context(), f, limitInt, offset)
+	recipes, err := h.repo.SearchRecipes(c.Request.Context(), f, limitInt, offset)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -105,7 +105,7 @@ func (h *RecipeHandler) CreateRecipe(c *gin.Context) {
 		return
 	}
 
-	newRecipeID, err := h.Repo.CreateRecipe(c.Request.Context(), &r)
+	newRecipeID, err := h.repo.CreateRecipe(c.Request.Context(), &r)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -137,7 +137,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 		return
 	}
 
-	original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
+	original, err := h.repo.GetRecipeByID(c.Request.Context(), recipeID)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -162,7 +162,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
 	}
 
 	r.ID = recipeID
-	if err := h.Repo.UpdateRecipe(c.Request.Context(), &r); err != nil {
+	if err := h.repo.UpdateRecipe(c.Request.Context(), &r); err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
@@ -186,7 +186,7 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 		return
 	}
 
-	original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
+	original, err := h.repo.GetRecipeByID(c.Request.Context(), recipeID)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -204,7 +204,7 @@ func (h *RecipeHandler) DeleteRecipe(c *gin.Context) {
 		return
 	}
 
-	if err := h.Repo.DeleteRecipe(c.Request.Context(), recipeID); err != nil {
+	if err := h.repo.DeleteRecipe(c.Request.Context(), recipeID); err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}

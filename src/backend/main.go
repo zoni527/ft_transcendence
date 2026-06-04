@@ -65,34 +65,37 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	pgRepo := repository.NewPostgresRecipeRepo(repository.Pool)
-	recipeHandler := handlers.NewRecipeHandler(pgRepo)
+	pgRecipeRepo := repository.NewPostgresRecipeRepo(repository.Pool)
+	pgUserRepo := repository.NewPostgresUserRepo(repository.Pool)
+	recipeHandler := handlers.NewRecipeHandler(pgRecipeRepo)
+	userHandler := handlers.NewUserHandler(pgUserRepo)
+	googleHandler := handlers.NewGoogleHandler(pgUserRepo)
 
 	/* ROUTES --------------------------------------------------------------- */
 
 	// Users
-	router.GET("/api/users", handlers.GetUsers)
-	router.GET("/api/users/me", middleware.Authentication(), handlers.GetMe)
+	router.GET("/api/users", userHandler.GetUsers)
+	router.GET("/api/users/me", middleware.Authentication(), userHandler.GetMe)
 	router.GET("/api/users/avatar",
 		middleware.Authentication(),
-		handlers.UserAvatarSignature)
+		userHandler.UserAvatarSignature)
 	router.GET("/api/users/search",
 		middleware.Authentication(),
-		handlers.SearchUser)
-	router.GET("/api/users/:id", handlers.GetUserByID)
+		userHandler.SearchUser)
+	router.GET("/api/users/:id", userHandler.GetUserByID)
 
-	router.POST("/api/users", handlers.CreateUser)
+	router.POST("/api/users", userHandler.CreateUser)
 	router.POST("/api/users/apikey",
 		middleware.Authentication(),
 		middleware.RequireRoles(authorization.RoleDeveloper),
-		handlers.GenerateAPIKey)
+		userHandler.GenerateAPIKey)
 
 	router.PUT("/api/users/me/heartbeat", // Heartbeat - update server state
 		middleware.Authentication(),
-		handlers.Heartbeat)
-	router.PUT("/api/users/:id", middleware.Authentication(), handlers.UpdateUser)
+		userHandler.Heartbeat)
+	router.PUT("/api/users/:id", middleware.Authentication(), userHandler.UpdateUser)
 
-	router.DELETE("/api/users/:id", middleware.Authentication(), handlers.DeleteUser)
+	router.DELETE("/api/users/:id", middleware.Authentication(), userHandler.DeleteUser)
 
 	// Recipes
 	router.GET("/api/recipes", recipeHandler.GetAllRecipes)
@@ -114,12 +117,12 @@ func main() {
 	router.DELETE("/api/recipes/:id", middleware.Authentication(), recipeHandler.DeleteRecipe)
 
 	// Authentication
-	router.GET("/api/auth/session", handlers.GetSession)
+	router.GET("/api/auth/session", userHandler.GetSession)
 	router.GET("/api/auth/google/login", handlers.GoogleLogin)
-	router.GET("/api/auth/google/callback", handlers.GoogleCallback)
+	router.GET("/api/auth/google/callback", googleHandler.GoogleCallback)
 
-	router.POST("/api/auth/login", handlers.LoginUser)
-	router.POST("/api/auth/logout", middleware.Authentication(), handlers.LogoutUser)
+	router.POST("/api/auth/login", userHandler.LoginUser)
+	router.POST("/api/auth/logout", middleware.Authentication(), userHandler.LogoutUser)
 
 	// Friendships
 	router.GET("/api/friendships", middleware.Authentication(), handlers.GetFriendships)
@@ -128,7 +131,7 @@ func main() {
 	router.DELETE("/api/friendships/:id", middleware.Authentication(), handlers.DeleteFriendship)
 
 	/*--------------Public API endpoints------------*/
-	recipeSvc := services.NewRecipeService(pgRepo)
+	recipeSvc := services.NewRecipeService(pgRecipeRepo)
 	publicRecipeHandler := handlers.NewPublicRecipeHandler(recipeSvc)
 
 	publicAPI := router.Group("/api/v1")

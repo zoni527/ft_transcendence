@@ -347,7 +347,7 @@ export const fiTranslations = {
     noAuth: 'Ei tunnistauduttu',
 
     recipeNotFound: 'Reseptiä ei löytynyt',
-    recipeBindingError: 'Reseptipyynnön käsittely epäonnistui',
+    recipeBindingError: 'Pyynnön käsittely epäonnistui',
     recipeAuthorIdInvalid: 'Virheellinen reseptin tekijä',
     recipeDataInvalid: 'Reseptin tiedot ovat virheelliset',
     recipeDifficultyInvalid: 'Virheellinen vaikeustaso',
@@ -357,7 +357,7 @@ export const fiTranslations = {
     recipeBadField: 'Yksi tai useampi reseptin kenttä on virheellinen',
 
     userNotFound: 'Käyttäjää ei löytynyt',
-    userBindingError: 'Käyttäjäpyynnön käsittely epäonnistui',
+    userBindingError: 'Pyynnön käsittely epäonnistui',
     userUnauthorized: 'Sinulla ei ole oikeuksia tähän toimintoon',
     userBadField: 'Yksi tai useampi käyttäjän kenttä on virheellinen',
     userNameInvalid: 'Virheellinen nimi',

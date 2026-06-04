@@ -93,17 +93,23 @@ const EditRecipeModal = ({
   // Controlled input states
   const [title, setTitle] = useState(passedRecipe.title);
   const [description, setDescription] = useState(passedRecipe.description);
-  const [preparation_time_min, setPrepTimeMin] = useState(
-    passedRecipe.preparation_time_min,
+  const [preparation_time_min, setPrepTimeMin] = useState<string>(
+    passedRecipe.preparation_time_min.toString(),
   );
-  const [servings, setServings] = useState(passedRecipe.servings);
+  const [servings, setServings] = useState<string>(
+    passedRecipe.servings.toString(),
+  );
   const [difficulty, setDifficulty] = useState(passedRecipe.difficulty);
   const [cuisine, setCuisine] = useState(passedRecipe.cuisine);
   const [meal_type, setMealType] = useState(passedRecipe.meal_type);
-  const [calories, setCalories] = useState(passedRecipe.calories);
-  const [protein, setProtein] = useState(passedRecipe.protein_g);
-  const [carbs, setCarbs] = useState(passedRecipe.carbs_g);
-  const [fat, setFat] = useState(passedRecipe.fat_g);
+  const [calories, setCalories] = useState<string>(
+    passedRecipe.calories.toString(),
+  );
+  const [protein, setProtein] = useState<string>(
+    passedRecipe.protein_g.toString(),
+  );
+  const [carbs, setCarbs] = useState<string>(passedRecipe.carbs_g.toString());
+  const [fat, setFat] = useState<string>(passedRecipe.fat_g.toString());
   const [fileName, setFileName] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -267,7 +273,7 @@ const EditRecipeModal = ({
             label={t('createRecipe.prep')}
             placeholder={t('createRecipe.prepPlace')}
             value={preparation_time_min.toString()}
-            onChange={(e) => setPrepTimeMin(Number(e.target.value))}
+            onChange={(e) => setPrepTimeMin(e.target.value)}
           />
 
           <InputField
@@ -276,7 +282,7 @@ const EditRecipeModal = ({
             label={t('createRecipe.servings')}
             placeholder={t('createRecipe.servingsPlace')}
             value={servings.toString()}
-            onChange={(e) => setServings(Number(e.target.value))}
+            onChange={(e) => setServings(e.target.value)}
           />
 
           <SelectField
@@ -324,7 +330,7 @@ const EditRecipeModal = ({
             label={t('createRecipe.calories')}
             placeholder={t('createRecipe.caloriesPlace')}
             value={calories.toString()}
-            onChange={(e) => setCalories(Number(e.target.value))}
+            onChange={(e) => setCalories(e.target.value)}
           />
 
           <InputField
@@ -333,7 +339,7 @@ const EditRecipeModal = ({
             label={t('createRecipe.protein')}
             placeholder={t('createRecipe.proteinPlace')}
             value={protein.toString()}
-            onChange={(e) => setProtein(Number(e.target.value))}
+            onChange={(e) => setProtein(e.target.value)}
           />
 
           <InputField
@@ -342,7 +348,7 @@ const EditRecipeModal = ({
             label={t('createRecipe.carbs')}
             placeholder={t('createRecipe.carbsPlace')}
             value={carbs.toString()}
-            onChange={(e) => setCarbs(Number(e.target.value))}
+            onChange={(e) => setCarbs(e.target.value)}
           />
 
           <InputField
@@ -351,7 +357,7 @@ const EditRecipeModal = ({
             label={t('createRecipe.fat')}
             placeholder={t('createRecipe.fatPlace')}
             value={fat.toString()}
-            onChange={(e) => setFat(Number(e.target.value))}
+            onChange={(e) => setFat(e.target.value)}
           />
 
           {/* Image Upload */}

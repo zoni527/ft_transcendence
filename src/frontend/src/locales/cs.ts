@@ -381,7 +381,7 @@ export const csTranslations = {
     userUpdateOAuthForbidden: 'Uživatele OAuth nelze tímto způsobem upravovat',
     userUpdateRolesInvalid: 'Jedna nebo více rolí jsou neplatné',
 
-    friendshipAlreadyExists: 'S tímto uživatelem jste již propojeni',
+    friendshipAlreadyExists: 'S tímto uživatelem jste již spojeni',
     friendshipReceiverNotFound: 'Vybraný uživatel nebyl nalezen',
     friendshipNoSelf: 'Nemůžete si poslat žádost o přátelství sami sobě',
     friendshipDataInvalid: 'Data žádosti o přátelství jsou neplatná',

@@ -2,9 +2,12 @@ package handlers
 
 import (
 	"context"
-	"os"
-	"reflect"
+	"errors"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 
 	"ft_transcendence/backend/models"
 
@@ -102,45 +105,128 @@ func (m *MockUserRepo) MarkOffline(ctx context.Context, userID string) error {
 	return nil
 }
 
-
-func TestMain(m *testing.M) {
-	gin.SetMode(gin.TestMode)
-	os.Exit(m.Run())
+var getUsersTests = []struct {
+	name           string
+	mockSetup      func(repo *MockUserRepo)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name: "Success",
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockGetAllUsers = func(ctx context.Context) ([]models.User, error) {
+				return []models.User{{
+					ID:          "11111111-1111-1111-1111-111111111111",
+					DisplayName: "Alice",
+					Name:        "Alice Example",
+					LastSeen:    time.Now().Add(-time.Second),
+				}}, nil
+			}
+		},
+		expectedStatus: http.StatusOK,
+		expectedBody:   `"display_name":"Alice"`,
+	},
+	{
+		name: "Error",
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockGetAllUsers = func(ctx context.Context) ([]models.User, error) {
+				return nil, errors.New("error")
+			}
+		},
+		expectedStatus: http.StatusInternalServerError,
+		expectedBody:   `"error":"internal server error"`,
+	},
 }
 
-var getRolesByUserIDTests = []struct {
+func TestGetUsers_TableDriven(t *testing.T) {
+	for _, tt := range getUsersTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockUserRepo{}
+			tt.mockSetup(mockRepo)
+
+			handler := NewUserHandler(mockRepo)
+			router := gin.New()
+			router.GET("/api/users", handler.GetUsers)
+
+			req := httptest.NewRequest(http.MethodGet, "/api/users", nil)
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}
+
+var getUserByIDTests = []struct {
 	name           string
 	userID         string
 	mockSetup      func(repo *MockUserRepo)
-	expectedRoles  []string
-	expectedError  bool
+	expectedStatus int
+	expectedBody   string
 }{
 	{
 		name:   "Success",
-		userID: "123",
+		userID: "aa899f26-cf36-4570-b952-58752e6bf79a",
 		mockSetup: func(repo *MockUserRepo) {
-			repo.MockGetRolesByUserID = func(ctx context.Context, userID string) ([]string, error) {
-				if userID != "123" {
-					return nil, nil
-				}
-				return []string{"admin", "user"}, nil
+			repo.MockGetUserByID = func(ctx context.Context, id string) (models.User, error) {
+				return models.User{
+					ID:          id,
+					DisplayName: "Alice",
+					Name:        "Alice Example",
+					LastSeen:    time.Now().Add(-time.Second),
+				}, nil
 			}
 		},
-		expectedRoles: []string{"admin", "user"},
-		expectedError: false,
+		expectedStatus: http.StatusOK,
+		expectedBody:   `"display_name":"Alice"`,
 	},
 	{
-		name:   "Nil func field",
-		userID: "any",
+		name:           "Invalid UUID caught by handler validation",
+		userID:         "invalid-uuid",
+		mockSetup:      func(repo *MockUserRepo) {},
+		expectedStatus: http.StatusNotFound,
+		expectedBody:   `"error":"user not found"`,
+	},
+	{
+		name:   "Internal server error",
+		userID: "aa899f26-cf36-4570-b952-58752e6bf79a",
 		mockSetup: func(repo *MockUserRepo) {
+			repo.MockGetUserByID = func(ctx context.Context, id string) (models.User, error) {
+				return models.User{}, errors.New("problem with database")
+			}
 		},
-		expectedRoles: nil,
-		expectedError: false,
+		expectedStatus: http.StatusInternalServerError,
+		expectedBody:   `"error":"internal server error"`,
 	},
 }
 
-func TestMockGetRolesByUserID_TableDriven(t *testing.T) {
-	for _, tt := range getRolesByUserIDTests {
+func TestGetUserByID_TableDriven(t *testing.T) {
+	for _, tt := range getUserByIDTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockUserRepo{}
+			tt.mockSetup(mockRepo)
 
+			handler := NewUserHandler(mockRepo)
+			router := gin.New()
+			router.GET("/api/users/:id", handler.GetUserByID)
+
+			req := httptest.NewRequest(http.MethodGet, "/api/users/"+tt.userID, nil)
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
 }
-

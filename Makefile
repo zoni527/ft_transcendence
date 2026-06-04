@@ -31,6 +31,9 @@ nuke: fclean dbclean
 check_backend:
 	cd src/backend && go build ./...
 
+test_backend:
+	cd src/backend && go test ./...
+
 env_validation:
 	@./scripts/env_validation.sh
 
@@ -49,5 +52,5 @@ help:
 	@printf "  env_validation  Check local environment prerequisites\n"
 	@printf "  help            Show this help message\n"
 # ---------------------------------------------------------------------------- #
-.PHONY: all backend help clean fclean dbclean re check_backend env_validation up down nuke
+.PHONY: all backend help clean fclean dbclean re check_backend test_backend env_validation up down nuke
 # ---------------------------------------------------------------------------- #

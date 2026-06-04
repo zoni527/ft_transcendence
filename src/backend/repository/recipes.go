@@ -25,12 +25,12 @@ type RecipeRepository interface {
 	SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error)
 }
 
-type PostgresRecipeRepo struct {
+type postgresRecipeRepo struct {
 	Pool *pgxpool.Pool
 }
 
-func NewPostgresRecipeRepo(pool *pgxpool.Pool) *PostgresRecipeRepo {
-	return &PostgresRecipeRepo{Pool: pool}
+func NewPostgresRecipeRepo(pool *pgxpool.Pool) RecipeRepository {
+	return &postgresRecipeRepo{Pool: pool}
 }
 
 // GetAllRecipes returns all recipes.
@@ -47,7 +47,7 @@ func NewPostgresRecipeRepo(pool *pgxpool.Pool) *PostgresRecipeRepo {
 // LEFT JOIN, not INNER: author_id is ON DELETE SET NULL, so a recipe can
 // outlive its author. We still want to return the recipe, just with an empty
 // author block.
-func (pgRepo *PostgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error) {
+func (pgRepo *postgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),
 				COALESCE(u.display_name, ''),
@@ -94,12 +94,13 @@ func (pgRepo *PostgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.R
 	return recipes, nil
 }
 
-func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
+func (pgRepo *postgresRecipeRepo) SearchRecipes(ctx context.Context, f models.SearchRecipeFilters, limit, offset int) ([]models.SearchRecipeResponse, error) {
 	sql := `SELECT id, title, 
 			COALESCE(preparation_time_min, 0),
 			COALESCE(image_url, '')
 			FROM recipe
 			WHERE  1=1`
+
 	var args []interface{}
 	pCount := 1
 
@@ -152,7 +153,7 @@ func (pgRepo *PostgresRecipeRepo) SearchRecipes(ctx context.Context, f models.Se
 }
 
 // GetRecipeByID returns a single recipe by UUID.
-func (pgRepo *PostgresRecipeRepo) GetRecipeByID(ctx context.Context, id string) (models.RecipeResponse, error) {
+func (pgRepo *postgresRecipeRepo) GetRecipeByID(ctx context.Context, id string) (models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),
 				COALESCE(u.display_name, ''),
@@ -190,7 +191,7 @@ func (pgRepo *PostgresRecipeRepo) GetRecipeByID(ctx context.Context, id string) 
 	return r, nil
 }
 
-func (pgRepo *PostgresRecipeRepo) CreateRecipe(ctx context.Context, r *models.Recipe) (string, error) {
+func (pgRepo *postgresRecipeRepo) CreateRecipe(ctx context.Context, r *models.Recipe) (string, error) {
 	sql := `
 		INSERT INTO recipe (
 			author_id, title, description, preparation_time_min,
@@ -214,7 +215,7 @@ func (pgRepo *PostgresRecipeRepo) CreateRecipe(ctx context.Context, r *models.Re
 	return newID, nil
 }
 
-func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Recipe) error {
+func (pgRepo *postgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Recipe) error {
 	sql := `
 		UPDATE recipe
 		SET (
@@ -243,7 +244,7 @@ func (pgRepo *PostgresRecipeRepo) UpdateRecipe(ctx context.Context, r *models.Re
 	return nil
 }
 
-func (pgRepo *PostgresRecipeRepo) DeleteRecipe(ctx context.Context, id string) error {
+func (pgRepo *postgresRecipeRepo) DeleteRecipe(ctx context.Context, id string) error {
 	sql := `DELETE FROM recipe WHERE id = $1`
 	res, err := pgRepo.Pool.Exec(ctx, sql, id)
 	if err != nil {

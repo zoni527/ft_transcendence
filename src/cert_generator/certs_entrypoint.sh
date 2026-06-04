@@ -7,14 +7,14 @@ DAYS=365
 mkdir -p ${CERTS_DIR}
 
 CERT_FILES="\
-${CERTS_DIR}/ca.crt\
-${CERTS_DIR}/ca.key\
-${CERTS_DIR}/reverse_proxy.crt\
-${CERTS_DIR}/reverse_proxy.key\
-${CERTS_DIR}/backend.crt\
-${CERTS_DIR}/backend.key\
-${CERTS_DIR}/postgres.crt\
-${CERTS_DIR}/postgres.key\
+${CERTS_DIR}/ca.crt
+${CERTS_DIR}/ca.key
+${CERTS_DIR}/reverse_proxy.crt
+${CERTS_DIR}/reverse_proxy.key
+${CERTS_DIR}/backend.crt
+${CERTS_DIR}/backend.key
+${CERTS_DIR}/postgres.crt
+${CERTS_DIR}/postgres.key
 "
 
 all_certs_exist=true

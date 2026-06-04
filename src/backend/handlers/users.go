@@ -30,12 +30,16 @@ const searchUserQueryMinLen = 2
 const searchUserQueryMaxLen = 50
 const passwordLenMax = 72
 
-func markOnline(user *models.User) {
-	user.IsOnline = time.Since(user.LastSeen) < onlineThreshold
+type UserHandler struct {
+	repo repository.UserRepository
 }
 
-func GetUsers(c *gin.Context) {
-	users, err := repository.GetAllUsers(c.Request.Context())
+func NewUserHandler(repo repository.UserRepository) *UserHandler {
+	return &UserHandler{repo: repo}
+}
+
+func (h *UserHandler) GetUsers(c *gin.Context) {
+	users, err := h.repo.GetAllUsers(c.Request.Context())
 	if err != nil {
 		errorhandling.Respond(c, "GetUsers", err)
 		return
@@ -46,7 +50,7 @@ func GetUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func GetUserByID(c *gin.Context) {
+func (h *UserHandler) GetUserByID(c *gin.Context) {
 	functionName := "GetUserByID"
 	id := c.Param("id")
 	if !authorization.IsValidUUID(id) {
@@ -54,7 +58,7 @@ func GetUserByID(c *gin.Context) {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
-	user, err := repository.GetUserByID(c.Request.Context(), id)
+	user, err := h.repo.GetUserByID(c.Request.Context(), id)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -63,7 +67,7 @@ func GetUserByID(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func GetMe(c *gin.Context) {
+func (h *UserHandler) GetMe(c *gin.Context) {
 	functionName := "GetMe"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
@@ -71,7 +75,7 @@ func GetMe(c *gin.Context) {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
-	user, err := repository.GetUserByID(c.Request.Context(), userID)
+	user, err := h.repo.GetUserByID(c.Request.Context(), userID)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -80,7 +84,7 @@ func GetMe(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func UserAvatarSignature(c *gin.Context) {
+func (h *UserHandler) UserAvatarSignature(c *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	folder := "avatar"
 	allowedFormats := "jpg, jpeg, png, webp"
@@ -100,7 +104,7 @@ func UserAvatarSignature(c *gin.Context) {
 	})
 }
 
-func GetSession(c *gin.Context) {
+func (h *UserHandler) GetSession(c *gin.Context) {
 	functionName := "GetSession"
 	token, err := c.Cookie("token")
 	if err != nil {
@@ -126,7 +130,7 @@ func GetSession(c *gin.Context) {
 		return
 	}
 
-	user, err := repository.GetUserByID(c.Request.Context(), claims.Subject)
+	user, err := h.repo.GetUserByID(c.Request.Context(), claims.Subject)
 	if err == pgx.ErrNoRows {
 		authorization.ClearAuthCookie(c)
 		c.JSON(http.StatusOK, gin.H{"authenticated": false})
@@ -140,7 +144,7 @@ func GetSession(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"authenticated": true, "user": user})
 }
 
-func CreateUser(c *gin.Context) {
+func (h *UserHandler) CreateUser(c *gin.Context) {
 	functionName := "CreateUser"
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -172,7 +176,7 @@ func CreateUser(c *gin.Context) {
 		Name:           req.Name,
 		DisplayName:    req.DisplayName,
 	}
-	data, err := repository.CreateUser(c.Request.Context(), userParams)
+	data, err := h.repo.CreateUser(c.Request.Context(), userParams)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -188,7 +192,7 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": data.ID, "email": data.Email, "authenticated": true})
 }
 
-func LoginUser(c *gin.Context) {
+func (h *UserHandler) LoginUser(c *gin.Context) {
 	functionName := "LoginUser"
 	var req models.LoginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -197,7 +201,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
-	data, err := repository.GetUserCredentialsByEmail(c.Request.Context(), req.Email)
+	data, err := h.repo.GetUserCredentialsByEmail(c.Request.Context(), req.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			err := errorhandling.Unauthorized(errorhandling.UserCredentialsInvalid, "invalid credentials")
@@ -217,7 +221,7 @@ func LoginUser(c *gin.Context) {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
-	if err := repository.UpdateLastSeen(c.Request.Context(), data.ID); err != nil {
+	if err := h.repo.UpdateLastSeen(c.Request.Context(), data.ID); err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
@@ -226,7 +230,7 @@ func LoginUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"id": data.ID, "email": data.Email, "authenticated": true})
 }
 
-func LogoutUser(c *gin.Context) {
+func (h *UserHandler) LogoutUser(c *gin.Context) {
 	functionName := "LogoutUser"
 	token := c.GetString("token")
 	expDate := c.GetTime("expDate")
@@ -237,7 +241,7 @@ func LogoutUser(c *gin.Context) {
 
 	userID := c.GetString("userID")
 	if userID != "" {
-		if err := repository.MarkOffline(c.Request.Context(), userID); err != nil {
+		if err := h.repo.MarkOffline(c.Request.Context(), userID); err != nil {
 			log.Printf(functionName+" MarkOffline: %v", err)
 		}
 	}
@@ -246,7 +250,7 @@ func LogoutUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
-func UpdateUser(c *gin.Context) {
+func (h *UserHandler) UpdateUser(c *gin.Context) {
 	functionName := "UpdateUser"
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
@@ -342,7 +346,7 @@ func UpdateUser(c *gin.Context) {
 		AvatarURL:      req.AvatarURL,
 		Roles:          req.Roles,
 	}
-	user, err := repository.UpdateUser(c.Request.Context(), targetUserID, userParams)
+	user, err := h.repo.UpdateUser(c.Request.Context(), targetUserID, userParams)
 	if err != nil {
 		if errors.Is(err, repository.ErrOAuthUserBlock) {
 			context := "OAuth users cannot update their password or email"
@@ -357,7 +361,7 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func SearchUser(c *gin.Context) {
+func (h *UserHandler) SearchUser(c *gin.Context) {
 	functionName := "SearchUsers"
 	query := c.Query("q")
 	query = strings.TrimSpace(query)
@@ -379,7 +383,7 @@ func SearchUser(c *gin.Context) {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
-	users, err := repository.SearchUsersByUsername(c.Request.Context(), query)
+	users, err := h.repo.SearchUsersByUsername(c.Request.Context(), query)
 	if err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
@@ -387,7 +391,7 @@ func SearchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func GenerateAPIKey(c *gin.Context) {
+func (h *UserHandler) GenerateAPIKey(c *gin.Context) {
 	functionName := "GenerateAPIKey"
 	userID := c.GetString("userID")
 	if !authorization.IsValidUUID(userID) {
@@ -671,7 +675,7 @@ func hasAnyUpdateField(req *models.UpdateUserRequest) bool {
 		req.Roles != nil
 }
 
-func Heartbeat(c *gin.Context) {
+func (h *UserHandler) Heartbeat(c *gin.Context) {
 	functionName := "Heartbeat"
 	userID := c.GetString("userID")
 
@@ -680,14 +684,14 @@ func Heartbeat(c *gin.Context) {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
-	if err := repository.UpdateLastSeen(c.Request.Context(), userID); err != nil {
+	if err := h.repo.UpdateLastSeen(c.Request.Context(), userID); err != nil {
 		errorhandling.Respond(c, functionName, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
 }
 
-func DeleteUser(c *gin.Context) {
+func (h *UserHandler) DeleteUser(c *gin.Context) {
 	functionName := "DeleteUser"
 	targetUserID := c.Param("id")
 	if !authorization.IsValidUUID(targetUserID) {
@@ -715,7 +719,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := repository.DeleteUser(c.Request.Context(), targetUserID); err != nil {
+	if err := h.repo.DeleteUser(c.Request.Context(), targetUserID); err != nil {
 		if errors.Is(err, repository.ErrLastAdmin) {
 			err := errorhandling.Forbidden(errorhandling.UserLastAdmin, "cannot delete the last admin")
 			errorhandling.Respond(c, functionName, err)
@@ -734,4 +738,8 @@ func DeleteUser(c *gin.Context) {
 		authorization.ClearAuthCookie(c)
 	}
 	c.Status(http.StatusNoContent)
+}
+
+func markOnline(user *models.User) {
+	user.IsOnline = time.Since(user.LastSeen) < onlineThreshold
 }

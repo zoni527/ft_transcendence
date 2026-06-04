@@ -231,7 +231,7 @@ func (h *RecipeHandler) UpdateRecipe(c *gin.Context) {
     recipeID := c.Param("id")
     // error handling and JSON binding...
 
-    original, err := h.Repo.GetRecipeByID(c.Request.Context(), recipeID)
+    original, err := h.repo.GetRecipeByID(c.Request.Context(), recipeID)
     // error handling ...
 
     roleSet, _ := authorization.RolesFromContext(c)

@@ -24,7 +24,15 @@ import (
 
 const displayNameVersionLimit = 1000
 
-func RandomStateToken() (string, error) {
+type GoogleHandler struct {
+	repo repository.UserRepository
+}
+
+func NewGoogleHandler(repo repository.UserRepository) *GoogleHandler {
+	return &GoogleHandler{repo: repo}
+}
+
+func randomStateToken() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		log.Printf("unexpected random state generation error: %v", err)
@@ -34,7 +42,7 @@ func RandomStateToken() (string, error) {
 }
 
 func GoogleLogin(c *gin.Context) {
-	randomState, err := RandomStateToken()
+	randomState, err := randomStateToken()
 	if err != nil {
 		errorhandling.Respond(c, "GoogleLogin", err)
 		return
@@ -47,7 +55,7 @@ func GoogleLogin(c *gin.Context) {
 	c.Redirect(http.StatusFound, url)
 }
 
-func GoogleCallback(c *gin.Context) {
+func (h *GoogleHandler) GoogleCallback(c *gin.Context) {
 	queryState := c.Query("state")
 	cookieState, err := c.Cookie("oauth_state")
 	if err != nil || queryState != cookieState {
@@ -86,7 +94,7 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	u, err := getOrCreateGoogleUser(c.Request.Context(), &gu)
+	u, err := getOrCreateGoogleUser(c.Request.Context(), &gu, h.repo)
 	if err != nil {
 		var eu *errorUnauthorized
 		var eb *errorBadRequest
@@ -129,8 +137,8 @@ func (e *errorBadRequest) Error() string {
 	return e.msg
 }
 
-func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.User, error) {
-	user, err := repository.GetUserCredentialsByEmail(ctx, gu.Email)
+func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser, userRepo repository.UserRepository) (models.User, error) {
+	user, err := userRepo.GetUserCredentialsByEmail(ctx, gu.Email)
 	if err != nil && err != pgx.ErrNoRows {
 		return models.User{}, err
 	}
@@ -157,13 +165,13 @@ func getOrCreateGoogleUser(ctx context.Context, gu *models.GoogleUser) (models.U
 	}
 
 	for i := range displayNameVersionLimit {
-		_, err := repository.GetUserCredentialsByDisplayName(ctx, params.DisplayName)
+		_, err := userRepo.GetUserCredentialsByDisplayName(ctx, params.DisplayName)
 		if err == pgx.ErrNoRows {
 			err = normalizeAndValidateUserFields(&params.Email, &params.Name, &params.DisplayName)
 			if err != nil {
 				return models.User{}, &errorBadRequest{"bad email/name/display name value"}
 			}
-			return repository.CreateUser(ctx, params)
+			return userRepo.CreateUser(ctx, params)
 		} else if err != nil {
 			return models.User{}, err
 		}

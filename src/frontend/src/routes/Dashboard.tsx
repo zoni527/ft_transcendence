@@ -435,7 +435,7 @@ const Dashboard = () => {
         )}
 
         {/* Header */}
-        <h1 className="text-center text-3xl font-bold text-[#C04D31] md:text-left">
+        <h1 className="text-center text-3xl font-bold text-[#C04D31] md:pr-40 md:text-left">
           {userData.name}
         </h1>
 

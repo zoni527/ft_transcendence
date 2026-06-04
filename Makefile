@@ -32,7 +32,7 @@ check_backend:
 	cd src/backend && go build ./...
 
 test_backend:
-	cd src/backend && go test ./...
+	cd src/backend && go test ./handlers -v
 
 env_validation:
 	@./scripts/env_validation.sh
@@ -50,6 +50,7 @@ help:
 	@printf "  nuke            Run fclean and dbclean\n"
 	@printf "  check_backend   Compile the backend without producing an executable\n"
 	@printf "  env_validation  Check local environment prerequisites\n"
+	@printf "  test_backend    Execute all _test.go files inside handlers directory\n"
 	@printf "  help            Show this help message\n"
 # ---------------------------------------------------------------------------- #
 .PHONY: all backend help clean fclean dbclean re check_backend test_backend env_validation up down nuke

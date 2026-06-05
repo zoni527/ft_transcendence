@@ -430,7 +430,7 @@ func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error 
 		trimmed := strings.TrimSpace(*req.Name)
 		if trimmed != "" {
 			if !isValidName(trimmed) {
-				return errors.New("invalid name")
+				return errorhandling.BadRequest(errorhandling.UserNameInvalid, "invalid_name")
 			}
 			req.Name = &trimmed
 		} else {
@@ -441,7 +441,7 @@ func normalizeAndValidateUpdateUserRequest(req *models.UpdateUserRequest) error 
 		trimmed := strings.TrimSpace(*req.DisplayName)
 		if trimmed != "" {
 			if !isValidDisplayName(trimmed) {
-				return errors.New("invalid display_name")
+				return errorhandling.BadRequest(errorhandling.UserDisplayNameInvalid, "invalid display_name")
 			}
 			req.DisplayName = &trimmed
 		} else {
@@ -490,15 +490,15 @@ func validateCloudinaryAvatarURL(avatarURL string) error {
 
 	parsed, err := url.Parse(avatarURL)
 	if err != nil {
-		return errors.New("invalid avatar_url")
+		return errorhandling.BadRequest(errorhandling.UserBadField, "invalid avatar_url")
 	}
 
 	if parsed.Scheme != "https" || parsed.Host != "res.cloudinary.com" {
-		return errors.New("avatar_url must be a Cloudinary URL")
+		return errorhandling.BadRequest(errorhandling.UserBadField, "avatar_url must be a Cloudinary URL")
 	}
 
 	if !strings.HasPrefix(parsed.Path, "/") || len(strings.Split(strings.Trim(parsed.Path, "/"), "/")) < 2 {
-		return errors.New("avatar_url must include cloud name and asset path")
+		return errorhandling.BadRequest(errorhandling.UserBadField, "avatar_url must include cloud name and asset path")
 	}
 
 	return nil
@@ -517,14 +517,14 @@ func validateEmail(email string) error {
 
 	addr, err := mail.ParseAddress(email)
 	if err != nil {
-		return err
+		return errorhandling.BadRequest(errorhandling.UserEmailInvalid, "error parsing email")
 	}
 
 	parts := strings.Split(addr.Address, "@")
 	allowed := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-+"
 	for _, r := range parts[0] {
 		if !strings.ContainsRune(allowed, r) {
-			return fmt.Errorf("invalid character in email local part: %c", r)
+			return errorhandling.BadRequest(errorhandling.UserEmailInvalid, fmt.Sprintf("invalid character in email local part: %c", r))
 		}
 	}
 
@@ -545,7 +545,10 @@ func hashPassword(password string) (string, error) {
 // Any extra validations would come in this step
 func validatePassword(password string) error {
 	if len(password) > passwordLenMax {
-		return fmt.Errorf("password is too long (max %d bytes)", passwordLenMax)
+		return errorhandling.BadRequest(
+			errorhandling.UserPasswordInvalid,
+			fmt.Sprintf("password is too long (max %d bytes)", passwordLenMax),
+		)
 	}
 	for _, r := range password {
 		if unicode.IsControl(r) {

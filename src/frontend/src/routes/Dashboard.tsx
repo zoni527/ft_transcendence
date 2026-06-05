@@ -265,8 +265,12 @@ const Dashboard = () => {
 
     deleteUser(id, t)
       .then(() => {
-        logout();
-        void navigate('/');
+        if (isSelf) {
+          logout();
+          void navigate('/');
+        } else {
+          void navigate('/me');
+        }
         showNotification(t('notification.userDeleteSuccess'), 'success');
       })
       .catch((err: unknown) => {
@@ -463,6 +467,7 @@ const Dashboard = () => {
         {/* Sub-Tabs */}
         <div className="border-b">
           {activeSection === 'friends' &&
+            isSelf &&
             (friendsLoading ? (
               <StatusBox message={t('common.loading')} className="text-black" />
             ) : (

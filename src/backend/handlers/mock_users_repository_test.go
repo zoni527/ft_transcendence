@@ -230,3 +230,54 @@ func TestGetUserByID_TableDriven(t *testing.T) {
 		})
 	}
 }
+
+var createUserTests = []struct {
+	name           string
+	body           string
+	mockSetup      func(repo *MockUserRepo)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name: "success",
+		body: `{"email":"user@example.com","password":"CorrectHorseBatteryStaple#2026!","name":"Test User","display_name":"test-user"}`,
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockCreateUser = func(ctx context.Context, params models.CreateUserParams) (models.User, error) {
+				return models.User{
+					ID:          "11111111-1111-1111-1111-111111111111",
+					Email:       params.Email,
+					Name:        params.Name,
+					DisplayName: params.DisplayName,
+				}, nil
+			}
+		},
+		expectedStatus: http.StatusCreated,
+		expectedBody:   `"authenticated":true`,
+	},
+}
+
+func TestCreateUser_TableDriven(t *testing.T) {
+	for _, tt := range createUserTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockUserRepo{}
+			tt.mockSetup(mockRepo)
+
+			handler := NewUserHandler(mockRepo)
+			router := gin.New()
+			router.POST("/api/users", handler.CreateUser)
+
+			req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(tt.body))
+			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}

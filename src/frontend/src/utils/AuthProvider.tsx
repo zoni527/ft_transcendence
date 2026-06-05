@@ -41,6 +41,14 @@ const AuthProvider = ({ children, t }: Props) => {
     };
   }, [t]);
 
+  const login = (userData: User) => {
+    setUser(userData);
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
+
   // Heartbeat effect
   useEffect(() => {
     if (!user) return;
@@ -53,6 +61,7 @@ const AuthProvider = ({ children, t }: Props) => {
       } catch (err: unknown) {
         if (controller.signal.aborted) return;
         console.error('Heartbeat failed', err);
+        logout();
       }
     };
 
@@ -68,14 +77,6 @@ const AuthProvider = ({ children, t }: Props) => {
       clearInterval(interval);
     };
   }, [user, t]);
-
-  const login = (userData: User) => {
-    setUser(userData);
-  };
-
-  const logout = () => {
-    setUser(null);
-  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading, hasRole }}>

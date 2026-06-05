@@ -60,6 +60,8 @@ const Dashboard = () => {
   const [sortBy, setSortBy] = useState<'name' | 'username'>('name');
   const [activeSection, setActiveSection] = useState<'profile' | 'friends'>(
     () => {
+      if (id) return 'profile';
+
       return (
         (localStorage.getItem('dashboardActiveSection') as
           | 'profile'

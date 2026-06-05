@@ -13,6 +13,8 @@ services:
     container_name: frontend
     build: ./frontend
     image: transcendence_frontend:dev_1.0
+    volumes:
+      - ./frontend/templates:/etc/nginx/templates
     pull_policy: build
     expose:
       - "80"

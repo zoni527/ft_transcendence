@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
@@ -82,7 +83,7 @@ var getAllRecipesTests = []struct {
 				return []models.RecipeResponse{{Title: "Success"}}, nil
 			}
 		},
-		expectedStatus: 200,
+		expectedStatus: http.StatusOK,
 		expectedBody:   `"title":"Success"`,
 	},
 	{
@@ -92,7 +93,7 @@ var getAllRecipesTests = []struct {
 				return nil, errors.New("error")
 			}
 		},
-		expectedStatus: 500,
+		expectedStatus: http.StatusInternalServerError,
 		expectedBody:   `"error":"internal server error"`,
 	},
 }
@@ -144,14 +145,14 @@ var getRecipeByIDTests = []struct {
 				return models.RecipeResponse{ID: id, Title: "Success"}, nil
 			}
 		},
-		expectedStatus: 200,
+		expectedStatus: http.StatusOK,
 		expectedBody:   `"title":"Success"`,
 	},
 	{
 		name:           "Invalid UUID caught by handler validation",
 		recipeID:       "invalid-uuid",
 		mockSetup:      func(repo *MockRecipeRepo) {},
-		expectedStatus: 404,
+		expectedStatus: http.StatusNotFound,
 		expectedBody:   `"error":"recipe not found"`,
 	},
 	{
@@ -162,7 +163,7 @@ var getRecipeByIDTests = []struct {
 				return models.RecipeResponse{}, errors.New("problem with database")
 			}
 		},
-		expectedStatus: 500,
+		expectedStatus: http.StatusInternalServerError,
 		expectedBody:   `"error":"internal server error"`,
 	},
 }
@@ -214,7 +215,7 @@ var searchRecipesTests = []struct {
 				return []models.SearchRecipeResponse{{Title: "Pasta Night"}}, nil
 			}
 		},
-		expectedStatus: 200,
+		expectedStatus: http.StatusOK,
 		expectedBody:   `"title":"Pasta Night"`,
 	},
 	{
@@ -225,7 +226,7 @@ var searchRecipesTests = []struct {
 				return nil, errors.New("search index failure")
 			}
 		},
-		expectedStatus: 500,
+		expectedStatus: http.StatusInternalServerError,
 		expectedBody:   `"error":"internal server error"`,
 	},
 }
@@ -279,7 +280,7 @@ var createRecipeTests = []struct {
 				return "new-recipe-uuid", nil
 			}
 		},
-		expectedStatus: 201,
+		expectedStatus: http.StatusCreated,
 		expectedBody:   `"id":"new-recipe-uuid"`,
 	},
 	{
@@ -287,7 +288,7 @@ var createRecipeTests = []struct {
 		userID:         "00000000-0000-0000-0000-000000000001",
 		requestBody:    `{"title":"No","image_url":"https://example.com/image.jpg","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
 		mockSetup:      func(repo *MockRecipeRepo) {},
-		expectedStatus: 400,
+		expectedStatus: http.StatusBadRequest,
 		expectedBody:   `title: too short`,
 	},
 	{
@@ -299,8 +300,20 @@ var createRecipeTests = []struct {
 				return "", errorhandling.BadRequest(errorhandling.RecipeAuthorIDInvalid, "invalid author id")
 			}
 		},
-		expectedStatus: 400,
+		expectedStatus: http.StatusBadRequest,
 		expectedBody:   `"error":"invalid author id"`,
+	},
+	{
+		name:        "Internal server error",
+		userID:      "00000000-0000-0000-0000-000000000001",
+		requestBody: `{"title":"Valid Title","image_url":"https://example.com/image.jpg","servings":2,"difficulty":"easy","meal_type":"lunch"}`,
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockCreateRecipe = func(ctx context.Context, r *models.Recipe) (string, error) {
+				return "", errors.New("unexpected error")
+			}
+		},
+		expectedStatus: http.StatusInternalServerError,
+		expectedBody:   `"error":"internal server error"`,
 	},
 }
 
@@ -368,7 +381,7 @@ var updateRecipeTests = []struct {
 				return nil
 			}
 		},
-		expectedStatus: 200,
+		expectedStatus: http.StatusOK,
 		expectedBody:   `"id":"aa899f26-cf36-4570-b952-58752e6bf79a"`,
 	},
 	{
@@ -381,8 +394,21 @@ var updateRecipeTests = []struct {
 				return models.RecipeResponse{}, errorhandling.NotFoundRecipe()
 			}
 		},
-		expectedStatus: 404,
+		expectedStatus: http.StatusNotFound,
 		expectedBody:   `"error":"recipe not found"`,
+	},
+	{
+		name:        "Internal server error",
+		recipeID:    "aa899f26-cf36-4570-b952-58752e6bf79a",
+		userID:      "00000000-0000-0000-0000-000000000001",
+		requestBody: `{"title":"Updated Title","image_url":"https://example.com/image.jpg","servings":4,"difficulty":"medium","meal_type":"dinner"}`,
+		mockSetup: func(repo *MockRecipeRepo) {
+			repo.MockGetRecipeByID = func(ctx context.Context, id string) (models.RecipeResponse, error) {
+				return models.RecipeResponse{}, errors.New("unexpected error")
+			}
+		},
+		expectedStatus: http.StatusInternalServerError,
+		expectedBody:   `"error":"internal server error"`,
 	},
 }
 
@@ -454,7 +480,7 @@ var deleteRecipeTests = []struct {
 				return nil
 			}
 		},
-		expectedStatus: 204,
+		expectedStatus: http.StatusNoContent,
 		expectedBody:   "",
 	},
 	{
@@ -471,7 +497,7 @@ var deleteRecipeTests = []struct {
 				return errors.New("deadlock encountered row locking table")
 			}
 		},
-		expectedStatus: 500,
+		expectedStatus: http.StatusInternalServerError,
 		expectedBody:   `"error":"internal server error"`,
 	},
 }

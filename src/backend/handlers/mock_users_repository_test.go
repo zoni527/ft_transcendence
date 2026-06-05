@@ -127,7 +127,7 @@ var getUsersTests = []struct {
 		expectedBody:   `"display_name":"Alice"`,
 	},
 	{
-		name: "Error",
+		name: "Internal server error",
 		mockSetup: func(repo *MockUserRepo) {
 			repo.MockGetAllUsers = func(ctx context.Context) ([]models.User, error) {
 				return nil, errors.New("error")

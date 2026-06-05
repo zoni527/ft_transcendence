@@ -291,7 +291,6 @@ var updateUserTests = []struct {
 	routerSetup    func(router *gin.Engine)
 	expectedStatus int
 	expectedBody   string
-	called         bool
 }{
 	{
 		name:         "forbidden for non-owner non-admin",
@@ -312,7 +311,46 @@ var updateUserTests = []struct {
 		},
 		expectedStatus: http.StatusForbidden,
 		expectedBody:   `"code":"USER_UPDATE_FORBIDDEN"`,
-		called:         false,
+	},
+	{
+		name:         "success owner",
+		targetUserID: "11111111-1111-1111-1111-111111111111",
+		body:         `{"name":"Updated Name"}`,
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockUpdateUser = func(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
+				return models.User{ID: id, Name: "Updated Name"}, nil
+			}
+		},
+		routerSetup: func(router *gin.Engine) {
+			router.Use(func(c *gin.Context) {
+				c.Set("userID", "11111111-1111-1111-1111-111111111111")
+				c.Set("userRoles", map[string]bool{"user": true})
+				c.Set("userPerms", map[string]bool{})
+				c.Next()
+			})
+		},
+		expectedStatus: http.StatusOK,
+		expectedBody:   `"name":"Updated Name"`,
+	},
+	{
+		name:         "success admin",
+		targetUserID: "22222222-2222-2222-2222-222222222222",
+		body:         `{"name":"Admin Updated"}`,
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockUpdateUser = func(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
+				return models.User{ID: id, Name: "Admin Updated"}, nil
+			}
+		},
+		routerSetup: func(router *gin.Engine) {
+			router.Use(func(c *gin.Context) {
+				c.Set("userID", "11111111-1111-1111-1111-111111111111")
+				c.Set("userRoles", map[string]bool{"admin": true})
+				c.Set("userPerms", map[string]bool{})
+				c.Next()
+			})
+		},
+		expectedStatus: http.StatusOK,
+		expectedBody:   `"name":"Admin Updated"`,
 	},
 }
 
@@ -370,6 +408,24 @@ var deleteUserTests = []struct {
 		},
 		expectedStatus: http.StatusForbidden,
 		expectedBody:   `"code":"USER_LAST_ADMIN"`,
+	},
+	{
+		name:         "success admin",
+		targetUserID: "22222222-2222-2222-2222-222222222222",
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockDeleteUser = func(ctx context.Context, userID string) error {
+				return nil
+			}
+		},
+		routerSetup: func(router *gin.Engine) {
+			router.Use(func(c *gin.Context) {
+				c.Set("userID", "11111111-1111-1111-1111-111111111111")
+				c.Set("userRoles", map[string]bool{"admin": true})
+				c.Next()
+			})
+		},
+		expectedStatus: http.StatusNoContent,
+		expectedBody:   "",
 	},
 }
 

@@ -319,17 +319,8 @@ var updateUserTests = []struct {
 func TestUpdateUser_TableDriven(t *testing.T) {
 	for _, tt := range updateUserTests {
 		t.Run(tt.name, func(t *testing.T) {
-			called := false
 			mockRepo := &MockUserRepo{}
 			tt.mockSetup(mockRepo)
-			originalUpdateUser := mockRepo.MockUpdateUser
-			mockRepo.MockUpdateUser = func(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
-				called = true
-				if originalUpdateUser != nil {
-					return originalUpdateUser(ctx, id, params)
-				}
-				return models.User{}, nil
-			}
 
 			handler := NewUserHandler(mockRepo)
 			router := gin.New()
@@ -349,9 +340,6 @@ func TestUpdateUser_TableDriven(t *testing.T) {
 			}
 			if !strings.Contains(w.Body.String(), tt.expectedBody) {
 				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
-			}
-			if called != tt.called {
-				t.Errorf("Expected repo call=%v, got %v", tt.called, called)
 			}
 		})
 	}

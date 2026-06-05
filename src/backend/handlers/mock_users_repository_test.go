@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"ft_transcendence/backend/models"
+	"ft_transcendence/backend/repository"
 
 	"github.com/gin-gonic/gin"
 )
@@ -268,6 +269,136 @@ func TestCreateUser_TableDriven(t *testing.T) {
 
 			req := httptest.NewRequest(http.MethodPost, "/api/users", strings.NewReader(tt.body))
 			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+		})
+	}
+}
+
+var updateUserTests = []struct {
+	name           string
+	targetUserID   string
+	body           string
+	mockSetup      func(repo *MockUserRepo)
+	routerSetup    func(router *gin.Engine)
+	expectedStatus int
+	expectedBody   string
+	called         bool
+}{
+	{
+		name:         "forbidden for non-owner non-admin",
+		targetUserID: "22222222-2222-2222-2222-222222222222",
+		body:         `{"name":"Updated Name"}`,
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockUpdateUser = func(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
+				return models.User{}, nil
+			}
+		},
+		routerSetup: func(router *gin.Engine) {
+			router.Use(func(c *gin.Context) {
+				c.Set("userID", "11111111-1111-1111-1111-111111111111")
+				c.Set("userRoles", map[string]bool{"user": true})
+				c.Set("userPerms", map[string]bool{})
+				c.Next()
+			})
+		},
+		expectedStatus: http.StatusForbidden,
+		expectedBody:   `"code":"USER_UPDATE_FORBIDDEN"`,
+		called:         false,
+	},
+}
+
+func TestUpdateUser_TableDriven(t *testing.T) {
+	for _, tt := range updateUserTests {
+		t.Run(tt.name, func(t *testing.T) {
+			called := false
+			mockRepo := &MockUserRepo{}
+			tt.mockSetup(mockRepo)
+			originalUpdateUser := mockRepo.MockUpdateUser
+			mockRepo.MockUpdateUser = func(ctx context.Context, id string, params models.UpdateUserParams) (models.User, error) {
+				called = true
+				if originalUpdateUser != nil {
+					return originalUpdateUser(ctx, id, params)
+				}
+				return models.User{}, nil
+			}
+
+			handler := NewUserHandler(mockRepo)
+			router := gin.New()
+			if tt.routerSetup != nil {
+				tt.routerSetup(router)
+			}
+			router.PUT("/api/users/:id", handler.UpdateUser)
+
+			req := httptest.NewRequest(http.MethodPut, "/api/users/"+tt.targetUserID, strings.NewReader(tt.body))
+			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
+			}
+			if !strings.Contains(w.Body.String(), tt.expectedBody) {
+				t.Errorf("Expected body to contain %q, got %q", tt.expectedBody, w.Body.String())
+			}
+			if called != tt.called {
+				t.Errorf("Expected repo call=%v, got %v", tt.called, called)
+			}
+		})
+	}
+}
+
+var deleteUserTests = []struct {
+	name           string
+	targetUserID   string
+	mockSetup      func(repo *MockUserRepo)
+	routerSetup    func(router *gin.Engine)
+	expectedStatus int
+	expectedBody   string
+}{
+	{
+		name:         "last admin error mapped to forbidden",
+		targetUserID: "22222222-2222-2222-2222-222222222222",
+		mockSetup: func(repo *MockUserRepo) {
+			repo.MockDeleteUser = func(ctx context.Context, userID string) error {
+				return repository.ErrLastAdmin
+			}
+		},
+		routerSetup: func(router *gin.Engine) {
+			router.Use(func(c *gin.Context) {
+				c.Set("userID", "11111111-1111-1111-1111-111111111111")
+				c.Set("userRoles", map[string]bool{"admin": true})
+				c.Next()
+			})
+		},
+		expectedStatus: http.StatusForbidden,
+		expectedBody:   `"code":"USER_LAST_ADMIN"`,
+	},
+}
+
+func TestDeleteUser_TableDriven(t *testing.T) {
+	for _, tt := range deleteUserTests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &MockUserRepo{}
+			tt.mockSetup(mockRepo)
+
+			handler := NewUserHandler(mockRepo)
+			router := gin.New()
+			if tt.routerSetup != nil {
+				tt.routerSetup(router)
+			}
+			router.DELETE("/api/users/:id", handler.DeleteUser)
+
+			req := httptest.NewRequest(http.MethodDelete, "/api/users/"+tt.targetUserID, nil)
 			w := httptest.NewRecorder()
 
 			router.ServeHTTP(w, req)

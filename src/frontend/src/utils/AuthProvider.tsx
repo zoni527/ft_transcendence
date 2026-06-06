@@ -58,9 +58,8 @@ const AuthProvider = ({ children, t }: Props) => {
     const sendHeartbeat = async () => {
       try {
         await putHeartbeat(t, controller.signal);
-      } catch (err: unknown) {
+      } catch {
         if (controller.signal.aborted) return;
-        console.error('Heartbeat failed', err);
         logout();
       }
     };

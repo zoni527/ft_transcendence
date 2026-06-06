@@ -193,8 +193,6 @@ func (pgRepo *postgresUserRepo) GetAllUsers(ctx context.Context) ([]models.User,
 		return nil, fmt.Errorf("error iterating user rows: %w", err)
 	}
 
-	// TODO: N+1 query problem — this loops one query per user to get roles.
-	// Optimize with LEFT JOIN + array_agg to fetch users and roles in a single query.
 	for i := range users {
 		roles, err := pgRepo.GetRolesByUserID(ctx, users[i].ID)
 		if err != nil {
@@ -233,7 +231,6 @@ func (pgRepo *postgresUserRepo) GetUserByID(ctx context.Context, id string) (mod
 		return models.User{}, fmt.Errorf("error getting user by id: %w", err)
 	}
 
-	// TODO: Same N+1 issue — optimize with JOIN when GetAllUsers is updated.
 	roles, err := pgRepo.GetRolesByUserID(ctx, u.ID)
 	if err != nil {
 		return models.User{}, fmt.Errorf("error getting roles for user: %w", err)

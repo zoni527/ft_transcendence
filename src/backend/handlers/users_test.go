@@ -96,6 +96,53 @@ func TestPasswordStrength(t *testing.T) {
 	}
 }
 
+func TestValidateRoles(t *testing.T) {
+	tests := []struct {
+		name    string
+		roles   []string
+		wantErr bool
+	}{
+		{
+			name:    "empty roles",
+			roles:   []string{},
+			wantErr: true,
+		},
+		{
+			name:    "nil roles",
+			roles:   nil,
+			wantErr: true,
+		},
+		{
+			name:    "single valid role",
+			roles:   []string{"user"},
+			wantErr: false,
+		},
+		{
+			name:    "multiple valid roles",
+			roles:   []string{"user", "chef", "moderator", "developer", "admin"},
+			wantErr: false,
+		},
+		{
+			name:    "invalid role",
+			roles:   []string{"user", "superuser"},
+			wantErr: true,
+		},
+		{
+			name:    "duplicate role",
+			roles:   []string{"chef", "chef"},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validateRoles(tt.roles); (err != nil) != tt.wantErr {
+				t.Fatalf("validateRoles(%v) error = %v, wantErr %v", tt.roles, err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestCreateUserValidation(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 

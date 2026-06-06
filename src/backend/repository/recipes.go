@@ -34,19 +34,6 @@ func NewPostgresRecipeRepo(pool *pgxpool.Pool) RecipeRepository {
 }
 
 // GetAllRecipes returns all recipes.
-// COALESCE(column, fallback) — if column is NULL, use the fallback value instead.
-// We need this because pgx can't scan NULL into a Go string or int!!!
-//
-// Example:
-//
-//	COALESCE(image_url, '')	→ if image_url is NULL, return '' instead.
-//	COALESCE(calories, 0)	→ if  calories is NULL, return  0 instead.
-//
-// TODO: Replace COALESCE with pointer types (*string, *int) in the Recipe struct
-// so NULL fields return JSON null instead of empty strings/zeros.
-// LEFT JOIN, not INNER: author_id is ON DELETE SET NULL, so a recipe can
-// outlive its author. We still want to return the recipe, just with an empty
-// author block.
 func (pgRepo *postgresRecipeRepo) GetAllRecipes(ctx context.Context) ([]models.RecipeResponse, error) {
 	sql := `SELECT r.id,
 				COALESCE(r.author_id::text, ''),

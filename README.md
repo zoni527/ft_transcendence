@@ -518,11 +518,11 @@ on it.
     Chrome-only APIs are used.
   - _Worked on by:_ team.
 
-### Modules of choice
+### Modules of choice (1 point)
 
 - **Minor, 1pt: Testing.**
   - _Justification:_ Our testing functionality operates on multiple different
-    levels: Go unit tests for validation functions, mock repocitory testing for
+    levels: Go unit tests for validation functions, mock repository testing for
     simulating the backend's reaction to different responses from the repository
     layer, with verification of returned HTTP status codes by the handlers, and
     public API and endpoint integration testing via scripts. The Go tests were
@@ -530,10 +530,10 @@ on it.
     core functionality. The tests make it possible to spot problems easily, and
     keep the application's behaviour consistent, giving greater confidence for
     rewrites and refactors.
-  - _Implementation:_ Standard Go test files, can be run using:
+  - _Implementation:_ Standard Go test files. Run with:
     ```bash
     go test <directory>
-    ````
+    ```
     Go tests are mainly using a table driven approach, with custom mock repository
     return values, custom scenarios for different cases (missing data, limits,
     badly formatted data), expected return codes and body contents.

@@ -534,11 +534,14 @@ on it.
     ```bash
     go test <directory>
     ```
-    Go tests are mainly using a table driven approach, with custom mock repository
-    return values, custom scenarios for different cases (missing data, limits,
-    badly formatted data), expected return codes and body contents.
-    Scripts are a combination of bash scripting (curl) and integrated Python
-    snippets. They must be run while all containers are running.
+    Go tests live alongside the handlers in
+    [src/backend/handlers/](src/backend/handlers/) and mainly use a
+    table-driven approach, with custom mock repository return values, custom
+    scenarios for different cases (missing data, limits, badly formatted
+    data), expected return codes and body contents.
+    The integration scripts in [scripts/](scripts/) are a combination of bash
+    scripting (curl) and integrated Python snippets. They must be run while
+    all containers are running.
   - _Worked on by:_ Lucio and Johnny.
 
 **Total: 15 points.**

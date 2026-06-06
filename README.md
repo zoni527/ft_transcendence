@@ -418,7 +418,7 @@ What the application lets a user do, and who built each part:
 ## Modules
 
 The ft_transcendence subject requires a minimum of 14 points (Major = 2pts,
-Minor = 1pt). We claim **14 points** across three categories. For each
+Minor = 1pt). We claim **15 points** across four categories. For each
 module we record the justification, how it was implemented, and who worked
 on it.
 
@@ -518,7 +518,33 @@ on it.
     Chrome-only APIs are used.
   - _Worked on by:_ team.
 
-**Total: 14 points.**
+### Modules of choice (1 point)
+
+- **Minor, 1pt: Testing.**
+  - _Justification:_ Our testing functionality operates on multiple different
+    levels: Go unit tests for validation functions, mock repository testing for
+    simulating the backend's reaction to different responses from the repository
+    layer, with verification of returned HTTP status codes by the handlers, and
+    public API and endpoint integration testing via scripts. The Go tests were
+    also part of the GitHub CI checks, which verified that merges wouldn't break
+    core functionality. The tests make it possible to spot problems easily, and
+    keep the application's behaviour consistent, giving greater confidence for
+    rewrites and refactors.
+  - _Implementation:_ Standard Go test files. Run with:
+    ```bash
+    go test <directory>
+    ```
+    Go tests live alongside the handlers in
+    [src/backend/handlers/](src/backend/handlers/) and mainly use a
+    table-driven approach, with custom mock repository return values, custom
+    scenarios for different cases (missing data, limits, badly formatted
+    data), expected return codes and body contents.
+    The integration scripts in [scripts/](scripts/) are a combination of bash
+    scripting (curl) and integrated Python snippets. They must be run while
+    all containers are running.
+  - _Worked on by:_ Lucio and Johnny.
+
+**Total: 15 points.**
 
 ## Individual Contributions
 
